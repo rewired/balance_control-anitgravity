@@ -10,3 +10,7 @@
 - [x] Task 0008 - Expansion Gating + Setup Shuffle Order + Isolation
 - [x] Task 0009 - Measure CPU: PendingChoice Determinism + Serialization
 - [x] Task 0010 - Golden Replays + State Hashing Harness
+- [ ] Task 0011 - UTF-8 Cleanup: Remove UTF-16 Artifacts + Harden Encoding Guard
+- [ ] Task 0012 - Prevent Softlock When DrawPile Is Empty Mid-Round
+- [ ] Task 0013 - Influence Cap Enforcement: Apply Only On Creation (Not Move/Place)
+- [ ] Task 0014 - Grassroots Conversion Data: Make ConvertResources Work In Real Games
