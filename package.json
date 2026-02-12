@@ -6,6 +6,7 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "eslint .",
+    "check:encoding": "node scripts/check-encoding.mjs",
     "dev": "pnpm -r --parallel dev"
   },
   "devDependencies": {

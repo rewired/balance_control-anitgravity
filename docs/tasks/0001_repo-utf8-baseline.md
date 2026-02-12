@@ -35,12 +35,12 @@ Make the repo encoding-robust from day 1:
 - .editorconfig exists and applies to all text files
 
 ## PR Checklist (fill at end)
-- [ ] Added .editorconfig + .gitattributes
-- [ ] Added scripts/check-encoding.mjs and wired to package scripts
-- [ ] Created/updated docs/PR_TASK_LIST.md
-- [ ] Created/updated CHANGELOG.md (Unreleased)
-- [ ] Ran: pnpm check:encoding
-- [ ] No unrelated formatting churn
+- [x] Added .editorconfig + .gitattributes
+- [x] Added scripts/check-encoding.mjs and wired to package scripts
+- [x] Created/updated docs/PR_TASK_LIST.md
+- [x] Created/updated CHANGELOG.md (Unreleased)
+- [x] Ran: pnpm check:encoding
+- [x] No unrelated formatting churn
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":

@@ -1,6 +1,6 @@
 # PR Task List - BALANCE // CONTROL
 
-- [ ] Task 0001 - Repo UTF-8 Baseline + EditorConfig
+- [x] Task 0001 - Repo UTF-8 Baseline + EditorConfig
 - [ ] Task 0002 - Deterministic IDs + RNG Policy
 - [ ] Task 0003 - Build Health: Types, Exports, Server Imports
 - [ ] Task 0004 - Move Contracts Normalization (Payloads + Validation)
