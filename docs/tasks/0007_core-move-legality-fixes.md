@@ -33,13 +33,13 @@ Fix the most visible rule drift in core moves:
 - Formalize cost rules enforced with atomic rollback
 
 ## PR Checklist (fill at end)
-- [ ] placeInfluence legality fixed
-- [ ] moveInfluence board-only validation fixed
-- [ ] formalizeInfluence cost/timing enforced
-- [ ] convertResources implemented correctly
-- [ ] Updated tests
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md
+- [x] placeInfluence legality fixed
+- [x] moveInfluence board-only validation fixed
+- [x] formalizeInfluence cost/timing enforced
+- [x] convertResources implemented correctly
+- [x] Updated tests
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":

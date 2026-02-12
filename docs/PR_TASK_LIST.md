@@ -6,7 +6,7 @@
 - [x] Task 0004 - Move Contracts Normalization (Payloads + Validation)
 - [x] Task 0005 - Turn Flow: Exactly-One Political Action + Usage Reset
 - [x] Task 0006 - Atomic Cost Resolution + Production Tie Split
-- [ ] Task 0007 - Core Move Legality Fixes (Influence + Formalize + Convert)
+- [x] Task 0007 - Core Move Legality Fixes (Influence + Formalize + Convert)
 - [ ] Task 0008 - Expansion Gating + Setup Shuffle Order + Isolation
 - [ ] Task 0009 - Measure CPU: PendingChoice Determinism + Serialization
 - [ ] Task 0010 - Golden Replays + State Hashing Harness
