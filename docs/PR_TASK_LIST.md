@@ -23,3 +23,4 @@
 - [x] Task 0021 - EXP-02 Inner Order Hotspot Tile-ID Consistency Fix
 - [x] Task 0022 - Export EXP-02 Canonical Inner Order Tile ID
 - [x] Task 0023 - GitHub Actions CI (pnpm workspace)
+- [x] Task 0024 - README Quickstart + Repo Orientation
