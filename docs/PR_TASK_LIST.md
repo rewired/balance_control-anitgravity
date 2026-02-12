@@ -21,3 +21,4 @@
 - [x] Task 0019 - Fix EXP-03 CONTROLLER Grants Missing-Controller Policy
 - [x] Task 0020 - Repo-wide Tripwire for CONTROLLER Grant Policy
 - [x] Task 0021 - EXP-02 Inner Order Hotspot Tile-ID Consistency Fix
+- [x] Task 0022 - Export EXP-02 Canonical Inner Order Tile ID
