@@ -4,6 +4,19 @@ import { evaluateTileSelector } from './selectors';
 import { computeMajority } from '../mechanics';
 import { ExpansionRegistry } from '../expansion-registry';
 
+type CostSlot = string[] | 'ANY';
+
+interface CostSpec {
+    playerId: string;
+    slots: CostSlot[];
+    resourceIds?: string[];
+    allowSubstitutions?: boolean;
+}
+
+type CostValidationResult =
+    | { ok: true; resourceIds: string[] }
+    | { ok: false; error: string };
+
 /**
  * The EffectResolver is the central "CPU" of the game.
  * It processes instructions (Atoms) and applies reactive rules (Modifiers).
@@ -111,21 +124,155 @@ export class EffectResolver {
         }
     }
 
+    public static validateCost(
+        G: GameState & { engine: EngineState },
+        _ctx: any,
+        costSpec: CostSpec
+    ): CostValidationResult {
+        const { playerId, slots, resourceIds, allowSubstitutions = false } = costSpec;
+        if (slots.length === 0) {
+            return { ok: true, resourceIds: [] };
+        }
+
+        const supplyId = `PersonalSupply:${playerId}`;
+        const supply = G.zones[supplyId];
+        const bank = G.zones['Bank'];
+        if (!supply || !bank) {
+            return { ok: false, error: 'missing supply or bank zone' };
+        }
+
+        if (resourceIds && resourceIds.length < slots.length) {
+            return { ok: false, error: 'not enough resource ids provided' };
+        }
+
+        const usedSubstitution = { eco: false, sec: false };
+        const selectedResourceIds: string[] = [];
+        const usedResourceIds = new Set<string>();
+
+        const canUseResource = (rid: string, slot: CostSlot): { ok: true; useEcoSubstitution: boolean; useSecSubstitution: boolean } | { ok: false } => {
+            if (usedResourceIds.has(rid)) return { ok: false };
+            if (!supply.items.includes(rid)) return { ok: false };
+
+            const obj = G.objects[rid];
+            if (!obj || obj.type !== 'Resource') return { ok: false };
+
+            const normalizedSlot: CostSlot = slot === 'ANY' || slot.includes('ANY') ? 'ANY' : slot;
+            if (normalizedSlot === 'ANY' || normalizedSlot.includes(obj.resort!)) {
+                return { ok: true, useEcoSubstitution: false, useSecSubstitution: false };
+            }
+
+            if (!allowSubstitutions) {
+                return { ok: false };
+            }
+
+            if (
+                normalizedSlot.includes('ECO')
+                && !usedSubstitution.eco
+                && G.engine.attributes[`ecoSubstitute:${playerId}`]
+            ) {
+                return { ok: true, useEcoSubstitution: true, useSecSubstitution: false };
+            }
+
+            if (
+                obj.resort === 'SEC'
+                && !usedSubstitution.sec
+                && G.engine.attributes[`secSubstitution:${playerId}`]
+            ) {
+                return { ok: true, useEcoSubstitution: false, useSecSubstitution: true };
+            }
+
+            return { ok: false };
+        };
+
+        for (let slotIdx = 0; slotIdx < slots.length; slotIdx++) {
+            const slot = slots[slotIdx];
+
+            if (resourceIds) {
+                const rid = resourceIds[slotIdx];
+                if (!rid) {
+                    return { ok: false, error: 'missing explicit resource id for cost slot' };
+                }
+
+                const check = canUseResource(rid, slot);
+                if (!check.ok) {
+                    return { ok: false, error: `invalid explicit payment resource "${rid}"` };
+                }
+
+                if (check.useEcoSubstitution) usedSubstitution.eco = true;
+                if (check.useSecSubstitution) usedSubstitution.sec = true;
+                usedResourceIds.add(rid);
+                selectedResourceIds.push(rid);
+                continue;
+            }
+
+            let selectedId: string | undefined;
+            let selectedCheck: { ok: true; useEcoSubstitution: boolean; useSecSubstitution: boolean } | undefined;
+
+            for (let i = supply.items.length - 1; i >= 0; i--) {
+                const rid = supply.items[i];
+                const check = canUseResource(rid, slot);
+                if (check.ok) {
+                    selectedId = rid;
+                    selectedCheck = check;
+                    break;
+                }
+            }
+
+            if (!selectedId || !selectedCheck) {
+                return { ok: false, error: 'insufficient resources for cost' };
+            }
+
+            if (selectedCheck.useEcoSubstitution) usedSubstitution.eco = true;
+            if (selectedCheck.useSecSubstitution) usedSubstitution.sec = true;
+            usedResourceIds.add(selectedId);
+            selectedResourceIds.push(selectedId);
+        }
+
+        return { ok: true, resourceIds: selectedResourceIds };
+    }
+
+    public static commitCost(
+        G: GameState & { engine: EngineState },
+        _ctx: any,
+        costSpec: CostSpec & { resourceIds: string[] }
+    ): boolean {
+        const { playerId, resourceIds } = costSpec;
+        if (resourceIds.length === 0) return true;
+
+        const supplyId = `PersonalSupply:${playerId}`;
+        const supply = G.zones[supplyId];
+        const bank = G.zones['Bank'];
+        if (!supply || !bank) return false;
+
+        for (const rid of resourceIds) {
+            if (!supply.items.includes(rid)) return false;
+            const obj = G.objects[rid];
+            if (!obj || obj.type !== 'Resource') return false;
+        }
+
+        for (const rid of resourceIds) {
+            const idx = supply.items.indexOf(rid);
+            if (idx < 0) return false;
+            supply.items.splice(idx, 1);
+            bank.items.push(rid);
+            G.objects[rid].owner = undefined;
+        }
+
+        return true;
+    }
+
     public static checkAndPayCosts(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string, extraResourceIds?: string[]): boolean {
         const attr = G.engine.attributes;
-        let totalCost = 0;
-        const allowedResorts: string[][] = [];
+        const costSlots: CostSlot[] = [];
 
         // 1. Tile-based costs (Regulations, etc.)
         if (tileId && attr.tileExtraCosts?.[tileId]) {
-            totalCost += attr.tileExtraCosts[tileId];
-            for (let i = 0; i < attr.tileExtraCosts[tileId]; i++) allowedResorts.push(['ANY']);
+            for (let i = 0; i < attr.tileExtraCosts[tileId]; i++) costSlots.push('ANY');
         }
 
         // 2. Player-based costs (Measures, etc.)
         if (attr.playerExtraCosts?.[pid]) {
-            totalCost += attr.playerExtraCosts[pid];
-            for (let i = 0; i < attr.playerExtraCosts[pid]; i++) allowedResorts.push(['ANY']);
+            for (let i = 0; i < attr.playerExtraCosts[pid]; i++) costSlots.push('ANY');
         }
 
         // 3. Climate/Expansion rules
@@ -139,48 +286,32 @@ export class EffectResolver {
                     if (rule.type === 'resort' && tileId && G.tiles[tileId]?.resort === rule.target) apply = true;
 
                     if (apply) {
-                        totalCost += rule.amount;
-                        for (let i = 0; i < rule.amount; i++) allowedResorts.push(rule.resorts || ['ANY']);
+                        for (let i = 0; i < rule.amount; i++) costSlots.push(rule.resorts || 'ANY');
                     }
                 }
             }
         }
 
         // Apply discount attribute
-        if (attr[`ignoreCostIncrease:${pid}`] && totalCost > 0) {
-            totalCost = Math.max(0, totalCost - 1);
-            allowedResorts.shift();
+        if (attr[`ignoreCostIncrease:${pid}`] && costSlots.length > 0) {
+            costSlots.shift();
         }
 
-        if (totalCost === 0) return true;
-        if (!extraResourceIds || extraResourceIds.length < totalCost) return false;
+        if (costSlots.length === 0) return true;
 
-        const supplyId = `PersonalSupply:${pid}`;
-        const supply = G.zones[supplyId];
-        const bank = G.zones['Bank'];
-        if (!supply || !bank) return false;
-
-        // Verify and Deduct
-        const toDeduct: string[] = [];
-        for (let i = 0; i < totalCost; i++) {
-            const rid = extraResourceIds[i];
-            const obj = G.objects[rid];
-            const allowed = allowedResorts[i] || ['ANY'];
-
-            if (!supply.items.includes(rid)) return false;
-            if (!obj || obj.type !== 'Resource') return false;
-            if (allowed[0] !== 'ANY' && !allowed.includes(obj.resort!)) return false;
-
-            toDeduct.push(rid);
-        }
-
-        // Deduct
-        toDeduct.forEach(rid => {
-            const idx = supply.items.indexOf(rid);
-            supply.items.splice(idx, 1);
-            bank.items.push(rid);
-            G.objects[rid].owner = undefined;
+        const validation = this.validateCost(G, null, {
+            playerId: pid,
+            slots: costSlots,
+            resourceIds: extraResourceIds
         });
+        if (!validation.ok) return false;
+
+        const committed = this.commitCost(G, null, {
+            playerId: pid,
+            slots: costSlots,
+            resourceIds: validation.resourceIds
+        });
+        if (!committed) return false;
 
         // Consume one-time costs if applicable
         if (attr.playerExtraCosts?.[pid] > 0) attr.playerExtraCosts[pid]--;
@@ -188,19 +319,26 @@ export class EffectResolver {
         return true;
     }
 
-    public static resolve(G: GameState & { engine: EngineState }, ctx: any): void {
+    public static resolve(G: GameState & { engine: EngineState }, ctx: any): boolean {
         const engine = G.engine;
+        let ok = true;
 
         while (engine.effectQueue.length > 0 && !engine.pendingChoice) {
             const atom = engine.effectQueue.shift()!;
-            this.execute(G, ctx, atom);
+            ok = this.execute(G, ctx, atom);
+            if (!ok) {
+                engine.effectQueue = [];
+                break;
+            }
         }
+
+        return ok;
     }
 
     /**
      * Execute a single atom, applying relevant modifiers before/after.
      */
-    private static execute(G: GameState & { engine: EngineState }, ctx: any, atom: EffectAtom): void {
+    private static execute(G: GameState & { engine: EngineState }, ctx: any, atom: EffectAtom): boolean {
         const hook = this.getHookForAtom(atom);
 
         // 1. Apply "before" modifiers
@@ -211,7 +349,7 @@ export class EffectResolver {
         // 2. Main Logic
         switch (atom.kind) {
             case 'resource.pay':
-                this.handleResourcePay(G, atom);
+                if (!this.handleResourcePay(G, atom)) return false;
                 break;
             case 'resource.grant':
                 this.handleResourceGrant(G, atom);
@@ -292,6 +430,8 @@ export class EffectResolver {
             atom: atom.kind,
             ts: G.engine.history.length
         });
+
+        return true;
     }
 
     /**
@@ -331,44 +471,39 @@ export class EffectResolver {
         return null;
     }
 
-    private static handleResourcePay(G: GameState & { engine: EngineState }, atom: any): void {
+    private static handleResourcePay(G: GameState & { engine: EngineState }, atom: any): boolean {
         const { playerId, amount, resorts } = atom;
-        const supplyId = `PersonalSupply:${playerId}`;
-        const supply = G.zones[supplyId];
-        const bank = G.zones['Bank'];
+        let resolvedPlayerId = playerId;
 
-        if (!supply || !bank) return;
-
-        let count = 0;
-        const usedSubstitution = { eco: false, sec: false };
-
-        // 1. Try to pay normally
-        for (let i = supply.items.length - 1; i >= 0 && count < amount; i--) {
-            const rid = supply.items[i];
-            const obj = G.objects[rid];
-            if (!obj || obj.type !== 'Resource') continue;
-
-            let canUse = resorts === 'ANY' || resorts.includes(obj.resort!);
-
-            // M08: Eco Substitute (1 non-ECO as ECO)
-            if (!canUse && resorts.includes('ECO') && !usedSubstitution.eco && G.engine.attributes[`ecoSubstitute:${playerId}`]) {
-                canUse = true;
-                usedSubstitution.eco = true;
-            }
-
-            // M06: SEC Substitution (1 SEC as Any)
-            if (!canUse && obj.resort === 'SEC' && !usedSubstitution.sec && G.engine.attributes[`secSubstitution:${playerId}`]) {
-                canUse = true;
-                usedSubstitution.sec = true;
-            }
-
-            if (canUse) {
-                supply.items.splice(i, 1);
-                bank.items.push(rid);
-                obj.owner = undefined;
-                count++;
-            }
+        if (resolvedPlayerId === 'CONTROLLER') {
+            const contextTileId = atom.context?.tileId;
+            if (!contextTileId) return false;
+            const { controller } = computeMajority(contextTileId, G);
+            if (!controller) return false;
+            resolvedPlayerId = controller;
         }
+
+        const slots: CostSlot[] = Array.from({ length: Math.max(0, amount) }, () => (
+            resorts === 'ANY' ? 'ANY' : [...resorts]
+        ));
+
+        const validation = this.validateCost(G, null, {
+            playerId: resolvedPlayerId,
+            slots,
+            resourceIds: atom.resourceIds,
+            allowSubstitutions: !atom.resourceIds
+        });
+
+        if (!validation.ok) {
+            console.error(`[resolver:resource.pay] ${validation.error}`);
+            return false;
+        }
+
+        return this.commitCost(G, null, {
+            playerId: resolvedPlayerId,
+            slots,
+            resourceIds: validation.resourceIds
+        });
     }
 
     private static handleResourceGrant(G: GameState, atom: any): void {
@@ -386,7 +521,7 @@ export class EffectResolver {
             if (controller) {
                 playerId = controller;
             } else {
-                playerId = 'NOISE'; // Split logic not handled here yet for simplicity
+                playerId = 'NOISE';
             }
         }
 
@@ -476,21 +611,47 @@ export class EffectResolver {
         // 1. Trigger hooks that might add or subtract from this distribution
         this.applyModifiers(G, null, 'onProduction', atom);
 
-        // 2. Grant the base printed amount - unshift LAST so it is at the FRONT
-        const { controller } = computeMajority(tileId, G);
-        const cap = controller ? G.engine.attributes[`productionCap:${controller}`] : undefined;
-        let finalAmount = baseAmount;
-        if (cap !== undefined) {
-            finalAmount = Math.min(baseAmount, cap);
+        // CORE-01-06-16: Tie split is even; remainder goes to Noise.
+        const majority = computeMajority(tileId, G);
+        const grants: Array<{ playerId: string; amount: number }> = [];
+
+        if (majority.controller) {
+            const cap = G.engine.attributes[`productionCap:${majority.controller}`];
+            let finalAmount = baseAmount;
+            if (cap !== undefined) {
+                finalAmount = Math.min(baseAmount, cap);
+            }
+            if (finalAmount > 0) {
+                grants.push({ playerId: majority.controller, amount: finalAmount });
+            }
+        } else if (majority.winners.length > 0 && baseAmount > 0) {
+            const winners = [...majority.winners].sort();
+            const splitAmount = Math.floor(baseAmount / winners.length);
+            const remainder = baseAmount % winners.length;
+
+            if (splitAmount > 0) {
+                for (const winner of winners) {
+                    grants.push({ playerId: winner, amount: splitAmount });
+                }
+            }
+
+            if (remainder > 0) {
+                grants.push({ playerId: 'NOISE', amount: remainder });
+            }
+        } else if (baseAmount > 0) {
+            grants.push({ playerId: 'NOISE', amount: baseAmount });
         }
 
-        G.engine.effectQueue.unshift({
-            kind: 'resource.grant',
-            playerId: 'CONTROLLER',
-            amount: finalAmount,
-            resort: tile.resort,
-            context: { tileId, source: 'production', baseAmount: finalAmount }
-        });
+        for (let i = grants.length - 1; i >= 0; i--) {
+            const grant = grants[i];
+            G.engine.effectQueue.unshift({
+                kind: 'resource.grant',
+                playerId: grant.playerId as any,
+                amount: grant.amount,
+                resort: tile.resort,
+                context: { tileId, source: 'production', baseAmount }
+            });
+        }
     }
 
     private static handleCountdownPlace(G: GameState & { engine: EngineState }, atom: any): void {

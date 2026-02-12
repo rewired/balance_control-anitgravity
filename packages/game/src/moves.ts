@@ -29,6 +29,16 @@ function requireStage(ctx: any, expectedStage: string, moveName: string): boolea
     return false;
 }
 
+function hasDuplicateIds(ids: string[]): boolean {
+    return new Set(ids).size !== ids.length;
+}
+
+function hasOverlap(a: string[], b?: string[]): boolean {
+    if (!b || b.length === 0) return false;
+    const set = new Set(a);
+    return b.some(id => set.has(id));
+}
+
 export const CoreMoves = {
     // SYSTEM: Multi-stage Choice Resolution
     resolveChoice: ({ G, ctx }: any, payload: unknown) => {
@@ -81,7 +91,7 @@ export const CoreMoves = {
             targetTileId
         });
 
-        EffectResolver.resolve(G, ctx);
+        if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
 
         // Usage tracking
         EffectResolver.incrementUsage(G, 'politicalAction', pid);
@@ -127,7 +137,7 @@ export const CoreMoves = {
             targetTileId: targetId
         });
 
-        EffectResolver.resolve(G, ctx);
+        if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
 
         // Usage tracking
         EffectResolver.incrementUsage(G, 'politicalAction', pid);
@@ -150,9 +160,6 @@ export const CoreMoves = {
         // Generic Prohibition check
         if (EffectResolver.isProhibited(G, 'influence.formalize', pid, committeeTileId)) return INVALID_MOVE;
 
-        // Decoupled Extra Costs
-        if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.formalize', committeeTileId, extraResourceIds)) return INVALID_MOVE;
-
         // CORE-01-08-02/03: Must place all starting influence first
         if (!allStartingInfluencePlaced(G, ctx)) return INVALID_MOVE;
 
@@ -164,6 +171,9 @@ export const CoreMoves = {
             if (!EffectResolver.checkUsageLimit(G, 'startCommittee', pid)) return INVALID_MOVE;
         }
 
+        if (hasDuplicateIds(paymentResourceIds)) return INVALID_MOVE;
+        if (hasOverlap(paymentResourceIds, extraResourceIds)) return INVALID_MOVE;
+
         const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
         const supply = G.zones[supplyId];
         for (const rid of paymentResourceIds) {
@@ -173,13 +183,25 @@ export const CoreMoves = {
 
         const resources = paymentResourceIds.map((rid: string) => G.objects[rid]);
         const resorts = resources.map((r: any) => r.resort);
+        const normalizedResorts = Array.from(new Set(resorts)) as string[];
+
+        const baseCostValidation = EffectResolver.validateCost(G, ctx, {
+            playerId: pid,
+            slots: paymentResourceIds.map(() => normalizedResorts),
+            resourceIds: paymentResourceIds
+        });
+        if (!baseCostValidation.ok) return INVALID_MOVE;
+
+        // Decoupled Extra Costs
+        if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.formalize', committeeTileId, extraResourceIds)) return INVALID_MOVE;
 
         // PUSH ATOMS
         G.engine.effectQueue.push({
             kind: 'resource.pay',
             playerId: pid,
             amount: paymentResourceIds.length,
-            resorts: Array.from(new Set(resorts)) as string[]
+            resorts: normalizedResorts,
+            resourceIds: paymentResourceIds
         });
 
         G.engine.effectQueue.push({
@@ -189,7 +211,7 @@ export const CoreMoves = {
             resourceIds: paymentResourceIds
         });
 
-        EffectResolver.resolve(G, ctx);
+        if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
 
         // Track usage (Generalized)
         if (tile.type === TileType.StartCommittee) {
@@ -214,11 +236,11 @@ export const CoreMoves = {
 
         if (!tile || tile.type !== TileType.Grassroots) return INVALID_MOVE;
 
+        if (hasDuplicateIds(inputResourceIds)) return INVALID_MOVE;
+        if (hasOverlap(inputResourceIds, extraResourceIds)) return INVALID_MOVE;
+
         // Generic Prohibition check
         if (EffectResolver.isProhibited(G, 'convertResources', pid, grassrootsTileId)) return INVALID_MOVE;
-
-        // Decoupled Extra Costs
-        if (!EffectResolver.checkAndPayCosts(G, pid, 'convertResources', grassrootsTileId, extraResourceIds)) return INVALID_MOVE;
 
         const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
         const supply = G.zones[supplyId];
@@ -227,12 +249,22 @@ export const CoreMoves = {
             if (G.objects[rid]?.owner !== pid) return INVALID_MOVE;
         }
 
+        const baseCostValidation = EffectResolver.validateCost(G, ctx, {
+            playerId: pid,
+            slots: inputResourceIds.map(() => 'ANY'),
+            resourceIds: inputResourceIds
+        });
+        if (!baseCostValidation.ok) return INVALID_MOVE;
+
+        // Decoupled Extra Costs
+        if (!EffectResolver.checkAndPayCosts(G, pid, 'convertResources', grassrootsTileId, extraResourceIds)) return INVALID_MOVE;
+
         // Emit conversion atoms
         G.engine.effectQueue.push(
-            { kind: 'resource.pay', playerId: pid, amount: inputResourceIds.length, resorts: 'ANY' }, // Logic for ANY handled by resolver
+            { kind: 'resource.pay', playerId: pid, amount: inputResourceIds.length, resorts: 'ANY', resourceIds: inputResourceIds }, // Logic for ANY handled by resolver
             { kind: 'influence.formalize', playerId: pid, resourceIds: [], context: { source: 'convert', grassrootsTileId } }
         );
-        EffectResolver.resolve(G, ctx);
+        if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
 
         // Usage tracking
         EffectResolver.incrementUsage(G, 'politicalAction', pid);

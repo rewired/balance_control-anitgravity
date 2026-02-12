@@ -32,12 +32,12 @@ Restore "atomic" rule execution:
   - tie in majority -> split production + remainder to Noise
 
 ## PR Checklist (fill at end)
-- [ ] No partial pays remain
-- [ ] Two-phase (validate/commit) implemented for costs
-- [ ] Production tie-split implemented
-- [ ] Added/updated tests
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md
+- [x] No partial pays remain
+- [x] Two-phase (validate/commit) implemented for costs
+- [x] Production tie-split implemented
+- [x] Added/updated tests
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":
