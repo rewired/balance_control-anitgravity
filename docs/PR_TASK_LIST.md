@@ -16,3 +16,4 @@
 - [x] Task 0014 - Grassroots Conversion Data: Make ConvertResources Work In Real Games
 - [x] Task 0015 - Fix Production: Uncontrolled ResortTile Produces 0
 - [x] Task 0016 - Hardening: Explicit CONTROLLER Missing-Controller Policy
+- [x] Task 0017 - Fix EXP-01 CONTROLLER Grants Missing-Controller Policy

@@ -146,6 +146,7 @@ export const Expansion01: ExpansionDefinition = {
                             effect: {
                                 kind: 'resource.grant',
                                 playerId: 'CONTROLLER',
+                                missingController: 'SKIP',
                                 amount: 'CONTEXT_BASE',
                                 resort: 'CONTEXT_RESORT',
                                 context: { tileId: payload.targetTileId }
@@ -187,6 +188,7 @@ export const Expansion01: ExpansionDefinition = {
                             effect: {
                                 kind: 'resource.grant',
                                 playerId: 'CONTROLLER',
+                                missingController: 'SKIP',
                                 amount: -1,
                                 resort: 'CONTEXT_RESORT',
                                 context: { tileId: payload.targetTileId }
