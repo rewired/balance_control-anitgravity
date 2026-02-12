@@ -40,7 +40,54 @@ export const Expansion03: ExpansionDefinition = {
     onSetup: (GValue: GameState, ctxValue: any) => {
         const G = GValue as any;
         const ctx = ctxValue as any;
-        // ... (this part was mostly fine, but I'll make sure it's clean)
+
+        // 1. Initialize Zones
+        G.zones.CountdownSupply = { id: 'CountdownSupply', name: 'Countdown Supply', items: [] };
+        G.zones.EXP03_MeasureDrawPile = { id: 'EXP03_MeasureDrawPile', name: 'EXP-03 Measure Draw Pile', items: [] };
+        G.zones.EXP03_MeasureRecyclePile = { id: 'EXP03_MeasureRecyclePile', name: 'EXP-03 Measure Recycle Pile', items: [] };
+        G.zones.EXP03_MeasureFinalDiscard = { id: 'EXP03_MeasureFinalDiscard', name: 'EXP-03 Measure Final Discard', items: [] };
+        G.zones.EXP03_OpenMeasures = { id: 'EXP03_OpenMeasures', name: 'EXP-03 Open Measures', items: [] };
+
+        // 2. Add CLM ResortTiles
+        const addClmResort = (weight: number, count: number) => {
+            for (let i = 0; i < count; i++) {
+                const id = `tile_clm_w${weight}_${i}_${Math.random().toString(36).substr(2, 5)}`;
+                G.tiles[id] = { id, type: TileType.Resort, resort: 'CLM', weight, name: `CLM W${weight}` };
+                G.zones[CoreZoneNames.DrawPile].items.push(id);
+                G.zones[id] = { id, name: `CLM W${weight}`, items: [] };
+            }
+        };
+        addClmResort(1, 2); addClmResort(2, 1); addClmResort(3, 1);
+        if (ctx.numPlayers >= 5) {
+            addClmResort(1, 1); addClmResort(2, 1); addClmResort(3, 1);
+        }
+
+        // 3. Add Transformation Hotspot
+        const transformationId = 'tile_transformationsdruck';
+        G.tiles[transformationId] = { id: transformationId, type: TileType.Hotspot, name: 'Transformation Pressure', isHotspot: true };
+        G.zones[CoreZoneNames.DrawPile].items.push(transformationId);
+        G.zones[transformationId] = { id: transformationId, name: 'Transformation Pressure', items: [] };
+
+        // 4. Initialize Measures
+        MEASURE_IDS.forEach(mId => {
+            const objId = `exp03_measure_${mId}`;
+            G.objects[objId] = { id: objId, type: 'Measure', measureId: mId, playCount: 0 };
+            G.zones.EXP03_MeasureDrawPile.items.push(objId);
+        });
+
+        // 5. Initialize Countdowns
+        for (let i = 0; i < 10; i++) {
+            const id = `countdown_${i}`;
+            G.objects[id] = { id, type: 'Countdown', amount: 3 };
+            G.zones.CountdownSupply.items.push(id);
+        }
+
+        // 6. Shuffle and deal
+        G.zones.EXP03_MeasureDrawPile.items = ctx.random.Shuffle(G.zones.EXP03_MeasureDrawPile.items);
+        for (let i = 0; i < 3; i++) {
+            const mId = G.zones.EXP03_MeasureDrawPile.items.pop();
+            if (mId) G.zones.EXP03_OpenMeasures.items.push(mId);
+        }
     },
 
     getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {

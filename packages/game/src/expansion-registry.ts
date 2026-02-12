@@ -29,8 +29,8 @@ class Registry {
 
     getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
         for (const exp of this.expansions.values()) {
-            if ((exp as any).getMeasureAtoms) {
-                const atoms = (exp as any).getMeasureAtoms(G, measureId, payload);
+            if (exp.getMeasureAtoms) {
+                const atoms = exp.getMeasureAtoms(G, measureId, payload);
                 if (atoms) return atoms;
             }
         }

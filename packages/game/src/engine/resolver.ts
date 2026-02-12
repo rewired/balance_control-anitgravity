@@ -315,7 +315,7 @@ export class EffectResolver {
             G.engine.effectQueue.unshift(...atoms);
         }
 
-        // Standard Recycle (simplified for engine)
+        // Standard Recycle and Hand Removal
         const handId = `PlayerHand:${playerId}`;
         const hand = G.zones[handId];
         if (hand) {
@@ -325,9 +325,22 @@ export class EffectResolver {
 
         obj.playCount = (obj.playCount || 0) + 1;
         obj.owner = undefined;
-        const recycleZone = obj.playCount === 1 ? 'MeasureRecyclePile' : 'MeasureFinalDiscard';
-        if (G.zones[recycleZone]) {
-            G.zones[recycleZone].items.push(measureObjectId);
+
+        // Determine Zones based on prefix
+        let recycleZone = 'MeasureRecyclePile';
+        let discardZone = 'MeasureFinalDiscard';
+
+        if (measureObjectId.startsWith('exp02_')) {
+            recycleZone = 'EXP02_MeasureRecyclePile';
+            discardZone = 'EXP02_MeasureFinalDiscard';
+        } else if (measureObjectId.startsWith('exp03_')) {
+            recycleZone = 'EXP03_MeasureRecyclePile';
+            discardZone = 'EXP03_MeasureFinalDiscard';
+        }
+
+        const targetZone = obj.playCount === 1 ? recycleZone : discardZone;
+        if (G.zones[targetZone]) {
+            G.zones[targetZone].items.push(measureObjectId);
         }
     }
     private static handleChoiceApply(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {

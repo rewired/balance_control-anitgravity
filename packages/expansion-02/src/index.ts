@@ -238,109 +238,28 @@ export const Expansion02: ExpansionDefinition = {
                 }
             }
         },
-        'PLAY_MEASURE_EXP02': (G: GameState, ctx: any, effect: any, utils: any) => {
-            const { playerId, measureObjectId } = effect.payload;
-            const obj = G.objects[measureObjectId];
-            if (!obj || obj.type !== 'Measure') return;
-            const mId = obj.measureId!;
-            const { cost } = MEASURE_DETAILS[mId];
-
-            // 1. Pay Cost
-            if (!payResources(G, playerId, cost)) return;
-
-            // 2. Resolve Effects
-            switch (mId) {
-                case 'M01': // Threat Situation: Place one Regulation of choice
-                    placeRegulation(G, effect.payload.regType, effect.payload.targetTileId, true); // Override cost
-                    break;
-                case 'M02': // Emergency Decree: Place Blockade on Hotspot
-                    placeRegulation(G, 'Blockade', effect.payload.targetTileId, true);
-                    break;
-                case 'M03': // Deployment Order: After placing, move it
-                    // This is logic that might need state tracking or immediate resolution
-                    // We'll move the last placed regulation? The spec says "After placing a Regulation, move that Regulation"
-                    // We'll assume the payload contains the regulationId to move
-                    moveRegulation(G, effect.payload.regulationId, effect.payload.newTargetTileId);
-                    break;
-                case 'M04': // Jurisdiction Shift: Move one existing Regulation
-                    moveRegulation(G, effect.payload.regulationId, effect.payload.newTargetTileId);
-                    break;
-                case 'M05': // Competence Conflict: Administration on Authority Apparatus activation
-                    // This is a triggered effect. We'll set a flag.
-                    if (!G.secret.exp02) G.secret.exp02 = {};
-                    G.secret.exp02.administrationOnAuthority = true;
-                    break;
-                case 'M06': // Order Partnership: SEC substitutes any one resource for Reg/Measure costs
-                    if (!G.secret.exp02) G.secret.exp02 = {};
-                    G.secret.exp02.secSubstitution = true;
-                    break;
-                case 'M07': // Legal Review: Remove one Regulation
-                    removeRegulation(G, effect.payload.regulationId);
-                    break;
-                case 'M08': // De-escalation: Remove all Regulations from one Hotspot
-                    removeAllRegulations(G, effect.payload.targetTileId);
-                    break;
-                case 'M09': // Parliamentary Oversight: Each Regulation adds +1 cost.
-                    if (!G.secret.exp02) G.secret.exp02 = {};
-                    G.secret.exp02.extraRegCost = (G.secret.exp02.extraRegCost || 0) + 1;
-                    break;
-                case 'M10': // State of Exception: All effects cost +1
-                    if (!G.secret.extraCosts) G.secret.extraCosts = {};
-                    Object.keys(G.zones).filter(z => z.startsWith('PersonalSupply')).forEach(z => {
-                        const pid = z.split(':')[1];
-                        G.secret.extraCosts[pid] = (G.secret.extraCosts[pid] || 0) + 1;
-                    });
-                    break;
-                case 'M11': // Risk Address: Target player may not PlayMeasure next round
-                    if (!G.secret.nextRoundProhibitions) G.secret.nextRoundProhibitions = {};
-                    G.secret.nextRoundProhibitions[effect.payload.targetPlayerId] = { noPlayMeasure: true };
-                    break;
-                case 'M12': // Loss of Control: Place Regulation on Hotspot (pay cost)
-                    // payload: regType, targetTileId
-                    // This one REQUIRES paying the 2 SEC cost (EXP-02-08-M12-03)
-                    if (payResources(G, playerId, { SEC: 2 })) {
-                        placeRegulation(G, effect.payload.regType, effect.payload.targetTileId, true);
-                    }
-                    break;
-                case 'M13': // Surveillance: Regulations on chosen Tile may not be moved or removed
-                    if (!G.secret.exp02) G.secret.exp02 = {};
-                    if (!G.secret.exp02.protectedTiles) G.secret.exp02.protectedTiles = [];
-                    G.secret.exp02.protectedTiles.push(effect.payload.targetTileId);
-                    break;
-                case 'M14': // File Status: One Regulation counts twice
-                    if (!G.secret.exp02) G.secret.exp02 = {};
-                    if (!G.secret.exp02.doubledRegs) G.secret.exp02.doubledRegs = [];
-                    G.secret.exp02.doubledRegs.push(effect.payload.regulationId);
-                    break;
-                case 'M15': // Situation Assessment: Reduce cost of next Regulation placement by 1 SEC
-                    if (!G.secret.playerPerks) G.secret.playerPerks = {};
-                    if (!G.secret.playerPerks[playerId]) G.secret.playerPerks[playerId] = {};
-                    G.secret.playerPerks[playerId].regDiscount = (G.secret.playerPerks[playerId].regDiscount || 0) + 1;
-                    break;
-            }
-
-            // 3. Recycle
-            recycleMeasureEXP02(G, measureObjectId, playerId);
-        },
         'HOTSPOT_RESOLUTION': (G: GameState, ctx: any, effect: any, utils: any) => {
-            if (effect.payload.tileId === 'tile_inner_order') {
+            if (effect.payload.tileId === 'tile_innere_ordnung') {
                 const result = utils?.computeMajority?.(effect.payload.tileId, G);
                 if (result?.controller) {
                     const pid = result.controller;
-                    // Logic for "Inner Order": Place or Move
-                    // This would likely be a stage or a payload-driven resolution
                     if (effect.payload.action === 'place') {
-                        // Normally costs 2 SEC
                         let cost = 2;
-                        if (G.secret.playerPerks?.[pid]?.regDiscount) {
-                            cost = Math.max(1, cost - G.secret.playerPerks[pid].regDiscount);
-                            G.secret.playerPerks[pid].regDiscount--;
+                        if (G.engine.attributes.regDiscount?.[pid]) {
+                            cost = Math.max(1, cost - G.engine.attributes.regDiscount[pid]);
+                            // We don't decrement here, we let the pay atom or a separate attribute atom handle it?
+                            // Actually, regDiscount is usually per-action.
                         }
-                        if (payResources(G, pid, { SEC: cost })) {
-                            placeRegulation(G, effect.payload.regType, effect.payload.targetTileId, true);
-                        }
+                        G.engine.effectQueue.push(
+                            { kind: 'resource.pay', playerId: pid, amount: cost, resorts: ['SEC'] },
+                            { kind: 'regulation.place', regType: effect.payload.regType, targetTileId: effect.payload.targetTileId }
+                        );
                     } else if (effect.payload.action === 'move') {
-                        moveRegulation(G, effect.payload.regulationId, effect.payload.targetTileId);
+                        G.engine.effectQueue.push({
+                            kind: 'regulation.move',
+                            regulationId: effect.payload.regulationId,
+                            targetTileId: effect.payload.targetTileId
+                        });
                     }
                 }
             }
@@ -348,149 +267,27 @@ export const Expansion02: ExpansionDefinition = {
         'SYSTEM_TILE': (G: GameState, ctx: any, effect: any) => {
             if (effect.payload.tileId === 'tile_authority_apparatus') {
                 const pid = effect.payload.playerId;
-                // Move or Remove (no SEC cost)
                 if (effect.payload.action === 'move') {
-                    moveRegulation(G, effect.payload.regulationId, effect.payload.targetTileId);
+                    G.engine.effectQueue.push({
+                        kind: 'regulation.move',
+                        regulationId: effect.payload.regulationId,
+                        targetTileId: effect.payload.targetTileId
+                    });
                 } else if (effect.payload.action === 'remove') {
-                    removeRegulation(G, effect.payload.regulationId);
+                    G.engine.effectQueue.push({
+                        kind: 'regulation.remove',
+                        regulationId: effect.payload.regulationId
+                    });
                 }
 
-                // M05 logic
-                if (G.secret.exp02?.administrationOnAuthority) {
-                    placeRegulation(G, 'Administration', 'tile_authority_apparatus', true);
+                if (G.engine.attributes.administrationOnAuthority) {
+                    G.engine.effectQueue.push({
+                        kind: 'regulation.place',
+                        regType: 'Administration',
+                        targetTileId: 'tile_authority_apparatus'
+                    });
                 }
             }
         }
     }
 };
-
-function payResources(G: GameState, playerId: string, cost: Record<string, number>): boolean {
-    const supplyId = `${CoreZoneNames.PersonalSupply}:${playerId}`;
-    const supplyZone = G.zones[supplyId];
-    const bankZone = G.zones[CoreZoneNames.Bank];
-    if (!supplyZone) return false;
-
-    const inventory: Record<string, string[]> = {};
-    supplyZone.items.forEach(id => {
-        const o = G.objects[id];
-        if (o && o.type === 'Resource' && o.resort) {
-            if (!inventory[o.resort]) inventory[o.resort] = [];
-            inventory[o.resort].push(id);
-        }
-    });
-
-    // Handle M06 substitution if applicable
-    let subAvailable = G.secret?.exp02?.secSubstitution ? 1 : 0;
-
-    for (const [res, amt] of Object.entries(cost)) {
-        let needed = amt;
-        const available = inventory[res]?.length || 0;
-
-        if (available < needed) {
-            const diff = needed - available;
-            if (res !== 'SEC' && subAvailable >= diff && inventory['SEC']?.length >= diff) {
-                needed = available;
-                // We'll deduct them below
-            } else {
-                return false;
-            }
-        }
-    }
-
-    // Actually deduct
-    for (const [res, amt] of Object.entries(cost)) {
-        let needed = amt;
-        let diff = 0;
-        if (inventory[res]?.length < needed) {
-            diff = needed - inventory[res].length;
-            needed = inventory[res].length;
-        }
-
-        // Deduct specific resort
-        for (let i = 0; i < needed; i++) {
-            const rid = inventory[res].pop()!;
-            supplyZone.items.splice(supplyZone.items.indexOf(rid), 1);
-            bankZone.items.push(rid);
-            G.objects[rid].owner = undefined;
-        }
-
-        // Deduct SEC as sub
-        if (diff > 0) {
-            for (let i = 0; i < diff; i++) {
-                const rid = inventory['SEC'].pop()!;
-                supplyZone.items.splice(supplyZone.items.indexOf(rid), 1);
-                bankZone.items.push(rid);
-                G.objects[rid].owner = undefined;
-                subAvailable--;
-            }
-        }
-    }
-    return true;
-}
-
-function placeRegulation(G: GameState, type: RegulationType, targetTileId: string, costPaid: boolean = false) {
-    const supply = G.zones.RegulationSupply;
-    const attached = G.zones.BoardAttached;
-    const regId = supply.items.find(id => G.objects[id].regType === type);
-
-    if (regId) {
-        supply.items.splice(supply.items.indexOf(regId), 1);
-        attached.items.push(regId);
-        G.objects[regId].targetTileId = targetTileId;
-    } else {
-        // Create new if supply empty (unlimited)
-        const newId = `reg_${type}_gen_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-        G.objects[newId] = { id: newId, type: 'Regulation', regType: type, targetTileId };
-        attached.items.push(newId);
-    }
-}
-
-function moveRegulation(G: GameState, regulationId: string, newTargetTileId: string) {
-    const obj = G.objects[regulationId];
-    if (!obj || obj.type !== 'Regulation') return;
-
-    // Check M13 protection
-    if (G.secret?.exp02?.protectedTiles?.includes(obj.targetTileId)) return;
-
-    obj.targetTileId = newTargetTileId;
-}
-
-function removeRegulation(G: GameState, regulationId: string) {
-    const obj = G.objects[regulationId];
-    if (!obj || obj.type !== 'Regulation') return;
-
-    // Check M13 protection
-    if (G.secret?.exp02?.protectedTiles?.includes(obj.targetTileId)) return;
-
-    const attached = G.zones.BoardAttached;
-    const supply = G.zones.RegulationSupply;
-
-    attached.items.splice(attached.items.indexOf(regulationId), 1);
-    supply.items.push(regulationId);
-    obj.targetTileId = undefined;
-}
-
-function removeAllRegulations(G: GameState, targetTileId: string) {
-    const attached = G.zones.BoardAttached;
-    const toRemove = attached.items.filter(rid => G.objects[rid].targetTileId === targetTileId);
-    toRemove.forEach(rid => removeRegulation(G, rid));
-}
-
-function recycleMeasureEXP02(G: GameState, measureObjectId: string, playerId: string) {
-    const obj = G.objects[measureObjectId];
-    const handId = `PlayerHand:${playerId}`;
-    const handZone = G.zones[handId];
-
-    if (handZone.items.includes(measureObjectId)) {
-        handZone.items.splice(handZone.items.indexOf(measureObjectId), 1);
-    }
-
-    obj.playCount = (obj.playCount || 0) + 1;
-    obj.owner = undefined;
-
-    if (obj.playCount === 1) {
-        G.zones.EXP02_MeasureRecyclePile.items.push(measureObjectId);
-    } else {
-        G.zones.EXP02_MeasureFinalDiscard.items.push(measureObjectId);
-    }
-}
