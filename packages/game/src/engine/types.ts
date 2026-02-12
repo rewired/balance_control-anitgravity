@@ -48,7 +48,7 @@ export type EffectAtom =
     | { kind: 'measure.recycle'; drawPileId: string; recyclePileId: string; context?: any }
 
     // --- Choice/Interaction ---
-    | { kind: 'choice.request'; choice: Omit<PendingChoice, 'resumeToken'>; context?: any }
+    | { kind: 'choice.request'; choice: ChoiceRequest; context?: any }
     | { kind: 'choice.apply'; choiceId: string; selection: any; context?: any }
 
     // --- Meta/Rule Modifiers ---
@@ -67,6 +67,14 @@ export type ChoiceKind =
     | 'selectResource'
     | 'selectPlayer'
     | 'yesNo';
+
+export interface ChoiceRequest {
+    sourceId: string;
+    player: PlayerID;
+    kind: ChoiceKind;
+    spec: any;
+    choiceId?: string;
+}
 
 export interface PendingChoice {
     choiceId: string;      // Deterministic ID
