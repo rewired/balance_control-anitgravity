@@ -8,3 +8,4 @@
 - Normalized move payload contracts and added runtime validation.
 - Fixed turn stage gating and per-turn usage reset to prevent softlocks.
 - Made cost resolution atomic and implemented production tie-splitting.
+- Fixed core move legality (Influence placement/move, formalize costs, resource conversion).
