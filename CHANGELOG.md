@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed encoding drift by removing non-UTF-8 artifacts and hardening guardrails.
 - Enforced UTF-8 (no BOM), LF line endings, and added repository encoding checks via `pnpm check:encoding`.
 - Replaced nondeterministic ID/RNG sources with deterministic `allocId` and `ctx.random`-driven flows.
 - Fixed TypeScript build errors and package exports for server integration.

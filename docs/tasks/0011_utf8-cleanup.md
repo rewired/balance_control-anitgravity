@@ -39,12 +39,12 @@ and prevent them from reappearing via generated test outputs.
 - CHANGELOG.md updated under Unreleased.
 
 ## PR Checklist (fill at end)
-- [ ] Removed or converted UTF-16 artifacts (test_output_2.txt)
-- [ ] Added minimal .gitignore rules for generated test outputs
-- [ ] pnpm check:encoding passes
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md (checked Task 0011)
-- [ ] No unrelated formatting churn
+- [x] Removed or converted UTF-16 artifacts (test_output_2.txt)
+- [x] Added minimal .gitignore rules for generated test outputs
+- [x] pnpm check:encoding passes
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md (checked Task 0011)
+- [x] No unrelated formatting churn
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":
