@@ -40,12 +40,12 @@ Cap checks must apply only when a new Influence marker is created, not when one 
 - CHANGELOG.md updated under Unreleased.
 
 ## PR Checklist (fill at end)
-- [ ] Removed cap checks from move/placement paths
-- [ ] Enforced cap only on creation paths
-- [ ] Added tests for cap behavior (move allowed, create rejected)
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md (checked Task 0013)
-- [ ] No unrelated refactors
+- [x] Removed cap checks from move/placement paths
+- [x] Enforced cap only on creation paths
+- [x] Added tests for cap behavior (move allowed, create rejected)
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md (checked Task 0013)
+- [x] No unrelated refactors
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":
