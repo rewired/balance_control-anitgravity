@@ -1,0 +1,20 @@
+{
+  "id": "core_plus_ex01_small",
+  "seed": "golden-core-ex01-small",
+  "numPlayers": 2,
+  "registerExpansions": ["ex01"],
+  "config": {
+    "expansions": {
+      "ex01": true,
+      "ex02": false,
+      "ex03": false
+    }
+  },
+  "moves": [
+    { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
+    { "move": "pass", "args": [{}] },
+    { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
+    { "move": "pass", "args": [{}] }
+  ],
+  "expectedFinalHash": "f00fc176c60787af841b3b2e2dd9931d42145d965a71913603b2471585ec08e9"
+}
