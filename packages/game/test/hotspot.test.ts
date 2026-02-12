@@ -18,6 +18,20 @@ function makeHotspotTestGame(): Game {
                 objects: {},
                 adjacency: {},
                 grid: {},
+                engine: {
+                    idSeq: 0,
+                    effectQueue: [],
+                    activeModifiers: [],
+                    history: [],
+                    attributes: {
+                        limits: {},
+                        usage: {},
+                        prohibitions: {},
+                        tileExtraCosts: {},
+                        playerExtraCosts: {},
+                        climateCostRules: [],
+                    }
+                }
             };
 
             // Board zone
@@ -101,7 +115,7 @@ describe('Hotspot Mechanics', () => {
         expect(state0.G.zones['tile_center'].items.length).toBe(1); // 1 influence
 
         // Player 0 places the 6th tile at 0,1
-        client.moves.placeTile('0,1');
+        client.moves.placeTile({ targetCoord: '0,1' });
 
         const state1 = client.getState()!;
 
@@ -146,7 +160,7 @@ describe('Hotspot Mechanics', () => {
         client.start();
 
         // Place at 0,1 — but only 5 of 6 neighbors filled (missing -1,1)
-        client.moves.placeTile('0,1');
+        client.moves.placeTile({ targetCoord: '0,1' });
 
         const state = client.getState()!;
         // Center should NOT have extra influence (still 4 empty neighbors → not surrounded)
@@ -173,7 +187,7 @@ describe('Hotspot Mechanics', () => {
         const client = Client({ game, numPlayers: 2 });
         client.start();
 
-        client.moves.placeTile('0,1');
+        client.moves.placeTile({ targetCoord: '0,1' });
 
         const state = client.getState()!;
         // Hotspot DOES trigger, but no influence to place → center still has 1

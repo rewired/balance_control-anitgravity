@@ -12,8 +12,13 @@ export const Controls: React.FC<ControlsProps> = ({ moves, events, isActive }) =
 
     return (
         <div className="controls-bar">
-            <button className="btn-primary" onClick={() => moves.placeInfluence()}>Place Influence</button>
-            <button className="btn-secondary" onClick={() => events?.endTurn()}>Pass</button>
+            <button
+                className="btn-primary"
+                onClick={() => moves.placeInfluence({ targetTileId: 'tile_start_committee' })}
+            >
+                Place Influence
+            </button>
+            <button className="btn-secondary" onClick={() => moves.pass({})}>Pass</button>
         </div>
     );
 };
