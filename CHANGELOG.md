@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Hardening: Added repo-wide tripwire test enforcing explicit `missingController` policy on CONTROLLER grants.
 - Fix: EXP-03 controller-targeted grants now explicitly SKIP when no controller (compatible with resolver hardening).
 - Fix: EXP-02 controller-targeted grants now explicitly SKIP when no controller (compatible with resolver hardening).
 - Fix: EXP-01 controller-targeted grants now explicitly SKIP when no controller (compatible with resolver hardening).

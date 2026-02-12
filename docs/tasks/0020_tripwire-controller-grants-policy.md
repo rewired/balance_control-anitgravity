@@ -123,10 +123,10 @@ for the `CONTROLLER` case.
 
 ## PR Checklist
 
-- [ ] Added tripwire test `tripwire-controller-grants-policy.test.ts`
-- [ ] Traversal covers core + all three expansions (01/02/03)
-- [ ] Failure messages are actionable (package + stable id)
+- [x] Added tripwire test `tripwire-controller-grants-policy.test.ts`
+- [x] Traversal covers core + all three expansions (01/02/03)
+- [x] Failure messages are actionable (package + stable id)
 - [ ] `pnpm test` (repo standard) passes
-- [ ] `CHANGELOG.md` updated under Unreleased
-- [ ] `docs/PR_TASK_LIST.md` updated
-- [ ] Added `docs/tasks/0020_tripwire-controller-grants-policy.md` and completed checklist after implementation
+- [x] `CHANGELOG.md` updated under Unreleased
+- [x] `docs/PR_TASK_LIST.md` updated
+- [x] Added `docs/tasks/0020_tripwire-controller-grants-policy.md` and completed checklist after implementation

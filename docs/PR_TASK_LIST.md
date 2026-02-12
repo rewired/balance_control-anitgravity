@@ -19,3 +19,4 @@
 - [x] Task 0017 - Fix EXP-01 CONTROLLER Grants Missing-Controller Policy
 - [x] Task 0018 - Fix EXP-02 CONTROLLER Grants Missing-Controller Policy
 - [x] Task 0019 - Fix EXP-03 CONTROLLER Grants Missing-Controller Policy
+- [x] Task 0020 - Repo-wide Tripwire for CONTROLLER Grant Policy
