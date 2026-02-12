@@ -206,7 +206,7 @@ export class EffectResolver {
             case 'choice.request':
                 G.engine.pendingChoice = {
                     ...atom.choice,
-                    resumeToken: Math.random().toString(36).substr(2, 9)
+                    resumeToken: allocId(G, 'resume')
                 };
                 break;
 
@@ -250,7 +250,7 @@ export class EffectResolver {
         G.engine.history.push({
             tick: G.engine.history.length,
             atom: atom.kind,
-            ts: Date.now()
+            ts: G.engine.history.length
         });
     }
 
@@ -364,7 +364,7 @@ export class EffectResolver {
                     targetZone.items.push(rid);
                     if (G.objects[rid]) G.objects[rid].owner = playerId === 'NOISE' ? undefined : playerId;
                 } else {
-                    const rid = `res_${resort}_${Date.now()}_${Math.random()}`;
+                    const rid = allocId(G, `res_${resort}`);
                     G.objects[rid] = { id: rid, type: 'Resource', owner: playerId === 'NOISE' ? undefined : playerId, resort };
                     targetZone.items.push(rid);
                 }
@@ -407,7 +407,7 @@ export class EffectResolver {
         const supply = G.zones[supplyId];
 
         // CORE-01-04-17: Create exactly one new Influence
-        const infId = `inf_${playerId}_form_${Date.now()}`;
+        const infId = allocId(G, `inf_${playerId}_form`);
         G.objects[infId] = { id: infId, type: 'Influence', owner: playerId };
         supply.items.push(infId);
     }
@@ -608,7 +608,7 @@ export class EffectResolver {
 
         let regId = supply.items.find(id => G.objects[id].regType === regType);
         if (!regId) {
-            regId = `reg_${regType}_gen_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+            regId = allocId(G, `reg_${regType}_gen`);
             G.objects[regId] = { id: regId, type: 'Regulation', regType };
         } else {
             supply.items.splice(supply.items.indexOf(regId), 1);
@@ -675,4 +675,13 @@ export class EffectResolver {
 
 function capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function allocId(G: GameState & { engine: EngineState }, prefix: string): string {
+    if (typeof G.engine.idSeq !== 'number' || !Number.isFinite(G.engine.idSeq) || G.engine.idSeq < 0) {
+        G.engine.idSeq = 0;
+    }
+
+    G.engine.idSeq += 1;
+    return `${prefix}_${G.engine.idSeq}`;
 }

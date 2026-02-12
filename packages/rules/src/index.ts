@@ -96,12 +96,26 @@ export interface GameState {
 
     // Modular Engine State
     engine: {
+        idSeq: number;
         effectQueue: any[];
         activeModifiers: any[];
         pendingChoice?: any;
         history: any[];
         attributes: Record<string, any>;
     };
+}
+
+export function allocId(G: GameState, prefix: string): string {
+    if (!G.engine) {
+        throw new Error('Game state engine is required for deterministic ID allocation.');
+    }
+
+    if (typeof G.engine.idSeq !== 'number' || !Number.isFinite(G.engine.idSeq) || G.engine.idSeq < 0) {
+        G.engine.idSeq = 0;
+    }
+
+    G.engine.idSeq += 1;
+    return `${prefix}_${G.engine.idSeq}`;
 }
 
 export interface ExpansionDefinition {
