@@ -12,7 +12,8 @@ export const SetupGame = ({ ctx }: { ctx: Ctx }): GameState => {
         engine: {
             effectQueue: [],
             activeModifiers: [],
-            history: []
+            history: [],
+            attributes: {}
         },
     };
 

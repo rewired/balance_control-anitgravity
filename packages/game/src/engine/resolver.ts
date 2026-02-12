@@ -55,6 +55,15 @@ export class EffectResolver {
             case 'influence.move':
                 this.handleInfluenceMove(G, atom);
                 break;
+            case 'regulation.place':
+                this.handleRegulationPlace(G, atom);
+                break;
+            case 'regulation.move':
+                this.handleRegulationMove(G, atom);
+                break;
+            case 'regulation.remove':
+                this.handleRegulationRemove(G, atom);
+                break;
             case 'choice.request':
                 G.engine.pendingChoice = {
                     ...atom.choice,
@@ -72,6 +81,12 @@ export class EffectResolver {
 
             case 'modifier.remove':
                 this.removeModifier(G, atom.sourceId);
+                break;
+            case 'rule.prohibit':
+                this.handleRuleProhibit(G, atom);
+                break;
+            case 'rule.attribute':
+                this.handleRuleAttribute(G, atom);
                 break;
         }
 
@@ -125,7 +140,7 @@ export class EffectResolver {
         return null;
     }
 
-    private static handleResourcePay(G: GameState, atom: any): void {
+    private static handleResourcePay(G: GameState & { engine: EngineState }, atom: any): void {
         const { playerId, amount, resorts } = atom;
         const supplyId = `PersonalSupply:${playerId}`;
         const supply = G.zones[supplyId];
@@ -134,10 +149,29 @@ export class EffectResolver {
         if (!supply || !bank) return;
 
         let count = 0;
+        const usedSubstitution = { eco: false, sec: false };
+
+        // 1. Try to pay normally
         for (let i = supply.items.length - 1; i >= 0 && count < amount; i--) {
             const rid = supply.items[i];
             const obj = G.objects[rid];
-            if (obj && obj.type === 'Resource' && (resorts === 'ANY' || resorts.includes(obj.resort!))) {
+            if (!obj || obj.type !== 'Resource') continue;
+
+            let canUse = resorts === 'ANY' || resorts.includes(obj.resort!);
+
+            // M08: Eco Substitute (1 non-ECO as ECO)
+            if (!canUse && resorts.includes('ECO') && !usedSubstitution.eco && G.engine.attributes[`ecoSubstitute:${playerId}`]) {
+                canUse = true;
+                usedSubstitution.eco = true;
+            }
+
+            // M06: SEC Substitution (1 SEC as Any)
+            if (!canUse && obj.resort === 'SEC' && !usedSubstitution.sec && G.engine.attributes[`secSubstitution:${playerId}`]) {
+                canUse = true;
+                usedSubstitution.sec = true;
+            }
+
+            if (canUse) {
                 supply.items.splice(i, 1);
                 bank.items.push(rid);
                 obj.owner = undefined;
@@ -252,12 +286,19 @@ export class EffectResolver {
         this.applyModifiers(G, null, 'onProduction', atom);
 
         // 2. Grant the base printed amount - unshift LAST so it is at the FRONT
+        const { controller } = computeMajority(tileId, G);
+        const cap = controller ? G.engine.attributes[`productionCap:${controller}`] : undefined;
+        let finalAmount = baseAmount;
+        if (cap !== undefined) {
+            finalAmount = Math.min(baseAmount, cap);
+        }
+
         G.engine.effectQueue.unshift({
             kind: 'resource.grant',
             playerId: 'CONTROLLER',
-            amount: baseAmount,
+            amount: finalAmount,
             resort: tile.resort,
-            context: { tileId, source: 'production', baseAmount }
+            context: { tileId, source: 'production', baseAmount: finalAmount }
         });
     }
 
@@ -302,6 +343,66 @@ export class EffectResolver {
 
     private static removeModifier(G: GameState & { engine: EngineState }, id: string): void {
         G.engine.activeModifiers = G.engine.activeModifiers.filter(m => m.id !== id);
+    }
+
+    private static handleRuleAttribute(G: GameState & { engine: EngineState }, atom: any): void {
+        const { attribute, value, playerId, targetTileId } = atom;
+        const key = playerId ? `${attribute}:${playerId}` : (targetTileId ? `${attribute}:${targetTileId}` : attribute);
+        G.engine.attributes[key] = value;
+    }
+
+    private static handleRuleProhibit(G: GameState & { engine: EngineState }, atom: any): void {
+        G.engine.effectQueue = []; // Full stop
+    }
+
+    private static handleRegulationPlace(G: GameState & { engine: EngineState }, atom: any): void {
+        const { regType, targetTileId } = atom;
+        const supply = G.zones.RegulationSupply;
+        const attached = G.zones.BoardAttached;
+        if (!supply || !attached) return;
+
+        let regId = supply.items.find(id => G.objects[id].regType === regType);
+        if (!regId) {
+            regId = `reg_${regType}_gen_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+            G.objects[regId] = { id: regId, type: 'Regulation', regType };
+        } else {
+            supply.items.splice(supply.items.indexOf(regId), 1);
+        }
+        attached.items.push(regId);
+        G.objects[regId].targetTileId = targetTileId;
+    }
+
+    private static handleRegulationMove(G: GameState & { engine: EngineState }, atom: any): void {
+        const { regulationId, targetTileId } = atom;
+        const obj = G.objects[regulationId];
+        if (!obj || obj.type !== 'Regulation') return;
+
+        // Check M13 protection
+        const protectedTiles = G.engine.attributes.protectedTiles || [];
+        if (protectedTiles.includes(obj.targetTileId)) return;
+
+        obj.targetTileId = targetTileId;
+    }
+
+    private static handleRegulationRemove(G: GameState & { engine: EngineState }, atom: any): void {
+        const { regulationId } = atom;
+        const obj = G.objects[regulationId];
+        if (!obj || obj.type !== 'Regulation') return;
+
+        // Check M13 protection
+        const protectedTiles = G.engine.attributes.protectedTiles || [];
+        if (protectedTiles.includes(obj.targetTileId)) return;
+
+        const attached = G.zones.BoardAttached;
+        const supply = G.zones.RegulationSupply;
+        if (!attached || !supply) return;
+
+        const idx = attached.items.indexOf(regulationId);
+        if (idx >= 0) {
+            attached.items.splice(idx, 1);
+            supply.items.push(regulationId);
+            obj.targetTileId = undefined;
+        }
     }
 }
 

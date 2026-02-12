@@ -135,7 +135,7 @@ export const Expansion01: ExpansionDefinition = {
                 ];
             case 'M02': // Economic Stimulus
                 return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['ECO', 'FOR'] },
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M02'].cost.ECO, resorts: ['ECO', 'FOR'] },
                     {
                         kind: 'modifier.add',
                         modifier: {
@@ -154,6 +154,92 @@ export const Expansion01: ExpansionDefinition = {
                             targetTileId: payload.targetTileId
                         }
                     }
+                ];
+            case 'M03': // Collective Bargaining
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M03'].cost.ECO, resorts: ['ECO'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M03_${Date.now()}`,
+                            sourceId: 'M03',
+                            hook: 'beforeAction',
+                            effect: { kind: 'rule.prohibit', actionType: 'CONVERT', targetResort: 'ECO' },
+                            expiry: 'thisRound'
+                        }
+                    }
+                ];
+            case 'M04': // Subsidy Reduction
+            case 'M05': // Location Debate
+                const costM04 = MEASURE_DETAILS['M04'].cost;
+                const costM05 = MEASURE_DETAILS['M05'].cost;
+                const costResorts = measureId === 'M04' ? ['ECO', 'DOM'] : ['ECO', 'INF'];
+                const costAmount = measureId === 'M04' ? costM04.ECO + (costM04.DOM || 0) : costM05.ECO + (costM05.INF || 0);
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: costAmount, resorts: costResorts },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `${measureId}_${payload.targetTileId}_${Date.now()}`,
+                            sourceId: measureId,
+                            hook: 'onProduction',
+                            priority: 10, // Reductions run after doubling
+                            effect: {
+                                kind: 'resource.grant',
+                                playerId: 'CONTROLLER',
+                                amount: -1,
+                                resort: 'CONTEXT_RESORT',
+                                context: { tileId: payload.targetTileId }
+                            },
+                            expiry: 'thisRound',
+                            targetTileId: payload.targetTileId
+                        }
+                    }
+                ];
+            case 'M06': // Budget Deficit
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M06'].cost.ECO, resorts: ['ECO'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M06_${payload.targetPlayerId}_${Date.now()}`,
+                            sourceId: 'M06',
+                            hook: 'beforeAction',
+                            priority: 10,
+                            playerId: payload.targetPlayerId,
+                            effect: { kind: 'resource.pay', playerId: payload.targetPlayerId, amount: 1, resorts: ['ANY'] },
+                            expiry: 'thisTurn'
+                        }
+                    }
+                ];
+            case 'M07': // Debt Brake
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M07'].cost.ECO, resorts: ['DOM', 'ECO'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M07_${Date.now()}`,
+                            sourceId: 'M07',
+                            hook: 'beforeAction',
+                            effect: { kind: 'rule.prohibit', actionType: 'CONVERT' },
+                            expiry: 'nextRound'
+                        }
+                    }
+                ];
+            case 'M08': // Economic Council
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M08'].cost.ECO, resorts: ['ECO'] },
+                    { kind: 'rule.attribute', attribute: 'ecoSubstitute', value: true, playerId: payload.playerId }
+                ];
+            case 'M09': // Investment Freeze
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M09'].cost.ECO, resorts: ['ECO', 'INF'] },
+                    { kind: 'rule.attribute', attribute: 'ignoreMeasureModifiers', value: true, playerId: payload.targetPlayerId }
+                ];
+            case 'M10': // Supplemental Budget
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M10'].cost.ECO, resorts: ['ECO'] },
+                    { kind: 'rule.attribute', attribute: 'ignoreCostIncrease', value: true, playerId: payload.playerId }
                 ];
         }
         return null;

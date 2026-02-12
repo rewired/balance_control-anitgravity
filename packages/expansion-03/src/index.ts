@@ -82,6 +82,116 @@ export const Expansion03: ExpansionDefinition = {
                     { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
                     { kind: 'resource.grant', playerId: payload.playerId, amount: 1, resort: payload.targetResort }
                 ];
+            case 'M04': // Future Resolution
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M04_${payload.targetPlayerId}_${Date.now()}`,
+                            sourceId: 'M04',
+                            hook: 'beforeAction',
+                            playerId: payload.targetPlayerId,
+                            effect: { kind: 'rule.prohibit', actionType: 'measure.play' },
+                            expiry: 'nextRound'
+                        }
+                    }
+                ];
+            case 'M05': // Greenwashing
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'INF'] },
+                    { kind: 'rule.attribute', attribute: 'noInfluence', value: true, playerId: payload.playerId }
+                ];
+            case 'M06': // Energy Crisis
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'ECO'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M06_${Date.now()}`,
+                            sourceId: 'M06',
+                            hook: 'beforeAction',
+                            priority: 10,
+                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['DOM'] },
+                            expiry: 'thisTurn'
+                        }
+                    }
+                ];
+            case 'M07': // Protest Movement
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM'] },
+                    { kind: 'rule.attribute', attribute: 'noMajorityInfluence', value: true, playerId: payload.playerId }
+                ];
+            case 'M08': // Adaptation Strategy
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
+                    { kind: 'rule.attribute', attribute: 'ignoreClimateCosts', value: true, playerId: payload.playerId }
+                ];
+            case 'M09': // Technology Initiative
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'ECO', 'DOM'] },
+                    { kind: 'rule.attribute', attribute: 'ignoreClimateCostThisAction', value: true, playerId: payload.playerId }
+                ];
+            case 'M10': // Future Pact
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'DOM', 'FOR'] },
+                    { kind: 'rule.attribute', attribute: 'climateImmunity', value: true, playerId: payload.playerId }
+                ];
+            case 'M11': // Supply Chain Disruption
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'ECO'] },
+                    { kind: 'rule.attribute', attribute: 'productionCap', value: 1, playerId: payload.targetPlayerId }
+                ];
+            case 'M12': // Extreme Weather Event
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M12_${Date.now()}`,
+                            sourceId: 'M12',
+                            hook: 'beforeAction', // Triggered by placeTile
+                            priority: 10,
+                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
+                            expiry: 'thisTurn'
+                        }
+                    }
+                ];
+            case 'M13': // Intergenerational Pact
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'DOM'] },
+                    { kind: 'rule.attribute', attribute: 'transferableCost', value: true, playerId: payload.playerId }
+                ];
+            case 'M14': // Transformation Blockade
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'INF'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M14_${Date.now()}`,
+                            sourceId: 'M14',
+                            hook: 'beforeAction', // Triggered by placeCountdown
+                            priority: 10,
+                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
+                            expiry: 'thisTurn'
+                        }
+                    }
+                ];
+            case 'M15': // Future Committee
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'INF', 'ECO'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M15_${Date.now()}`,
+                            sourceId: 'M15',
+                            hook: 'beforeAction',
+                            priority: 10,
+                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
+                            expiry: 'thisTurn'
+                        }
+                    }
+                ];
         }
         return null;
     },

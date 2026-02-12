@@ -1,4 +1,4 @@
-import { PlayerID, ResourceType, TileType, GameObject } from '@balance-control/rules';
+import { PlayerID, ResourceType, TileType, GameState, RegulationType } from '@balance-control/rules';
 
 /** 
  * SELECTORS: JSON-AST for filtering game objects 
@@ -38,6 +38,11 @@ export type EffectAtom =
     | { kind: 'regulation.place'; regType: string; targetTileId: string; costPaid?: boolean; context?: any }
     | { kind: 'regulation.remove'; regulationId: string; context?: any }
 
+    // --- Regulation Actions (EXP-02) ---
+    | { kind: 'regulation.place'; regType: RegulationType; targetTileId: string; context?: any }
+    | { kind: 'regulation.move'; regulationId: string; targetTileId: string; context?: any }
+    | { kind: 'regulation.remove'; regulationId: string; context?: any }
+
     // --- Climate/Countdown (EXP-03) ---
     | { kind: 'countdown.place'; targetTileId: string; amount: number; context?: any }
 
@@ -51,7 +56,9 @@ export type EffectAtom =
 
     // --- Meta/Rule Modifiers ---
     | { kind: 'modifier.add'; modifier: ActiveModifier; context?: any }
-    | { kind: 'modifier.remove'; sourceId: string; context?: any };
+    | { kind: 'modifier.remove'; sourceId: string; context?: any }
+    | { kind: 'rule.prohibit'; actionType: string; playerId?: PlayerID; context?: any }
+    | { kind: 'rule.attribute'; attribute: string; value: any; playerId?: PlayerID; targetTileId?: string; context?: any };
 
 /**
  * CHOICE SYSTEM: Multi-stage interaction
@@ -118,4 +125,5 @@ export interface EngineState {
     activeModifiers: ActiveModifier[];
     pendingChoice?: PendingChoice;
     history: any[]; // For RuleLog
+    attributes: Record<string, any>; // Pervasive flags/values
 }

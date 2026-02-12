@@ -102,6 +102,7 @@ export interface GameState {
         activeModifiers: any[];
         pendingChoice?: any;
         history: any[];
+        attributes: Record<string, any>;
     };
 }
 
