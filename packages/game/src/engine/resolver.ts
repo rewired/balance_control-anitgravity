@@ -12,7 +12,143 @@ export class EffectResolver {
     /**
      * Entry point: Run the effect queue until empty or paused by choice.
      */
-    static resolve(G: GameState & { engine: EngineState }, ctx: any): void {
+    public static triggerHook(G: GameState & { engine: EngineState }, ctx: any, hook: HookPoint, payload?: any): void {
+        const modifiers = G.engine.activeModifiers
+            .filter(m => m.hook === hook)
+            .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
+        for (const mod of modifiers) {
+            // Context checks
+            if (mod.playerId && mod.playerId !== payload?.playerId) continue;
+            if (mod.targetTileId && mod.targetTileId !== payload?.targetTileId) continue;
+
+            G.engine.effectQueue.unshift(mod.effect);
+
+            if (mod.expiry === 'consumed' || mod.consumeRule === 'once') {
+                this.removeModifier(G, mod.id);
+            }
+        }
+
+        this.resolve(G, ctx);
+    }
+    public static isProhibited(G: GameState & { engine: EngineState }, actionType: string, playerId: string, tileId?: string): boolean {
+        const prohibitions = G.engine.attributes.prohibitions || {};
+
+        // Global prohibition for this action
+        if (prohibitions[actionType] === true) return true;
+
+        // Player-specific prohibition
+        if (prohibitions[playerId]?.[actionType] === true) return true;
+
+        // Tile-specific prohibition (if applicable)
+        if (tileId && prohibitions[tileId]?.[actionType] === true) return true;
+
+        return false;
+    }
+
+    public static checkUsageLimit(G: GameState & { engine: EngineState }, actionType: string, playerId: string): boolean {
+        const limits = G.engine.attributes.limits || {};
+        const usage = G.engine.attributes.usage || {};
+
+        const limit = limits[actionType] ?? Infinity;
+        const playerUsage = usage[playerId]?.[actionType] || 0;
+        const globalUsage = usage[actionType] || 0;
+
+        if (playerUsage >= limit) return false;
+        // Some limits might be global per round
+        const globalLimit = limits[`global:${actionType}`] ?? Infinity;
+        if (globalUsage >= globalLimit) return false;
+
+        return true;
+    }
+
+    public static incrementUsage(G: GameState & { engine: EngineState }, actionType: string, playerId: string): void {
+        if (!G.engine.attributes.usage) G.engine.attributes.usage = {};
+        const usage = G.engine.attributes.usage;
+
+        if (!usage[playerId]) usage[playerId] = {};
+        usage[playerId][actionType] = (usage[playerId][actionType] || 0) + 1;
+        usage[actionType] = (usage[actionType] || 0) + 1;
+    }
+
+    public static checkAndPayCosts(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string, extraResourceIds?: string[]): boolean {
+        const attr = G.engine.attributes;
+        let totalCost = 0;
+        const allowedResorts: string[][] = [];
+
+        // 1. Tile-based costs (Regulations, etc.)
+        if (tileId && attr.tileExtraCosts?.[tileId]) {
+            totalCost += attr.tileExtraCosts[tileId];
+            for (let i = 0; i < attr.tileExtraCosts[tileId]; i++) allowedResorts.push(['ANY']);
+        }
+
+        // 2. Player-based costs (Measures, etc.)
+        if (attr.playerExtraCosts?.[pid]) {
+            totalCost += attr.playerExtraCosts[pid];
+            for (let i = 0; i < attr.playerExtraCosts[pid]; i++) allowedResorts.push(['ANY']);
+        }
+
+        // 3. Climate/Expansion rules
+        if (attr.climateCostRules) {
+            const isImmune = attr[`climateImmunity:${pid}`] || attr[`ignoreClimateCosts:${pid}`] || attr.ignoreClimateCostThisAction;
+            if (!isImmune) {
+                for (const rule of attr.climateCostRules) {
+                    let apply = false;
+                    if (rule.type === 'action' && rule.target === actionType) apply = true;
+                    if (rule.type === 'tile' && rule.target === tileId) apply = true;
+                    if (rule.type === 'resort' && tileId && G.tiles[tileId]?.resort === rule.target) apply = true;
+
+                    if (apply) {
+                        totalCost += rule.amount;
+                        for (let i = 0; i < rule.amount; i++) allowedResorts.push(rule.resorts || ['ANY']);
+                    }
+                }
+            }
+        }
+
+        // Apply discount attribute
+        if (attr[`ignoreCostIncrease:${pid}`] && totalCost > 0) {
+            totalCost = Math.max(0, totalCost - 1);
+            allowedResorts.shift();
+        }
+
+        if (totalCost === 0) return true;
+        if (!extraResourceIds || extraResourceIds.length < totalCost) return false;
+
+        const supplyId = `PersonalSupply:${pid}`;
+        const supply = G.zones[supplyId];
+        const bank = G.zones['Bank'];
+        if (!supply || !bank) return false;
+
+        // Verify and Deduct
+        const toDeduct: string[] = [];
+        for (let i = 0; i < totalCost; i++) {
+            const rid = extraResourceIds[i];
+            const obj = G.objects[rid];
+            const allowed = allowedResorts[i] || ['ANY'];
+
+            if (!supply.items.includes(rid)) return false;
+            if (!obj || obj.type !== 'Resource') return false;
+            if (allowed[0] !== 'ANY' && !allowed.includes(obj.resort!)) return false;
+
+            toDeduct.push(rid);
+        }
+
+        // Deduct
+        toDeduct.forEach(rid => {
+            const idx = supply.items.indexOf(rid);
+            supply.items.splice(idx, 1);
+            bank.items.push(rid);
+            G.objects[rid].owner = undefined;
+        });
+
+        // Consume one-time costs if applicable
+        if (attr.playerExtraCosts?.[pid] > 0) attr.playerExtraCosts[pid]--;
+
+        return true;
+    }
+
+    public static resolve(G: GameState & { engine: EngineState }, ctx: any): void {
         const engine = G.engine;
 
         while (engine.effectQueue.length > 0 && !engine.pendingChoice) {
@@ -64,6 +200,9 @@ export class EffectResolver {
             case 'regulation.remove':
                 this.handleRegulationRemove(G, atom);
                 break;
+            case 'countdown.place':
+                this.handleCountdownPlace(G, atom);
+                break;
             case 'choice.request':
                 G.engine.pendingChoice = {
                     ...atom.choice,
@@ -82,11 +221,23 @@ export class EffectResolver {
             case 'modifier.remove':
                 this.removeModifier(G, atom.sourceId);
                 break;
+            case 'measure.take':
+                this.handleMeasureTake(G, ctx, atom);
+                break;
+            case 'measure.recycle':
+                this.handleMeasureRecycle(G, ctx, atom);
+                break;
             case 'rule.prohibit':
                 this.handleRuleProhibit(G, atom);
                 break;
             case 'rule.attribute':
                 this.handleRuleAttribute(G, atom);
+                break;
+            case 'hook.trigger':
+                this.triggerHook(G, ctx, atom.hook, atom.payload);
+                break;
+            case 'hotspot.resolve':
+                this.handleHotspotResolve(G, ctx, atom);
                 break;
         }
 
@@ -302,6 +453,24 @@ export class EffectResolver {
         });
     }
 
+    private static handleCountdownPlace(G: GameState & { engine: EngineState }, atom: any): void {
+        const { targetTileId, amount = 3 } = atom;
+        const supply = G.zones.CountdownSupply;
+        if (!supply || supply.items.length === 0) return;
+
+        const cid = supply.items.pop()!;
+        const obj = G.objects[cid];
+        if (obj) {
+            obj.targetTileId = targetTileId;
+            (obj as any).amount = amount;
+        }
+
+        const targetZone = G.zones[targetTileId];
+        if (targetZone) {
+            targetZone.items.push(cid);
+        }
+    }
+
     private static handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): void {
         const { playerId, measureObjectId } = atom;
         const obj = G.objects[measureObjectId];
@@ -358,10 +527,73 @@ export class EffectResolver {
         G.engine.activeModifiers = G.engine.activeModifiers.filter(m => m.id !== id);
     }
 
+    private static handleMeasureTake(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
+        const { playerId, measureObjectId } = atom;
+        const obj = G.objects[measureObjectId];
+        if (!obj || obj.type !== 'Measure') return;
+
+        // Determine correct zones based on prefix
+        let openZoneId = 'OpenMeasures';
+        let drawPileId = 'MeasureDrawPile';
+        let recyclePileId = 'MeasureRecyclePile';
+
+        if (measureObjectId.startsWith('exp02_')) {
+            openZoneId = 'EXP02_OpenMeasures';
+            drawPileId = 'EXP02_MeasureDrawPile';
+            recyclePileId = 'EXP02_MeasureRecyclePile';
+        } else if (measureObjectId.startsWith('exp03_')) {
+            openZoneId = 'EXP03_OpenMeasures';
+            drawPileId = 'EXP03_MeasureDrawPile';
+            recyclePileId = 'EXP03_MeasureRecyclePile';
+        }
+
+        const openZone = G.zones[openZoneId];
+        const hand = G.zones[`PlayerHand:${playerId}`];
+        if (!openZone || !hand) return;
+
+        const idx = openZone.items.indexOf(measureObjectId);
+        if (idx >= 0) {
+            openZone.items.splice(idx, 1);
+            hand.items.push(measureObjectId);
+            obj.owner = playerId;
+
+            // Refill logic
+            const drawPile = G.zones[drawPileId];
+            if (drawPile && drawPile.items.length > 0) {
+                openZone.items.push(drawPile.items.pop()!);
+            } else {
+                // Trigger recycle
+                this.handleMeasureRecycle(G, ctx, { kind: 'measure.recycle', drawPileId, recyclePileId });
+                if (drawPile && drawPile.items.length > 0) {
+                    openZone.items.push(drawPile.items.pop()!);
+                }
+            }
+        }
+    }
+
+    private static handleMeasureRecycle(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
+        const { drawPileId, recyclePileId } = atom;
+        const drawPile = G.zones[drawPileId];
+        const recyclePile = G.zones[recyclePileId];
+
+        if (drawPile && recyclePile && recyclePile.items.length > 0) {
+            drawPile.items = ctx.random.Shuffle([...recyclePile.items]);
+            recyclePile.items = [];
+        }
+    }
+
     private static handleRuleAttribute(G: GameState & { engine: EngineState }, atom: any): void {
-        const { attribute, value, playerId, targetTileId } = atom;
+        const { attribute, value, playerId, targetTileId, context } = atom;
         const key = playerId ? `${attribute}:${playerId}` : (targetTileId ? `${attribute}:${targetTileId}` : attribute);
-        G.engine.attributes[key] = value;
+
+        if (context?.append) {
+            if (!G.engine.attributes[key]) G.engine.attributes[key] = [];
+            if (Array.isArray(G.engine.attributes[key])) {
+                G.engine.attributes[key].push(value);
+            }
+        } else {
+            G.engine.attributes[key] = value;
+        }
     }
 
     private static handleRuleProhibit(G: GameState & { engine: EngineState }, atom: any): void {
@@ -413,9 +645,31 @@ export class EffectResolver {
         const idx = attached.items.indexOf(regulationId);
         if (idx >= 0) {
             attached.items.splice(idx, 1);
-            supply.items.push(regulationId);
-            obj.targetTileId = undefined;
         }
+    }
+
+    private static handleHotspotResolve(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
+        const { tileId } = atom;
+        const tile = G.tiles[tileId];
+        if (!tile) return;
+
+        // 1. Prohibitions & Modifiers
+        if (this.isProhibited(G, 'hotspot.resolve', 'NONE', tileId)) return;
+        this.applyModifiers(G, ctx, 'beforeAction', atom);
+
+        // 2. Determine Majority
+        const { controller } = computeMajority(tileId, G);
+        if (controller) {
+            // Emit influence placement
+            G.engine.effectQueue.unshift({
+                kind: 'influence.place',
+                playerId: controller,
+                targetTileId: tileId,
+                context: { source: 'hotspot.resolve', tileId }
+            });
+        }
+
+        this.applyModifiers(G, ctx, 'afterAction', atom);
     }
 }
 

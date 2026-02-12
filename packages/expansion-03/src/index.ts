@@ -101,10 +101,14 @@ export const Expansion03: ExpansionDefinition = {
                             id: `M01_${payload.targetTileId}_${Date.now()}`,
                             sourceId: 'M01',
                             hook: 'beforeAction',
-                            priority: 10,
-                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
-                            expiry: 'nextTurn',
-                            targetTileId: payload.targetTileId
+                            targetTileId: payload.targetTileId,
+                            effect: {
+                                kind: 'rule.attribute',
+                                attribute: 'climateCostRules',
+                                value: { type: 'tile', target: payload.targetTileId, amount: 1, resorts: ['CLM', 'DOM'] },
+                                context: { append: true }
+                            },
+                            expiry: 'nextTurn'
                         }
                     }
                 ];
@@ -117,10 +121,13 @@ export const Expansion03: ExpansionDefinition = {
                             id: `M02_${payload.targetResort}_${Date.now()}`,
                             sourceId: 'M02',
                             hook: 'beforeAction',
-                            priority: 10,
-                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
-                            expiry: 'nextRound',
-                            selector: { op: 'eq', key: 'resort', value: payload.targetResort }
+                            effect: {
+                                kind: 'rule.attribute',
+                                attribute: 'climateCostRules',
+                                value: { type: 'resort', target: payload.targetResort, amount: 1, resorts: ['CLM', 'DOM'] },
+                                context: { append: true }
+                            },
+                            expiry: 'nextRound'
                         }
                     }
                 ];
@@ -177,7 +184,7 @@ export const Expansion03: ExpansionDefinition = {
             case 'M09': // Technology Initiative
                 return [
                     { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'ECO', 'DOM'] },
-                    { kind: 'rule.attribute', attribute: 'ignoreClimateCostThisAction', value: true, playerId: payload.playerId }
+                    { kind: 'rule.attribute', attribute: 'ignoreClimateCostThisAction', value: true }
                 ];
             case 'M10': // Future Pact
                 return [

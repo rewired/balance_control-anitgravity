@@ -20,6 +20,16 @@ class Registry {
         this.expansions.clear();
     }
 
+    getMergedMoves() {
+        let allMoves: Record<string, (arg0: any, arg1: any) => any> = {};
+        this.expansions.forEach(exp => {
+            if (exp.moves) {
+                allMoves = { ...allMoves, ...exp.moves };
+            }
+        });
+        return allMoves;
+    }
+
     // Hook Executors
     applySetup(G: GameState, ctx: any) {
         this.expansions.forEach(exp => {

@@ -13,7 +13,18 @@ export const SetupGame = ({ ctx }: { ctx: Ctx }): GameState => {
             effectQueue: [],
             activeModifiers: [],
             history: [],
-            attributes: {}
+            attributes: {
+                limits: {
+                    'measure.hold': 2,
+                    'measure.play': 1,
+                    'startCommittee': 1
+                },
+                prohibitions: {},
+                usage: {},
+                tileExtraCosts: {},
+                playerExtraCosts: {},
+                climateCostRules: []
+            }
         },
     };
 

@@ -215,13 +215,14 @@ export const Expansion01: ExpansionDefinition = {
             case 'M07': // Debt Brake
                 return [
                     { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M07'].cost.ECO, resorts: ['DOM', 'ECO'] },
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M07'].cost.ECO, resorts: ['ECO'] },
                     {
                         kind: 'modifier.add',
                         modifier: {
                             id: `M07_${Date.now()}`,
                             sourceId: 'M07',
                             hook: 'beforeAction',
-                            effect: { kind: 'rule.prohibit', actionType: 'CONVERT' },
+                            effect: { kind: 'rule.prohibit', actionType: 'convertResources' },
                             expiry: 'nextRound'
                         }
                     }
@@ -229,51 +230,23 @@ export const Expansion01: ExpansionDefinition = {
             case 'M08': // Economic Council
                 return [
                     { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M08'].cost.ECO, resorts: ['ECO'] },
-                    { kind: 'rule.attribute', attribute: 'ecoSubstitute', value: true, playerId: payload.playerId }
+                    { kind: 'rule.attribute', attribute: `ecoSubstitute:${payload.playerId}`, value: true }
                 ];
             case 'M09': // Investment Freeze
                 return [
                     { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M09'].cost.ECO, resorts: ['ECO', 'INF'] },
-                    { kind: 'rule.attribute', attribute: 'ignoreMeasureModifiers', value: true, playerId: payload.targetPlayerId }
+                    { kind: 'rule.attribute', attribute: `ignoreMeasureModifiers:${payload.targetPlayerId}`, value: true }
                 ];
-            case 'M10': // Supplemental Budget
+            case 'M10': // Supplemental Budget (active for this turn)
                 return [
                     { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M10'].cost.ECO, resorts: ['ECO'] },
-                    { kind: 'rule.attribute', attribute: 'ignoreCostIncrease', value: true, playerId: payload.playerId }
+                    { kind: 'rule.attribute', attribute: `ignoreCostIncrease:${payload.playerId}`, value: true, context: { expiry: 'thisTurn' } }
                 ];
         }
         return null;
     },
 
     effectHandlers: {
-        'TAKE_MEASURE': (G: GameState, ctx: any, effect: any) => {
-            const { playerId, measureObjectId } = effect.payload;
-            const openZone = G.zones.OpenMeasures;
-            const handZone = G.zones[`PlayerHand:${playerId}`];
-
-            if (!openZone || !handZone) return;
-
-            const idx = openZone.items.indexOf(measureObjectId);
-            if (idx >= 0) {
-                openZone.items.splice(idx, 1);
-                handZone.items.push(measureObjectId);
-                if (G.objects[measureObjectId]) {
-                    G.objects[measureObjectId].owner = playerId;
-                }
-
-                // Refill OpenMeasures
-                if (G.zones.MeasureDrawPile.items.length > 0) {
-                    const next = G.zones.MeasureDrawPile.items.pop();
-                    if (next) G.zones.OpenMeasures.items.push(next);
-                } else if (G.zones.MeasureRecyclePile.items.length > 0) {
-                    // EXP-01-07-05: If DrawPile empty, shuffle RecyclePile
-                    G.zones.MeasureDrawPile.items = (ctx as any).random.Shuffle(G.zones.MeasureRecyclePile.items);
-                    G.zones.MeasureRecyclePile.items = [];
-                    const next = G.zones.MeasureDrawPile.items.pop();
-                    if (next) G.zones.OpenMeasures.items.push(next);
-                }
-            }
-        },
         'CONVERT': (G: GameState, ctx: any, effect: any, utils: any) => {
             const { playerId, resourceIds } = effect.payload;
 

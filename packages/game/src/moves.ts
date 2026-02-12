@@ -1,4 +1,3 @@
-import { resolveEffect, resolveProduction, getRegulationModifiers } from './mechanics';
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneNames, TileType, PlayerID } from '@balance-control/rules';
 import { stringToCoord, coordToString, getNeighbors, isSurrounded } from './topology';
@@ -25,14 +24,17 @@ export const CoreMoves = {
     },
 
     // CORE-01-04-10–12: PlaceInfluence via Lobbyist
-    placeInfluence: ({ G, ctx, events }: any, { targetTileId, extraResourceIds, transferToPlayerId }: { targetTileId: string, extraResourceIds?: string[], transferToPlayerId?: string }) => {
+    placeInfluence: ({ G, ctx, events }: any, { targetTileId, extraResourceIds }: { targetTileId: string, extraResourceIds?: string[] }) => {
         const pid = ctx.currentPlayer;
         const tile = G.tiles[targetTileId];
 
         if (!tile || tile.type !== TileType.Lobbyist) return INVALID_MOVE;
 
-        // Handle Extra Costs (EXP-01/EXP-02/EXP-03)
-        if (!handleExtraCosts(G, pid, extraResourceIds, targetTileId, 'PLACE_INFLUENCE', transferToPlayerId)) return INVALID_MOVE;
+        // Generic Prohibition check
+        if (EffectResolver.isProhibited(G, 'influence.place', pid, targetTileId)) return INVALID_MOVE;
+
+        // Decoupled Extra Costs
+        if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.place', targetTileId, extraResourceIds)) return INVALID_MOVE;
 
         // CORE-01-08-01: Cannot exceed influence cap
         if (countPlayerInfluence(G, pid) >= getInfluenceCap(ctx)) return INVALID_MOVE;
@@ -45,18 +47,22 @@ export const CoreMoves = {
 
         EffectResolver.resolve(G, ctx);
 
-        // CORE-01-04-09: Exactly one political action per turn
+        // Usage tracking
+        EffectResolver.incrementUsage(G, 'politicalAction', pid);
         events.endTurn();
     },
 
     // CORE-01-04-12: Move exactly one Influence from one Board Tile to another
-    moveInfluence: ({ G, ctx, events }: any, { sourceId, targetId, extraResourceIds, transferToPlayerId }: { sourceId: string, targetId: string, extraResourceIds?: string[], transferToPlayerId?: string }) => {
+    moveInfluence: ({ G, ctx, events }: any, { sourceId, targetId, extraResourceIds }: { sourceId: string, targetId: string, extraResourceIds?: string[] }) => {
         const pid = ctx.currentPlayer;
         const srcZone = G.zones[sourceId];
         if (!srcZone) return INVALID_MOVE;
 
-        // Handle Extra Costs (EXP-01/EXP-02/EXP-03)
-        if (!handleExtraCosts(G, pid, extraResourceIds, targetId, 'MOVE_INFLUENCE', transferToPlayerId)) return INVALID_MOVE;
+        // Generic Prohibition check
+        if (EffectResolver.isProhibited(G, 'influence.move', pid, targetId)) return INVALID_MOVE;
+
+        // Decoupled Extra Costs
+        if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.move', targetId, extraResourceIds)) return INVALID_MOVE;
 
         // CORE-01-04-12: Source must be a Board tile
         const boardZone = G.zones[CoreZoneNames.Board];
@@ -80,20 +86,24 @@ export const CoreMoves = {
 
         EffectResolver.resolve(G, ctx);
 
-        // CORE-01-04-09: Exactly one political action per turn
+        // Usage tracking
+        EffectResolver.incrementUsage(G, 'politicalAction', pid);
         events.endTurn();
     },
 
     // CORE-01-04-13–19: FormalizeInfluence via Committee
-    formalizeInfluence: ({ G, ctx, events }: any, { committeeTileId, paymentResourceIds, extraResourceIds, transferToPlayerId, payForInfluenceResourceId }: { committeeTileId: string, paymentResourceIds: string[], extraResourceIds?: string[], transferToPlayerId?: string, payForInfluenceResourceId?: string }) => {
+    formalizeInfluence: ({ G, ctx, events }: any, { committeeTileId, paymentResourceIds, extraResourceIds }: { committeeTileId: string, paymentResourceIds: string[], extraResourceIds?: string[] }) => {
 
         const pid = ctx.currentPlayer;
         const tile = G.tiles[committeeTileId];
 
         if (!tile || (tile.type !== TileType.Committee && tile.type !== TileType.StartCommittee)) return INVALID_MOVE;
 
-        // Handle Extra Costs (EXP-01/EXP-02/EXP-03)
-        if (!handleExtraCosts(G, pid, extraResourceIds, committeeTileId, 'FORMALIZE', transferToPlayerId)) return INVALID_MOVE;
+        // Generic Prohibition check
+        if (EffectResolver.isProhibited(G, 'influence.formalize', pid, committeeTileId)) return INVALID_MOVE;
+
+        // Decoupled Extra Costs
+        if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.formalize', committeeTileId, extraResourceIds)) return INVALID_MOVE;
 
         // CORE-01-08-02/03: Must place all starting influence first
         if (!allStartingInfluencePlaced(G, ctx)) return INVALID_MOVE;
@@ -101,9 +111,9 @@ export const CoreMoves = {
         // CORE-01-08-01: Cannot exceed influence cap
         if (countPlayerInfluence(G, pid) >= getInfluenceCap(ctx)) return INVALID_MOVE;
 
-        // CORE-01-08-07: Start Committee at most once per game per player
+        // CORE-01-08-07: Start Committee at most once per game per player (Generalized)
         if (tile.type === TileType.StartCommittee) {
-            if (G.startCommitteeUsed && G.startCommitteeUsed[pid]) return INVALID_MOVE;
+            if (!EffectResolver.checkUsageLimit(G, 'startCommittee', pid)) return INVALID_MOVE;
         }
 
         const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
@@ -116,35 +126,12 @@ export const CoreMoves = {
         const resources = paymentResourceIds.map((rid: string) => G.objects[rid]);
         const resorts = resources.map((r: any) => r.resort);
 
-        // EXP-01-08-M08: Economic Council (Treat 1 non-ECO as ECO)
-        const hasEcoPerk = G.secret?.playerPerks?.[pid]?.ecoSubstitute;
-        if (hasEcoPerk) {
-            const firstNonEcoIdx = resorts.findIndex((r: any) => r !== 'ECO');
-            if (firstNonEcoIdx >= 0) {
-                resorts[firstNonEcoIdx] = 'ECO';
-                // Consumed
-                G.secret.playerPerks[pid].ecoSubstitute = false;
-            }
-        }
-
-        const uniqueResorts = new Set(resorts);
-
-        if (tile.type === TileType.StartCommittee) {
-            // CORE-01-08-08: 3 different resorts + 1 any = 4 total
-            if (paymentResourceIds.length !== 4) return INVALID_MOVE;
-            if (uniqueResorts.size < 3) return INVALID_MOVE;
-        } else {
-            // CORE-01-04-15: 2 Resources of different resorts
-            if (paymentResourceIds.length !== 2) return INVALID_MOVE;
-            if (uniqueResorts.size < 2) return INVALID_MOVE;
-        }
-
         // PUSH ATOMS
         G.engine.effectQueue.push({
             kind: 'resource.pay',
             playerId: pid,
             amount: paymentResourceIds.length,
-            resorts: Array.from(uniqueResorts) as string[]
+            resorts: Array.from(new Set(resorts)) as string[]
         });
 
         G.engine.effectQueue.push({
@@ -156,28 +143,28 @@ export const CoreMoves = {
 
         EffectResolver.resolve(G, ctx);
 
-        // Track Start Committee usage
+        // Track usage (Generalized)
         if (tile.type === TileType.StartCommittee) {
-            if (!G.startCommitteeUsed) G.startCommitteeUsed = {};
-            G.startCommitteeUsed[pid] = true;
+            EffectResolver.incrementUsage(G, 'startCommittee', pid);
         }
 
-        // CORE-01-04-09: Exactly one political action per turn
+        // Usage tracking
+        EffectResolver.incrementUsage(G, 'politicalAction', pid);
         events.endTurn();
     },
 
     // CORE-01-04-20–22: ConvertResources via Grassroots tile
-    convertResources: ({ G, ctx, events }: any, { grassrootsTileId, inputResourceIds, extraResourceIds, transferToPlayerId }: { grassrootsTileId: string, inputResourceIds: string[], extraResourceIds?: string[], transferToPlayerId?: string }) => {
+    convertResources: ({ G, ctx, events }: any, { grassrootsTileId, inputResourceIds, extraResourceIds }: { grassrootsTileId: string, inputResourceIds: string[], extraResourceIds?: string[] }) => {
         const pid = ctx.currentPlayer;
         const tile = G.tiles[grassrootsTileId];
 
         if (!tile || tile.type !== TileType.Grassroots) return INVALID_MOVE;
 
-        // EXP-01-08-M07: Debt Brake prohibition
-        if (G.secret?.prohibitions?.noConvert) return INVALID_MOVE;
+        // Generic Prohibition check
+        if (EffectResolver.isProhibited(G, 'convertResources', pid, grassrootsTileId)) return INVALID_MOVE;
 
-        // Handle Extra Costs (EXP-01/EXP-02/EXP-03)
-        if (!handleExtraCosts(G, pid, extraResourceIds, grassrootsTileId, 'CONVERT', transferToPlayerId)) return INVALID_MOVE;
+        // Decoupled Extra Costs
+        if (!EffectResolver.checkAndPayCosts(G, pid, 'convertResources', grassrootsTileId, extraResourceIds)) return INVALID_MOVE;
 
         const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
         const supply = G.zones[supplyId];
@@ -186,23 +173,20 @@ export const CoreMoves = {
             if (G.objects[rid]?.owner !== pid) return INVALID_MOVE;
         }
 
-        // EXP-01-08-M03: Collective Bargaining
-        if (G.secret?.prohibitions?.noEcoConvert) {
-            const hasEco = inputResourceIds.some((rid: string) => G.objects[rid]?.resort === 'ECO');
-            if (hasEco) return INVALID_MOVE;
-        }
+        // Emit conversion atoms
+        G.engine.effectQueue.push(
+            { kind: 'resource.pay', playerId: pid, amount: inputResourceIds.length, resorts: 'ANY' }, // Logic for ANY handled by resolver
+            { kind: 'influence.formalize', playerId: pid, resourceIds: [], context: { source: 'convert', grassrootsTileId } }
+        );
+        EffectResolver.resolve(G, ctx);
 
-        resolveEffect(G, ctx, {
-            type: 'CONVERT',
-            payload: { playerId: pid, resourceIds: inputResourceIds, grassrootsTileId }
-        }, grassrootsTileId);
-
-        // CORE-01-04-09: Exactly one political action per turn
+        // Usage tracking
+        EffectResolver.incrementUsage(G, 'politicalAction', pid);
         events.endTurn();
     },
 
     // CORE-01-04-02: DrawAndPlaceTile — place drawn tile at coord
-    placeTile: ({ G, ctx, events }: any, { targetCoord, extraResourceIds, transferToPlayerId, payForInfluenceResourceId }: { targetCoord: string, extraResourceIds?: string[], transferToPlayerId?: string, payForInfluenceResourceId?: string }) => {
+    placeTile: ({ G, ctx, events }: any, { targetCoord, extraResourceIds }: { targetCoord: string, extraResourceIds?: string[] }) => {
         const pid = ctx.currentPlayer;
         const stagingId = `staging_${pid}`;
         const staging = G.zones[stagingId];
@@ -212,10 +196,14 @@ export const CoreMoves = {
         const tileId = staging.items[0];
         const tile = G.tiles[tileId];
 
-        // M12 Extreme Weather Event: Placing ResortTiles requires +1 CLM or +1 DOM
-        const actionType = tile && tile.type === TileType.Resort ? 'PLACE_RESORT' : 'PLACE_TILE';
-        // Handle Extra Costs (EXP-01/EXP-02/EXP-03)
-        if (!handleExtraCosts(G, pid, extraResourceIds, undefined, actionType, transferToPlayerId)) return INVALID_MOVE;
+        // Generalized Action Type for cost check
+        const actionType = tile && tile.type === TileType.Resort ? 'placeResort' : 'placeTile';
+
+        // Generic Prohibition check
+        if (EffectResolver.isProhibited(G, actionType, pid)) return INVALID_MOVE;
+
+        // Decoupled Extra Costs
+        if (!EffectResolver.checkAndPayCosts(G, pid, actionType, undefined, extraResourceIds)) return INVALID_MOVE;
 
         if (G.grid[targetCoord]) return INVALID_MOVE; // Occupied
 
@@ -250,19 +238,18 @@ export const CoreMoves = {
         // CORE-01-06-02/03: Hotspot check — skip StartCommittee (CORE-01-08-06)
         const candidates = [coord, ...neighbors];
         candidates.forEach(c => {
-            const cStr = coordToString(c);
-            const tId = G.grid[cStr];
+            const tId = G.grid[coordToString(c)];
             if (!tId) return;
             const candidateTile = G.tiles[tId];
-            // CORE-01-08-06: StartCommittee is immune to all effects
             if (candidateTile && candidateTile.type === TileType.StartCommittee) return;
             if (isSurrounded(c, G.grid)) {
-                resolveEffect(G, ctx, {
-                    type: 'HOTSPOT_RESOLUTION',
-                    payload: { payForInfluenceResourceId }
-                }, tId);
+                G.engine.effectQueue.push({ kind: 'hotspot.resolve', tileId: tId });
             }
         });
+        EffectResolver.resolve(G, ctx);
+
+        // Usage tracking
+        EffectResolver.incrementUsage(G, 'politicalAction', pid);
 
         // End Stage → politicalAction
         if (events && events.endStage) {
@@ -272,181 +259,8 @@ export const CoreMoves = {
         }
     },
 
-    // EXP-01: Take exactly one Measure from OpenMeasures to PlayerHand
-    takeMeasure: ({ G, ctx, events }: any, measureObjectId: string) => {
-        const pid = ctx.currentPlayer;
-        const openZone = G.zones.OpenMeasures;
-        if (!openZone || !openZone.items.includes(measureObjectId)) return INVALID_MOVE;
-
-        const handZone = G.zones[`PlayerHand:${pid}`];
-        if (!handZone) return INVALID_MOVE;
-        // EXP-01-06-03: Hold at most 2 measures
-        if (handZone.items.length >= 2) return INVALID_MOVE;
-
-        resolveEffect(G, ctx, {
-            type: 'TAKE_MEASURE',
-            payload: { playerId: pid, measureObjectId }
-        });
-
-        // EXP-01-06-04: TakeMeasure ends the turn immediately
-        events.endTurn();
-    },
-
-    // EXP-01: Play a Measure from Hand
-    playMeasure: ({ G, ctx, events }: any, measureObjectId: string, targetPayload: any) => {
-        const pid = ctx.currentPlayer;
-        const handZone = G.zones[`PlayerHand:${pid}`];
-        if (!handZone || !handZone.items.includes(measureObjectId)) return INVALID_MOVE;
-
-        // EXP-01-06-02: At most one PlayMeasure per round
-        if (G.playedMeasureThisRound?.[pid]) return INVALID_MOVE;
-
-        // EXP-03-08-M04: Future Resolution prohibition
-        if (G.secret?.prohibitions?.[pid]?.noPlayMeasure) return INVALID_MOVE;
-
-        G.engine.effectQueue.push({
-            kind: 'measure.play' as any, // Need to add to types
-            playerId: pid,
-            measureObjectId,
-            ...targetPayload
-        });
-
-        EffectResolver.resolve(G, ctx);
-
-        // Track PlayMeasure usage
-        if (!G.playedMeasureThisRound) G.playedMeasureThisRound = {};
-        G.playedMeasureThisRound[pid] = true;
-    },
-
-    // EXP-03: Place Countdown Marker (Triggered by Transformationsdruck resolution or M01/M03/etc)
-    placeCountdownMarker: ({ G, ctx }: any, { targetTileId, extraResourceIds, transferToPlayerId }: { targetTileId: string, extraResourceIds?: string[], transferToPlayerId?: string }) => {
-        const pid = ctx.currentPlayer;
-        if (!handleExtraCosts(G, pid, extraResourceIds, targetTileId, 'PLACE_COUNTDOWN', transferToPlayerId)) return INVALID_MOVE;
-
-        // Core logic now in expansion handler, but we need the move to be valid
-        resolveEffect(G, ctx, {
-            type: 'PLACE_COUNTDOWN_EXP03',
-            payload: { playerId: pid, targetTileId }
-        }, targetTileId);
-    },
-
     // Pass = choose no political action, just end turn
     pass: ({ G, ctx, events }: any) => {
         events.endTurn();
     }
 };
-
-/** EXP-01/EXP-02/EXP-03 Helper: Handle extra costs from Measures, Regulations, and Climate */
-function handleExtraCosts(G: any, pid: string, extraResourceIds?: string[], onTileId?: string, actionType?: string, transferToPlayerId?: string): boolean {
-    let regCost = 0;
-    if (onTileId) {
-        const regs = getRegulationModifiers(onTileId, G);
-        regCost = regs.extraCost;
-    }
-
-    let measureExtraCost = (G.secret?.extraCosts?.[pid] || 0);
-
-    // Climate Modifiers
-    let climateExtraCost = 0;
-    let climateAllowed = ['CLM', 'DOM'];
-    if (G.secret?.exp03) {
-        const perk = G.secret.playerPerks?.[pid];
-        const isImmune = perk?.climateImmunity || perk?.ignoreClimateCosts || G.secret.exp03.ignoreClimateCostThisAction;
-
-        if (!isImmune) {
-            if (onTileId && G.secret.exp03.tileCostIncreases?.[onTileId]) climateExtraCost++;
-            const tile = G.tiles[onTileId || ''];
-            if (tile?.resort && G.secret.exp03.resortCostIncreases?.[tile.resort]) climateExtraCost++;
-            if (actionType === 'CONVERT' && G.secret.exp03.convertCostIncrease) {
-                climateExtraCost++;
-                climateAllowed = ['DOM'];
-            }
-            if (actionType === 'PLACE_RESORT' && G.secret.exp03.placeResortCostIncrease) climateExtraCost++;
-            if (actionType === 'PLACE_COUNTDOWN') {
-                if (G.secret.exp03.placeCountdownCostIncrease) climateExtraCost++;
-                if (G.secret.exp03.placeCountdownAddedCost) climateExtraCost++;
-            }
-        }
-    }
-
-    // IG Pact (M13) - Transfer exactly 1 component
-    let transferred = false;
-    if (transferToPlayerId && G.secret?.playerPerks?.[pid]?.transferableCost) {
-        if (regCost + measureExtraCost + climateExtraCost > 0) {
-            // Transfer 1 component to another player
-            // We'll prioritize transferring Measure > Climate > Reg
-            let transferTargetId: string | undefined;
-            if (measureExtraCost > 0) {
-                G.secret.extraCosts[pid]--;
-                if (!G.secret.extraCosts[transferToPlayerId]) G.secret.extraCosts[transferToPlayerId] = 0;
-                G.secret.extraCosts[transferToPlayerId]++;
-                measureExtraCost--;
-            } else if (climateExtraCost > 0) {
-                climateExtraCost--;
-                // Transferee must pay it NOW - this is tricky for a single mover
-                // Deterministic implementation: Deduct automatically if possible
-                if (!deductResource(G, transferToPlayerId, climateAllowed)) return false;
-            } else if (regCost > 0) {
-                regCost--;
-                if (!deductResource(G, transferToPlayerId, ['ANY'])) return false;
-            }
-            G.secret.playerPerks[pid].transferableCost = false; // Consumed
-            transferred = true;
-        }
-    }
-
-    const ignoreIncrease = G.secret?.playerPerks?.[pid]?.ignoreCostIncrease || false;
-    let finalExtraCost = regCost + measureExtraCost + climateExtraCost;
-    if (ignoreIncrease) finalExtraCost = Math.max(0, finalExtraCost - 1);
-
-    if (finalExtraCost > 0) {
-        if (!extraResourceIds || extraResourceIds.length < finalExtraCost) return false;
-
-        const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
-        const supply = G.zones[supplyId];
-        const bankZone = G.zones[CoreZoneNames.Bank];
-
-        for (let i = 0; i < finalExtraCost; i++) {
-            const rid = extraResourceIds[i];
-            if (!supply.items.includes(rid)) return false;
-            const obj = G.objects[rid];
-
-            // Check Climate validity if we are in the climate portion of costs
-            // Simplification: as long as enough resources of correct types are provided
-            if (i >= (regCost + measureExtraCost)) {
-                if (!climateAllowed.includes(obj.resort!) && !climateAllowed.includes('ANY')) return false;
-            }
-
-            // Deduct
-            const idx = supply.items.indexOf(rid);
-            supply.items.splice(idx, 1);
-            bankZone.items.push(rid);
-            if (G.objects[rid]) G.objects[rid].owner = undefined;
-        }
-
-        // Consume Measure-based cost
-        if (G.secret?.extraCosts?.[pid] > 0) {
-            G.secret.extraCosts[pid]--;
-        }
-    }
-
-    // Reset temporary flags
-    if (G.secret?.exp03) G.secret.exp03.ignoreClimateCostThisAction = false;
-
-    return true;
-}
-
-function deductResource(G: any, pid: string, allowedResorts: string[]): boolean {
-    const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
-    const supply = G.zones[supplyId];
-    for (const rid of supply.items) {
-        const obj = G.objects[rid];
-        if (obj.type === 'Resource' && (allowedResorts.includes(obj.resort!) || allowedResorts.includes('ANY'))) {
-            supply.items.splice(supply.items.indexOf(rid), 1);
-            G.zones[CoreZoneNames.Bank].items.push(rid);
-            obj.owner = undefined;
-            return true;
-        }
-    }
-    return false;
-}

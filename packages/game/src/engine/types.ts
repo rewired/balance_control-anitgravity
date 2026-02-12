@@ -49,6 +49,7 @@ export type EffectAtom =
     // --- Measure Actions ---
     | { kind: 'measure.take'; playerId: PlayerID; measureObjectId: string; context?: any }
     | { kind: 'measure.play'; playerId: PlayerID; measureObjectId: string;[key: string]: any }
+    | { kind: 'measure.recycle'; drawPileId: string; recyclePileId: string; context?: any }
 
     // --- Choice/Interaction ---
     | { kind: 'choice.request'; choice: Omit<PendingChoice, 'resumeToken'>; context?: any }
@@ -58,7 +59,8 @@ export type EffectAtom =
     | { kind: 'modifier.add'; modifier: ActiveModifier; context?: any }
     | { kind: 'modifier.remove'; sourceId: string; context?: any }
     | { kind: 'rule.prohibit'; actionType: string; playerId?: PlayerID; context?: any }
-    | { kind: 'rule.attribute'; attribute: string; value: any; playerId?: PlayerID; targetTileId?: string; context?: any };
+    | { kind: 'rule.attribute'; attribute: string; value: any; playerId?: PlayerID; targetTileId?: string; context?: any }
+    | { kind: 'hook.trigger'; hook: HookPoint; payload?: any; context?: any };
 
 /**
  * CHOICE SYSTEM: Multi-stage interaction
@@ -89,7 +91,10 @@ export type HookPoint =
     | 'afterAction'
     | 'onProduction'
     | 'onSettlement'
-    | 'onMajority';
+    | 'onMajority'
+    | 'onTurnBegin'
+    | 'onTurnEnd'
+    | 'onRoundEnd';
 
 export type ExpiryTrigger =
     | 'thisTurn'           // End of current player turn

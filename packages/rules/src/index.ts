@@ -93,8 +93,6 @@ export interface GameState {
     // Tracking flags
     roundNumber?: number;
     roundSettlementDone?: boolean;
-    startCommitteeUsed?: Record<string, boolean>;
-    playedMeasureThisRound?: Record<string, boolean>;
 
     // Modular Engine State
     engine: {
@@ -123,6 +121,7 @@ export interface ExpansionDefinition {
     // Effect Handlers
     effectHandlers?: Record<string, (G: GameState, ctx: any, effect: any, utils: any) => void>;
     getMeasureAtoms?: (G: GameState, measureId: string, payload: any) => any[] | null;
+    moves?: Record<string, (arg0: any, arg1: any) => any>;
 }
 
 export interface EffectContext {

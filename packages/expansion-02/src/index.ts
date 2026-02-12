@@ -196,48 +196,25 @@ export const Expansion02: ExpansionDefinition = {
                     { kind: 'regulation.place', regType: payload.regType, targetTileId: payload.targetTileId }
                 ];
             case 'M13': // Surveillance
-                const currentProtected = G.engine.attributes.protectedTiles || [];
                 return [
                     { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'INF'] },
-                    { kind: 'rule.attribute', attribute: 'protectedTiles', value: [...currentProtected, payload.targetTileId] }
+                    { kind: 'rule.attribute', attribute: 'protectedTiles', value: payload.targetTileId, context: { append: true } }
                 ];
             case 'M14': // File Status
-                const currentDoubled = G.engine.attributes.doubledRegs || [];
                 return [
                     { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'DOM'] },
-                    { kind: 'rule.attribute', attribute: 'doubledRegs', value: [...currentDoubled, payload.regulationId] }
+                    { kind: 'rule.attribute', attribute: 'doubledRegs', value: payload.regulationId, context: { append: true } }
                 ];
             case 'M15': // Situation Assessment
                 return [
                     { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['SEC'] },
-                    { kind: 'rule.attribute', attribute: 'regDiscount', value: 1, playerId: payload.playerId }
+                    { kind: 'rule.attribute', attribute: `regDiscount:${payload.playerId}`, value: 1 }
                 ];
         }
         return null;
     },
 
     effectHandlers: {
-        'TAKE_MEASURE_EXP02': (G: GameState, ctx: any, effect: any) => {
-            const { playerId, measureObjectId } = effect.payload;
-            const openZone = G.zones.EXP02_OpenMeasures;
-            const handZone = G.zones[`PlayerHand:${playerId}`];
-            const idx = openZone.items.indexOf(measureObjectId);
-            if (idx >= 0) {
-                openZone.items.splice(idx, 1);
-                handZone.items.push(measureObjectId);
-                G.objects[measureObjectId].owner = playerId;
-                // Refill
-                if (G.zones.EXP02_MeasureDrawPile.items.length > 0) {
-                    const next = G.zones.EXP02_MeasureDrawPile.items.pop();
-                    if (next) G.zones.EXP02_OpenMeasures.items.push(next);
-                } else if (G.zones.EXP02_MeasureRecyclePile.items.length > 0) {
-                    G.zones.EXP02_MeasureDrawPile.items = (ctx as any).random.Shuffle(G.zones.EXP02_MeasureRecyclePile.items);
-                    G.zones.EXP02_MeasureRecyclePile.items = [];
-                    const next = G.zones.EXP02_MeasureDrawPile.items.pop();
-                    if (next) G.zones.EXP02_OpenMeasures.items.push(next);
-                }
-            }
-        },
         'HOTSPOT_RESOLUTION': (G: GameState, ctx: any, effect: any, utils: any) => {
             if (effect.payload.tileId === 'tile_innere_ordnung') {
                 const result = utils?.computeMajority?.(effect.payload.tileId, G);
