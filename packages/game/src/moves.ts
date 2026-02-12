@@ -400,6 +400,25 @@ export const CoreMoves = {
         }
     },
 
+    // CORE-01-09-01 / CORE-01-07-02: Allow round completion when DrawPile is empty mid-round.
+    passTilePlacement: ({ G, ctx, events }: any, payload?: unknown) => {
+        const validated = validateMovePayload('passTilePlacement', passPayloadSchema, payload);
+        if (!validated.ok) return INVALID_MOVE;
+
+        const pid = ctx.currentPlayer;
+        if (!requireStage(ctx, DRAW_AND_PLACE_STAGE, 'passTilePlacement')) return INVALID_MOVE;
+
+        const stagingId = `staging_${pid}`;
+        const staging = G.zones[stagingId];
+        if (!staging || staging.items.length > 0) return INVALID_MOVE;
+
+        if (events && events.endStage) {
+            events.endStage();
+        } else if (events && events.setStage) {
+            events.setStage(POLITICAL_ACTION_STAGE);
+        }
+    },
+
     // Pass = choose no political action, just end turn
     pass: ({ G, ctx, events }: any, payload?: unknown) => {
         const validated = validateMovePayload('pass', passPayloadSchema, payload);

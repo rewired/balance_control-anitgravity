@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { Client } from 'boardgame.io/client';
 import { BalanceControl } from '../src/index';
+import { CoreZoneNames } from '@balance-control/rules';
+import { SetupGame } from '../src/setup';
 
 const HEX_DIRECTIONS: Array<[number, number]> = [
     [1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]
@@ -18,6 +20,18 @@ function findFirstOpenNeighborCoord(grid: Record<string, string>): string {
     }
 
     return '0,1';
+}
+
+function createTinyDrawPileGame() {
+    return {
+        ...BalanceControl,
+        setup: (ctx: any) => {
+            const G = SetupGame({ ctx });
+            const drawPile = G.zones[CoreZoneNames.DrawPile];
+            drawPile.items = drawPile.items.slice(0, 1);
+            return G;
+        }
+    };
 }
 
 describe('Turn Structure (Stages)', () => {
@@ -92,6 +106,70 @@ describe('Turn Structure (Stages)', () => {
         expect(afterState.ctx.currentPlayer).toBe(beforeCurrentPlayer);
         expect(afterState.ctx.activePlayers[pid]).toBe(beforeStage);
         expect(afterState.ctx.activePlayers[pid]).toBe('politicalAction');
+    });
+
+    it('should reject passTilePlacement when a staging tile exists', () => {
+        const client = Client({ game: BalanceControl, numPlayers: 2 });
+        client.start();
+
+        const beforeState = client.getState();
+        const pid = beforeState.ctx.currentPlayer;
+        const beforeG = JSON.stringify(beforeState.G);
+
+        client.moves.passTilePlacement({});
+
+        const afterState = client.getState();
+        const afterG = JSON.stringify(afterState.G);
+
+        expect(afterG).toBe(beforeG);
+        expect(afterState.ctx.currentPlayer).toBe(pid);
+        expect(afterState.ctx.activePlayers[pid]).toBe('drawAndPlace');
+    });
+
+    it('should allow passTilePlacement when staging is empty and continue turn flow', () => {
+        const client = Client({ game: createTinyDrawPileGame(), numPlayers: 2 });
+        client.start();
+
+        client.moves.placeTile({ targetCoord: '1,0' });
+        client.moves.pass({});
+
+        const secondState = client.getState();
+        const secondPid = secondState.ctx.currentPlayer;
+        expect(secondState.ctx.activePlayers[secondPid]).toBe('drawAndPlace');
+        expect(secondState.G.zones[`staging_${secondPid}`].items.length).toBe(0);
+
+        client.moves.passTilePlacement({});
+
+        const afterStageSkip = client.getState();
+        expect(afterStageSkip.ctx.currentPlayer).toBe(secondPid);
+        expect(afterStageSkip.ctx.activePlayers[secondPid]).toBe('politicalAction');
+    });
+
+    it('should end only after round settlement when draw pile empties mid-round', () => {
+        const client = Client({ game: createTinyDrawPileGame(), numPlayers: 2 });
+        client.start();
+
+        const stateAfterStart = client.getState();
+        expect(stateAfterStart.G.zones[CoreZoneNames.DrawPile].items.length).toBe(0);
+
+        client.moves.placeTile({ targetCoord: '1,0' });
+        client.moves.pass({});
+
+        const midRoundState = client.getState();
+        const secondPid = midRoundState.ctx.currentPlayer;
+        expect(midRoundState.ctx.gameover).toBeUndefined();
+        expect(midRoundState.G.roundSettlementDone).toBeUndefined();
+        expect(midRoundState.G.roundNumber ?? 0).toBe(0);
+        expect(midRoundState.ctx.activePlayers[secondPid]).toBe('drawAndPlace');
+        expect(midRoundState.G.zones[`staging_${secondPid}`].items.length).toBe(0);
+
+        client.moves.passTilePlacement({});
+        client.moves.pass({});
+
+        const finalState = client.getState();
+        expect(finalState.G.roundNumber).toBe(1);
+        expect(finalState.G.roundSettlementDone).toBe(true);
+        expect(finalState.ctx.gameover).toBeDefined();
     });
 
     it('should complete two full rounds in 3-player hotseat without softlock', () => {

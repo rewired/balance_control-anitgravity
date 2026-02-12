@@ -40,12 +40,12 @@ The game must remain playable until the end-of-round settlement that ends the ga
 - CHANGELOG.md updated under Unreleased.
 
 ## PR Checklist (fill at end)
-- [ ] Implemented pass/skip behavior for empty staging tile (no softlocks)
-- [ ] Added deterministic tests for empty DrawPile mid-round
-- [ ] Verified endGame timing remains end-of-round settlement
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md (checked Task 0012)
-- [ ] No rule changes / no rebalance
+- [x] Implemented pass/skip behavior for empty staging tile (no softlocks)
+- [x] Added deterministic tests for empty DrawPile mid-round
+- [x] Verified endGame timing remains end-of-round settlement
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md (checked Task 0012)
+- [x] No rule changes / no rebalance
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":
