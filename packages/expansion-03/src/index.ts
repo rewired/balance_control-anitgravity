@@ -134,7 +134,7 @@ export const Expansion03: ExpansionDefinition = {
             case 'M03': // Future Investment
                 return [
                     { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
-                    { kind: 'resource.grant', playerId: payload.playerId, amount: 1, resort: payload.targetResort }
+                    { kind: 'resource.grant', playerId: payload.playerId, missingController: 'SKIP', amount: 1, resort: payload.targetResort }
                 ];
             case 'M04': // Future Resolution
                 return [
