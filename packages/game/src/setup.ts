@@ -1,8 +1,11 @@
 import { GameState, CoreZoneNames, Tile, TileType, CoreResources, GameObject, Zone } from '@balance-control/rules';
 import { Ctx } from 'boardgame.io';
 import { ExpansionRegistry } from './expansion-registry';
+import { normalizeGameConfig } from './config';
 
-export const SetupGame = ({ ctx }: { ctx: Ctx }): GameState => {
+export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown }): GameState => {
+    const gameConfig = normalizeGameConfig(setupData);
+
     const G: GameState = {
         zones: {},
         tiles: {},
@@ -25,7 +28,8 @@ export const SetupGame = ({ ctx }: { ctx: Ctx }): GameState => {
                 usage: {},
                 tileExtraCosts: {},
                 playerExtraCosts: {},
-                climateCostRules: []
+                climateCostRules: [],
+                enabledExpansions: { ...gameConfig.expansions }
             }
         },
     };
@@ -84,23 +88,10 @@ export const SetupGame = ({ ctx }: { ctx: Ctx }): GameState => {
         G.zones[t.id] = { id: t.id, name: t.name || t.id, items: [] };
     });
 
-    // Shuffle DrawPile 
-    // basic Fisher-Yates if ctx.random is available
-    // Cast to any because boardgame.io Ctx type definition might be missing random in some versions
-    const _ctx = ctx as any;
-    if (_ctx && _ctx.random) {
-        G.zones[CoreZoneNames.DrawPile].items = _ctx.random.Shuffle(G.zones[CoreZoneNames.DrawPile].items);
-    }
+    // 4. Apply enabled expansions before the one final setup shuffle.
+    ExpansionRegistry.applySetup(G, ctx, gameConfig);
 
-    // 4. Apply Expansions
-    ExpansionRegistry.applySetup(G, ctx);
-
-    // Re-shuffle if Expansions added to DrawPile?
-    // Rules say "Setup shuffles all non-Start tiles into DrawPile", essentially implying one big shuffle at end of setup or before game start.
-    // We'll trust ExpansionRegistry to add to DrawPile, then we might want to shuffle again or ensure expansions inject before shuffle.
-    // For now, let's assume expansions might add their own, so maybe shuffle should be last?
-    // But API says applySetup(G). G is fully mutable.
-    // Let's do a final shuffle after expansion setup to be safe and fair.
+    // CORE-01-03-02: Shuffle all non-Start tiles after composition is finalized.
     if (ctx && (ctx as any).random) {
         G.zones[CoreZoneNames.DrawPile].items = (ctx as any).random.Shuffle(G.zones[CoreZoneNames.DrawPile].items);
     }

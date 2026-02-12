@@ -30,12 +30,12 @@ Make expansions optional, isolated, and setup-correct:
 - ex01 enabled setup includes tiles and remains deterministic
 
 ## PR Checklist (fill at end)
-- [ ] Added expansion flags + gating
-- [ ] Setup ordering fixed (inject then shuffle)
-- [ ] Core isolation improved (no expansion hardcoding)
-- [ ] Tests updated
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md
+- [x] Added expansion flags + gating
+- [x] Setup ordering fixed (inject then shuffle)
+- [x] Core isolation improved (no expansion hardcoding)
+- [x] Tests updated
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":

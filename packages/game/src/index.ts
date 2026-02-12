@@ -19,7 +19,7 @@ const politicalActionMoves = {
 
 export const BalanceControl: Game<GameState> = {
     name: 'balance-control',
-    setup: SetupGame,
+    setup: (ctx: any, setupData: unknown) => SetupGame({ ctx, setupData }),
     moves: {
         ...CoreMoves,
         ...expansionMoves
@@ -115,3 +115,4 @@ export const BalanceControl: Game<GameState> = {
 
 export { ExpansionRegistry } from './expansion-registry';
 export * from './move-contracts';
+export * from './config';
