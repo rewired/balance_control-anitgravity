@@ -25,6 +25,7 @@ export const formalizeInfluencePayloadSchema = z.object({
 export const convertResourcesPayloadSchema = z.object({
     grassrootsTileId: z.string(),
     inputResourceIds: z.array(z.string()),
+    outputResort: z.string().min(1),
     extraResourceIds: z.array(z.string()).optional(),
 }).strict();
 

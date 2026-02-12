@@ -1,5 +1,5 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { CoreZoneNames, TileType, PlayerID } from '@balance-control/rules';
+import { CoreZoneNames, CoreResources, TileType, PlayerID } from '@balance-control/rules';
 import { stringToCoord, coordToString, getNeighbors, isSurrounded } from './topology';
 import { drawMeasure, allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from './mechanics-turn';
 import { EffectResolver } from './engine/resolver';
@@ -42,9 +42,8 @@ function hasOverlap(a: string[], b?: string[]): boolean {
 type CostSlot = string[] | 'ANY';
 
 interface GrassrootsConversionSpec {
-    inputSlots: CostSlot[];
-    outputResort: string;
-    outputAmount: number;
+    inputSlots: number;
+    outputSlots: number;
 }
 
 function isBoardTile(G: any, tileId: string): boolean {
@@ -54,16 +53,21 @@ function isBoardTile(G: any, tileId: string): boolean {
 
 function getGrassrootsConversionSpec(tile: any): GrassrootsConversionSpec | null {
     const spec = tile?.conversion;
-    if (!spec || !Array.isArray(spec.inputSlots) || typeof spec.outputResort !== 'string') {
+    if (!spec || typeof spec.inputSlots !== 'number' || typeof spec.outputSlots !== 'number') {
         return null;
     }
 
-    const outputAmount = typeof spec.outputAmount === 'number' ? spec.outputAmount : 1;
+    if (!Number.isInteger(spec.inputSlots) || spec.inputSlots <= 0) return null;
+    if (!Number.isInteger(spec.outputSlots) || spec.outputSlots <= 0) return null;
+
     return {
         inputSlots: spec.inputSlots,
-        outputResort: spec.outputResort,
-        outputAmount
+        outputSlots: spec.outputSlots
     };
+}
+
+function isCoreResort(resort: string): boolean {
+    return resort === CoreResources.DOM || resort === CoreResources.FOR || resort === CoreResources.INF;
 }
 
 export const CoreMoves = {
@@ -265,7 +269,7 @@ export const CoreMoves = {
     convertResources: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('convertResources', convertResourcesPayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
-        const { grassrootsTileId, inputResourceIds, extraResourceIds } = validated.value;
+        const { grassrootsTileId, inputResourceIds, outputResort, extraResourceIds } = validated.value;
 
         const pid = ctx.currentPlayer;
         if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'convertResources')) return INVALID_MOVE;
@@ -277,6 +281,7 @@ export const CoreMoves = {
 
         if (hasDuplicateIds(inputResourceIds)) return INVALID_MOVE;
         if (hasOverlap(inputResourceIds, extraResourceIds)) return INVALID_MOVE;
+        if (!isCoreResort(outputResort)) return INVALID_MOVE;
 
         // Generic Prohibition check
         if (EffectResolver.isProhibited(G, 'convertResources', pid, grassrootsTileId)) return INVALID_MOVE;
@@ -291,11 +296,11 @@ export const CoreMoves = {
             if (G.objects[rid]?.owner !== pid) return INVALID_MOVE;
         }
 
-        if (inputResourceIds.length !== conversionSpec.inputSlots.length) return INVALID_MOVE;
+        if (inputResourceIds.length !== conversionSpec.inputSlots) return INVALID_MOVE;
 
         const baseCostValidation = EffectResolver.validateCost(G, ctx, {
             playerId: pid,
-            slots: conversionSpec.inputSlots,
+            slots: Array.from({ length: conversionSpec.inputSlots }, () => 'ANY'),
             resourceIds: inputResourceIds
         });
         if (!baseCostValidation.ok) return INVALID_MOVE;
@@ -309,8 +314,8 @@ export const CoreMoves = {
             {
                 kind: 'resource.grant',
                 playerId: pid,
-                amount: conversionSpec.outputAmount,
-                resort: conversionSpec.outputResort as any,
+                amount: conversionSpec.outputSlots,
+                resort: outputResort as any,
                 context: { source: 'convertResources', tileId: grassrootsTileId }
             }
         );
