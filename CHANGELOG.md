@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: EXP-01 controller-targeted grants now explicitly SKIP when no controller (compatible with resolver hardening).
 - Hardening: `CONTROLLER` grants now require explicit missing-controller behavior; no implicit reroute to Noise.
 - Fix: Uncontrolled ResortTile production now yields 0 (no Noise grant).
 - Fixed Grassroots conversion plumbing so ConvertResources works in real matches.
