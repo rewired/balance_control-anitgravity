@@ -39,9 +39,8 @@ describe('Moves', () => {
                     id: 'board_gr',
                     type: TileType.Grassroots,
                     conversion: {
-                        inputSlots: [['DOM'], ['FOR']],
-                        outputResort: 'INF',
-                        outputAmount: 1
+                        inputSlots: 2,
+                        outputSlots: 1
                     }
                 } as any,
                 board_start: { id: 'board_start', type: TileType.StartCommittee },
@@ -184,7 +183,7 @@ describe('Moves', () => {
 
         CoreMoves.convertResources(
             { G, ctx, events },
-            { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'] }
+            { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'], outputResort: 'INF' }
         );
 
         expect(G.zones['PersonalSupply:p1'].items).toHaveLength(1);

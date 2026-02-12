@@ -51,12 +51,18 @@ export enum TileType {
     SystemTile = 'SystemTile',
 }
 
+export interface GrassrootsConversionMetadata {
+    inputSlots: number;
+    outputSlots: number;
+}
+
 export interface Tile {
     id: string;
     type: TileType;
     resort?: ResourceType;
     weight?: number;
     name?: string;
+    conversion?: GrassrootsConversionMetadata;
     // EXP-01 attributes
     isHotspot?: boolean;
 }

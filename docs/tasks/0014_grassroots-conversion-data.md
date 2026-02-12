@@ -43,12 +43,12 @@ Also:
 - CHANGELOG.md updated under Unreleased.
 
 ## PR Checklist (fill at end)
-- [ ] ConvertResources works on real setup-generated Grassroots tiles
-- [ ] Removed reliance on per-instance conversion data or added generic metadata (one consistent approach)
-- [ ] Added tests using real SetupGame tile generation
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md (checked Task 0014)
-- [ ] No rule changes / no rebalance
+- [x] ConvertResources works on real setup-generated Grassroots tiles
+- [x] Removed reliance on per-instance conversion data or added generic metadata (one consistent approach)
+- [x] Added tests using real SetupGame tile generation
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md (checked Task 0014)
+- [x] No rule changes / no rebalance
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":

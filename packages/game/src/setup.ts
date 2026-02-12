@@ -129,7 +129,10 @@ function generateCoreTiles(): Tile[] {
     add(TileType.Committee, 10);
 
     // Grassroots x8
-    add(TileType.Grassroots, 8);
+    add(TileType.Grassroots, 8, {
+        // CORE-01-04-22: conversion parameters come from tile text metadata.
+        conversion: { inputSlots: 2, outputSlots: 1 }
+    });
 
     // Lobbyists x9
     add(TileType.Lobbyist, 9);

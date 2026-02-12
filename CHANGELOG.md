@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fixed Grassroots conversion plumbing so ConvertResources works in real matches.
 - Corrected Influence cap enforcement to apply only to marker creation, not relocation.
 - Fixed draw-stage softlock when DrawPile is empty; end-of-round completion remains intact.
 - Fixed encoding drift by removing non-UTF-8 artifacts and hardening guardrails.

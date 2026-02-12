@@ -13,4 +13,4 @@
 - [x] Task 0011 - UTF-8 Cleanup: Remove UTF-16 Artifacts + Harden Encoding Guard
 - [x] Task 0012 - Prevent Softlock When DrawPile Is Empty Mid-Round
 - [x] Task 0013 - Influence Cap Enforcement: Apply Only On Creation (Not Move/Place)
-- [ ] Task 0014 - Grassroots Conversion Data: Make ConvertResources Work In Real Games
+- [x] Task 0014 - Grassroots Conversion Data: Make ConvertResources Work In Real Games
