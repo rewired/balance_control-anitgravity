@@ -90,4 +90,17 @@ describe('Moves', () => {
         expect(result).toBe(INVALID_MOVE);
         expect(JSON.stringify(G)).toBe(before);
     });
+
+    it('formalizeInfluence should reject duplicate payment ids without mutation', () => {
+        G.zones['PersonalSupply:p1'].items = ['res_dom'];
+
+        const before = JSON.stringify(G);
+        const result = CoreMoves.formalizeInfluence(
+            { G, ctx, events },
+            { committeeTileId: 'board_t2', paymentResourceIds: ['res_dom', 'res_dom'] }
+        );
+
+        expect(result).toBe(INVALID_MOVE);
+        expect(JSON.stringify(G)).toBe(before);
+    });
 });

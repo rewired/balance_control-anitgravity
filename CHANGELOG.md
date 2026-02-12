@@ -7,3 +7,4 @@
 - Fixed TypeScript build errors and package exports for server integration.
 - Normalized move payload contracts and added runtime validation.
 - Fixed turn stage gating and per-turn usage reset to prevent softlocks.
+- Made cost resolution atomic and implemented production tie-splitting.

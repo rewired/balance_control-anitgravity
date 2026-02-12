@@ -19,7 +19,7 @@ export type PlayerSelector =
  */
 export type EffectAtom =
     // --- Resource Actions ---
-    | { kind: 'resource.pay'; playerId: PlayerID | 'CONTROLLER'; amount: number; resorts: ResourceType[] | 'ANY'; reason?: string; context?: any }
+    | { kind: 'resource.pay'; playerId: PlayerID | 'CONTROLLER'; amount: number; resorts: ResourceType[] | 'ANY'; resourceIds?: string[]; reason?: string; context?: any }
     | { kind: 'resource.grant'; playerId: PlayerID | 'CONTROLLER'; amount: number; resort: ResourceType; reason?: string; context?: any }
     | { kind: 'production.resolve'; tileId: string; context?: any }
 
