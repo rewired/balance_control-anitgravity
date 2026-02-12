@@ -1,7 +1,7 @@
 {
-  "id": "core_only_3p_2rounds",
-  "seed": "golden-core-3p-2rounds",
-  "numPlayers": 3,
+  "id": "production_uncontrolled_produces_zero",
+  "seed": "golden-production-uncontrolled-zero",
+  "numPlayers": 2,
   "config": {
     "expansions": {
       "ex01": false,
@@ -17,11 +17,7 @@
     { "move": "placeTile", "args": [{ "targetCoord": "0,-1" }] },
     { "move": "pass", "args": [{}] },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
-    { "move": "pass", "args": [{}] },
-    { "move": "placeTile", "args": [{ "targetCoord": "-1,1" }] },
-    { "move": "pass", "args": [{}] },
-    { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
     { "move": "pass", "args": [{}] }
   ],
-  "expectedFinalHash": "a915df84f5d5fbbfc069621c213c83784956351e85c6a8cc5f7210bc52fe6c68"
+  "expectedFinalHash": "c65c537262ab128a688364f989d39c457f83afed1a57287809449b89b2b4dcc2"
 }

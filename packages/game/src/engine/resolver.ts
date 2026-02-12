@@ -645,8 +645,6 @@ export class EffectResolver {
             if (remainder > 0) {
                 grants.push({ playerId: 'NOISE', amount: remainder });
             }
-        } else if (baseAmount > 0) {
-            grants.push({ playerId: 'NOISE', amount: baseAmount });
         }
 
         for (let i = grants.length - 1; i >= 0; i--) {
