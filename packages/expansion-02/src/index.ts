@@ -1,7 +1,7 @@
 import { ExpansionDefinition, GameState, ResourceType, TileType, CoreResources, CoreZoneNames, GameObject, RegulationType } from '@balance-control/rules';
 
 const EXP_02_NAME = 'EXP-02 Security & Order';
-const EXP02_TILE_INNER_ORDER_ID = 'tile_inner_order' as const;
+export const EXP02_TILE_INNER_ORDER_ID = 'tile_inner_order' as const;
 
 const MEASURE_IDS = [
     'M01', 'M02', 'M03', 'M04', 'M05',

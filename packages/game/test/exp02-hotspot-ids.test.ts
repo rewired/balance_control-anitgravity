@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreZoneNames } from '@balance-control/rules';
-import { Expansion02 } from '../../expansion-02/src/index';
+import { Expansion02, EXP02_TILE_INNER_ORDER_ID } from '../../expansion-02/src/index';
 import { ExpansionRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
@@ -27,7 +27,7 @@ describe('EXP-02 Inner Order hotspot id consistency', () => {
             setupData: { expansions: { ex01: false, ex02: true, ex03: false } }
         }) as any;
 
-        const innerOrderId = 'tile_inner_order';
+        const innerOrderId = EXP02_TILE_INNER_ORDER_ID;
         expect(G.tiles[innerOrderId]).toBeTruthy();
         expect(G.zones[innerOrderId]).toBeTruthy();
 
