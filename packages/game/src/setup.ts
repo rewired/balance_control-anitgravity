@@ -16,6 +16,7 @@ export const SetupGame = ({ ctx }: { ctx: Ctx }): GameState => {
             history: [],
             attributes: {
                 limits: {
+                    'politicalAction': 1,
                     'measure.hold': 2,
                     'measure.play': 1,
                     'startCommittee': 1

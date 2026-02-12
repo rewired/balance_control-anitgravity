@@ -14,6 +14,21 @@ import {
     validateMovePayload
 } from './move-contracts';
 
+const DRAW_AND_PLACE_STAGE = 'drawAndPlace';
+const POLITICAL_ACTION_STAGE = 'politicalAction';
+
+function getCurrentStage(ctx: any): string | undefined {
+    return ctx?.activePlayers?.[ctx?.currentPlayer];
+}
+
+function requireStage(ctx: any, expectedStage: string, moveName: string): boolean {
+    const stage = getCurrentStage(ctx);
+    if (stage === expectedStage) return true;
+
+    console.error(`[move:${moveName}] illegal in stage "${stage ?? 'none'}"; expected "${expectedStage}".`);
+    return false;
+}
+
 export const CoreMoves = {
     // SYSTEM: Multi-stage Choice Resolution
     resolveChoice: ({ G, ctx }: any, payload: unknown) => {
@@ -44,6 +59,9 @@ export const CoreMoves = {
         const { targetTileId, extraResourceIds } = validated.value;
 
         const pid = ctx.currentPlayer;
+        if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'placeInfluence')) return INVALID_MOVE;
+        if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
+
         const tile = G.tiles[targetTileId];
 
         if (!tile || tile.type !== TileType.Lobbyist) return INVALID_MOVE;
@@ -77,6 +95,9 @@ export const CoreMoves = {
         const { sourceId, targetId, extraResourceIds } = validated.value;
 
         const pid = ctx.currentPlayer;
+        if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'moveInfluence')) return INVALID_MOVE;
+        if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
+
         const srcZone = G.zones[sourceId];
         if (!srcZone) return INVALID_MOVE;
 
@@ -120,6 +141,8 @@ export const CoreMoves = {
         const { committeeTileId, paymentResourceIds, extraResourceIds } = validated.value;
 
         const pid = ctx.currentPlayer;
+        if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'formalizeInfluence')) return INVALID_MOVE;
+        if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
         const tile = G.tiles[committeeTileId];
 
         if (!tile || (tile.type !== TileType.Committee && tile.type !== TileType.StartCommittee)) return INVALID_MOVE;
@@ -185,6 +208,8 @@ export const CoreMoves = {
         const { grassrootsTileId, inputResourceIds, extraResourceIds } = validated.value;
 
         const pid = ctx.currentPlayer;
+        if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'convertResources')) return INVALID_MOVE;
+        if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
         const tile = G.tiles[grassrootsTileId];
 
         if (!tile || tile.type !== TileType.Grassroots) return INVALID_MOVE;
@@ -221,6 +246,7 @@ export const CoreMoves = {
         const { targetCoord, extraResourceIds } = validated.value;
 
         const pid = ctx.currentPlayer;
+        if (!requireStage(ctx, DRAW_AND_PLACE_STAGE, 'placeTile')) return INVALID_MOVE;
         const stagingId = `staging_${pid}`;
         const staging = G.zones[stagingId];
 
@@ -281,9 +307,6 @@ export const CoreMoves = {
         });
         EffectResolver.resolve(G, ctx);
 
-        // Usage tracking
-        EffectResolver.incrementUsage(G, 'politicalAction', pid);
-
         // End Stage → politicalAction
         if (events && events.endStage) {
             events.endStage();
@@ -296,6 +319,11 @@ export const CoreMoves = {
     pass: ({ G, ctx, events }: any, payload?: unknown) => {
         const validated = validateMovePayload('pass', passPayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
+        const pid = ctx.currentPlayer;
+        if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'pass')) return INVALID_MOVE;
+        if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
+
+        EffectResolver.incrementUsage(G, 'politicalAction', pid);
         events.endTurn();
     }
 };

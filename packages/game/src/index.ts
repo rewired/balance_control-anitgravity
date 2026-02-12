@@ -6,12 +6,23 @@ import { drawTileToStaging } from './mechanics-turn';
 import { EffectResolver } from './engine/resolver';
 import { ExpansionRegistry } from './expansion-registry';
 
+const expansionMoves = ExpansionRegistry.getMergedMoves();
+const politicalActionMoves = {
+    placeInfluence: CoreMoves.placeInfluence,
+    moveInfluence: CoreMoves.moveInfluence,
+    formalizeInfluence: CoreMoves.formalizeInfluence,
+    convertResources: CoreMoves.convertResources,
+    pass: CoreMoves.pass,
+    resolveChoice: CoreMoves.resolveChoice,
+    ...expansionMoves
+};
+
 export const BalanceControl: Game<GameState> = {
     name: 'balance-control',
     setup: SetupGame,
     moves: {
         ...CoreMoves,
-        ...ExpansionRegistry.getMergedMoves()
+        ...expansionMoves
     },
 
     // CORE-01-09-01: End when DrawPile is empty
@@ -58,18 +69,17 @@ export const BalanceControl: Game<GameState> = {
                 next: 'politicalAction'
             },
             politicalAction: {
-                moves: {
-                    ...CoreMoves,
-                    ...ExpansionRegistry.getMergedMoves()
-                }
+                moves: politicalActionMoves
             }
         },
         onBegin: ({ G, ctx }: any) => {
+            EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
             drawTileToStaging(G, ctx);
             EffectResolver.triggerHook(G as any, ctx, 'onTurnBegin', { playerId: ctx.currentPlayer });
         },
         onEnd: ({ G, ctx }: any) => {
             EffectResolver.triggerHook(G as any, ctx, 'onTurnEnd', { playerId: ctx.currentPlayer });
+            EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
 
             // CORE-01-07-02: After last player, Round Settlement
             const lastPlayer = (ctx.numPlayers - 1).toString();
@@ -91,6 +101,7 @@ export const BalanceControl: Game<GameState> = {
                 }
 
                 EffectResolver.triggerHook(G as any, ctx, 'onRoundEnd');
+                EffectResolver.resetRoundScopedUsage(G as any);
 
                 // Check if draw pile is empty → flag for endIf
                 const drawPile = G.zones[CoreZoneNames.DrawPile];

@@ -31,11 +31,11 @@ Make turns playable and rule-consistent:
 - No placeTile callable during politicalAction stage
 
 ## PR Checklist (fill at end)
-- [ ] Stage move lists are strict
-- [ ] Exactly-one political action enforced
-- [ ] Usage reset implemented
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md
+- [x] Stage move lists are strict
+- [x] Exactly-one political action enforced
+- [x] Usage reset implemented
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":

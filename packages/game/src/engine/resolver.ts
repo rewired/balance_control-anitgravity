@@ -9,6 +9,12 @@ import { ExpansionRegistry } from '../expansion-registry';
  * It processes instructions (Atoms) and applies reactive rules (Modifiers).
  */
 export class EffectResolver {
+    private static readonly TURN_SCOPED_USAGE_ACTIONS = [
+        'politicalAction',
+        'measure.play',
+        'measure.hold'
+    ];
+
     /**
      * Entry point: Run the effect queue until empty or paused by choice.
      */
@@ -69,6 +75,40 @@ export class EffectResolver {
         if (!usage[playerId]) usage[playerId] = {};
         usage[playerId][actionType] = (usage[playerId][actionType] || 0) + 1;
         usage[actionType] = (usage[actionType] || 0) + 1;
+    }
+
+    public static resetTurnScopedUsage(G: GameState & { engine: EngineState }, playerId: string): void {
+        const usage = G.engine.attributes.usage;
+        if (!usage) return;
+
+        const playerUsage = usage[playerId];
+        if (!playerUsage || typeof playerUsage !== 'object') return;
+
+        for (const actionType of this.TURN_SCOPED_USAGE_ACTIONS) {
+            const usedCount = playerUsage[actionType] || 0;
+            if (usedCount > 0) {
+                if (typeof usage[actionType] === 'number') {
+                    usage[actionType] = Math.max(0, usage[actionType] - usedCount);
+                    if (usage[actionType] === 0) {
+                        delete usage[actionType];
+                    }
+                }
+                delete playerUsage[actionType];
+            }
+        }
+
+        if (Object.keys(playerUsage).length === 0) {
+            delete usage[playerId];
+        }
+    }
+
+    public static resetRoundScopedUsage(G: GameState & { engine: EngineState }): void {
+        const usage = G.engine.attributes.usage;
+        if (!usage) return;
+
+        for (const actionType of this.TURN_SCOPED_USAGE_ACTIONS) {
+            delete usage[actionType];
+        }
     }
 
     public static checkAndPayCosts(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string, extraResourceIds?: string[]): boolean {
