@@ -28,11 +28,11 @@ Make the repo compile reliably:
 - "pnpm -r typecheck" (if exists) succeeds
 
 ## PR Checklist (fill at end)
-- [ ] Fixed TS syntax/type errors
-- [ ] Fixed server import/export wiring
-- [ ] Build passes: pnpm -r build
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md
+- [x] Fixed TS syntax/type errors
+- [x] Fixed server import/export wiring
+- [x] Build passes: pnpm -r build
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":

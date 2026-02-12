@@ -1,5 +1,5 @@
 import React from 'react';
-import { GameState, CoreZoneNames } from '@balance-control/rules';
+import type { GameState } from '@balance-control/rules';
 import { Zone } from './Zone';
 import { Controls } from './Controls';
 
@@ -13,9 +13,17 @@ interface GameLayoutProps {
 }
 
 export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, playerID, isActive }) => {
+    const zoneNames = {
+        PersonalSupply: 'PersonalSupply',
+        Bank: 'Bank',
+        Board: 'Board',
+        DrawPile: 'DrawPile',
+        Noise: 'Noise'
+    } as const;
+
     // Determine player's personal supply
     const myPid = playerID || '0';
-    const mySupplyId = `${CoreZoneNames.PersonalSupply}:${myPid}`;
+    const mySupplyId = `${zoneNames.PersonalSupply}:${myPid}`;
 
     return (
         <div className="game-layout">
@@ -31,19 +39,19 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, p
                 </div>
 
                 <Zone zoneId={mySupplyId} G={G} title="My Supply" />
-                <Zone zoneId={CoreZoneNames.Bank} G={G} title="Bank" />
+                <Zone zoneId={zoneNames.Bank} G={G} title="Bank" />
             </aside>
 
             {/* Center: Board */}
             <main className="center-panel glass-panel">
                 <h3>Board</h3>
-                <Zone zoneId={CoreZoneNames.Board} G={G} className="board-grid" />
+                <Zone zoneId={zoneNames.Board} G={G} className="board-grid" />
             </main>
 
             {/* Right Panel: Opponents / Deck / Info */}
             <aside className="right-panel glass-panel">
-                <Zone zoneId={CoreZoneNames.DrawPile} G={G} title="Draw Pile" />
-                <Zone zoneId={CoreZoneNames.Noise} G={G} title="Noise" />
+                <Zone zoneId={zoneNames.DrawPile} G={G} title="Draw Pile" />
+                <Zone zoneId={zoneNames.Noise} G={G} title="Noise" />
             </aside>
 
             {/* Bottom Controls */}
