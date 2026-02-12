@@ -113,30 +113,50 @@ export const Expansion01: ExpansionDefinition = {
     },
 
     modifiers: {
-        production: (tileId: string, G: GameState, base: number) => {
-            let amount = base;
+        // Porting to engine atoms soon...
+    },
 
-            // Check if player whose turn produced this is under M09 Investment Freeze
-            // Wait, production happens during Round Settlement. M09 says "During the targeted player's current turn".
-            // So if a measure effect is already active on a tile, does M09 block it?
-            // EXP-01-08-M09-05: "During the targeted player's current turn, ignore Measure effects that modify production output..."
-            // But production happens in Settlement, not in a turn.
-            // Wait, "During the next round..." (M07), "This round" (M08).
-            // M09 says "This turn".
-            // Since production is outside turns, M09 probably doesn't affect standard Round Settlement production.
-
-            // M02: Double printed production
-            if (G.secret?.doublingEffects?.[tileId]) {
-                amount *= 2;
-            }
-
-            // M04/M05: Reductions
-            if (G.secret?.productionReductions?.[tileId]) {
-                amount -= G.secret.productionReductions[tileId];
-            }
-
-            return Math.max(0, amount);
+    getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
+        switch (measureId) {
+            case 'M01': // Budget Compromise
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 3, resorts: ['DOM', 'ECO', 'INF'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M01_${payload.targetTileId}_${Date.now()}`,
+                            sourceId: 'M01',
+                            hook: 'onSettlement', // Or a new hook for hotspots
+                            effect: { kind: 'hotspot.prohibit', tileId: payload.targetTileId, window: 'thisTurn' },
+                            expiry: 'thisTurn',
+                            targetTileId: payload.targetTileId
+                        }
+                    }
+                ];
+            case 'M02': // Economic Stimulus
+                return [
+                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['ECO', 'FOR'] },
+                    {
+                        kind: 'modifier.add',
+                        modifier: {
+                            id: `M02_${payload.targetTileId}_${Date.now()}`,
+                            sourceId: 'M02',
+                            hook: 'onProduction',
+                            priority: 100, // Doubling runs early
+                            effect: {
+                                kind: 'resource.grant',
+                                playerId: 'CONTROLLER',
+                                amount: 'CONTEXT_BASE',
+                                resort: 'CONTEXT_RESORT',
+                                context: { tileId: payload.targetTileId }
+                            },
+                            expiry: 'thisRound',
+                            targetTileId: payload.targetTileId
+                        }
+                    }
+                ];
         }
+        return null;
     },
 
     effectHandlers: {

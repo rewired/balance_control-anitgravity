@@ -21,6 +21,7 @@ export type EffectAtom =
     // --- Resource Actions ---
     | { kind: 'resource.pay'; playerId: PlayerID | 'CONTROLLER'; amount: number; resorts: ResourceType[] | 'ANY'; reason?: string; context?: any }
     | { kind: 'resource.grant'; playerId: PlayerID | 'CONTROLLER'; amount: number; resort: ResourceType; reason?: string; context?: any }
+    | { kind: 'production.resolve'; tileId: string; context?: any }
 
     // --- Influence Actions ---
     | { kind: 'influence.place'; playerId: PlayerID | 'CONTROLLER'; targetTileId: string; isStarting?: boolean; context?: any }
@@ -39,6 +40,10 @@ export type EffectAtom =
 
     // --- Climate/Countdown (EXP-03) ---
     | { kind: 'countdown.place'; targetTileId: string; amount: number; context?: any }
+
+    // --- Measure Actions ---
+    | { kind: 'measure.take'; playerId: PlayerID; measureObjectId: string; context?: any }
+    | { kind: 'measure.play'; playerId: PlayerID; measureObjectId: string;[key: string]: any }
 
     // --- Choice/Interaction ---
     | { kind: 'choice.request'; choice: Omit<PendingChoice, 'resumeToken'>; context?: any }
@@ -102,6 +107,7 @@ export interface ActiveModifier {
 
     // Status
     consumeRule?: 'once' | 'turn' | 'round';
+    priority?: number; // Higher runs first
 }
 
 /**

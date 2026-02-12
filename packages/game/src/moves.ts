@@ -150,6 +150,7 @@ export const CoreMoves = {
         G.engine.effectQueue.push({
             kind: 'influence.formalize',
             playerId: pid,
+            tileId: committeeTileId,
             resourceIds: paymentResourceIds
         });
 
@@ -303,16 +304,18 @@ export const CoreMoves = {
         // EXP-03-08-M04: Future Resolution prohibition
         if (G.secret?.prohibitions?.[pid]?.noPlayMeasure) return INVALID_MOVE;
 
-        resolveEffect(G, ctx, {
-            type: 'PLAY_MEASURE',
-            payload: { playerId: pid, measureObjectId, ...targetPayload }
+        G.engine.effectQueue.push({
+            kind: 'measure.play' as any, // Need to add to types
+            playerId: pid,
+            measureObjectId,
+            ...targetPayload
         });
+
+        EffectResolver.resolve(G, ctx);
 
         // Track PlayMeasure usage
         if (!G.playedMeasureThisRound) G.playedMeasureThisRound = {};
         G.playedMeasureThisRound[pid] = true;
-
-        // Note: Turn does NOT end here (EXP-01-06-05)
     },
 
     // EXP-03: Place Countdown Marker (Triggered by Transformationsdruck resolution or M01/M03/etc)

@@ -4,6 +4,7 @@ import { SetupGame } from './setup';
 import { CoreMoves } from './moves';
 import { drawTileToStaging } from './mechanics-turn';
 import { resolveProduction } from './mechanics';
+import { EffectResolver } from './engine/resolver';
 export { ExpansionRegistry } from './expansion-registry';
 
 export const BalanceControl: Game<GameState> = {
@@ -109,8 +110,12 @@ export const BalanceControl: Game<GameState> = {
                 const boardZone = G.zones[CoreZoneNames.Board];
                 if (boardZone) {
                     for (const tileId of boardZone.items) {
-                        resolveProduction(tileId, G);
+                        (G as any).engine.effectQueue.push({
+                            kind: 'production.resolve',
+                            tileId
+                        });
                     }
+                    EffectResolver.resolve(G as any, ctx);
                 }
 
                 // Check if draw pile is empty → flag for endIf

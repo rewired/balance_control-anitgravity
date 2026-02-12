@@ -121,6 +121,7 @@ export interface ExpansionDefinition {
 
     // Effect Handlers
     effectHandlers?: Record<string, (G: GameState, ctx: any, effect: any, utils: any) => void>;
+    getMeasureAtoms?: (G: GameState, measureId: string, payload: any) => any[] | null;
 }
 
 export interface EffectContext {

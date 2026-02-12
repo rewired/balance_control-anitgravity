@@ -2,6 +2,7 @@ import { GameState } from '@balance-control/rules';
 import { EffectAtom, ActiveModifier, HookPoint, EngineState } from './types';
 import { evaluateTileSelector } from './selectors';
 import { computeMajority } from '../mechanics';
+import { ExpansionRegistry } from '../expansion-registry';
 
 /**
  * The EffectResolver is the central "CPU" of the game.
@@ -39,6 +40,12 @@ export class EffectResolver {
             case 'resource.grant':
                 this.handleResourceGrant(G, atom);
                 break;
+            case 'production.resolve':
+                this.handleProductionResolve(G, atom);
+                break;
+            case 'measure.play':
+                this.handleMeasurePlay(G, atom);
+                break;
             case 'influence.place':
                 this.handleInfluencePlace(G, atom);
                 break;
@@ -64,7 +71,7 @@ export class EffectResolver {
                 break;
 
             case 'modifier.remove':
-                G.engine.activeModifiers = G.engine.activeModifiers.filter(m => m.sourceId !== atom.sourceId);
+                this.removeModifier(G, atom.sourceId);
                 break;
         }
 
@@ -85,7 +92,9 @@ export class EffectResolver {
      * Find all modifiers matching the current hook and context, and trigger them.
      */
     private static applyModifiers(G: GameState & { engine: EngineState }, ctx: any, hook: HookPoint, currentAtom: EffectAtom): void {
-        const modifiers = G.engine.activeModifiers.filter(m => m.hook === hook);
+        const modifiers = G.engine.activeModifiers
+            .filter(m => m.hook === hook)
+            .sort((a, b) => (b.priority || 0) - (a.priority || 0));
 
         for (const mod of modifiers) {
             // Check context suitability (Player/Tile)
@@ -109,7 +118,8 @@ export class EffectResolver {
     }
 
     private static getHookForAtom(atom: EffectAtom): string | null {
-        if (atom.kind.startsWith('resource.')) return 'PayCost';
+        if (atom.kind === 'resource.pay') return 'PayCost';
+        if (atom.kind === 'resource.grant') return 'Grant';
         if (atom.kind.startsWith('influence.')) return 'Action';
         if (atom.kind.startsWith('tile.')) return 'Action';
         return null;
@@ -120,6 +130,8 @@ export class EffectResolver {
         const supplyId = `PersonalSupply:${playerId}`;
         const supply = G.zones[supplyId];
         const bank = G.zones['Bank'];
+
+        if (!supply || !bank) return;
 
         let count = 0;
         for (let i = supply.items.length - 1; i >= 0 && count < amount; i--) {
@@ -135,8 +147,14 @@ export class EffectResolver {
     }
 
     private static handleResourceGrant(G: GameState, atom: any): void {
-        const { amount, resort, context } = atom;
-        let { playerId } = atom;
+        let { playerId, amount, resort, context } = atom;
+
+        if (amount === 'CONTEXT_BASE' && context?.baseAmount !== undefined) {
+            amount = context.baseAmount;
+        }
+        if (resort === 'CONTEXT_RESORT' && context?.resort) {
+            resort = context.resort;
+        }
 
         if (playerId === 'CONTROLLER' && context?.tileId) {
             const { controller } = computeMajority(context.tileId, G);
@@ -151,21 +169,40 @@ export class EffectResolver {
         const targetZone = G.zones[supplyId];
         const bank = G.zones['Bank'];
 
-        for (let k = 0; k < amount; k++) {
-            const bankIdx = bank.items.findIndex(id => G.objects[id]?.resort === resort);
-            if (bankIdx >= 0) {
-                const rid = bank.items.splice(bankIdx, 1)[0];
-                targetZone.items.push(rid);
-                if (G.objects[rid]) G.objects[rid].owner = playerId === 'NOISE' ? undefined : playerId;
-            } else {
-                const rid = `res_${resort}_${Date.now()}_${Math.random()}`;
-                G.objects[rid] = { id: rid, type: 'Resource', owner: playerId === 'NOISE' ? undefined : playerId, resort };
-                targetZone.items.push(rid);
+        if (!targetZone || !bank) return;
+
+        if (amount >= 0) {
+            for (let k = 0; k < amount; k++) {
+                const bankIdx = bank.items.findIndex(id => G.objects[id]?.resort === resort);
+                if (bankIdx >= 0) {
+                    const rid = bank.items.splice(bankIdx, 1)[0];
+                    targetZone.items.push(rid);
+                    if (G.objects[rid]) G.objects[rid].owner = playerId === 'NOISE' ? undefined : playerId;
+                } else {
+                    const rid = `res_${resort}_${Date.now()}_${Math.random()}`;
+                    G.objects[rid] = { id: rid, type: 'Resource', owner: playerId === 'NOISE' ? undefined : playerId, resort };
+                    targetZone.items.push(rid);
+                }
+            }
+        } else {
+            // Negative grant = Removal (Reduction)
+            const countToRemove = Math.abs(amount);
+            let removed = 0;
+            for (let i = targetZone.items.length - 1; i >= 0 && removed < countToRemove; i--) {
+                const rid = targetZone.items[i];
+                const obj = G.objects[rid];
+                if (obj && obj.type === 'Resource' && obj.resort === resort) {
+                    targetZone.items.splice(i, 1);
+                    bank.items.push(rid);
+                    obj.owner = undefined;
+                    removed++;
+                }
             }
         }
     }
 
-    private static handleInfluencePlace(G: GameState, atom: any): void {
+    private static handleInfluencePlace(G: GameState & { engine: EngineState }, atom: any): void {
+        this.applyModifiers(G, null, 'beforeAction', atom);
         const { playerId, targetTileId } = atom;
         const supplyId = `PersonalSupply:${playerId}`;
         const supply = G.zones[supplyId];
@@ -178,7 +215,8 @@ export class EffectResolver {
         }
     }
 
-    private static handleInfluenceFormalize(G: GameState, atom: any): void {
+    private static handleInfluenceFormalize(G: GameState & { engine: EngineState }, atom: any): void {
+        this.applyModifiers(G, null, 'beforeAction', atom);
         const { playerId } = atom;
         const supplyId = `PersonalSupply:${playerId}`;
         const supply = G.zones[supplyId];
@@ -189,7 +227,8 @@ export class EffectResolver {
         supply.items.push(infId);
     }
 
-    private static handleInfluenceMove(G: GameState, atom: any): void {
+    private static handleInfluenceMove(G: GameState & { engine: EngineState }, atom: any): void {
+        this.applyModifiers(G, null, 'beforeAction', atom);
         const { playerId, sourceTileId, targetTileId } = atom;
         const srcZone = G.zones[sourceTileId];
         const dstZone = G.zones[targetTileId];
@@ -201,6 +240,55 @@ export class EffectResolver {
         }
     }
 
+    private static handleProductionResolve(G: GameState & { engine: EngineState }, atom: any): void {
+        const { tileId } = atom;
+        const tile = G.tiles[tileId];
+        if (!tile || tile.type !== 'Resort' || !tile.resort) return;
+
+        const baseAmount = tile.weight || 0;
+        atom.context = { ...atom.context, tileId, baseAmount, resort: tile.resort };
+
+        // 1. Trigger hooks that might add or subtract from this distribution
+        this.applyModifiers(G, null, 'onProduction', atom);
+
+        // 2. Grant the base printed amount - unshift LAST so it is at the FRONT
+        G.engine.effectQueue.unshift({
+            kind: 'resource.grant',
+            playerId: 'CONTROLLER',
+            amount: baseAmount,
+            resort: tile.resort,
+            context: { tileId, source: 'production', baseAmount }
+        });
+    }
+
+    private static handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): void {
+        const { playerId, measureObjectId } = atom;
+        const obj = G.objects[measureObjectId];
+        if (!obj || obj.type !== 'Measure') return;
+
+        const mId = obj.measureId;
+        if (!mId) return;
+
+        const atoms = ExpansionRegistry.getMeasureAtoms(G, mId, atom);
+        if (atoms && atoms.length > 0) {
+            G.engine.effectQueue.unshift(...atoms);
+        }
+
+        // Standard Recycle (simplified for engine)
+        const handId = `PlayerHand:${playerId}`;
+        const hand = G.zones[handId];
+        if (hand) {
+            const idx = hand.items.indexOf(measureObjectId);
+            if (idx >= 0) hand.items.splice(idx, 1);
+        }
+
+        obj.playCount = (obj.playCount || 0) + 1;
+        obj.owner = undefined;
+        const recycleZone = obj.playCount === 1 ? 'MeasureRecyclePile' : 'MeasureFinalDiscard';
+        if (G.zones[recycleZone]) {
+            G.zones[recycleZone].items.push(measureObjectId);
+        }
+    }
     private static handleChoiceApply(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
         const { selection, context } = atom;
         if (context?.followUp) {

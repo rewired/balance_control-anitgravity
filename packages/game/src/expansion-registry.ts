@@ -27,6 +27,16 @@ class Registry {
         });
     }
 
+    getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
+        for (const exp of this.expansions.values()) {
+            if ((exp as any).getMeasureAtoms) {
+                const atoms = (exp as any).getMeasureAtoms(G, measureId, payload);
+                if (atoms) return atoms;
+            }
+        }
+        return null;
+    }
+
     applyEffect(G: GameState, ctx: any, effect: any, contextTileId?: string, utils?: any) {
         this.expansions.forEach(exp => {
             if (exp.effectHandlers && exp.effectHandlers[effect.type]) {
