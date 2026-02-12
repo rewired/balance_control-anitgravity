@@ -35,10 +35,6 @@ export type EffectAtom =
     | { kind: 'hotspot.prohibit'; tileId: string; window: ExpiryTrigger; context?: any }
 
     // --- Regulation Actions (EXP-02) ---
-    | { kind: 'regulation.place'; regType: string; targetTileId: string; costPaid?: boolean; context?: any }
-    | { kind: 'regulation.remove'; regulationId: string; context?: any }
-
-    // --- Regulation Actions (EXP-02) ---
     | { kind: 'regulation.place'; regType: RegulationType; targetTileId: string; context?: any }
     | { kind: 'regulation.move'; regulationId: string; targetTileId: string; context?: any }
     | { kind: 'regulation.remove'; regulationId: string; context?: any }
