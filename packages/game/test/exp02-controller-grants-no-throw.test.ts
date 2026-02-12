@@ -92,9 +92,9 @@ describe('EXP-02 controller grants with no controller', () => {
             setupData: { expansions: { ex01: false, ex02: true, ex03: false } }
         }) as any;
 
-        const hotspotId = 'tile_innere_ordnung';
-        G.tiles[hotspotId] = { id: hotspotId, type: TileType.Hotspot, name: 'Inner Order' };
-        G.zones[hotspotId] = { id: hotspotId, name: 'Inner Order', items: [] };
+        const hotspotId = 'tile_inner_order';
+        expect(G.tiles[hotspotId]).toBeTruthy();
+        expect(G.zones[hotspotId]).toBeTruthy();
 
         const pid = ctx.currentPlayer;
         const supply = G.zones[`${CoreZoneNames.PersonalSupply}:${pid}`];

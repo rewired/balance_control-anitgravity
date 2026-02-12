@@ -1,6 +1,7 @@
 import { ExpansionDefinition, GameState, ResourceType, TileType, CoreResources, CoreZoneNames, GameObject, RegulationType } from '@balance-control/rules';
 
 const EXP_02_NAME = 'EXP-02 Security & Order';
+const EXP02_TILE_INNER_ORDER_ID = 'tile_inner_order' as const;
 
 const MEASURE_IDS = [
     'M01', 'M02', 'M03', 'M04', 'M05',
@@ -63,10 +64,9 @@ export const Expansion02: ExpansionDefinition = {
         }
 
         // 3. Add Inner Order Hotspot
-        const innerOrderId = 'tile_inner_order';
-        G.tiles[innerOrderId] = { id: innerOrderId, type: TileType.Hotspot, name: 'Inner Order', isHotspot: true };
-        G.zones[CoreZoneNames.DrawPile].items.push(innerOrderId);
-        G.zones[innerOrderId] = { id: innerOrderId, name: 'Inner Order', items: [] };
+        G.tiles[EXP02_TILE_INNER_ORDER_ID] = { id: EXP02_TILE_INNER_ORDER_ID, type: TileType.Hotspot, name: 'Inner Order', isHotspot: true };
+        G.zones[CoreZoneNames.DrawPile].items.push(EXP02_TILE_INNER_ORDER_ID);
+        G.zones[EXP02_TILE_INNER_ORDER_ID] = { id: EXP02_TILE_INNER_ORDER_ID, name: 'Inner Order', items: [] };
 
         // 4. Add Authority Apparatus
         const authorityId = 'tile_authority_apparatus';
@@ -216,7 +216,7 @@ export const Expansion02: ExpansionDefinition = {
 
     effectHandlers: {
         'HOTSPOT_RESOLUTION': (G: GameState, ctx: any, effect: any, utils: any) => {
-            if (effect.payload.tileId === 'tile_innere_ordnung') {
+            if (effect.payload.tileId === EXP02_TILE_INNER_ORDER_ID) {
                 const result = utils?.computeMajority?.(effect.payload.tileId, G);
                 if (result?.controller) {
                     const pid = result.controller;
