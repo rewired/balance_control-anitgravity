@@ -115,10 +115,10 @@ Test requirements:
 
 ## PR Checklist
 
-- [ ] Updated all EXP-03 `resource.grant` atoms targeting `CONTROLLER` to include `missingController: 'SKIP'` (or `NOISE` with explicit rule citation)
-- [ ] Added deterministic regression test covering uncontrolled tile scenario under EXP-03
-- [ ] Verified no implicit NOISE grants occur from these atoms
+- [x] Updated all EXP-03 `resource.grant` atoms targeting `CONTROLLER` to include `missingController: 'SKIP'` (or `NOISE` with explicit rule citation)
+- [x] Added deterministic regression test covering uncontrolled tile scenario under EXP-03
+- [x] Verified no implicit NOISE grants occur from these atoms
 - [ ] `pnpm test` (repo standard) passes
-- [ ] `CHANGELOG.md` updated under Unreleased
-- [ ] `docs/PR_TASK_LIST.md` updated
-- [ ] Added `docs/tasks/0019_fix-exp03-controller-grants.md` and completed checklist after implementation
+- [x] `CHANGELOG.md` updated under Unreleased
+- [x] `docs/PR_TASK_LIST.md` updated
+- [x] Added `docs/tasks/0019_fix-exp03-controller-grants.md` and completed checklist after implementation
