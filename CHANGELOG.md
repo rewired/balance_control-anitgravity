@@ -6,3 +6,4 @@
 - Replaced nondeterministic ID/RNG sources with deterministic `allocId` and `ctx.random`-driven flows.
 - Fixed TypeScript build errors and package exports for server integration.
 - Normalized move payload contracts and added runtime validation.
+- Fixed turn stage gating and per-turn usage reset to prevent softlocks.

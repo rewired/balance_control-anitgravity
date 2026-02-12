@@ -43,7 +43,11 @@ describe('Moves', () => {
                 }
             }
         } as any;
-        ctx = { currentPlayer: 'p1', numPlayers: 2 };
+        ctx = {
+            currentPlayer: 'p1',
+            numPlayers: 2,
+            activePlayers: { p1: 'politicalAction' }
+        };
     });
 
     it('placeInfluence should move influence to target', () => {
