@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: workspace test recursion now uses `pnpm -r --if-present test` to avoid CI failures on packages without test scripts.
 - Docs: Added README quickstart and repo orientation.
 - Fix: restored expansion-level production modifier application during `production.resolve`.
 - Hardening: EXP-02 exports canonical Inner Order tile id and tests use it (single source of truth).
