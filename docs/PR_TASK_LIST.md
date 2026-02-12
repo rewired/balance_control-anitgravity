@@ -14,3 +14,4 @@
 - [x] Task 0012 - Prevent Softlock When DrawPile Is Empty Mid-Round
 - [x] Task 0013 - Influence Cap Enforcement: Apply Only On Creation (Not Move/Place)
 - [x] Task 0014 - Grassroots Conversion Data: Make ConvertResources Work In Real Games
+- [x] Task 0015 - Fix Production: Uncontrolled ResortTile Produces 0
