@@ -3,10 +3,24 @@ import { CoreZoneNames, TileType, PlayerID } from '@balance-control/rules';
 import { stringToCoord, coordToString, getNeighbors, isSurrounded } from './topology';
 import { drawMeasure, allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from './mechanics-turn';
 import { EffectResolver } from './engine/resolver';
+import {
+    resolveChoicePayloadSchema,
+    placeInfluencePayloadSchema,
+    moveInfluencePayloadSchema,
+    formalizeInfluencePayloadSchema,
+    convertResourcesPayloadSchema,
+    placeTilePayloadSchema,
+    passPayloadSchema,
+    validateMovePayload
+} from './move-contracts';
 
 export const CoreMoves = {
     // SYSTEM: Multi-stage Choice Resolution
-    resolveChoice: ({ G, ctx }: any, { choiceId, selection }: { choiceId: string, selection: any }) => {
+    resolveChoice: ({ G, ctx }: any, payload: unknown) => {
+        const validated = validateMovePayload('resolveChoice', resolveChoicePayloadSchema, payload);
+        if (!validated.ok) return INVALID_MOVE;
+        const { choiceId, selection } = validated.value;
+
         if (!G.engine.pendingChoice || G.engine.pendingChoice.choiceId !== choiceId) return INVALID_MOVE;
 
         const choice = G.engine.pendingChoice;
@@ -24,7 +38,11 @@ export const CoreMoves = {
     },
 
     // CORE-01-04-10–12: PlaceInfluence via Lobbyist
-    placeInfluence: ({ G, ctx, events }: any, { targetTileId, extraResourceIds }: { targetTileId: string, extraResourceIds?: string[] }) => {
+    placeInfluence: ({ G, ctx, events }: any, payload: unknown) => {
+        const validated = validateMovePayload('placeInfluence', placeInfluencePayloadSchema, payload);
+        if (!validated.ok) return INVALID_MOVE;
+        const { targetTileId, extraResourceIds } = validated.value;
+
         const pid = ctx.currentPlayer;
         const tile = G.tiles[targetTileId];
 
@@ -53,7 +71,11 @@ export const CoreMoves = {
     },
 
     // CORE-01-04-12: Move exactly one Influence from one Board Tile to another
-    moveInfluence: ({ G, ctx, events }: any, { sourceId, targetId, extraResourceIds }: { sourceId: string, targetId: string, extraResourceIds?: string[] }) => {
+    moveInfluence: ({ G, ctx, events }: any, payload: unknown) => {
+        const validated = validateMovePayload('moveInfluence', moveInfluencePayloadSchema, payload);
+        if (!validated.ok) return INVALID_MOVE;
+        const { sourceId, targetId, extraResourceIds } = validated.value;
+
         const pid = ctx.currentPlayer;
         const srcZone = G.zones[sourceId];
         if (!srcZone) return INVALID_MOVE;
@@ -92,7 +114,10 @@ export const CoreMoves = {
     },
 
     // CORE-01-04-13–19: FormalizeInfluence via Committee
-    formalizeInfluence: ({ G, ctx, events }: any, { committeeTileId, paymentResourceIds, extraResourceIds }: { committeeTileId: string, paymentResourceIds: string[], extraResourceIds?: string[] }) => {
+    formalizeInfluence: ({ G, ctx, events }: any, payload: unknown) => {
+        const validated = validateMovePayload('formalizeInfluence', formalizeInfluencePayloadSchema, payload);
+        if (!validated.ok) return INVALID_MOVE;
+        const { committeeTileId, paymentResourceIds, extraResourceIds } = validated.value;
 
         const pid = ctx.currentPlayer;
         const tile = G.tiles[committeeTileId];
@@ -154,7 +179,11 @@ export const CoreMoves = {
     },
 
     // CORE-01-04-20–22: ConvertResources via Grassroots tile
-    convertResources: ({ G, ctx, events }: any, { grassrootsTileId, inputResourceIds, extraResourceIds }: { grassrootsTileId: string, inputResourceIds: string[], extraResourceIds?: string[] }) => {
+    convertResources: ({ G, ctx, events }: any, payload: unknown) => {
+        const validated = validateMovePayload('convertResources', convertResourcesPayloadSchema, payload);
+        if (!validated.ok) return INVALID_MOVE;
+        const { grassrootsTileId, inputResourceIds, extraResourceIds } = validated.value;
+
         const pid = ctx.currentPlayer;
         const tile = G.tiles[grassrootsTileId];
 
@@ -186,7 +215,11 @@ export const CoreMoves = {
     },
 
     // CORE-01-04-02: DrawAndPlaceTile — place drawn tile at coord
-    placeTile: ({ G, ctx, events }: any, { targetCoord, extraResourceIds }: { targetCoord: string, extraResourceIds?: string[] }) => {
+    placeTile: ({ G, ctx, events }: any, payload: unknown) => {
+        const validated = validateMovePayload('placeTile', placeTilePayloadSchema, payload);
+        if (!validated.ok) return INVALID_MOVE;
+        const { targetCoord, extraResourceIds } = validated.value;
+
         const pid = ctx.currentPlayer;
         const stagingId = `staging_${pid}`;
         const staging = G.zones[stagingId];
@@ -260,7 +293,9 @@ export const CoreMoves = {
     },
 
     // Pass = choose no political action, just end turn
-    pass: ({ G, ctx, events }: any) => {
+    pass: ({ G, ctx, events }: any, payload?: unknown) => {
+        const validated = validateMovePayload('pass', passPayloadSchema, payload);
+        if (!validated.ok) return INVALID_MOVE;
         events.endTurn();
     }
 };

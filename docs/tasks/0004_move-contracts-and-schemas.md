@@ -27,12 +27,12 @@ Stop signature drift between UI/tests/engine:
 - Test suite updated to match new signatures (even if not yet fully passing until later tasks)
 
 ## PR Checklist (fill at end)
-- [ ] Canonical payload types defined
-- [ ] Runtime validation added
-- [ ] Client updated
-- [ ] Tests updated
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md
+- [x] Canonical payload types defined
+- [x] Runtime validation added
+- [x] Client updated
+- [x] Tests updated
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":

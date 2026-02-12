@@ -90,6 +90,26 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
+  packages/expansion-02:
+    dependencies:
+      '@balance-control/rules':
+        specifier: workspace:*
+        version: link:../rules
+    devDependencies:
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  packages/expansion-03:
+    dependencies:
+      '@balance-control/rules':
+        specifier: workspace:*
+        version: link:../rules
+    devDependencies:
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
   packages/game:
     dependencies:
       '@balance-control/rules':
@@ -101,6 +121,9 @@ importers:
       boardgame.io:
         specifier: ^0.50.0
         version: 0.50.2
+      zod:
+        specifier: ^3.0.0
+        version: 3.25.76
     devDependencies:
       typescript:
         specifier: ^5.0.0
@@ -120,6 +143,12 @@ importers:
       '@balance-control/expansion-01':
         specifier: workspace:*
         version: link:../expansion-01
+      '@balance-control/expansion-02':
+        specifier: workspace:*
+        version: link:../expansion-02
+      '@balance-control/expansion-03':
+        specifier: workspace:*
+        version: link:../expansion-03
       '@balance-control/game':
         specifier: workspace:*
         version: link:../game

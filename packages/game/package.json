@@ -11,7 +11,8 @@
   "dependencies": {
     "@balance-control/rules": "workspace:*",
     "@balance-control/shared": "workspace:*",
-    "boardgame.io": "^0.50.0"
+    "boardgame.io": "^0.50.0",
+    "zod": "^3.0.0"
   },
   "devDependencies": {
      "typescript": "^5.0.0",

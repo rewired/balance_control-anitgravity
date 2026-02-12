@@ -31,7 +31,7 @@ describe('Turn Structure (Stages)', () => {
         const tileId = client.getState().G.zones[stagingId].items[0];
 
         // placeTile
-        client.moves.placeTile('1,0');
+        client.moves.placeTile({ targetCoord: '1,0' });
 
         const state = client.store.getState();
         // Should be in politicalAction
@@ -44,10 +44,10 @@ describe('Turn Structure (Stages)', () => {
         const initialPlayer = client.getState().ctx.currentPlayer;
 
         // 1. Place Tile
-        client.moves.placeTile('1,0');
+        client.moves.placeTile({ targetCoord: '1,0' });
 
         // 2. Pass
-        client.moves.pass();
+        client.moves.pass({});
 
         const state = client.store.getState();
         expect(state.ctx.currentPlayer).not.toBe(initialPlayer);
