@@ -14,13 +14,23 @@ export type PlayerSelector =
     | { op: 'eq'; key: 'id'; value: PlayerID | 'currentPlayer' | 'opponent' }
     | { op: 'all' };
 
+export type MissingControllerPolicy = 'ERROR' | 'NOISE' | 'SKIP';
+
 /**
  * EFFECT ATOMS: The atomic instructions of the engine
  */
 export type EffectAtom =
     // --- Resource Actions ---
     | { kind: 'resource.pay'; playerId: PlayerID | 'CONTROLLER'; amount: number; resorts: ResourceType[] | 'ANY'; resourceIds?: string[]; reason?: string; context?: any }
-    | { kind: 'resource.grant'; playerId: PlayerID | 'CONTROLLER'; amount: number; resort: ResourceType; reason?: string; context?: any }
+    | {
+        kind: 'resource.grant';
+        playerId: PlayerID | 'CONTROLLER';
+        amount: number;
+        resort: ResourceType;
+        missingController?: MissingControllerPolicy;
+        reason?: string;
+        context?: any;
+    }
     | { kind: 'production.resolve'; tileId: string; context?: any }
 
     // --- Influence Actions ---

@@ -15,10 +15,11 @@ export const CoreModule = {
         if (!tile || tile.type !== TileType.Resort || !tile.resort || !tile.weight) return [];
 
         return [
-            // 1. Calculate base amount (as an atom that sets a context value or just uses the weight)
+            // CONTROLLER grants must always declare missingController explicitly.
             {
                 kind: 'resource.grant',
-                playerId: 'CONTROLLER', // Special keyword for the distribution atom 
+                playerId: 'CONTROLLER',
+                missingController: 'SKIP',
                 amount: tile.weight,
                 resort: tile.resort,
                 context: { tileId }

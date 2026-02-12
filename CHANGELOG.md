@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Hardening: `CONTROLLER` grants now require explicit missing-controller behavior; no implicit reroute to Noise.
 - Fix: Uncontrolled ResortTile production now yields 0 (no Noise grant).
 - Fixed Grassroots conversion plumbing so ConvertResources works in real matches.
 - Corrected Influence cap enforcement to apply only to marker creation, not relocation.
