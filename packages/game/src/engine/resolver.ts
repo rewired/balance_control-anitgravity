@@ -510,7 +510,7 @@ export class EffectResolver {
     }
 
     private static handleResourceGrant(G: GameState, atom: any): void {
-        let { playerId, amount, resort, context } = atom;
+        let { playerId, amount, resort, context, missingController } = atom;
 
         if (amount === 'CONTEXT_BASE' && context?.baseAmount !== undefined) {
             amount = context.baseAmount;
@@ -519,12 +519,21 @@ export class EffectResolver {
             resort = context.resort;
         }
 
-        if (playerId === 'CONTROLLER' && context?.tileId) {
-            const { controller } = computeMajority(context.tileId, G);
+        if (playerId === 'CONTROLLER') {
+            const controller = context?.tileId ? computeMajority(context.tileId, G).controller : null;
+
             if (controller) {
                 playerId = controller;
             } else {
-                playerId = 'NOISE';
+                const policy = missingController ?? 'ERROR';
+                if (policy === 'NOISE') {
+                    playerId = 'NOISE';
+                } else if (policy === 'SKIP') {
+                    return;
+                } else {
+                    const sourceTag = context?.source || context?.tileId || atom.reason || 'unknown';
+                    throw new Error(`[resolver:resource.grant] missing controller for "${sourceTag}"`);
+                }
             }
         }
 
