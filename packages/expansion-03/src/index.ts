@@ -51,7 +51,7 @@ export const Expansion03: ExpansionDefinition = {
         // 2. Add CLM ResortTiles
         const addClmResort = (weight: number, count: number) => {
             for (let i = 0; i < count; i++) {
-                const id = `tile_clm_w${weight}_${i}_${Math.random().toString(36).substr(2, 5)}`;
+                const id = allocId(G, `tile_clm_w${weight}_${i}`);
                 G.tiles[id] = { id, type: TileType.Resort, resort: 'CLM', weight, name: `CLM W${weight}` };
                 G.zones[CoreZoneNames.DrawPile].items.push(id);
                 G.zones[id] = { id, name: `CLM W${weight}`, items: [] };
@@ -98,7 +98,7 @@ export const Expansion03: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M01_${payload.targetTileId}_${Date.now()}`,
+                            id: allocId(G, `M01_${payload.targetTileId}`),
                             sourceId: 'M01',
                             hook: 'beforeAction',
                             targetTileId: payload.targetTileId,
@@ -118,7 +118,7 @@ export const Expansion03: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M02_${payload.targetResort}_${Date.now()}`,
+                            id: allocId(G, `M02_${payload.targetResort}`),
                             sourceId: 'M02',
                             hook: 'beforeAction',
                             effect: {
@@ -142,7 +142,7 @@ export const Expansion03: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M04_${payload.targetPlayerId}_${Date.now()}`,
+                            id: allocId(G, `M04_${payload.targetPlayerId}`),
                             sourceId: 'M04',
                             hook: 'beforeAction',
                             playerId: payload.targetPlayerId,
@@ -162,7 +162,7 @@ export const Expansion03: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M06_${Date.now()}`,
+                            id: allocId(G, 'M06'),
                             sourceId: 'M06',
                             hook: 'beforeAction',
                             priority: 10,
@@ -202,7 +202,7 @@ export const Expansion03: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M12_${Date.now()}`,
+                            id: allocId(G, 'M12'),
                             sourceId: 'M12',
                             hook: 'beforeAction', // Triggered by placeTile
                             priority: 10,
@@ -222,7 +222,7 @@ export const Expansion03: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M14_${Date.now()}`,
+                            id: allocId(G, 'M14'),
                             sourceId: 'M14',
                             hook: 'beforeAction', // Triggered by placeCountdown
                             priority: 10,
@@ -237,7 +237,7 @@ export const Expansion03: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M15_${Date.now()}`,
+                            id: allocId(G, 'M15'),
                             sourceId: 'M15',
                             hook: 'beforeAction',
                             priority: 10,
@@ -285,6 +285,15 @@ export const Expansion03: ExpansionDefinition = {
         }
     }
 };
+
+function allocId(G: GameState, prefix: string): string {
+    if (typeof G.engine.idSeq !== 'number' || !Number.isFinite(G.engine.idSeq) || G.engine.idSeq < 0) {
+        G.engine.idSeq = 0;
+    }
+
+    G.engine.idSeq += 1;
+    return `${prefix}_${G.engine.idSeq}`;
+}
 
 function payResources(G: GameState, playerId: string, cost: Record<string, number>): boolean {
     const supplyId = `${CoreZoneNames.PersonalSupply}:${playerId}`;

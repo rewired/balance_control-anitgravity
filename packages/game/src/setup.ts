@@ -10,6 +10,7 @@ export const SetupGame = ({ ctx }: { ctx: Ctx }): GameState => {
         adjacency: {},
         grid: {},
         engine: {
+            idSeq: 0,
             effectQueue: [],
             activeModifiers: [],
             history: [],

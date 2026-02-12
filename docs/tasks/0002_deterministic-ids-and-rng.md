@@ -33,11 +33,11 @@ Eliminate all nondeterministic sources:
 - A deterministic replay run produces identical state hashes (hashing can be stubbed until Task 0010, but at least snapshot equality tests exist)
 
 ## PR Checklist (fill at end)
-- [ ] Added deterministic allocId in G and used everywhere
-- [ ] Removed Date.now / Math.random from gameplay
-- [ ] Added guard test for forbidden APIs
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md
+- [x] Added deterministic allocId in G and used everywhere
+- [x] Removed Date.now / Math.random from gameplay
+- [x] Added guard test for forbidden APIs
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":

@@ -126,6 +126,7 @@ export interface ActiveModifier {
  * RESOLVER STATE: To be integrated into GameState
  */
 export interface EngineState {
+    idSeq: number;
     effectQueue: EffectAtom[];
     activeModifiers: ActiveModifier[];
     pendingChoice?: PendingChoice;

@@ -51,7 +51,7 @@ export const Expansion01: ExpansionDefinition = {
         // 2. Add ECO ResortTiles (EXP-01-02-A-01/02)
         const addEcoResort = (weight: number, count: number) => {
             for (let i = 0; i < count; i++) {
-                const id = `tile_eco_w${weight}_${i}_${Math.random().toString(36).substr(2, 5)}`;
+                const id = allocId(G, `tile_eco_w${weight}_${i}`);
                 G.tiles[id] = { id, type: TileType.Resort, resort: 'ECO', weight, name: `ECO W${weight}` };
                 G.zones[CoreZoneNames.DrawPile].items.push(id);
                 G.zones[id] = { id, name: `ECO W${weight}`, items: [] };
@@ -124,7 +124,7 @@ export const Expansion01: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M01_${payload.targetTileId}_${Date.now()}`,
+                            id: allocId(G, `M01_${payload.targetTileId}`),
                             sourceId: 'M01',
                             hook: 'onSettlement', // Or a new hook for hotspots
                             effect: { kind: 'hotspot.prohibit', tileId: payload.targetTileId, window: 'thisTurn' },
@@ -139,7 +139,7 @@ export const Expansion01: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M02_${payload.targetTileId}_${Date.now()}`,
+                            id: allocId(G, `M02_${payload.targetTileId}`),
                             sourceId: 'M02',
                             hook: 'onProduction',
                             priority: 100, // Doubling runs early
@@ -161,7 +161,7 @@ export const Expansion01: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M03_${Date.now()}`,
+                            id: allocId(G, 'M03'),
                             sourceId: 'M03',
                             hook: 'beforeAction',
                             effect: { kind: 'rule.prohibit', actionType: 'CONVERT', targetResort: 'ECO' },
@@ -180,7 +180,7 @@ export const Expansion01: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `${measureId}_${payload.targetTileId}_${Date.now()}`,
+                            id: allocId(G, `${measureId}_${payload.targetTileId}`),
                             sourceId: measureId,
                             hook: 'onProduction',
                             priority: 10, // Reductions run after doubling
@@ -202,7 +202,7 @@ export const Expansion01: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M06_${payload.targetPlayerId}_${Date.now()}`,
+                            id: allocId(G, `M06_${payload.targetPlayerId}`),
                             sourceId: 'M06',
                             hook: 'beforeAction',
                             priority: 10,
@@ -219,7 +219,7 @@ export const Expansion01: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M07_${Date.now()}`,
+                            id: allocId(G, 'M07'),
                             sourceId: 'M07',
                             hook: 'beforeAction',
                             effect: { kind: 'rule.prohibit', actionType: 'convertResources' },
@@ -271,7 +271,7 @@ export const Expansion01: ExpansionDefinition = {
             const result = utils?.computeMajority?.(laborMarketId, G);
             if (result?.controller) {
                 const pid = result.controller;
-                const infId = `inf_${pid}_labor_${Date.now()}`;
+                const infId = allocId(G, `inf_${pid}_labor`);
                 G.objects[infId] = { id: infId, type: 'Influence', owner: pid };
                 const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
                 if (G.zones[supplyId]) {
@@ -281,3 +281,12 @@ export const Expansion01: ExpansionDefinition = {
         }
     }
 };
+
+function allocId(G: GameState, prefix: string): string {
+    if (typeof G.engine.idSeq !== 'number' || !Number.isFinite(G.engine.idSeq) || G.engine.idSeq < 0) {
+        G.engine.idSeq = 0;
+    }
+
+    G.engine.idSeq += 1;
+    return `${prefix}_${G.engine.idSeq}`;
+}

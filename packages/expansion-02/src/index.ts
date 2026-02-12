@@ -50,7 +50,7 @@ export const Expansion02: ExpansionDefinition = {
         // 2. Add SEC ResortTiles (Assuming similar scaling to ECO for now as per usual patterns)
         const addSecResort = (weight: number, count: number) => {
             for (let i = 0; i < count; i++) {
-                const id = `tile_sec_w${weight}_${i}_${Math.random().toString(36).substr(2, 5)}`;
+                const id = allocId(G, `tile_sec_w${weight}_${i}`);
                 G.tiles[id] = { id, type: TileType.Resort, resort: 'SEC', weight, name: `SEC W${weight}` };
                 G.zones[CoreZoneNames.DrawPile].items.push(id);
                 G.zones[id] = { id, name: `SEC W${weight}`, items: [] };
@@ -126,7 +126,7 @@ export const Expansion02: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M05_${Date.now()}`,
+                            id: allocId(G, 'M05'),
                             sourceId: 'M05',
                             hook: 'beforeAction',
                             targetTileId: 'tile_authority_apparatus',
@@ -152,7 +152,7 @@ export const Expansion02: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M09_${Date.now()}`,
+                            id: allocId(G, 'M09'),
                             sourceId: 'M09',
                             hook: 'beforeAction', // Trigger on reg placement
                             effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['ANY'] },
@@ -166,7 +166,7 @@ export const Expansion02: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M10_${Date.now()}`,
+                            id: allocId(G, 'M10'),
                             sourceId: 'M10',
                             hook: 'beforeAction',
                             priority: 10,
@@ -181,7 +181,7 @@ export const Expansion02: ExpansionDefinition = {
                     {
                         kind: 'modifier.add',
                         modifier: {
-                            id: `M11_${payload.targetPlayerId}_${Date.now()}`,
+                            id: allocId(G, `M11_${payload.targetPlayerId}`),
                             sourceId: 'M11',
                             hook: 'beforeAction',
                             playerId: payload.targetPlayerId,
@@ -268,3 +268,12 @@ export const Expansion02: ExpansionDefinition = {
         }
     }
 };
+
+function allocId(G: GameState, prefix: string): string {
+    if (typeof G.engine.idSeq !== 'number' || !Number.isFinite(G.engine.idSeq) || G.engine.idSeq < 0) {
+        G.engine.idSeq = 0;
+    }
+
+    G.engine.idSeq += 1;
+    return `${prefix}_${G.engine.idSeq}`;
+}
