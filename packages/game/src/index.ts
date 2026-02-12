@@ -116,3 +116,4 @@ export const BalanceControl: Game<GameState> = {
 export { ExpansionRegistry } from './expansion-registry';
 export * from './move-contracts';
 export * from './config';
+export * from './hash-state';

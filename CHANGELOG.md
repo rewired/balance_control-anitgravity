@@ -11,3 +11,4 @@
 - Fixed core move legality (Influence placement/move, formalize costs, resource conversion).
 - Added expansion gating and fixed setup shuffle order for deterministic composition.
 - Made PendingChoice/Measure execution deterministic and replay-stable.
+- Added golden replay + state hashing harness to prevent rule drift.

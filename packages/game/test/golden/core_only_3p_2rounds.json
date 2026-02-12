@@ -1,0 +1,27 @@
+{
+  "id": "core_only_3p_2rounds",
+  "seed": "golden-core-3p-2rounds",
+  "numPlayers": 3,
+  "config": {
+    "expansions": {
+      "ex01": false,
+      "ex02": false,
+      "ex03": false
+    }
+  },
+  "moves": [
+    { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
+    { "move": "pass", "args": [{}] },
+    { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
+    { "move": "pass", "args": [{}] },
+    { "move": "placeTile", "args": [{ "targetCoord": "0,-1" }] },
+    { "move": "pass", "args": [{}] },
+    { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
+    { "move": "pass", "args": [{}] },
+    { "move": "placeTile", "args": [{ "targetCoord": "-1,1" }] },
+    { "move": "pass", "args": [{}] },
+    { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
+    { "move": "pass", "args": [{}] }
+  ],
+  "expectedFinalHash": "2039a31679e8572aa7af22d22587f667d678914362cae6e1321e3a673fc38400"
+}

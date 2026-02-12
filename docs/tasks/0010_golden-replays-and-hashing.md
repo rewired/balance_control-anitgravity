@@ -28,11 +28,11 @@ Create a deterministic regression harness:
   - core + ex01 enabled small scenario
 
 ## PR Checklist (fill at end)
-- [ ] Added canonical hashing
-- [ ] Added golden replay fixtures
-- [ ] Tests pass locally
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md
+- [x] Added canonical hashing
+- [x] Added golden replay fixtures
+- [x] Tests pass locally
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":
