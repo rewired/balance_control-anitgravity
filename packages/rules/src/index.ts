@@ -1,4 +1,5 @@
 export type ResourceType = 'DOM' | 'FOR' | 'INF' | string;
+export type PlayerID = string;
 
 export enum CoreResources {
     DOM = 'DOM',
@@ -94,6 +95,14 @@ export interface GameState {
     roundSettlementDone?: boolean;
     startCommitteeUsed?: Record<string, boolean>;
     playedMeasureThisRound?: Record<string, boolean>;
+
+    // Modular Engine State
+    engine: {
+        effectQueue: any[];
+        activeModifiers: any[];
+        pendingChoice?: any;
+        history: any[];
+    };
 }
 
 export interface ExpansionDefinition {

@@ -1,65 +1,49 @@
 import { resolveEffect, resolveProduction, getRegulationModifiers } from './mechanics';
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { CoreZoneNames, TileType } from '@balance-control/rules';
+import { CoreZoneNames, TileType, PlayerID } from '@balance-control/rules';
 import { stringToCoord, coordToString, getNeighbors, isSurrounded } from './topology';
-
-// --- Restriction Helpers ---
-
-/** CORE-01-08-01: Max influence cap */
-function getInfluenceCap(ctx: any): number {
-    return ctx.numPlayers >= 5 ? 8 : 7;
-}
-
-/** Count total Influence objects owned by a player */
-function countPlayerInfluence(G: any, pid: string): number {
-    let count = 0;
-    for (const obj of Object.values(G.objects) as any[]) {
-        if (obj.type === 'Influence' && obj.owner === pid) count++;
-    }
-    return count;
-}
-
-/** CORE-01-08-02: Check if ALL starting influence has been placed on Board by ALL players */
-function allStartingInfluencePlaced(G: any, ctx: any): boolean {
-    // Check every PersonalSupply for any influence marked isStarting
-    for (let i = 0; i < ctx.numPlayers; i++) {
-        const pid = i.toString();
-        const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
-        const supply = G.zones[supplyId];
-        if (!supply) continue;
-        for (const itemId of supply.items) {
-            const obj = G.objects[itemId];
-            if (obj && obj.type === 'Influence' && obj.isStarting) {
-                return false; // Still has starting influence in supply
-            }
-        }
-    }
-    return true;
-}
+import { drawMeasure, allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from './mechanics-turn';
+import { EffectResolver } from './engine/resolver';
 
 export const CoreMoves = {
-    // CORE-01-04-11: Place exactly one Influence from PersonalSupply to a Board Tile
-    placeInfluence: ({ G, ctx, events }: any, { tileId, extraResourceIds, transferToPlayerId }: { tileId: string, extraResourceIds?: string[], transferToPlayerId?: string }) => {
+    // SYSTEM: Multi-stage Choice Resolution
+    resolveChoice: ({ G, ctx }: any, { choiceId, selection }: { choiceId: string, selection: any }) => {
+        if (!G.engine.pendingChoice || G.engine.pendingChoice.choiceId !== choiceId) return INVALID_MOVE;
+
+        const choice = G.engine.pendingChoice;
+        G.engine.pendingChoice = undefined;
+
+        // Push resolution atom to front of queue
+        G.engine.effectQueue.unshift({
+            kind: 'choice.apply',
+            choiceId,
+            selection,
+            context: choice.spec // Spec might contain the branching data
+        } as any);
+
+        EffectResolver.resolve(G, ctx);
+    },
+
+    // CORE-01-04-10–12: PlaceInfluence via Lobbyist
+    placeInfluence: ({ G, ctx, events }: any, { targetTileId, extraResourceIds, transferToPlayerId }: { targetTileId: string, extraResourceIds?: string[], transferToPlayerId?: string }) => {
         const pid = ctx.currentPlayer;
-        const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
-        const supply = G.zones[supplyId];
+        const tile = G.tiles[targetTileId];
+
+        if (!tile || tile.type !== TileType.Lobbyist) return INVALID_MOVE;
 
         // Handle Extra Costs (EXP-01/EXP-02/EXP-03)
-        if (!handleExtraCosts(G, pid, extraResourceIds, tileId, 'PLACE_INFLUENCE', transferToPlayerId)) return INVALID_MOVE;
+        if (!handleExtraCosts(G, pid, extraResourceIds, targetTileId, 'PLACE_INFLUENCE', transferToPlayerId)) return INVALID_MOVE;
 
-        // CORE-01-08-04: No Influence may be placed on the Start Committee
-        const tile = G.tiles[tileId];
-        if (tile && tile.type === TileType.StartCommittee) return INVALID_MOVE;
+        // CORE-01-08-01: Cannot exceed influence cap
+        if (countPlayerInfluence(G, pid) >= getInfluenceCap(ctx)) return INVALID_MOVE;
 
-        const hasInf = supply.items.some((id: string) => G.objects[id] && G.objects[id].type === 'Influence');
-        if (!hasInf) return INVALID_MOVE;
+        G.engine.effectQueue.push({
+            kind: 'influence.place',
+            playerId: pid,
+            targetTileId
+        });
 
-        if (!G.zones[tileId]) return INVALID_MOVE;
-
-        resolveEffect(G, ctx, {
-            type: 'PLACE_INFLUENCE',
-            payload: { playerId: pid, targetTileId: tileId }
-        }, tileId);
+        EffectResolver.resolve(G, ctx);
 
         // CORE-01-04-09: Exactly one political action per turn
         events.endTurn();
@@ -87,10 +71,14 @@ export const CoreMoves = {
 
         if (!G.zones[targetId]) return INVALID_MOVE;
 
-        resolveEffect(G, ctx, {
-            type: 'MOVE_INFLUENCE',
-            payload: { sourceTileId: sourceId, targetTileId: targetId }
-        }, targetId);
+        G.engine.effectQueue.push({
+            kind: 'influence.move',
+            playerId: pid,
+            sourceTileId: sourceId,
+            targetTileId: targetId
+        });
+
+        EffectResolver.resolve(G, ctx);
 
         // CORE-01-04-09: Exactly one political action per turn
         events.endTurn();
@@ -98,6 +86,7 @@ export const CoreMoves = {
 
     // CORE-01-04-13–19: FormalizeInfluence via Committee
     formalizeInfluence: ({ G, ctx, events }: any, { committeeTileId, paymentResourceIds, extraResourceIds, transferToPlayerId, payForInfluenceResourceId }: { committeeTileId: string, paymentResourceIds: string[], extraResourceIds?: string[], transferToPlayerId?: string, payForInfluenceResourceId?: string }) => {
+
         const pid = ctx.currentPlayer;
         const tile = G.tiles[committeeTileId];
 
@@ -150,10 +139,21 @@ export const CoreMoves = {
             if (uniqueResorts.size < 2) return INVALID_MOVE;
         }
 
-        resolveEffect(G, ctx, {
-            type: 'FORMALIZE',
-            payload: { playerId: pid, resourceIds: paymentResourceIds, payForInfluenceResourceId }
-        }, committeeTileId);
+        // PUSH ATOMS
+        G.engine.effectQueue.push({
+            kind: 'resource.pay',
+            playerId: pid,
+            amount: paymentResourceIds.length,
+            resorts: Array.from(uniqueResorts) as string[]
+        });
+
+        G.engine.effectQueue.push({
+            kind: 'influence.formalize',
+            playerId: pid,
+            resourceIds: paymentResourceIds
+        });
+
+        EffectResolver.resolve(G, ctx);
 
         // Track Start Committee usage
         if (tile.type === TileType.StartCommittee) {

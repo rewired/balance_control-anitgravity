@@ -9,6 +9,11 @@ export const SetupGame = ({ ctx }: { ctx: Ctx }): GameState => {
         objects: {},
         adjacency: {},
         grid: {},
+        engine: {
+            effectQueue: [],
+            activeModifiers: [],
+            history: []
+        },
     };
 
     // 1. Initialize Zones

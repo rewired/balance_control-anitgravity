@@ -19,33 +19,34 @@ export type PlayerSelector =
  */
 export type EffectAtom =
     // --- Resource Actions ---
-    | { kind: 'resource.pay'; playerId: PlayerID; amount: number; resorts: ResourceType[] | 'ANY'; reason?: string }
-    | { kind: 'resource.grant'; playerId: PlayerID; amount: number; resort: ResourceType; reason?: string }
+    | { kind: 'resource.pay'; playerId: PlayerID | 'CONTROLLER'; amount: number; resorts: ResourceType[] | 'ANY'; reason?: string; context?: any }
+    | { kind: 'resource.grant'; playerId: PlayerID | 'CONTROLLER'; amount: number; resort: ResourceType; reason?: string; context?: any }
 
     // --- Influence Actions ---
-    | { kind: 'influence.place'; playerId: PlayerID; targetTileId: string; isStarting?: boolean }
-    | { kind: 'influence.move'; playerId: PlayerID; sourceTileId: string; targetTileId: string }
-    | { kind: 'influence.formalize'; playerId: PlayerID; resourceIds: string[] }
-    | { kind: 'influence.suppress'; playerId: PlayerID; window: ExpiryTrigger }
+    | { kind: 'influence.place'; playerId: PlayerID | 'CONTROLLER'; targetTileId: string; isStarting?: boolean; context?: any }
+    | { kind: 'influence.move'; playerId: PlayerID | 'CONTROLLER'; sourceTileId: string; targetTileId: string; context?: any }
+    | { kind: 'influence.formalize'; playerId: PlayerID; resourceIds: string[]; context?: any }
+    | { kind: 'influence.suppress'; playerId: PlayerID; window: ExpiryTrigger; context?: any }
 
     // --- Map/Tile Actions ---
-    | { kind: 'tile.place'; playerId: PlayerID; tileId: string; coord: string }
-    | { kind: 'hotspot.resolve'; tileId: string }
-    | { kind: 'hotspot.prohibit'; tileId: string; window: ExpiryTrigger }
+    | { kind: 'tile.place'; playerId: PlayerID; tileId: string; coord: string; context?: any }
+    | { kind: 'hotspot.resolve'; tileId: string; context?: any }
+    | { kind: 'hotspot.prohibit'; tileId: string; window: ExpiryTrigger; context?: any }
 
     // --- Regulation Actions (EXP-02) ---
-    | { kind: 'regulation.place'; regType: string; targetTileId: string; costPaid?: boolean }
-    | { kind: 'regulation.remove'; regulationId: string }
+    | { kind: 'regulation.place'; regType: string; targetTileId: string; costPaid?: boolean; context?: any }
+    | { kind: 'regulation.remove'; regulationId: string; context?: any }
 
     // --- Climate/Countdown (EXP-03) ---
-    | { kind: 'countdown.place'; targetTileId: string; amount: number }
+    | { kind: 'countdown.place'; targetTileId: string; amount: number; context?: any }
 
     // --- Choice/Interaction ---
-    | { kind: 'choice.request'; choice: Omit<PendingChoice, 'resumeToken'> }
+    | { kind: 'choice.request'; choice: Omit<PendingChoice, 'resumeToken'>; context?: any }
+    | { kind: 'choice.apply'; choiceId: string; selection: any; context?: any }
 
     // --- Meta/Rule Modifiers ---
-    | { kind: 'modifier.add'; modifier: ActiveModifier }
-    | { kind: 'modifier.remove'; sourceId: string };
+    | { kind: 'modifier.add'; modifier: ActiveModifier; context?: any }
+    | { kind: 'modifier.remove'; sourceId: string; context?: any };
 
 /**
  * CHOICE SYSTEM: Multi-stage interaction

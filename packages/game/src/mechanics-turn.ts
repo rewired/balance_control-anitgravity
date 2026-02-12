@@ -73,3 +73,40 @@ function canBeLegallyPlaced(G: GameState): boolean {
 
     return false; // All adjacent positions occupied (extremely unlikely)
 }
+
+/** CORE-01-08-01: Max influence cap */
+export function getInfluenceCap(ctx: any): number {
+    return ctx.numPlayers >= 5 ? 8 : 7;
+}
+
+/** Count total Influence objects owned by a player */
+export function countPlayerInfluence(G: any, pid: string): number {
+    let count = 0;
+    for (const obj of Object.values(G.objects) as any[]) {
+        if (obj.type === 'Influence' && obj.owner === pid) count++;
+    }
+    return count;
+}
+
+/** CORE-01-08-02: Check if ALL starting influence has been placed on Board by ALL players */
+export function allStartingInfluencePlaced(G: any, ctx: any): boolean {
+    for (let i = 0; i < ctx.numPlayers; i++) {
+        const pid = i.toString();
+        const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+        const supply = G.zones[supplyId];
+        if (!supply) continue;
+        for (const itemId of supply.items) {
+            const obj = G.objects[itemId];
+            if (obj && obj.type === 'Influence' && obj.isStarting) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+export function drawMeasure(G: GameState, ctx: any) {
+    // Basic drawMeasure for EXP-01/02
+    // ... logic would go here, or just stub for now if not used yet
+}
+
