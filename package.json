@@ -1,0 +1,22 @@
+{
+  "name": "balance-control-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "eslint .",
+    "dev": "pnpm -r --parallel dev"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^0.30.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

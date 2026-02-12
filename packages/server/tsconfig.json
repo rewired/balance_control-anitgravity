@@ -1,0 +1,27 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "baseUrl": ".",
+        "paths": {
+            "@balance-control/rules": [
+                "../rules/dist/index.d.ts"
+            ],
+            "@balance-control/game": [
+                "../game/dist/index.d.ts"
+            ],
+            "@balance-control/expansion-01": [
+                "../expansion-01/dist/index.d.ts"
+            ],
+            "@balance-control/expansion-02": [
+                "../expansion-02/dist/index.d.ts"
+            ],
+            "@balance-control/expansion-03": [
+                "../expansion-03/dist/index.d.ts"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*"
+    ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@balance-control/bot-llm",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@balance-control/game": "workspace:*"  },
+  "devDependencies": {
+     "typescript": "^5.0.0"
+  }
+}

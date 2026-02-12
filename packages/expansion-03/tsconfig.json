@@ -1,0 +1,24 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "rootDir": "./src",
+        "declaration": true,
+        "outDir": "./dist",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "baseUrl": ".",
+        "paths": {
+            "@balance-control/rules": [
+                "../rules/dist/index.d.ts"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
