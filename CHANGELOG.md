@@ -9,3 +9,4 @@
 - Fixed turn stage gating and per-turn usage reset to prevent softlocks.
 - Made cost resolution atomic and implemented production tie-splitting.
 - Fixed core move legality (Influence placement/move, formalize costs, resource conversion).
+- Added expansion gating and fixed setup shuffle order for deterministic composition.
