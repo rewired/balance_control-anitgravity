@@ -64,7 +64,8 @@ export const BalanceControl: Game<GameState> = {
         stages: {
             drawAndPlace: {
                 moves: {
-                    placeTile: CoreMoves.placeTile
+                    placeTile: CoreMoves.placeTile,
+                    passTilePlacement: CoreMoves.passTilePlacement
                 },
                 next: 'politicalAction'
             },
