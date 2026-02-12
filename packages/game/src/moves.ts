@@ -107,9 +107,6 @@ export const CoreMoves = {
         // Generic Prohibition check
         if (EffectResolver.isProhibited(G, 'influence.place', pid, targetTileId)) return INVALID_MOVE;
 
-        // CORE-01-08-01: Cannot exceed influence cap
-        if (countPlayerInfluence(G, pid) >= getInfluenceCap(ctx)) return INVALID_MOVE;
-
         // Decoupled Extra Costs
         if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.place', targetTileId, extraResourceIds)) return INVALID_MOVE;
 

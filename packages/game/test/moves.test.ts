@@ -8,6 +8,17 @@ describe('Moves', () => {
     let ctx: any;
     let events: any;
 
+    const seedPlayerInfluenceAtCap = () => {
+        for (let i = 2; i <= 7; i++) {
+            const infId = `inf_cap_${i}`;
+            G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
+            G.zones.board_t1.items.push(infId);
+        }
+    };
+
+    const countOwnedInfluence = () =>
+        Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === 'p1').length;
+
     beforeEach(() => {
         events = { endTurn: () => { }, endStage: () => { } };
         G = {
@@ -93,6 +104,30 @@ describe('Moves', () => {
         expect(JSON.stringify(G)).toBe(before);
     });
 
+    it('moveInfluence should remain legal at cap because it only relocates markers', () => {
+        seedPlayerInfluenceAtCap();
+        const beforeCount = countOwnedInfluence();
+
+        const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+
+        expect(result).not.toBe(INVALID_MOVE);
+        expect(G.zones.board_t1.items.length).toBe(5);
+        expect(G.zones.board_t2.items.length).toBe(1);
+        expect(countOwnedInfluence()).toBe(beforeCount);
+    });
+
+    it('placeInfluence should remain legal at cap because it uses existing supply marker', () => {
+        seedPlayerInfluenceAtCap();
+        const beforeCount = countOwnedInfluence();
+
+        const result = CoreMoves.placeInfluence({ G, ctx, events }, { targetTileId: 'board_t2' });
+
+        expect(result).not.toBe(INVALID_MOVE);
+        expect(G.zones['PersonalSupply:p1'].items.includes('inf_1')).toBe(false);
+        expect(G.zones.board_t2.items).toContain('inf_1');
+        expect(countOwnedInfluence()).toBe(beforeCount);
+    });
+
     it('formalizeInfluence should enforce different-resort cost on standard Committee', () => {
         G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_dom_2'];
 
@@ -100,6 +135,19 @@ describe('Moves', () => {
         const result = CoreMoves.formalizeInfluence(
             { G, ctx, events },
             { committeeTileId: 'board_t2', paymentResourceIds: ['res_dom', 'res_dom_2'] }
+        );
+
+        expect(result).toBe(INVALID_MOVE);
+        expect(JSON.stringify(G)).toBe(before);
+    });
+
+    it('formalizeInfluence should be rejected at cap without partial mutation', () => {
+        seedPlayerInfluenceAtCap();
+        const before = JSON.stringify(G);
+
+        const result = CoreMoves.formalizeInfluence(
+            { G, ctx, events },
+            { committeeTileId: 'board_t2', paymentResourceIds: ['res_dom', 'res_for'] }
         );
 
         expect(result).toBe(INVALID_MOVE);

@@ -2,6 +2,7 @@ import { GameState } from '@balance-control/rules';
 import { EffectAtom, ActiveModifier, HookPoint, EngineState } from './types';
 import { evaluateTileSelector } from './selectors';
 import { computeMajority } from '../mechanics';
+import { countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
 import { ExpansionRegistry } from '../expansion-registry';
 
 type CostSlot = string[] | 'ANY';
@@ -364,7 +365,7 @@ export class EffectResolver {
                 this.handleInfluencePlace(G, atom);
                 break;
             case 'influence.formalize':
-                this.handleInfluenceFormalize(G, atom);
+                this.handleInfluenceFormalize(G, ctx, atom);
                 break;
             case 'influence.move':
                 this.handleInfluenceMove(G, atom);
@@ -577,9 +578,13 @@ export class EffectResolver {
         }
     }
 
-    private static handleInfluenceFormalize(G: GameState & { engine: EngineState }, atom: any): void {
+    private static handleInfluenceFormalize(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
         this.applyModifiers(G, null, 'beforeAction', atom);
         const { playerId } = atom;
+        if (countPlayerInfluence(G, playerId) >= getInfluenceCap(ctx)) {
+            return;
+        }
+
         const supplyId = `PersonalSupply:${playerId}`;
         const supply = G.zones[supplyId];
 

@@ -12,5 +12,5 @@
 - [x] Task 0010 - Golden Replays + State Hashing Harness
 - [x] Task 0011 - UTF-8 Cleanup: Remove UTF-16 Artifacts + Harden Encoding Guard
 - [x] Task 0012 - Prevent Softlock When DrawPile Is Empty Mid-Round
-- [ ] Task 0013 - Influence Cap Enforcement: Apply Only On Creation (Not Move/Place)
+- [x] Task 0013 - Influence Cap Enforcement: Apply Only On Creation (Not Move/Place)
 - [ ] Task 0014 - Grassroots Conversion Data: Make ConvertResources Work In Real Games
