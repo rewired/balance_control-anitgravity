@@ -122,10 +122,10 @@ Optional (nice-to-have):
 
 ## PR Checklist
 
-* [ ] Added/updated `README.md` with: requirements, quickstart, repo map, determinism notes
-* [ ] Verified commands work on a clean clone
-* [ ] Kept README strictly descriptive (no new mechanics)
-* [ ] `pnpm -w test` passes
-* [ ] Updated `CHANGELOG.md` (Unreleased)
-* [ ] Updated `docs/PR_TASK_LIST.md`
-* [ ] Added `docs/tasks/0024_readme-quickstart.md` and completed checklist after implementation
+* [x] Added/updated `README.md` with: requirements, quickstart, repo map, determinism notes
+* [x] Verified commands work on a clean clone
+* [x] Kept README strictly descriptive (no new mechanics)
+* [x] `pnpm -w test` passes
+* [x] Updated `CHANGELOG.md` (Unreleased)
+* [x] Updated `docs/PR_TASK_LIST.md`
+* [x] Added `docs/tasks/0024_readme-quickstart.md` and completed checklist after implementation

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Docs: Added README quickstart and repo orientation.
 - Fix: restored expansion-level production modifier application during `production.resolve`.
 - Hardening: EXP-02 exports canonical Inner Order tile id and tests use it (single source of truth).
 - Fix: EXP-02 Inner Order Hotspot id now matches between setup and HOTSPOT_RESOLUTION handler; added regression test.
