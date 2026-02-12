@@ -20,8 +20,7 @@ describe('Expansion System', () => {
         // Setup State
         const G: GameState & { engine: any } = {
             zones: {
-                'ps:p1': { id: 'ps:p1', name: 'PS', items: [] },
-                'bank': { id: 'bank', name: 'Bank', items: [] },
+                'Bank': { id: 'Bank', name: 'Bank', items: [] },
                 'PersonalSupply:p1': { id: 'PersonalSupply:p1', name: 'PS', items: [] }
             },
             tiles: {

@@ -129,7 +129,7 @@ import { Expansion02, EXP02_TILE_INNER_ORDER_ID } from '@bc/expansion-02';
 * [x] Updated internal EXP-02 references to use the exported constant (no duplicates)
 * [x] Updated `exp02-hotspot-ids.test.ts` to import and use the constant
 * [x] Verified no dependency cycles introduced
-* [ ] `pnpm test` passes
+* [x] `pnpm test` passes
 * [x] Updated `CHANGELOG.md` (Unreleased)
 * [x] Updated `docs/PR_TASK_LIST.md`
 * [x] Added `docs/tasks/0022_export-exp02-inner-order-id.md` and completed checklist after implementation

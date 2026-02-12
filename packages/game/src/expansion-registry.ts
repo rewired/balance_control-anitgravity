@@ -97,6 +97,24 @@ class Registry {
             }
         });
     }
+
+    applyProductionModifiers(G: GameState, tileId: string, baseAmount: number, config?: GameConfig): number {
+        const flags = this.resolveFlags(G, config);
+        let amount = baseAmount;
+
+        this.expansions.forEach(exp => {
+            if (!this.isEnabled(exp, flags)) return;
+            const productionModifier = exp.modifiers?.production;
+            if (!productionModifier) return;
+
+            const nextAmount = productionModifier(tileId, G, amount);
+            if (typeof nextAmount === 'number' && Number.isFinite(nextAmount)) {
+                amount = nextAmount;
+            }
+        });
+
+        return amount;
+    }
     // ... other hooks
 }
 

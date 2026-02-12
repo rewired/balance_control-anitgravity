@@ -139,7 +139,7 @@ If the handler uses the wrong id, the queue stays unchanged (no-op), and the tes
 * [x] Removed all occurrences of the legacy mismatched hotspot id literal
 * [x] Added regression test `exp02-hotspot-ids.test.ts`
 * [ ] Verified test fails pre-fix and passes post-fix
-* [ ] `pnpm test` passes
+* [x] `pnpm test` passes
 * [x] Updated `CHANGELOG.md` (Unreleased)
 * [x] Updated `docs/PR_TASK_LIST.md`
 * [x] Added `docs/tasks/0021_fix-exp02-inner-order-hotspot-id.md` and completed checklist after implementation

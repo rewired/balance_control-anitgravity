@@ -621,7 +621,8 @@ export class EffectResolver {
         const tile = G.tiles[tileId];
         if (!tile || tile.type !== 'Resort' || !tile.resort) return;
 
-        const baseAmount = tile.weight || 0;
+        const printedAmount = tile.weight || 0;
+        const baseAmount = ExpansionRegistry.applyProductionModifiers(G, tileId, printedAmount);
         atom.context = { ...atom.context, tileId, baseAmount, resort: tile.resort };
 
         // 1. Trigger hooks that might add or subtract from this distribution
