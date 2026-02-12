@@ -382,9 +382,12 @@ export class EffectResolver {
                 this.handleCountdownPlace(G, atom);
                 break;
             case 'choice.request':
+                // Deterministic pending choice token for network/replay stability.
+                const choiceId = allocId(G, 'choice');
                 G.engine.pendingChoice = {
                     ...atom.choice,
-                    resumeToken: allocId(G, 'resume')
+                    choiceId,
+                    resumeToken: choiceId
                 };
                 break;
 
@@ -426,9 +429,8 @@ export class EffectResolver {
 
         // Log to history
         G.engine.history.push({
-            tick: G.engine.history.length,
-            atom: atom.kind,
-            ts: G.engine.history.length
+            seq: G.engine.history.length,
+            atom: atom.kind
         });
 
         return true;

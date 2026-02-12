@@ -8,5 +8,5 @@
 - [x] Task 0006 - Atomic Cost Resolution + Production Tie Split
 - [x] Task 0007 - Core Move Legality Fixes (Influence + Formalize + Convert)
 - [x] Task 0008 - Expansion Gating + Setup Shuffle Order + Isolation
-- [ ] Task 0009 - Measure CPU: PendingChoice Determinism + Serialization
+- [x] Task 0009 - Measure CPU: PendingChoice Determinism + Serialization
 - [ ] Task 0010 - Golden Replays + State Hashing Harness

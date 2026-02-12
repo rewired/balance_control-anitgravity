@@ -25,11 +25,11 @@ Make PendingChoice safe for network play and replays:
 - Deterministic replay with pending choices produces identical state
 
 ## PR Checklist (fill at end)
-- [ ] PendingChoice IDs deterministic
-- [ ] No timestamps in state/history
-- [ ] Tests added
-- [ ] Updated CHANGELOG.md (Unreleased)
-- [ ] Updated docs/PR_TASK_LIST.md
+- [x] PendingChoice IDs deterministic
+- [x] No timestamps in state/history
+- [x] Tests added
+- [x] Updated CHANGELOG.md (Unreleased)
+- [x] Updated docs/PR_TASK_LIST.md
 
 ## Changelog
 Update /CHANGELOG.md under "Unreleased":

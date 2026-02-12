@@ -45,7 +45,7 @@ function collectTsFiles(dirPath: string): string[] {
     return files;
 }
 
-function runDeterministicScenario(seed: number): string {
+function runDeterministicScenario(seed: number): { snapshot: string; pendingChoiceId?: string } {
     ExpansionRegistry.clear();
     const ctx: any = {
         numPlayers: 2,
@@ -63,7 +63,6 @@ function runDeterministicScenario(seed: number): string {
         {
             kind: 'choice.request',
             choice: {
-                choiceId: 'choice_1',
                 sourceId: 'test',
                 player: '0',
                 kind: 'yesNo',
@@ -73,7 +72,10 @@ function runDeterministicScenario(seed: number): string {
     );
 
     EffectResolver.resolve(G as any, ctx);
-    return JSON.stringify(G);
+    return {
+        snapshot: JSON.stringify(G),
+        pendingChoiceId: G.engine.pendingChoice?.choiceId
+    };
 }
 
 describe('Determinism policy', () => {
@@ -115,6 +117,8 @@ describe('Determinism policy', () => {
         const first = runDeterministicScenario(2026);
         const second = runDeterministicScenario(2026);
 
-        expect(first).toBe(second);
+        expect(first.snapshot).toBe(second.snapshot);
+        expect(first.pendingChoiceId).toBe(second.pendingChoiceId);
+        expect(first.pendingChoiceId).toMatch(/^choice_\d+$/);
     });
 });
