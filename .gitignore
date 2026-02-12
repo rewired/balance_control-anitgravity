@@ -1,10 +1,17 @@
 # Dependencies
 node_modules/
 
-# Production
+# Build artifacts
 dist/
 build/
 coverage/
+*.tsbuildinfo
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+!**/src/**/*.d.ts # Allow manual type definitions if any
+!**/types/**/*.d.ts
 
 # Misc
 .DS_Store
