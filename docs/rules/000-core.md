@@ -3,7 +3,7 @@
 # CORE-01 Simulation Specification (Atomic, Deterministic)
 
 Version: 01
-Scope: Core Rules v1.0.20 only with variants (no expansions)
+Scope: Core Rules v1.0.21 only with variants (no expansions)
 
 ---
 
@@ -51,6 +51,12 @@ CORE-01-00-T02 Adjacent(TileA, TileB) must be deterministic.
 CORE-01-00-T03 All adjacency-based rules reference Adjacent(TileA, TileB).
 CORE-01-00-T04 The topology implementation may represent hexagonal, orthogonal, or other grid structures.
 CORE-01-00-T05 Changing topology does not alter any rule outside adjacency evaluation.
+CORE-01-00-T06 Board Position Binding
+Each Tile in Board is bound to exactly one Position value defined by the topology. No two Tiles may share a Position.
+CORE-01-00-T07 Neighbor Positions
+A topology implementation must define NeighborPositions(Position) → ordered list of adjacent Positions.
+CORE-01-00-T08 Canonical Position Order
+A topology implementation must define PositionKey(Position) → a deterministic total-order key used for canonical ordering.
 
 ---
 
@@ -68,6 +74,8 @@ CORE-01-01-04 Tie results in no control.
 CORE-01-02-01 The game contains exactly one Start Committee tile.
 CORE-01-02-02 The Start Committee tile is not part of the DrawPile.
 CORE-01-02-03 A tile in the DrawPile is drawn only during DrawAndPlaceTile.
+CORE-01-02-03A Ownership
+Each Influence object is owned by exactly one player. A player may move only their own Influence unless a rule explicitly states otherwise.
 
 CORE-01-02-04 Core tile types are: ResortTiles, Committees, Grassroots, Lobbyists, Hotspots.
 
@@ -104,7 +112,13 @@ CORE-01-02-17D A Meta-Marker may be placed on the Start Committee despite Start 
 
 CORE-01-03-01 Setup places the Start Committee tile into Board.
 CORE-01-03-02 Setup shuffles all non-Start tiles into DrawPile.
+CORE-01-03-02A Deterministic Randomness Contract
+All randomization in CORE-01 (shuffles, starting player selection) MUST use a deterministic RNG seeded at game start, and the seed MUST be part of the initial game state.
+CORE-01-03-02B Canonical Pre-Shuffle Ordering
+Before any shuffle, build the initial DrawPile list in a canonical order: sort by (TileType, Resort if any, W value if any), and within identical entries by an increasing serial index.
 CORE-01-03-03 Setup determines a starting player.
+CORE-01-03-03A Turn Order
+Turn order is fixed for the entire game: starting player acts first, then players act in ascending seat order wrapping around.
 
 CORE-01-03-04 For 2 players, assign 4 Influence objects to each player’s PersonalSupply.
 CORE-01-03-05 For 3 players, assign 3 Influence objects to each player’s PersonalSupply.
@@ -118,17 +132,19 @@ CORE-01-04-01 A turn consists of exactly two phases.
 CORE-01-04-02 Phase 1 is DrawAndPlaceTile.
 CORE-01-04-03 Phase 2 is ExactlyOnePoliticalAction.
 
-CORE-01-04-04 DrawAndPlaceTile draws exactly one Tile from DrawPile.
+CORE-01-04-04 DrawAndPlaceTile repeats: draw the top Tile from DrawPile, attempt to place it legally, until either (a) a Tile is placed, or (b) DrawPile is empty.
 CORE-01-04-05 A tile placement is legal only if adjacent to at least one Tile in Board.
 CORE-01-04-06 If the drawn Tile cannot be legally placed, move it from DrawPile to DiscardFaceUp.
 CORE-01-04-07 If a Tile is moved to DiscardFaceUp due to illegality, the player immediately draws again from DrawPile.
-CORE-01-04-08 A tile may be placed only on free table space.
+CORE-01-04-08 A tile may be placed only on an unoccupied Position in the current topology.
 
 CORE-01-04-09 ExactlyOnePoliticalAction allows exactly one action type from: PlaceOrMoveInfluence, FormalizeInfluence, ConvertResources.
 
 CORE-01-04-10 PlaceOrMoveInfluence may be chosen as the Political Action.
 CORE-01-04-11 PlaceOrMoveInfluence (Place) moves exactly one Influence from the active player’s PersonalSupply to Board on a chosen Tile.
-CORE-01-04-12 PlaceOrMoveInfluence (Move) moves exactly one Influence from one Board Tile to another Board Tile.
+CORE-01-04-11A PlaceOrMoveInfluence (Place) Legality
+Place is legal only if the active player has at least one Influence in PersonalSupply and the chosen Tile is not prohibited by restrictions (e.g., Start Committee per CORE-01-08-04/06E).
+CORE-01-04-12 PlaceOrMoveInfluence (Move) moves exactly one active-player-owned Influence from a source Board Tile to a different destination Board Tile. The Start Committee may not be source or destination (CORE-01-08-06E).
 CORE-01-04-12A PlaceOrMoveInfluence (Move) Meta-Marker Placement
 After a successful PlaceOrMoveInfluence (Move) resolution, place the active player’s Meta-Marker onto the source Tile (the Tile the Influence was moved from).
 If the Meta-Marker was previously on another Tile, remove it from that Tile.
@@ -139,13 +155,17 @@ If the move is a Ping-Pong Move, set the Meta-Marker’s mode to PingPong for th
 If the move is not a Ping-Pong Move, set the Meta-Marker’s mode to Shift for the remainder of the Round.
 
 CORE-01-04-12C PlaceOrMoveInfluence (Move) Meta-Marker Expiry
-A Meta-Marker placed or updated due to PlaceOrMoveInfluence (Move) expires at the beginning of that player’s next Turn and is returned to its owner’s PersonalSupply.
+A Meta-Marker placed or updated due to PlaceOrMoveInfluence (Move) expires at the beginning of the next Round and is returned to its owner’s PersonalSupply.
 
 CORE-01-04-13 FormalizeInfluence may be chosen as the Political Action.
 CORE-01-04-14 FormalizeInfluence is performed via a Committee tile.
+CORE-01-04-14A Start Committee Override
+If the selected Committee tile is the Start Committee, resolve FormalizeInfluence using CORE-01-08-07 through CORE-01-08-10 instead of CORE-01-04-15 through CORE-01-04-19.
 CORE-01-04-15 FormalizeInfluence (Standard Committee) cost requires paying 2 Resources of different resorts.
 CORE-01-04-16 FormalizeInfluence (Standard Committee) moves paid Resources from the active player’s PersonalSupply to Bank.
 CORE-01-04-17 FormalizeInfluence (Standard Committee) creates exactly one new Influence in the active player’s PersonalSupply.
+CORE-01-04-17A Influence Cap Check
+FormalizeInfluence does not resolve if creating the new Influence would cause the active player to exceed the Influence cap (CORE-01-08-01). In that case, no state change occurs (CORE-01-04-19).
 CORE-01-04-18 FormalizeInfluence fails if the required Resources cannot be fully paid.
 CORE-01-04-19 If FormalizeInfluence fails, no state change occurs.
 
@@ -174,20 +194,25 @@ After a successful ConvertResources resolution, place the active player’s Meta
 If the Meta-Marker was previously on another Tile, remove it from that Tile.
 
 CORE-01-04-22F ConvertResources Meta-Marker Expiry
-A Meta-Marker placed or updated due to ConvertResources expires at the beginning of that player’s next Turn and is returned to its owner’s PersonalSupply.
+A Meta-Marker placed or updated due to ConvertResources expires at the beginning of the next Round and is returned to its owner’s PersonalSupply.
+
+CORE-01-04-22G Grassroots ConvertRecipe Requirement
+For engine implementations, each Grassroots Tile MUST provide a machine-readable ConvertRecipe descriptor (inputs + outputs) that exactly matches its printed text.
+If the selected Grassroots Tile has no ConvertRecipe descriptor, ConvertResources is invalid and does not resolve (CORE-01-06-00-03).
 
 ---
 
 # CORE-01-05 CONTROL
 
-CORE-01-05-01 A player controls a Tile if that player has strictly more Influence on that Tile than any other player.
-CORE-01-05-02 If two or more players tie for highest Influence on a Tile, no player controls that Tile.
+CORE-01-05-01 A player controls a Tile iff computeMajority(Tile) returns that player (CORE-01-05-03A).
+CORE-01-05-02 If computeMajority(Tile) returns None (tie), no player controls that Tile (CORE-01-05-03A).
 CORE-01-05-03 Control updates immediately after any Influence movement onto, off, or between Board Tiles.
 
-CORE-01-05-03A A player controls a Tile if computeMajority(Tile) == that player.
-If computeMajority(Tile) returns None (tie), the Tile is uncontrolled.
+CORE-01-05-03A Definition — computeMajority(Tile)
 
 computeMajority(Tile):
+
+Applicable modifiers in CORE-01 are limited to Lobbyist adjacency per CORE-01-05-04A and are subject to CORE-01-05-04B.
 
 1. For each player:
    totalInfluence =
@@ -201,6 +226,11 @@ computeMajority(Tile):
    return None.
 
 CORE-01-05-04 Each Lobbyist adjacent to a Tile contributes +1 virtual Influence for majority calculation on that adjacent Tile.
+CORE-01-05-04A Lobbyist Bonus Attribution
+For a given target Tile X, each adjacent Lobbyist Tile L contributes +1 virtual Influence to the player who controls L, applied to X during majority calculation.
+If L is uncontrolled, L contributes 0.
+CORE-01-05-04B Lobbyist Self-Reference Exclusion
+When computing majority/control for a Lobbyist Tile, do not apply any Lobbyist adjacency bonuses (i.e., treat the Lobbyist modifier set as empty for that Tile).
 CORE-01-05-05 Lobbyist contribution applies only to majority calculation.
 CORE-01-05-06 Lobbyist contribution does not create or move Influence objects.
 
@@ -214,6 +244,7 @@ An “Effect” is any rule-defined state change that is executed as a result of
 (b) resolving a triggered Tile behavior (e.g., Hotspot resolution), or
 (c) resolving a Political Action (PlaceOrMoveInfluence, FormalizeInfluence, ConvertResources), or
 (d) resolving any Measure or Regulation instruction.
+In CORE-01 without expansions, there are no Measures, Regulations, Overlays, or external prohibition/modifier effects beyond those explicitly defined in this document.
 
 CORE-01-06-00-02 Paying costs, checking prohibitions, and applying modifiers are part of effect resolution.
 CORE-01-06-00-03 If an Effect does not resolve, no partial state changes occur unless explicitly stated.
@@ -236,9 +267,12 @@ If an instruction references multiple Tiles, it must explicitly state which Tile
 CORE-01-06-01 A Hotspot becomes “fully surrounded” when all positions adjacent to that Hotspot are occupied by Tiles.
 CORE-01-06-02 The check for full enclosure occurs immediately after a Tile is placed during DrawAndPlaceTile.
 CORE-01-06-03 If full enclosure is detected, Hotspot resolution is executed immediately before proceeding to the Political Action phase of that turn.
+CORE-01-06-03A Multiple Hotspots (Canonical Order)
+If multiple Hotspots are fully surrounded as a result of the same Tile placement, resolve them one at a time in ascending PositionKey(Hotspot.Position).
+If resolving one Hotspot affects Influence availability for later Hotspots, later Hotspots resolve using the updated state.
 CORE-01-06-04 Hotspot resolution follows this order:
-(a) Determine majority on that Hotspot.
-(b) Apply any pre-majority effects explicitly defined as occurring “before majority resolution.”
+(a) Apply any pre-majority effects explicitly defined as occurring “before majority determination.”
+(b) Determine majority on that Hotspot.
 (c) Resolve majority outcome.
 (d) Apply effect modifiers and prohibitions according to Rule Hierarchy.
 CORE-01-06-05 If a player has majority on the Hotspot, place exactly one Influence on that Hotspot for the majority player.
@@ -251,7 +285,9 @@ CORE-01-06-10 Each ResortTile has a printed production value.
 CORE-01-06-11 When a player controls a ResortTile, that ResortTile produces Resources equal to its printed production value.
 CORE-01-06-12 Produced Resources are moved from Bank to the controlling player’s PersonalSupply.
 CORE-01-06-13 If no player controls a ResortTile, that ResortTile produces no Resources.
-CORE-01-06-14 If players tie for control of a ResortTile, divide the produced Resources evenly among tied players.
+CORE-01-06-13A Zero-Influence Production
+If the highest totalInfluence on a ResortTile is 0 (i.e., no player has any Influence/modifier advantage on that tile), that ResortTile produces 0 Resources.
+CORE-01-06-14 If two or more players tie for highest totalInfluence on a ResortTile and that highest totalInfluence is > 0, divide the produced Resources evenly among those tied players.
 CORE-01-06-15 Any remainder from a tied ResortTile production is moved to Noise.
 CORE-01-06-16 Production Resolution Order (Canonical)
 CORE-01-06-16-00 Modifier Collection Step
@@ -265,15 +301,15 @@ When resolving a ResortTile’s production during Round Settlement, use the foll
 2. Apply doubling effects (if any).
 3. Apply production output modifiers (reductions or increases).
 4. Apply Ping-Pong reduction, if applicable:
-If the controlling player’s Meta-Marker mode is PingPong, reduce this production output to 50% (rounded down) and cap it at a maximum of 10.
+If the production winner determined in step (b) is exactly one player and that player’s Meta-Marker mode is PingPong, reduce this production output to 50% (rounded down) and cap it at a maximum of 10.
 5. Apply floors (minimum 0).
 
-(b) Determine control for that Tile using the standard majority rules.
+(b) Determine highest totalInfluence on that Tile using the standard majority rules (including modifiers). If the unique highest player exists, that player is the production winner. If multiple players tie for highest and highest > 0, those players are tied production winners. If highest == 0, there are no production winners.
 
 (c) Distribute the produced Resources:
-- If exactly one player controls the Tile, that player receives the full amount.
+- If there is exactly one production winner, that player receives the full amount.
 - If no player controls the Tile, produce 0.
-- If players tie for control, split evenly; any remainder is moved to Noise.
+- If there are tied production winners (highest > 0), split evenly; any remainder is moved to Noise.
 
 CORE-01-06-17 If an effect-level prohibition applies to production (e.g., “Blockade”), production output is treated as 0 and no Resources are distributed.
 
@@ -285,10 +321,12 @@ CORE-01-07-01 A round consists of one complete player cycle in turn order.
 CORE-01-07-02 After the last player completes a turn in a round, Round Settlement begins.
 CORE-01-07-03 Round Settlement resolves Resort Production for all ResortTiles.
 CORE-01-07-03A Meta-Marker Return Step (Round Start)
-At the beginning of each Round, before any player takes a turn, return every Meta-Marker that expires this Round to its owner’s PersonalSupply.
+At the beginning of each Round, before any player takes a turn, return every Meta-Marker currently on Board to its owner’s PersonalSupply.
 
 CORE-01-07-03B Meta-Marker Duration
 A Meta-Marker placed during a Round remains on its Tile for at most that Round and is returned at the beginning of the next Round.
+CORE-01-07-03C Meta-Marker Mode Reset
+When a Meta-Marker is returned at the beginning of a Round, set its mode to None.
 
 ---
 
@@ -329,12 +367,16 @@ CORE-01-08-07 Each player may FormalizeInfluence via the Start Committee at most
 CORE-01-08-08 Start Committee formalization cost requires paying 3 Resources of different resorts plus 1 additional Resource of any resort.
 CORE-01-08-09 Start Committee formalization moves all paid Resources from the active player’s PersonalSupply to Bank.
 CORE-01-08-10 Start Committee formalization creates exactly one new Influence in the active player’s PersonalSupply.
+CORE-01-08-10A Influence Cap Check (Start Committee)
+Start Committee formalization does not resolve if it would cause the active player to exceed the Influence cap (CORE-01-08-01 / ADD56-01-03-00-01). In that case, no state change occurs.
 
 ---
 
 # CORE-01-09 END GAME
 
 CORE-01-09-01 The game ends when no further Tiles can be drawn from DrawPile.
+CORE-01-09-01A Final Settlement Trigger
+If a player would begin DrawAndPlaceTile and DrawPile is empty, immediately begin the final Round Settlement (CORE-01-07-02) and then end the game (CORE-01-09-02).
 CORE-01-09-02 After the final Round Settlement completes, the game ends immediately.
 CORE-01-09-03 The player with the highest total Influence on Board wins.
 CORE-01-09-04 If two or more players tie for highest total Influence on Board, victory is shared.
