@@ -6,16 +6,38 @@ interface TileProps {
     tileId: string;
     G: GameState;
     onClick?: () => void;
+    selected?: boolean;
+    disabled?: boolean;
+    tooltip?: string;
+    testId?: string;
 }
 
-export const Tile: React.FC<TileProps> = ({ tileId, G, onClick }) => {
+export const Tile: React.FC<TileProps> = ({
+    tileId,
+    G,
+    onClick,
+    selected = false,
+    disabled = false,
+    tooltip,
+    testId,
+}) => {
     const tile = G.tiles[tileId];
     const zone = G.zones[tileId];
 
     if (!tile) return <div className="tile error">Unknown Tile</div>;
 
+    const classes = ['tile'];
+    if (selected) classes.push('tile-selected');
+    if (disabled) classes.push('tile-disabled');
+    if (onClick && !disabled) classes.push('tile-clickable');
+
     return (
-        <div className="tile" onClick={onClick}>
+        <div
+            className={classes.join(' ')}
+            onClick={disabled ? undefined : onClick}
+            title={tooltip}
+            data-testid={testId}
+        >
             <div className="tile-header">
                 <span className="tile-type">{tile.type}</span>
                 {tile.resort && <span className="tile-resort">{tile.resort}</span>}
