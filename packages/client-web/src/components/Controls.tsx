@@ -1,94 +1,95 @@
 import React, { useMemo } from 'react';
-import type { GameState } from '@balance-control/rules';
+import type { LegalIntent } from '@balance-control/game';
 
 interface ControlsProps {
     moves: any;
-    events?: any;
-    ctx: any;
-    G: GameState;
-    playerID: string;
     isActive: boolean;
     stage?: string | null;
+    intents: LegalIntent[];
     selectedTileId?: string | null;
     stagedTileId?: string | null;
 }
 
-function stringToCoord(s: string): { q: number; r: number } {
-    const [q, r] = s.split(',').map(Number);
-    return { q, r };
-}
-
-function coordToString(c: { q: number; r: number }): string {
-    return `${c.q},${c.r}`;
-}
-
-function getNeighbors(c: { q: number; r: number }): { q: number; r: number }[] {
-    const directions = [
-        { q: 1, r: 0 }, { q: 1, r: -1 }, { q: 0, r: -1 },
-        { q: -1, r: 0 }, { q: -1, r: 1 }, { q: 0, r: 1 }
-    ];
-    return directions.map(d => ({ q: c.q + d.q, r: c.r + d.r }));
-}
-
 export const Controls: React.FC<ControlsProps> = ({
     moves,
-    events,
-    ctx,
-    G,
-    playerID,
     isActive,
     stage,
+    intents,
     selectedTileId,
     stagedTileId
 }) => {
     if (!isActive) return null;
 
     const isDrawAndPlace = stage === 'drawAndPlace';
-    const isPoliticalAction = stage === 'politicalAction';
 
-    const legalGhostTargets = useMemo(() => {
-        const occupied = Object.keys(G.grid || {});
-        const occSet = new Set(occupied);
-        if (occSet.size === 0) return ['0,0'];
-        const ghosts = new Set<string>();
-        for (const coordStr of occupied) {
-            const base = stringToCoord(coordStr);
-            for (const n of getNeighbors(base)) {
-                const s = coordToString(n);
-                if (!occSet.has(s)) ghosts.add(s);
-            }
+    const placeInfluenceIntent = useMemo(() => {
+        if (!selectedTileId) return null;
+        return intents.find(intent => intent.moveType === 'placeInfluence' && intent.payload?.targetTileId === selectedTileId) || null;
+    }, [intents, selectedTileId]);
+
+    const passIntent = useMemo(() => intents.find(intent => intent.moveType === 'pass') || null, [intents]);
+    const passTilePlacementIntent = useMemo(() => intents.find(intent => intent.moveType === 'passTilePlacement') || null, [intents]);
+
+    const otherIntents = useMemo(() => {
+        return intents.filter(intent => {
+            if (intent.moveType === 'placeTile') return false;
+            if (intent.moveType === 'placeInfluence') return intent.payload?.targetTileId === selectedTileId;
+            if (intent.moveType === 'pass') return false;
+            if (intent.moveType === 'passTilePlacement') return false;
+            return true;
+        });
+    }, [intents, selectedTileId]);
+
+    const formatIntentLabel = (intent: LegalIntent) => {
+        if (intent.moveType === 'moveInfluence') {
+            return `Move Influence ${intent.payload?.sourceId} → ${intent.payload?.targetId}`;
         }
-        return Array.from(ghosts).sort((a, b) => a.localeCompare(b));
-    }, [G.grid]);
-
-    const selectedIsStartCommittee = selectedTileId ? (G.tiles[selectedTileId]?.type === 'StartCommittee') : false;
+        if (intent.moveType === 'formalizeInfluence') {
+            return `Formalize ${intent.payload?.tileId}`;
+        }
+        if (intent.moveType === 'convertResources') {
+            return `Convert → ${intent.payload?.outputResort}`;
+        }
+        if (intent.moveType === 'resolveChoice') {
+            return `Resolve Choice: ${String(intent.payload?.selection)}`;
+        }
+        if (intent.moveType === 'placeInfluence') {
+            return `Place Influence ${intent.payload?.targetTileId}`;
+        }
+        return intent.moveType;
+    };
 
     return (
         <div className="controls-bar">
             {isDrawAndPlace && (
-                <>
-                    <span>Staged: {stagedTileId || 'None'}</span>
-                    {legalGhostTargets.length === 0 && (
-                        <button className="btn-secondary" onClick={() => moves.passTilePlacement({})}>
-                            Skip Placement
-                        </button>
-                    )}
-                </>
+                <span>Staged: {stagedTileId || 'None'}</span>
             )}
-            {isPoliticalAction && (
-                <>
-                    <button
-                        className="btn-primary"
-                        onClick={() => moves.placeInfluence({ targetTileId: selectedTileId, extraResourceIds: [] })}
-                        disabled={!selectedTileId || selectedIsStartCommittee}
-                        title={selectedIsStartCommittee ? 'Start Committee cannot be targeted' : undefined}
-                        data-testid="btn-place-influence"
-                    >
-                        Place Influence
-                    </button>
-                    <button className="btn-secondary" onClick={() => moves.pass({})}>Pass</button>
-                </>
+            {passTilePlacementIntent && (
+                <button className="btn-secondary" onClick={() => moves[passTilePlacementIntent.moveType](passTilePlacementIntent.payload)}>
+                    Skip Placement
+                </button>
             )}
+            {placeInfluenceIntent && (
+                <button
+                    className="btn-primary"
+                    onClick={() => moves[placeInfluenceIntent.moveType](placeInfluenceIntent.payload)}
+                    data-testid="btn-place-influence"
+                >
+                    Place Influence
+                </button>
+            )}
+            {passIntent && (
+                <button className="btn-secondary" onClick={() => moves[passIntent.moveType](passIntent.payload)}>Pass</button>
+            )}
+            {otherIntents.map(intent => (
+                <button
+                    key={`${intent.moveType}:${JSON.stringify(intent.payload)}`}
+                    className="btn-secondary"
+                    onClick={() => moves[intent.moveType](intent.payload)}
+                >
+                    {formatIntentLabel(intent)}
+                </button>
+            ))}
         </div>
     );
 };

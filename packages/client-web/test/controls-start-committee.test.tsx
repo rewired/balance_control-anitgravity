@@ -5,7 +5,7 @@ import { Controls } from '../src/components/Controls';
 import { TileType } from '@balance-control/rules';
 
 describe('Controls - StartCommittee targeting', () => {
-    it('disables PlaceInfluence when selected tile is StartCommittee', () => {
+    it('does not render PlaceInfluence when selected tile is StartCommittee', () => {
         const moves = {
             placeInfluence: vi.fn(),
             pass: vi.fn(),
@@ -26,19 +26,16 @@ describe('Controls - StartCommittee targeting', () => {
         render(
             <Controls
                 moves={moves}
-                ctx={ctx}
-                events={{}}
-                G={G}
-                playerID={'0'}
                 isActive={true}
                 stage={'politicalAction'}
+                intents={[]}
                 selectedTileId={'tile_start_committee'}
             />
         );
 
-        const btn = screen.getByTestId('btn-place-influence') as HTMLButtonElement;
-        expect(btn.disabled).toBe(true);
-        fireEvent.click(btn);
+        const btn = screen.queryByTestId('btn-place-influence');
+        expect(btn).toBeNull();
+        fireEvent.click(document.body);
         expect(moves.placeInfluence).not.toHaveBeenCalled();
     });
 });

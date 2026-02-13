@@ -1,40 +1,20 @@
 import React, { useMemo } from 'react';
 import type { GameState } from '@balance-control/rules';
+import type { LegalIntent } from '@balance-control/game';
 import { Tile } from './Tile';
 
 interface BoardGridProps {
     G: GameState;
-    ctx: any;
     moves: any;
-    playerID: string | null;
-    stage?: string;
+    intents: LegalIntent[];
     selectedTileId?: string | null;
     onSelectTile?: (tileId: string) => void;
 }
 
-function stringToCoord(s: string): { q: number; r: number } {
-    const [q, r] = s.split(',').map(Number);
-    return { q, r };
-}
-
-function coordToString(c: { q: number; r: number }): string {
-    return `${c.q},${c.r}`;
-}
-
-function getNeighbors(c: { q: number; r: number }): { q: number; r: number }[] {
-    const directions = [
-        { q: 1, r: 0 }, { q: 1, r: -1 }, { q: 0, r: -1 },
-        { q: -1, r: 0 }, { q: -1, r: 1 }, { q: 0, r: 1 }
-    ];
-    return directions.map(d => ({ q: c.q + d.q, r: c.r + d.r }));
-}
-
 export const BoardGrid: React.FC<BoardGridProps> = ({
     G,
-    ctx,
     moves,
-    playerID,
-    stage,
+    intents,
     selectedTileId,
     onSelectTile
 }) => {
@@ -43,21 +23,12 @@ export const BoardGrid: React.FC<BoardGridProps> = ({
     }, [G.grid]);
 
     const ghostCoords = useMemo(() => {
-        const occ = new Set(occupiedCoords);
-        if (occ.size === 0) return ['0,0'];
-        const ghosts = new Set<string>();
-        for (const coordStr of occupiedCoords) {
-            const base = stringToCoord(coordStr);
-            const neighbors = getNeighbors(base);
-            for (const n of neighbors) {
-                const s = coordToString(n);
-                if (!occ.has(s)) ghosts.add(s);
-            }
-        }
-        return Array.from(ghosts).sort((a, b) => a.localeCompare(b));
-    }, [occupiedCoords]);
-
-    const isDrawAndPlace = stage === 'drawAndPlace';
+        return intents
+            .filter(intent => intent.moveType === 'placeTile' && intent.payload?.targetCoord)
+            .map(intent => intent.payload.targetCoord)
+            .filter((coord, index, all) => all.indexOf(coord) === index)
+            .sort((a, b) => a.localeCompare(b));
+    }, [intents]);
 
     return (
         <div className="board-grid">
@@ -83,17 +54,21 @@ export const BoardGrid: React.FC<BoardGridProps> = ({
                 );
             })}
 
-            {isDrawAndPlace && ghostCoords.map((coordStr) => (
-                <button
-                    key={`ghost-${coordStr}`}
-                    className="ghost-cell"
-                    onClick={() => moves.placeTile({ targetCoord: coordStr, extraResourceIds: [] })}
-                    data-testid={`ghost-${coordStr}`}
-                    title={`Place at ${coordStr}`}
-                >
-                    {coordStr}
-                </button>
-            ))}
+            {ghostCoords.map((coordStr) => {
+                const intent = intents.find(i => i.moveType === 'placeTile' && i.payload?.targetCoord === coordStr);
+                if (!intent) return null;
+                return (
+                    <button
+                        key={`ghost-${coordStr}`}
+                        className="ghost-cell"
+                        onClick={() => moves[intent.moveType](intent.payload)}
+                        data-testid={`ghost-${coordStr}`}
+                        title={`Place at ${coordStr}`}
+                    >
+                        {coordStr}
+                    </button>
+                );
+            })}
         </div>
     );
 };

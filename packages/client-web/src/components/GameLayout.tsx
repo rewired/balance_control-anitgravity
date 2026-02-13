@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { GameState } from '@balance-control/rules';
+import { enumerateLegalIntents, type LegalIntent } from '@balance-control/game';
 import { Zone } from './Zone';
 import { Controls } from './Controls';
 import { BoardGrid } from './BoardGrid';
@@ -8,12 +9,11 @@ interface GameLayoutProps {
     G: GameState;
     ctx: any;
     moves: any;
-    events?: any;
     playerID: string | null;
     isActive: boolean;
 }
 
-export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, playerID, isActive }) => {
+export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID, isActive }) => {
     const zoneNames = {
         PersonalSupply: 'PersonalSupply',
         Bank: 'Bank',
@@ -23,7 +23,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, p
     } as const;
 
     // Determine player's personal supply
-    const myPid = playerID || '0';
+    const myPid = playerID ?? ctx.currentPlayer ?? '0';
     const mySupplyId = `${zoneNames.PersonalSupply}:${myPid}`;
     const stage = useMemo(() => {
         const pid = playerID ?? ctx.currentPlayer;
@@ -34,6 +34,9 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, p
     const [selectedTileId, setSelectedTileId] = useState<string | null>(null);
     const stagingZoneId = `staging_${myPid}`;
     const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
+    const intents: LegalIntent[] = useMemo(() => {
+        return enumerateLegalIntents(G, ctx, myPid);
+    }, [G, ctx, myPid]);
 
     return (
         <div className="game-layout">
@@ -57,10 +60,8 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, p
                 <h3>Board</h3>
                 <BoardGrid
                     G={G}
-                    ctx={ctx}
                     moves={moves}
-                    playerID={playerID}
-                    stage={stage || undefined}
+                    intents={intents}
                     selectedTileId={selectedTileId}
                     onSelectTile={setSelectedTileId}
                 />
@@ -76,12 +77,9 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, p
             <div className="controls-container glass-panel">
                 <Controls
                     moves={moves}
-                    events={events}
-                    ctx={ctx}
-                    G={G}
-                    playerID={myPid}
                     isActive={isActive}
                     stage={stage}
+                    intents={intents}
                     selectedTileId={selectedTileId}
                     stagedTileId={stagedTileId}
                 />

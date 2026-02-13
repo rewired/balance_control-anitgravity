@@ -262,21 +262,18 @@ export class EffectResolver {
         return true;
     }
 
-    public static checkAndPayCosts(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string, extraResourceIds?: string[]): boolean {
+    public static getExtraCostSlots(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string): CostSlot[] {
         const attr = G.engine.attributes;
         const costSlots: CostSlot[] = [];
 
-        // 1. Tile-based costs (Regulations, etc.)
         if (tileId && attr.tileExtraCosts?.[tileId]) {
             for (let i = 0; i < attr.tileExtraCosts[tileId]; i++) costSlots.push('ANY');
         }
 
-        // 2. Player-based costs (Measures, etc.)
         if (attr.playerExtraCosts?.[pid]) {
             for (let i = 0; i < attr.playerExtraCosts[pid]; i++) costSlots.push('ANY');
         }
 
-        // 3. Climate/Expansion rules
         if (attr.climateCostRules) {
             const isImmune = attr[`climateImmunity:${pid}`] || attr[`ignoreClimateCosts:${pid}`] || attr.ignoreClimateCostThisAction;
             if (!isImmune) {
@@ -293,10 +290,16 @@ export class EffectResolver {
             }
         }
 
-        // Apply discount attribute
         if (attr[`ignoreCostIncrease:${pid}`] && costSlots.length > 0) {
             costSlots.shift();
         }
+
+        return costSlots;
+    }
+
+    public static checkAndPayCosts(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string, extraResourceIds?: string[]): boolean {
+        const attr = G.engine.attributes;
+        const costSlots = this.getExtraCostSlots(G, pid, actionType, tileId);
 
         if (costSlots.length === 0) return true;
 

@@ -1,0 +1,392 @@
+import { CoreResources, CoreZoneNames, GameState, TileType } from '@balance-control/rules';
+import { canonicalJsonStringify } from '../hash-state';
+import { allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
+import { coordToString, getNeighbors, stringToCoord } from '../topology';
+import { EffectResolver } from './resolver';
+import { evaluateTileSelector } from './selectors';
+
+type CostSlot = string[] | 'ANY';
+
+export interface LegalIntent {
+    moveType: string;
+    payload: any;
+    contextTileId?: string;
+}
+
+export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string): LegalIntent[] {
+    if (!playerID) return [];
+    if (ctx.currentPlayer !== playerID) return [];
+    const stage = ctx.activePlayers?.[playerID];
+    if (!stage) return [];
+
+    const pendingChoice = G.engine?.pendingChoice;
+    if (pendingChoice) {
+        if (pendingChoice.player !== playerID) return [];
+        const intents = buildResolveChoiceIntents(G, ctx, pendingChoice);
+        return sortIntents(intents);
+    }
+
+    const intents: LegalIntent[] = [];
+
+    if (stage === 'drawAndPlace') {
+        const stagingId = `staging_${playerID}`;
+        const staging = G.zones[stagingId];
+        const stagedTileId = staging?.items?.[0];
+        if (stagedTileId) {
+            const stagedTile = G.tiles[stagedTileId];
+            const actionType = stagedTile?.type === TileType.Resort ? 'placeResort' : 'placeTile';
+            if (!EffectResolver.isProhibited(G as any, playerID, actionType)) {
+                const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, actionType);
+                const canPay = canPayExtraCosts(G, playerID, costSlots);
+                if (canPay) {
+                    const ghostCoords = getGhostCoords(G);
+                    for (const coord of ghostCoords) {
+                        intents.push({
+                            moveType: 'placeTile',
+                            payload: { targetCoord: coord },
+                            contextTileId: stagedTileId
+                        });
+                    }
+                }
+            }
+        } else {
+            intents.push({ moveType: 'passTilePlacement', payload: {} });
+        }
+    }
+
+    if (stage === 'politicalAction') {
+        if (EffectResolver.checkUsageLimit(G as any, 'politicalAction', playerID)) {
+            intents.push(...enumeratePlaceInfluence(G, playerID));
+            intents.push(...enumerateMoveInfluence(G, playerID));
+            intents.push(...enumerateFormalize(G, ctx, playerID));
+            intents.push(...enumerateConvertResources(G, playerID));
+            intents.push({ moveType: 'pass', payload: {} });
+        }
+    }
+
+    return sortIntents(intents);
+}
+
+function buildResolveChoiceIntents(G: GameState, ctx: any, pendingChoice: any): LegalIntent[] {
+    const selections = getChoiceSelections(G, ctx, pendingChoice);
+    return selections.map(selection => ({
+        moveType: 'resolveChoice',
+        payload: { choiceId: pendingChoice.choiceId, selection }
+    }));
+}
+
+function getChoiceSelections(G: GameState, ctx: any, pendingChoice: any): any[] {
+    const kind = pendingChoice.kind;
+    const spec = pendingChoice.spec || {};
+
+    if (kind === 'yesNo') return [true, false];
+
+    if (kind === 'selectOption') {
+        const options = Array.isArray(spec.options) ? spec.options : [];
+        return [...options].sort((a: any, b: any) => String(a).localeCompare(String(b)));
+    }
+
+    if (kind === 'selectTile') {
+        if (Array.isArray(spec.tileIds)) {
+            return [...spec.tileIds].sort((a: string, b: string) => a.localeCompare(b));
+        }
+        if (spec.selector) {
+            return Object.keys(G.tiles)
+                .filter(tileId => evaluateTileSelector(spec.selector, tileId, G))
+                .sort((a, b) => a.localeCompare(b));
+        }
+    }
+
+    if (kind === 'selectResource') {
+        if (Array.isArray(spec.resourceIds)) {
+            return [...spec.resourceIds].sort((a: string, b: string) => a.localeCompare(b));
+        }
+        const playerId = spec.playerId ?? pendingChoice.player;
+        return getPlayerResourceIds(G, playerId);
+    }
+
+    if (kind === 'selectPlayer') {
+        if (Array.isArray(spec.playerIds)) {
+            return [...spec.playerIds].sort((a: string, b: string) => a.localeCompare(b));
+        }
+        const players = [];
+        for (let i = 0; i < ctx.numPlayers; i++) players.push(i.toString());
+        return players;
+    }
+
+    return [];
+}
+
+function enumeratePlaceInfluence(G: GameState, playerID: string): LegalIntent[] {
+    const intents: LegalIntent[] = [];
+    const boardTiles = getBoardTileIds(G);
+
+    for (const tileId of boardTiles) {
+        if (tileId === 'tile_start_committee') continue;
+        if (EffectResolver.isProhibited(G as any, playerID, 'influence.place', tileId)) continue;
+        const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.place', tileId);
+        if (!canPayExtraCosts(G, playerID, costSlots)) continue;
+        intents.push({
+            moveType: 'placeInfluence',
+            payload: { targetTileId: tileId },
+            contextTileId: tileId
+        });
+    }
+
+    return intents;
+}
+
+function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
+    const intents: LegalIntent[] = [];
+    const boardTiles = getBoardTileIds(G);
+    const sources = boardTiles.filter(tileId => hasPlayerInfluenceOnTile(G, tileId, playerID));
+
+    for (const sourceId of sources) {
+        for (const targetId of boardTiles) {
+            if (targetId === 'tile_start_committee') continue;
+            if (EffectResolver.isProhibited(G as any, playerID, 'influence.move', targetId)) continue;
+            const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.move', targetId);
+            if (!canPayExtraCosts(G, playerID, costSlots)) continue;
+            intents.push({
+                moveType: 'moveInfluence',
+                payload: { sourceId, targetId },
+                contextTileId: targetId
+            });
+        }
+    }
+
+    return intents;
+}
+
+function enumerateFormalize(G: GameState, ctx: any, playerID: string): LegalIntent[] {
+    const intents: LegalIntent[] = [];
+    const boardTiles = getBoardTileIds(G);
+    const supplyResources = getPlayerResourceIds(G, playerID);
+
+    for (const tileId of boardTiles) {
+        const tile = G.tiles[tileId];
+        if (!tile) continue;
+        if (tile.type !== TileType.Committee && tile.type !== TileType.StartCommittee) continue;
+        if (countPlayerInfluence(G, playerID) >= getInfluenceCap(ctx)) continue;
+        const isStartCommittee = tile.type === TileType.StartCommittee;
+
+        if (isStartCommittee) {
+            if (!allStartingInfluencePlaced(G, ctx)) continue;
+            if (!EffectResolver.checkUsageLimit(G as any, 'startCommittee', playerID)) continue;
+        } else {
+            if (EffectResolver.isProhibited(G as any, playerID, 'influence.formalize', tileId)) continue;
+        }
+
+        const requiredCount = isStartCommittee ? 4 : 2;
+        const paymentCandidates = enumerateResourceCombos(G, supplyResources, requiredCount)
+            .filter(combo => hasUniqueResorts(G, combo, isStartCommittee ? 3 : 2));
+
+        for (const paymentResourceIds of paymentCandidates) {
+            const extraCostSlots = isStartCommittee ? [] : EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.formalize', tileId);
+            const extraResourceCombos = extraCostSlots.length === 0
+                ? [[]]
+                : enumerateCostResourceIds(G, playerID, extraCostSlots, new Set(paymentResourceIds));
+            for (const extraResourceIds of extraResourceCombos) {
+                intents.push({
+                    moveType: 'formalizeInfluence',
+                    payload: {
+                        tileId,
+                        paymentResourceIds,
+                        extraResourceIds: extraResourceIds.length > 0 ? extraResourceIds : undefined
+                    },
+                    contextTileId: tileId
+                });
+            }
+        }
+    }
+
+    return intents;
+}
+
+function enumerateConvertResources(G: GameState, playerID: string): LegalIntent[] {
+    const intents: LegalIntent[] = [];
+    const boardTiles = getBoardTileIds(G);
+    const supplyResources = getPlayerResourceIds(G, playerID);
+    const coreResorts = [CoreResources.DOM, CoreResources.FOR, CoreResources.INF];
+
+    for (const tileId of boardTiles) {
+        const tile = G.tiles[tileId];
+        if (!tile || tile.type !== TileType.Grassroots) continue;
+        if (EffectResolver.isProhibited(G as any, playerID, 'convertResources', tileId)) continue;
+        const conversionSpec = tile.conversion;
+        if (!conversionSpec || conversionSpec.inputSlots <= 0) continue;
+
+        const inputCombos = enumerateResourceCombos(G, supplyResources, conversionSpec.inputSlots);
+        const extraCostSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'convertResources', tileId);
+
+        for (const inputResourceIds of inputCombos) {
+            const extraResourceCombos = extraCostSlots.length === 0
+                ? [[]]
+                : enumerateCostResourceIds(G, playerID, extraCostSlots, new Set(inputResourceIds));
+            if (extraResourceCombos.length === 0) continue;
+            for (const outputResort of coreResorts) {
+                for (const extraResourceIds of extraResourceCombos) {
+                    intents.push({
+                        moveType: 'convertResources',
+                        payload: {
+                            tileId,
+                            inputResourceIds,
+                            outputResort,
+                            extraResourceIds: extraResourceIds.length > 0 ? extraResourceIds : undefined
+                        },
+                        contextTileId: tileId
+                    });
+                }
+            }
+        }
+    }
+
+    return intents;
+}
+
+function getBoardTileIds(G: GameState): string[] {
+    const board = G.zones[CoreZoneNames.Board];
+    if (!board) return [];
+    return [...board.items].sort((a, b) => a.localeCompare(b));
+}
+
+function getGhostCoords(G: GameState): string[] {
+    const occupiedCoords = Object.keys(G.grid || {}).sort((a, b) => a.localeCompare(b));
+    if (occupiedCoords.length === 0) return ['0,0'];
+    const occupied = new Set(occupiedCoords);
+    const ghosts = new Set<string>();
+
+    for (const coordStr of occupiedCoords) {
+        const coord = stringToCoord(coordStr);
+        for (const neighbor of getNeighbors(coord)) {
+            const nStr = coordToString(neighbor);
+            if (!occupied.has(nStr)) ghosts.add(nStr);
+        }
+    }
+
+    return Array.from(ghosts).sort((a, b) => a.localeCompare(b));
+}
+
+function getPlayerResourceIds(G: GameState, playerID: string): string[] {
+    const supplyId = `${CoreZoneNames.PersonalSupply}:${playerID}`;
+    const supply = G.zones[supplyId];
+    if (!supply) return [];
+    return supply.items
+        .filter(itemId => {
+            const obj = G.objects[itemId];
+            return obj && obj.type === 'Resource';
+        })
+        .sort((a, b) => a.localeCompare(b));
+}
+
+function hasPlayerInfluenceOnTile(G: GameState, tileId: string, playerID: string): boolean {
+    const zone = G.zones[tileId];
+    if (!zone) return false;
+    return zone.items.some(itemId => {
+        const obj: any = G.objects[itemId];
+        return obj && obj.type === 'Influence' && obj.owner === playerID;
+    });
+}
+
+function enumerateResourceCombos(G: GameState, resourceIds: string[], count: number): string[][] {
+    const results: string[][] = [];
+    if (count <= 0) return results;
+    const sorted = [...resourceIds].sort((a, b) => a.localeCompare(b));
+
+    const recurse = (startIndex: number, acc: string[]) => {
+        if (acc.length === count) {
+            results.push([...acc]);
+            return;
+        }
+        for (let i = startIndex; i <= sorted.length - (count - acc.length); i++) {
+            const rid = sorted[i];
+            if (!isResourceId(G, rid)) continue;
+            acc.push(rid);
+            recurse(i + 1, acc);
+            acc.pop();
+        }
+    };
+
+    recurse(0, []);
+    return results;
+}
+
+function hasUniqueResorts(G: GameState, resourceIds: string[], requiredUnique: number): boolean {
+    const resorts = new Set<string>();
+    for (const rid of resourceIds) {
+        const res: any = G.objects[rid];
+        if (res && res.resort) resorts.add(res.resort);
+    }
+    return resorts.size >= requiredUnique;
+}
+
+function enumerateCostResourceIds(G: GameState, playerID: string, slots: CostSlot[], excluded: Set<string>): string[][] {
+    if (slots.length === 0) return [[]];
+    const available = getPlayerResourceIds(G, playerID).filter(rid => !excluded.has(rid));
+    const results: string[][] = [];
+    const normalizedSlots = slots.map(slot => normalizeSlot(slot));
+
+    const recurse = (slotIndex: number, acc: string[], used: Set<string>, lastAnyIndex: number) => {
+        if (slotIndex >= normalizedSlots.length) {
+            results.push([...acc]);
+            return;
+        }
+
+        const slot = normalizedSlots[slotIndex];
+        const isAny = slot === 'ANY';
+        const minIndex = isAny && slotIndex > 0 && normalizedSlots[slotIndex - 1] === 'ANY' ? lastAnyIndex + 1 : 0;
+
+        for (let i = minIndex; i < available.length; i++) {
+            const rid = available[i];
+            if (used.has(rid)) continue;
+            if (!isResourceId(G, rid)) continue;
+            if (!canUseResource(G, rid, slot)) continue;
+            used.add(rid);
+            acc.push(rid);
+            recurse(slotIndex + 1, acc, used, isAny ? i : lastAnyIndex);
+            acc.pop();
+            used.delete(rid);
+        }
+    };
+
+    recurse(0, [], new Set<string>(), -1);
+    return results;
+}
+
+function normalizeSlot(slot: CostSlot): CostSlot {
+    if (slot === 'ANY') return 'ANY';
+    if (slot.includes('ANY')) return 'ANY';
+    return slot;
+}
+
+function canUseResource(G: GameState, resourceId: string, slot: CostSlot): boolean {
+    if (slot === 'ANY') return true;
+    const res: any = G.objects[resourceId];
+    if (!res) return false;
+    return slot.includes(res.resort);
+}
+
+function isResourceId(G: GameState, resourceId: string): boolean {
+    const res: any = G.objects[resourceId];
+    return Boolean(res && res.type === 'Resource');
+}
+
+function canPayExtraCosts(G: GameState, playerID: string, costSlots: CostSlot[]): boolean {
+    if (costSlots.length === 0) return true;
+    const validation = EffectResolver.validateCost(G as any, null, {
+        playerId: playerID,
+        slots: costSlots,
+        resourceIds: undefined
+    });
+    return validation.ok;
+}
+
+function sortIntents(intents: LegalIntent[]): LegalIntent[] {
+    return [...intents].sort((a, b) => {
+        const typeCmp = a.moveType.localeCompare(b.moveType);
+        if (typeCmp !== 0) return typeCmp;
+        const aPayload = canonicalJsonStringify(a.payload ?? {});
+        const bPayload = canonicalJsonStringify(b.payload ?? {});
+        return aPayload.localeCompare(bPayload);
+    });
+}

@@ -31,3 +31,6 @@
 - Made PendingChoice/Measure execution deterministic and replay-stable.
 - Added golden replay + state hashing harness to prevent rule drift.
 - Client: core hotseat MVP controls with stage-aware actions and BoardGrid derived from G.grid.
+- Added canonical legal intent enumeration with deterministic ordering and PendingChoice gating.
+- Client: intent-driven controls and board actions driven by legal intent enumeration.
+- Tests: added legal intent determinism and PendingChoice gating coverage.

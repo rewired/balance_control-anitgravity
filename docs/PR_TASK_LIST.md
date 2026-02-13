@@ -25,3 +25,6 @@
 - [x] Task 0023 - GitHub Actions CI (pnpm workspace)
 - [x] Task 0024 - README Quickstart + Repo Orientation
 - [x] Task 0025 - Client-Web Core Playability (Hotseat MVP)
+- [x] Task 0026 - Enumerate Legal Intents (Canonical)
+- [x] Task 0027 - Client-Web Intent-Driven UI
+- [x] Task 0028 - PendingChoice Intent Priority
