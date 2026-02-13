@@ -3,7 +3,7 @@
 # CORE-01 Simulation Specification (Atomic, Deterministic)
 
 Version: 01
-Scope: Core Rules v1.0.20 only with variants (no expansions)
+Scope: Core Rules v1.0.21 only with variants (no expansions)
 
 ---
 
@@ -51,6 +51,7 @@ CORE-01-00-T02 Adjacent(TileA, TileB) must be deterministic.
 CORE-01-00-T03 All adjacency-based rules reference Adjacent(TileA, TileB).
 CORE-01-00-T04 The topology implementation may represent hexagonal, orthogonal, or other grid structures.
 CORE-01-00-T05 Changing topology does not alter any rule outside adjacency evaluation.
+CORE-01-00-T06 A topology/state implementation must provide a deterministic TileKey(Tile) -> string that is stable for the duration of the game and unique among Board Tiles. TileKey is used whenever a deterministic ordering of Tiles is required.
 
 ---
 
@@ -180,27 +181,18 @@ A Meta-Marker placed or updated due to ConvertResources expires at the beginning
 
 # CORE-01-05 CONTROL
 
-CORE-01-05-01 A player controls a Tile if that player has strictly more Influence on that Tile than any other player.
-CORE-01-05-02 If two or more players tie for highest Influence on a Tile, no player controls that Tile.
-CORE-01-05-03 Control updates immediately after any Influence movement onto, off, or between Board Tiles.
+CORE-01-05-01 A player controls a Tile if computeMajority(Tile) == that player.
+CORE-01-05-02 If computeMajority(Tile) returns None (tie), the Tile is uncontrolled.
 
-CORE-01-05-03A A player controls a Tile if computeMajority(Tile) == that player.
-If computeMajority(Tile) returns None (tie), the Tile is uncontrolled.
+CORE-01-05-03A computeMajority(Tile) is the canonical majority function:
+CORE-01-05-03 Control updates immediately after any state change that can change
+computeMajority(Tile), including:
+(a) moving, placing, creating, or removing Influence on any Board Tile,
+(b) placing, removing, or changing control of any Lobbyist that is adjacent to that Tile,
+(c) any other modifier change that affects majority totals.
 
-computeMajority(Tile):
-
-1. For each player:
-   totalInfluence =
-   Influence markers on the Tile
-
-   * all applicable modifiers (e.g., Lobbyist adjacency bonus)
-
-2. The player with strictly highest totalInfluence is returned.
-
-3. If two or more players share the highest totalInfluence,
-   return None.
-
-CORE-01-05-04 Each Lobbyist adjacent to a Tile contributes +1 virtual Influence for majority calculation on that adjacent Tile.
+CORE-01-05-04 Each Lobbyist adjacent to a Tile contributes +1 virtual Influence to the player who controls that Lobbyist, for majority calculation on that adjacent Tile.
+CORE-01-05-04A If a Lobbyist is uncontrolled, it contributes 0 virtual Influence.
 CORE-01-05-05 Lobbyist contribution applies only to majority calculation.
 CORE-01-05-06 Lobbyist contribution does not create or move Influence objects.
 
@@ -230,15 +222,26 @@ Assign ContextTile as follows:
 (d) If the effect is Hotspot resolution, ContextTile = that Hotspot Tile.
 (e) If none applies, ContextTile = null.
 
+CORE-01-06-00-05A ContextTile for PlaceOrMoveInfluence
+(a) For PlaceOrMoveInfluence (Place), ContextTile = the chosen target Tile.
+(b) For PlaceOrMoveInfluence (Move), ContextTile = the destination Tile.
+
 CORE-01-06-00-06 Multiple-Tile References
 If an instruction references multiple Tiles, it must explicitly state which Tile is the ContextTile; otherwise the effect is invalid and does not resolve.
 
 CORE-01-06-01 A Hotspot becomes “fully surrounded” when all positions adjacent to that Hotspot are occupied by Tiles.
 CORE-01-06-02 The check for full enclosure occurs immediately after a Tile is placed during DrawAndPlaceTile.
 CORE-01-06-03 If full enclosure is detected, Hotspot resolution is executed immediately before proceeding to the Political Action phase of that turn.
+CORE-01-06-03A Hotspot resolves at most once per game. After resolving a Hotspot, mark it as Resolved; ignore it for future enclosure triggers.
+CORE-01-06-03B Multiple Hotspots If one or more unresolved Hotspots are fully surrounded after a state change,
+resolve them one-by-one before proceeding.
+CORE-01-06-03C Inside-to-Outside (Depth-First) Resolution Hotspot resolution is processed depth-first:
+If resolving a Hotspot causes additional Hotspots to become fully surrounded, resolve those newly triggered Hotspots immediately (before continuing with any previously pending Hotspot resolutions).
+CORE-01-06-03D Deterministic ordering for simultaneous triggers If multiple Hotspots are triggered by the same state change, resolve them in ascending TileKey order (as defined by the topology attachment or state representation).
+
 CORE-01-06-04 Hotspot resolution follows this order:
-(a) Determine majority on that Hotspot.
-(b) Apply any pre-majority effects explicitly defined as occurring “before majority resolution.”
+(a) Apply any pre-majority effects explicitly defined as occurring “before majority resolution.”
+(b) Determine majority on that Hotspot.
 (c) Resolve majority outcome.
 (d) Apply effect modifiers and prohibitions according to Rule Hierarchy.
 CORE-01-06-05 If a player has majority on the Hotspot, place exactly one Influence on that Hotspot for the majority player.
@@ -249,11 +252,34 @@ CORE-01-06-08 Hotspots do not produce Resources.
 CORE-01-06-09 Resort Production is resolved only during Round Settlement.
 CORE-01-06-10 Each ResortTile has a printed production value.
 CORE-01-06-11 When a player controls a ResortTile, that ResortTile produces Resources equal to its printed production value.
-CORE-01-06-12 Produced Resources are moved from Bank to the controlling player’s PersonalSupply.
-CORE-01-06-13 If no player controls a ResortTile, that ResortTile produces no Resources.
-CORE-01-06-14 If players tie for control of a ResortTile, divide the produced Resources evenly among tied players.
+CORE-01-06-12 Produced Resources are moved from Bank to recipients’ PersonalSupply as defined by CORE-01-06-16(c).
+CORE-01-06-13 If no player has any (modified) influence on a ResortTile (leaders is empty set), that ResortTile produces 0.
+CORE-01-06-14 If two or more players tie for highest (modified) influence on a ResortTile, split the produced Resources evenly among those tied players.
 CORE-01-06-15 Any remainder from a tied ResortTile production is moved to Noise.
-CORE-01-06-16 Production Resolution Order (Canonical)
+When resolving a ResortTile’s production during Round Settlement, use the following order:
+
+(a) Determine the production leader set (canonical):
+1. For each player, compute totalInfluence for this ResortTile using the same method as computeMajority(Tile),
+   including all applicable modifiers (e.g., Lobbyist adjacency bonus).
+2. Let maxInfluence be the maximum of these totals.
+3. If maxInfluence == 0, leaders = empty set.
+4. Otherwise, leaders = all players whose totalInfluence == maxInfluence.
+
+(b) Determine the total production output amount using the applicable modifier steps:
+1. If leaders is empty set, output = 0 and skip to (c).
+2. Start with the tile’s printed production value.
+3. Apply doubling effects (if any).
+4. Apply production output modifiers (reductions or increases).
+5. Apply Ping-Pong reduction, if applicable:
+   If leaders has exactly one player AND that player’s Meta-Marker mode is PingPong,
+   reduce this production output to 50% (rounded down) and cap it at a maximum of 10.
+6. Apply floors (minimum 0).
+
+(c) Distribute the produced Resources:
+- If leaders has exactly one player, that player receives the full output.
+- If leaders is empty set, produce 0.
+- If leaders has two or more players, split output evenly among leaders; any remainder is moved to Noise.
+
 CORE-01-06-16-00 Modifier Collection Step
 Before resolving production for a tile, collect all applicable modifiers for that production instance.
 No modifier is applied until the canonical order steps (a)–(c) begin.

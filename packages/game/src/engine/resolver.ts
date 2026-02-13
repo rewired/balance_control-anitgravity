@@ -652,6 +652,9 @@ export class EffectResolver {
         const tile = G.tiles[tileId];
         if (!tile || tile.type !== 'Resort' || !tile.resort) return;
 
+        // CORE-01-06-17
+        if (this.isProhibited(G, 'production.resolve', 'NONE', tileId)) return;
+
         const printedAmount = tile.weight || 0;
         const baseAmount = ExpansionRegistry.applyProductionModifiers(G, tileId, printedAmount);
         atom.context = { ...atom.context, tileId, baseAmount, resort: tile.resort };
@@ -666,8 +669,13 @@ export class EffectResolver {
         if (majority.controller) {
             const cap = G.engine.attributes[`productionCap:${majority.controller}`];
             let finalAmount = baseAmount;
+            const marker = this.getPlayerMetaMarker(G, majority.controller);
+            if (marker && marker.mode === 'PingPong') {
+                // CORE-01-06-16(a)4
+                finalAmount = Math.min(Math.floor(finalAmount / 2), 10);
+            }
             if (cap !== undefined) {
-                finalAmount = Math.min(baseAmount, cap);
+                finalAmount = Math.min(finalAmount, cap);
             }
             if (finalAmount > 0) {
                 grants.push({ playerId: majority.controller, amount: finalAmount });
