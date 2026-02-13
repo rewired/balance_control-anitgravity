@@ -89,6 +89,11 @@ body {
     background: var(--accent-eco);
 }
 
+.token.meta-marker {
+    background: #f472b6;
+    border-color: rgba(244, 114, 182, 0.7);
+}
+
 .tile {
     width: 120px;
     height: 160px;

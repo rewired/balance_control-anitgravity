@@ -71,7 +71,7 @@ export type RegulationType = 'SecurityLevel' | 'Control' | 'Administration' | 'B
 
 export interface GameObject {
     id: string;
-    type: 'Influence' | 'Resource' | 'Measure' | 'Regulation' | 'CountdownMarker';
+    type: 'Influence' | 'Resource' | 'Measure' | 'Regulation' | 'CountdownMarker' | 'MetaMarker';
     owner?: string;
     resort?: ResourceType;
     isStarting?: boolean;
@@ -81,6 +81,8 @@ export interface GameObject {
     // EXP-02 attributes
     regType?: RegulationType;
     targetTileId?: string;
+    mode?: 'PingPong' | 'Shift' | 'Convert';
+    expiresRound?: number;
 }
 
 export interface Zone {
@@ -132,7 +134,7 @@ export interface ExpansionDefinition {
     // Hooks
     onSetup?: (G: GameState, ctx: any) => void;
 
-    // Modifiers 
+    // Modifiers
     modifiers?: {
         production?: (tileId: string, G: GameState, baseAmount: number) => number;
         cost?: (effect: any, G: GameState, baseCost: any) => any;

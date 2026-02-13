@@ -53,6 +53,11 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         const zoneId = `${CoreZoneNames.PersonalSupply}:${pid}`;
         G.zones[zoneId] = { id: zoneId, name: zoneId, items: [] };
 
+        const metaId = `meta_${pid}`;
+        const meta: GameObject = { id: metaId, type: 'MetaMarker', owner: pid };
+        G.objects[metaId] = meta;
+        G.zones[zoneId].items.push(metaId);
+
         // CORE-01-03-04/05/06: Influence Assignment
         let influenceCount = 0;
         if (ctx.numPlayers === 2) influenceCount = 4;

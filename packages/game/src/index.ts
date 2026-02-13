@@ -2,7 +2,7 @@ import { Game } from 'boardgame.io';
 import { GameState, CoreZoneNames } from '@balance-control/rules';
 import { SetupGame } from './setup';
 import { CoreMoves } from './moves';
-import { drawTileToStaging } from './mechanics-turn';
+import { drawTileToStaging, returnMetaMarkersAtRoundStart } from './mechanics-turn';
 import { EffectResolver } from './engine/resolver';
 import { ExpansionRegistry } from './expansion-registry';
 
@@ -74,6 +74,9 @@ export const BalanceControl: Game<GameState> = {
             }
         },
         onBegin: ({ G, ctx }: any) => {
+            if (ctx.currentPlayer === '0') {
+                returnMetaMarkersAtRoundStart(G as any);
+            }
             EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
             drawTileToStaging(G, ctx);
             EffectResolver.triggerHook(G as any, ctx, 'onTurnBegin', { playerId: ctx.currentPlayer });

@@ -16,6 +16,8 @@ export const Token: React.FC<TokenProps> = ({ object }) => {
         if (object.resort) {
             className += ` resource-${object.resort.toLowerCase()}`;
         }
+    } else if (object.type === 'MetaMarker') {
+        className += ' meta-marker';
     }
 
     return (

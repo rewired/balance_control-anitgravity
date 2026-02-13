@@ -22,6 +22,6 @@ describe('Replay runner', () => {
         };
 
         const result = runReplay(replay);
-        expect(result.hash).toBe('1e8d6446911ed062cb1ad16fd82eaf01c9d8738eebc1faff24840d30188f1466');
+        expect(result.hash).toBe('5d6caf1bf159cc64b4b00f5ed3ac1f741f9b6196809e6792d1d86cce7ad78599');
     });
 });

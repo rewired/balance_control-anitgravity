@@ -63,6 +63,19 @@ describe('SetupGame', () => {
         expect(G.tiles[board[0]].type).toBe(TileType.StartCommittee);
     });
 
+    it('should create one meta-marker per player in personal supply', () => {
+        const ctx: any = { numPlayers: 3, random: { Shuffle: (arr: any[]) => arr } };
+        const G = SetupGame({ ctx });
+
+        const markers = Object.values(G.objects).filter(obj => obj.type === 'MetaMarker');
+        expect(markers.length).toBe(3);
+
+        for (const marker of markers) {
+            const supplyId = `${CoreZoneNames.PersonalSupply}:${marker.owner}`;
+            expect(G.zones[supplyId].items).toContain(marker.id);
+        }
+    });
+
     it('should not apply ex01 setup when ex01 flag is disabled', () => {
         const mockEx01: ExpansionDefinition = {
             name: 'EXP-01 Economy & Labor',

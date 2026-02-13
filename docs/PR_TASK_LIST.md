@@ -30,7 +30,7 @@
 - [x] Task 0028 - PendingChoice Intent Priority
 - [x] Task 0030 - Deterministic Move Log + Replay Export
 - [x] Task 0031 - CORE-01 v1.0.20 Inventory + Delta Map
-- [ ] Task 0032 - Meta-Marker State + Round Return
+- [x] Task 0032 - Meta-Marker State + Round Return
 - [ ] Task 0033 - PlaceOrMoveInfluence Meta-Marker + Start Committee Gates
 - [ ] Task 0034 - ConvertResources Meta-Marker + Anchor Rules
 - [ ] Task 0035 - Production PingPong Reduction

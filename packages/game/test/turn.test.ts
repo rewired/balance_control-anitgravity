@@ -34,6 +34,30 @@ function createTinyDrawPileGame() {
     };
 }
 
+function createMetaMarkerRoundReturnGame() {
+    return {
+        ...BalanceControl,
+        setup: (ctx: any) => {
+            const G = SetupGame({ ctx });
+            const markerId = 'meta_0';
+            const supplyId = `${CoreZoneNames.PersonalSupply}:0`;
+            if (!G.zones[supplyId]) {
+                G.zones[supplyId] = { id: supplyId, name: supplyId, items: [] };
+            }
+            if (!G.objects[markerId]) {
+                G.objects[markerId] = { id: markerId, type: 'MetaMarker', owner: '0' } as any;
+                G.zones[supplyId].items.push(markerId);
+            }
+            const marker = G.objects[markerId] as any;
+            G.zones[supplyId].items = G.zones[supplyId].items.filter(id => id !== marker.id);
+            G.zones['tile_start_committee'].items.push(marker.id);
+            marker.mode = 'Shift';
+            marker.expiresRound = 1;
+            return G;
+        }
+    };
+}
+
 describe('Turn Structure (Stages)', () => {
     it('should start in drawAndPlace stage', () => {
         const client = Client({ game: BalanceControl, numPlayers: 2 });
@@ -170,6 +194,30 @@ describe('Turn Structure (Stages)', () => {
         expect(finalState.G.roundNumber).toBe(1);
         expect(finalState.G.roundSettlementDone).toBe(true);
         expect(finalState.ctx.gameover).toBeDefined();
+    });
+
+    it('should return expiring meta-markers at round start', () => {
+        const client = Client({ game: createMetaMarkerRoundReturnGame(), numPlayers: 2 });
+        client.start();
+
+        const startState = client.getState();
+        const marker = startState.G.objects['meta_0'] as any;
+        expect(marker).toBeTruthy();
+        expect(startState.G.zones['tile_start_committee'].items).toContain(marker.id);
+
+        const firstCoord = findFirstOpenNeighborCoord(startState.G.grid);
+        client.moves.placeTile({ targetCoord: firstCoord });
+        client.moves.pass({});
+
+        const secondState = client.getState();
+        const secondCoord = findFirstOpenNeighborCoord(secondState.G.grid);
+        client.moves.placeTile({ targetCoord: secondCoord });
+        client.moves.pass({});
+
+        const roundStartState = client.getState();
+        expect(roundStartState.ctx.currentPlayer).toBe('0');
+        expect(roundStartState.G.zones['tile_start_committee'].items).not.toContain(marker.id);
+        expect(roundStartState.G.zones['PersonalSupply:0'].items).toContain(marker.id);
     });
 
     it('should complete two full rounds in 3-player hotseat without softlock', () => {

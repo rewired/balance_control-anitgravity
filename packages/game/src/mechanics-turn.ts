@@ -105,6 +105,45 @@ export function allStartingInfluencePlaced(G: any, ctx: any): boolean {
     return true;
 }
 
+export function returnMetaMarkersAtRoundStart(G: GameState) {
+    const currentRound = G.roundNumber ?? 0;
+    const attrs = G.engine.attributes || {};
+    if (attrs.roundStartProcessed === currentRound) return;
+    attrs.roundStartProcessed = currentRound;
+    G.engine.attributes = attrs;
+
+    for (const obj of Object.values(G.objects)) {
+        if (!obj || obj.type !== 'MetaMarker') continue;
+        if (!obj.owner) continue;
+        if (typeof obj.expiresRound !== 'number') continue;
+        if (obj.expiresRound > currentRound) continue;
+
+        const supplyId = `${CoreZoneNames.PersonalSupply}:${obj.owner}`;
+        const supply = G.zones[supplyId];
+        if (!supply) continue;
+
+        const currentZoneId = findObjectZoneId(G, obj.id);
+        if (currentZoneId && currentZoneId !== supplyId) {
+            const currentZone = G.zones[currentZoneId];
+            currentZone.items = currentZone.items.filter(id => id !== obj.id);
+        }
+
+        if (!supply.items.includes(obj.id)) {
+            supply.items.push(obj.id);
+        }
+
+        obj.expiresRound = undefined;
+        obj.mode = undefined;
+    }
+}
+
+function findObjectZoneId(G: GameState, objectId: string): string | null {
+    for (const zone of Object.values(G.zones)) {
+        if (zone.items.includes(objectId)) return zone.id;
+    }
+    return null;
+}
+
 export function drawMeasure(G: GameState, ctx: any) {
     // Basic drawMeasure for EXP-01/02
     // ... logic would go here, or just stub for now if not used yet
