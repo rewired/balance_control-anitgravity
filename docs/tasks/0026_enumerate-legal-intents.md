@@ -97,13 +97,13 @@ Legality and ordering must respect:
 
 ### PR Checklist
 
-* [ ] Added `enumerateLegalIntents(G, ctx, playerID)` in `packages/game`
-* [ ] Shared legality helpers with move validation (no duplicated logic)
-* [ ] Deterministic sorting of intent lists and targets
-* [ ] ContextTile binding enforced (CORE-01-06-00-05)
-* [ ] Production/regulation/climate ordering respected (CORE-01-06-16, EXP-02-04-B, EXP-03-10)
-* [ ] Tests added for determinism and validation parity
-* [ ] `CHANGELOG.md` updated under Unreleased
-* [ ] `docs/PR_TASK_LIST.md` updated
+* [x] Added `enumerateLegalIntents(G, ctx, playerID)` in `packages/game`
+* [x] Shared legality helpers with move validation (no duplicated logic)
+* [x] Deterministic sorting of intent lists and targets
+* [x] ContextTile binding enforced (CORE-01-06-00-05)
+* [x] Production/regulation/climate ordering respected (CORE-01-06-16, EXP-02-04-B, EXP-03-10)
+* [x] Tests added for determinism and validation parity
+* [x] `CHANGELOG.md` updated under Unreleased
+* [x] `docs/PR_TASK_LIST.md` updated
 
 ---

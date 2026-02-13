@@ -72,10 +72,10 @@ No other intents appear until the choice is resolved.
 
 ### PR Checklist
 
-* [ ] PendingChoice gating implemented in enumeration
-* [ ] ResolveChoice intents are deterministic and stable
-* [ ] Tests verify gating behavior
-* [ ] `CHANGELOG.md` updated under Unreleased
-* [ ] `docs/PR_TASK_LIST.md` updated
+* [x] PendingChoice gating implemented in enumeration
+* [x] ResolveChoice intents are deterministic and stable
+* [x] Tests verify gating behavior
+* [x] `CHANGELOG.md` updated under Unreleased
+* [x] `docs/PR_TASK_LIST.md` updated
 
 ---

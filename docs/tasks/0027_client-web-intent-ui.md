@@ -78,12 +78,12 @@ Make the web client **purely intent-driven**:
 
 ### PR Checklist
 
-* [ ] Client actions fully driven by `enumerateLegalIntents`
-* [ ] Removed any duplicated legality logic from client
-* [ ] Stage read only from `ctx.activePlayers[playerID]` (CORE-01-04)
-* [ ] ContextTile binding respected via intents (CORE-01-06-00-05)
-* [ ] Deterministic ordering of action lists
-* [ ] `CHANGELOG.md` updated under Unreleased
-* [ ] `docs/PR_TASK_LIST.md` updated
+* [x] Client actions fully driven by `enumerateLegalIntents`
+* [x] Removed any duplicated legality logic from client
+* [x] Stage read only from `ctx.activePlayers[playerID]` (CORE-01-04)
+* [x] ContextTile binding respected via intents (CORE-01-06-00-05)
+* [x] Deterministic ordering of action lists
+* [x] `CHANGELOG.md` updated under Unreleased
+* [x] `docs/PR_TASK_LIST.md` updated
 
 ---
