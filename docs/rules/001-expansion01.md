@@ -1,7 +1,7 @@
 # EXP-01 — Economy & Labor
 
 Fully Engine-Formalized Specification v1.3
-Requires: CORE-01 (v1.0.14)
+Requires: CORE-01 (>= v1.0.14)
 
 ---
 

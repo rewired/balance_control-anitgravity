@@ -1,8 +1,8 @@
 # EXP-03 — Climate & Future
 
 Fully Engine-Formalized Specification v1.0
-Requires: CORE-01 (v1.0.14) 
-Compatible with: EXP-01 (v1.3) , EXP-02 (v1.0) 
+Requires: CORE-01 (>= v1.0.14)
+Compatible with: EXP-01 (v1.3) , EXP-02 (v1.0)
 
 ---
 

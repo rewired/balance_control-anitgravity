@@ -1,7 +1,7 @@
 # EXP-02 — Security & Order
 
 Fully Engine-Formalized Specification v1.0
-Requires: CORE-01 (v1.0.14) 
+Requires: CORE-01 (>= v1.0.14)
 Compatible with: EXP-01 (v1.3)
 
 ---
