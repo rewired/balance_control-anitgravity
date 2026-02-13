@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import type { GameState } from '@balance-control/rules';
 import { Zone } from './Zone';
 import { Controls } from './Controls';
+import { BoardGrid } from './BoardGrid';
 
 interface GameLayoutProps {
     G: GameState;
@@ -24,6 +25,15 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, p
     // Determine player's personal supply
     const myPid = playerID || '0';
     const mySupplyId = `${zoneNames.PersonalSupply}:${myPid}`;
+    const stage = useMemo(() => {
+        const pid = playerID ?? ctx.currentPlayer;
+        const ap = ctx.activePlayers || {};
+        return ap[pid] || null;
+    }, [ctx, playerID]);
+
+    const [selectedTileId, setSelectedTileId] = useState<string | null>(null);
+    const stagingZoneId = `staging_${myPid}`;
+    const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
 
     return (
         <div className="game-layout">
@@ -45,7 +55,15 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, p
             {/* Center: Board */}
             <main className="center-panel glass-panel">
                 <h3>Board</h3>
-                <Zone zoneId={zoneNames.Board} G={G} className="board-grid" />
+                <BoardGrid
+                    G={G}
+                    ctx={ctx}
+                    moves={moves}
+                    playerID={playerID}
+                    stage={stage || undefined}
+                    selectedTileId={selectedTileId}
+                    onSelectTile={setSelectedTileId}
+                />
             </main>
 
             {/* Right Panel: Opponents / Deck / Info */}
@@ -56,7 +74,17 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, events, p
 
             {/* Bottom Controls */}
             <div className="controls-container glass-panel">
-                <Controls moves={moves} events={events} ctx={ctx} isActive={isActive} />
+                <Controls
+                    moves={moves}
+                    events={events}
+                    ctx={ctx}
+                    G={G}
+                    playerID={myPid}
+                    isActive={isActive}
+                    stage={stage}
+                    selectedTileId={selectedTileId}
+                    stagedTileId={stagedTileId}
+                />
             </div>
         </div>
     );
