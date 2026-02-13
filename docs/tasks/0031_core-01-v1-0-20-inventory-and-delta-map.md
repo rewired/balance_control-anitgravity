@@ -50,6 +50,7 @@ Produce an authoritative inventory of the current CORE-01 v1.0.14 implementation
   * `mechanics.ts` for `computeMajority`.
   * `index.ts` for turn structure + Round Settlement.
 * UI uses `enumerateLegalIntents` but must not compute legality itself (ARCH-01).
+* Core tests live in `packages/game/test` with coverage for setup, moves, legal-intents, resolver, hotspot, production, turn flow, and golden-replay.
 
 ### B) Current alignment gaps vs v1.0.20 (high-level)
 
@@ -130,7 +131,7 @@ Produce an authoritative inventory of the current CORE-01 v1.0.14 implementation
 
 ## PR Checklist
 
-* [ ] Inventory captured in this task file
-* [ ] Delta map complete with rule citations
-* [ ] No expansion rules modified
-* [ ] `docs/PR_TASK_LIST.md` updated (add Task 0031)
+* [x] Inventory captured in this task file
+* [x] Delta map complete with rule citations
+* [x] No expansion rules modified
+* [x] `docs/PR_TASK_LIST.md` updated (add Task 0031)
