@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Tooling: added a baseline ESLint configuration and updated lint targets so `pnpm run lint` works reliably in CI.
 - Chore: stopped tracking `tsconfig.tsbuildinfo` artifacts to prevent stale incremental metadata from breaking clean CI builds.
 - Fix: CI now builds workspace packages before tests and uses workspace-wide install for fresh-runner reliability.
 - Fix: workspace test recursion now uses `pnpm -r --if-present test` to avoid CI failures on packages without test scripts.
