@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Chore: stopped tracking `tsconfig.tsbuildinfo` artifacts to prevent stale incremental metadata from breaking clean CI builds.
 - Fix: CI now builds workspace packages before tests and uses workspace-wide install for fresh-runner reliability.
 - Fix: workspace test recursion now uses `pnpm -r --if-present test` to avoid CI failures on packages without test scripts.
 - Docs: Added README quickstart and repo orientation.
