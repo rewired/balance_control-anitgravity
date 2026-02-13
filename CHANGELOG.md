@@ -34,3 +34,5 @@
 - Added canonical legal intent enumeration with deterministic ordering and PendingChoice gating.
 - Client: intent-driven controls and board actions driven by legal intent enumeration.
 - Tests: added legal intent determinism and PendingChoice gating coverage.
+- Client: added debug replay export panel with move log capture (dev-only).
+- Added replay runner utility and integration test for deterministic replays.

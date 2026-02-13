@@ -8,7 +8,7 @@ Key anchors (ASCII only):
 
 * Determinism: AGENTS 0.2
 * Tests + golden replays + hashing: AGENTS 5.1-5.3
-* No implicit effects: CORE-01-10 
+* No implicit effects: CORE-01-10
 
 ---
 
@@ -16,7 +16,7 @@ Key anchors (ASCII only):
 
 Provide deterministic debugging for Client↔Game communication by adding:
 
-1) a structured **move log** capture (name + payload + playerID + stateID), and  
+1) a structured **move log** capture (name + payload + playerID + stateID), and
 2) a **replay export/import** path usable by tests and developers.
 
 No gameplay changes.
@@ -98,10 +98,10 @@ This is used for:
 
 ## PR Checklist
 
-* [ ] Add move log capture (dev-only flag)
-* [ ] Add replay export UI
-* [ ] Add replay runner utility (node)
-* [ ] Add integration test w/ expected hash
-* [ ] Update `docs/PR_TASK_LIST.md` (add Task 0030)
-* [ ] Update `CHANGELOG.md` (Unreleased)
-* [ ] CI green
+* [x] Add move log capture (dev-only flag)
+* [x] Add replay export UI
+* [x] Add replay runner utility (node)
+* [x] Add integration test w/ expected hash
+* [x] Update `docs/PR_TASK_LIST.md` (add Task 0030)
+* [x] Update `CHANGELOG.md` (Unreleased)
+* [x] CI green

@@ -28,3 +28,4 @@
 - [x] Task 0026 - Enumerate Legal Intents (Canonical)
 - [x] Task 0027 - Client-Web Intent-Driven UI
 - [x] Task 0028 - PendingChoice Intent Priority
+- [x] Task 0030 - Deterministic Move Log + Replay Export
