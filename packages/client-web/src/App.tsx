@@ -44,7 +44,7 @@ const App: React.FC = () => {
     useEffect(() => {
         client.start();
         setState(client.getState());
-        const unsubscribe = client.subscribe((nextState) => {
+        const unsubscribe = client.subscribe((nextState: any) => {
             setState(nextState);
             if (DEBUG_REPLAY && pendingMovesRef.current.length > 0) {
                 const entry = pendingMovesRef.current.shift()!;

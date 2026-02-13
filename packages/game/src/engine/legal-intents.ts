@@ -1,5 +1,4 @@
 import { CoreResources, CoreZoneNames, GameState, TileType } from '@balance-control/rules';
-import { canonicalJsonStringify } from '../hash-state';
 import { allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
 import { computeMajority } from '../mechanics';
 import { coordToString, getNeighbors, stringToCoord } from '../topology';
@@ -7,6 +6,40 @@ import { EffectResolver } from './resolver';
 import { evaluateTileSelector } from './selectors';
 
 type CostSlot = string[] | 'ANY';
+type JsonLike =
+    | null
+    | boolean
+    | number
+    | string
+    | JsonLike[]
+    | { [key: string]: JsonLike | undefined };
+
+function canonicalize(value: JsonLike): JsonLike {
+    if (value === null || typeof value !== 'object') {
+        return value;
+    }
+
+    if (Array.isArray(value)) {
+        return value.map((entry) => canonicalize(entry as JsonLike));
+    }
+
+    const input = value as { [key: string]: JsonLike | undefined };
+    const ordered: { [key: string]: JsonLike } = {};
+    const keys = Object.keys(input).sort();
+
+    for (const key of keys) {
+        const entry = input[key];
+        if (entry !== undefined) {
+            ordered[key] = canonicalize(entry);
+        }
+    }
+
+    return ordered;
+}
+
+function canonicalJsonStringify(value: JsonLike): string {
+    return JSON.stringify(canonicalize(value));
+}
 
 export interface LegalIntent {
     moveType: string;

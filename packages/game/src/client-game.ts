@@ -5,6 +5,10 @@ import { CoreMoves } from './moves';
 import { drawTileToStaging } from './mechanics-turn';
 import { EffectResolver } from './engine/resolver';
 import { ExpansionRegistry } from './expansion-registry';
+import { enumerateLegalIntents } from './engine/legal-intents';
+
+export { enumerateLegalIntents };
+export type { LegalIntent } from './engine/legal-intents';
 
 const expansionMoves = ExpansionRegistry.getMergedMoves();
 const politicalActionMoves = {
