@@ -126,13 +126,13 @@ Add a small `vitest` test in `packages/client-web`:
 
 ### PR Checklist
 
-* [ ] Implement `BoardGrid` from `G.grid` with deterministic ordering
-* [ ] Implement stage-aware `Controls` (drawAndPlace vs politicalAction)
-* [ ] Remove hardcoded `tile_start_committee` targeting
-* [ ] Add minimal client regression test
-* [ ] Update `docs/tasks/0025_...md`
-* [ ] Update `docs/PR_TASK_LIST.md`
-* [ ] Update `CHANGELOG.md` (Unreleased)
-* [ ] CI green
+* [x] Implement `BoardGrid` from `G.grid` with deterministic ordering
+* [x] Implement stage-aware `Controls` (drawAndPlace vs politicalAction)
+* [x] Remove hardcoded `tile_start_committee` targeting
+* [x] Add minimal client regression test
+* [x] Update `docs/tasks/0025_...md`
+* [x] Update `docs/PR_TASK_LIST.md`
+* [x] Update `CHANGELOG.md` (Unreleased)
+* [x] CI green
 
 ---

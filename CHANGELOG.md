@@ -30,3 +30,4 @@
 - Added expansion gating and fixed setup shuffle order for deterministic composition.
 - Made PendingChoice/Measure execution deterministic and replay-stable.
 - Added golden replay + state hashing harness to prevent rule drift.
+- Client: core hotseat MVP controls with stage-aware actions and BoardGrid derived from G.grid.
