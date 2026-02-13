@@ -38,7 +38,10 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -w build
 
       - name: Run test suite
         run: pnpm -w test

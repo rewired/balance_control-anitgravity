@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: CI now builds workspace packages before tests and uses workspace-wide install for fresh-runner reliability.
 - Fix: workspace test recursion now uses `pnpm -r --if-present test` to avoid CI failures on packages without test scripts.
 - Docs: Added README quickstart and repo orientation.
 - Fix: restored expansion-level production modifier application during `production.resolve`.
