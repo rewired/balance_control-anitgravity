@@ -2,6 +2,7 @@ import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneNames, CoreResources, TileType, PlayerID } from '@balance-control/rules';
 import { stringToCoord, coordToString, getNeighbors, isSurrounded } from './topology';
 import { drawMeasure, allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from './mechanics-turn';
+import { computeMajority } from './mechanics';
 import { EffectResolver } from './engine/resolver';
 import {
     resolveChoicePayloadSchema,
@@ -53,16 +54,16 @@ function isBoardTile(G: any, tileId: string): boolean {
 
 function getGrassrootsConversionSpec(tile: any): GrassrootsConversionSpec | null {
     const spec = tile?.conversion;
-    if (!spec || typeof spec.inputSlots !== 'number' || typeof spec.outputSlots !== 'number') {
+    if (!spec || typeof spec.inputSlots !== 'number') {
         return null;
     }
 
     if (!Number.isInteger(spec.inputSlots) || spec.inputSlots <= 0) return null;
-    if (!Number.isInteger(spec.outputSlots) || spec.outputSlots <= 0) return null;
+    const outputSlots = Number.isInteger(spec.outputSlots) && spec.outputSlots > 0 ? spec.outputSlots : 1;
 
     return {
         inputSlots: spec.inputSlots,
-        outputSlots: spec.outputSlots
+        outputSlots
     };
 }
 
@@ -87,7 +88,7 @@ function findObjectZoneId(G: any, objectId: string): string | null {
     return null;
 }
 
-function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'PingPong' | 'Shift', expiresRound: number) {
+function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'PingPong' | 'Shift' | 'Convert', expiresRound: number) {
     const currentZoneId = findObjectZoneId(G, marker.id);
     if (currentZoneId && currentZoneId !== tileId) {
         const currentZone = G.zones[currentZoneId];
@@ -340,6 +341,9 @@ export const CoreMoves = {
         const conversionSpec = getGrassrootsConversionSpec(tile);
         if (!conversionSpec) return INVALID_MOVE;
 
+        const { controller } = computeMajority(grassrootsTileId, G);
+        if (controller !== pid) return INVALID_MOVE;
+
         const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
         const supply = G.zones[supplyId];
         for (const rid of inputResourceIds) {
@@ -356,6 +360,11 @@ export const CoreMoves = {
         });
         if (!baseCostValidation.ok) return INVALID_MOVE;
 
+        const extraCostSlots = EffectResolver.getExtraCostSlots(G, pid, 'convertResources', grassrootsTileId);
+        if (extraCostSlots.length > 0 && (!extraResourceIds || extraResourceIds.length !== extraCostSlots.length)) {
+            return INVALID_MOVE;
+        }
+
         // Decoupled Extra Costs
         if (!EffectResolver.checkAndPayCosts(G, pid, 'convertResources', grassrootsTileId, extraResourceIds)) return INVALID_MOVE;
 
@@ -371,6 +380,12 @@ export const CoreMoves = {
             }
         );
         if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
+
+        const marker = getPlayerMetaMarker(G, pid);
+        if (marker) {
+            const expiresRound = (G.roundNumber ?? 0) + 1;
+            placeMetaMarkerOnTile(G, marker, grassrootsTileId, 'Convert', expiresRound);
+        }
 
         // Usage tracking
         EffectResolver.incrementUsage(G, 'politicalAction', pid);

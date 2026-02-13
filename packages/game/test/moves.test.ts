@@ -225,7 +225,9 @@ describe('Moves', () => {
     });
 
     it('convertResources should follow grassroots conversion spec without formalizing influence', () => {
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for'];
+        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1'];
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones.board_gr.items.push('inf_1');
 
         CoreMoves.convertResources(
             { G, ctx, events },
@@ -236,6 +238,65 @@ describe('Moves', () => {
         const grantedId = G.zones['PersonalSupply:p1'].items[0];
         expect(G.objects[grantedId].type).toBe('Resource');
         expect(G.objects[grantedId].resort).toBe('INF');
+    });
+
+    it('convertResources should reject when no controlled Grassroots tile exists', () => {
+        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for'];
+        const before = JSON.stringify(G);
+
+        const result = CoreMoves.convertResources(
+            { G, ctx, events },
+            { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'], outputResort: 'INF' }
+        );
+
+        expect(result).toBe(INVALID_MOVE);
+        expect(JSON.stringify(G)).toBe(before);
+    });
+
+    it('convertResources should require extra cost when meta-marker is in Convert mode', () => {
+        G.roundNumber = 2;
+        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'res_inf', 'inf_1', 'meta_p1'];
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'meta_p1');
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones.board_gr.items.push('inf_1');
+        G.zones.board_t1.items.push('meta_p1');
+        G.objects.meta_p1.mode = 'Convert';
+
+        const beforeFail = JSON.stringify(G);
+        const fail = CoreMoves.convertResources(
+            { G, ctx, events },
+            { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'], outputResort: 'INF' }
+        );
+        expect(fail).toBe(INVALID_MOVE);
+        expect(JSON.stringify(G)).toBe(beforeFail);
+
+        const result = CoreMoves.convertResources(
+            { G, ctx, events },
+            {
+                grassrootsTileId: 'board_gr',
+                inputResourceIds: ['res_dom', 'res_for'],
+                outputResort: 'INF',
+                extraResourceIds: ['res_inf']
+            }
+        );
+
+        expect(result).not.toBe(INVALID_MOVE);
+    });
+
+    it('convertResources should place meta-marker on the anchor with Convert mode', () => {
+        G.roundNumber = 5;
+        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1', 'meta_p1'];
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones.board_gr.items.push('inf_1');
+
+        CoreMoves.convertResources(
+            { G, ctx, events },
+            { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'], outputResort: 'INF' }
+        );
+
+        expect(G.zones.board_gr.items).toContain('meta_p1');
+        expect(G.objects.meta_p1.mode).toBe('Convert');
+        expect(G.objects.meta_p1.expiresRound).toBe(6);
     });
 
     it('placeInfluence should reject malformed payload without mutation', () => {

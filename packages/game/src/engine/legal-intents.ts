@@ -1,6 +1,7 @@
 import { CoreResources, CoreZoneNames, GameState, TileType } from '@balance-control/rules';
 import { canonicalJsonStringify } from '../hash-state';
 import { allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
+import { computeMajority } from '../mechanics';
 import { coordToString, getNeighbors, stringToCoord } from '../topology';
 import { EffectResolver } from './resolver';
 import { evaluateTileSelector } from './selectors';
@@ -220,6 +221,8 @@ function enumerateConvertResources(G: GameState, playerID: string): LegalIntent[
         if (EffectResolver.isProhibited(G as any, playerID, 'convertResources', tileId)) continue;
         const conversionSpec = tile.conversion;
         if (!conversionSpec || conversionSpec.inputSlots <= 0) continue;
+        const { controller } = computeMajority(tileId, G);
+        if (controller !== playerID) continue;
 
         const inputCombos = enumerateResourceCombos(G, supplyResources, conversionSpec.inputSlots);
         const extraCostSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'convertResources', tileId);
@@ -234,7 +237,7 @@ function enumerateConvertResources(G: GameState, playerID: string): LegalIntent[
                     intents.push({
                         moveType: 'convertResources',
                         payload: {
-                            tileId,
+                            grassrootsTileId: tileId,
                             inputResourceIds,
                             outputResort,
                             extraResourceIds: extraResourceIds.length > 0 ? extraResourceIds : undefined

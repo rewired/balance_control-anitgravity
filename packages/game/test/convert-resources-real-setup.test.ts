@@ -48,6 +48,9 @@ describe('ConvertResources with real setup-generated Grassroots tiles', () => {
 
         addPlayerResource(G, pid, 'res_dom_input', CoreResources.DOM);
         addPlayerResource(G, pid, 'res_for_input', CoreResources.FOR);
+        const influenceId = supply.items.find((itemId: string) => G.objects[itemId]?.type === 'Influence') as string;
+        supply.items = supply.items.filter((itemId: string) => itemId !== influenceId);
+        G.zones[grassrootsTileId].items.push(influenceId);
 
         const result = CoreMoves.convertResources(
             { G, ctx, events },

@@ -262,6 +262,23 @@ export class EffectResolver {
         return true;
     }
 
+    private static getPlayerMetaMarker(G: GameState & { engine: EngineState }, playerId: string): any | null {
+        const directId = `meta_${playerId}`;
+        const direct = (G.objects as any)?.[directId];
+        if (direct && direct.type === 'MetaMarker') return direct;
+        for (const obj of Object.values(G.objects || {})) {
+            if (obj && (obj as any).type === 'MetaMarker' && (obj as any).owner === playerId) return obj;
+        }
+        return null;
+    }
+
+    private static findObjectZoneId(G: GameState & { engine: EngineState }, objectId: string): string | null {
+        for (const zone of Object.values(G.zones || {})) {
+            if (zone.items.includes(objectId)) return zone.id;
+        }
+        return null;
+    }
+
     public static getExtraCostSlots(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string): CostSlot[] {
         const attr = G.engine.attributes;
         const costSlots: CostSlot[] = [];
@@ -286,6 +303,17 @@ export class EffectResolver {
                     if (apply) {
                         for (let i = 0; i < rule.amount; i++) costSlots.push(rule.resorts || 'ANY');
                     }
+                }
+            }
+        }
+
+        if (actionType === 'convertResources') {
+            const marker = this.getPlayerMetaMarker(G, pid);
+            if (marker && marker.mode === 'Convert') {
+                const markerZoneId = this.findObjectZoneId(G, marker.id);
+                const supplyId = `PersonalSupply:${pid}`;
+                if (markerZoneId && markerZoneId !== supplyId && G.tiles[markerZoneId]) {
+                    costSlots.push('ANY');
                 }
             }
         }

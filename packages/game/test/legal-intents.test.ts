@@ -68,6 +68,33 @@ describe('enumerateLegalIntents', () => {
         expect(hasStartCommittee).toBe(false);
     });
 
+    it('emits convertResources intents only when Grassroots is controlled', () => {
+        const ctx = createCtx('politicalAction');
+        const G = SetupGame({ ctx });
+        const grassrootsId = Object.values(G.tiles).find(tile => tile.type === TileType.Grassroots)?.id as string;
+        G.zones[CoreZoneNames.Board].items.push(grassrootsId);
+        G.grid['1,0'] = grassrootsId;
+
+        let intents = enumerateLegalIntents(G as any, ctx, '0');
+        let hasConvert = intents.some(intent => intent.moveType === 'convertResources');
+        expect(hasConvert).toBe(false);
+
+        const resourceA = 'res_dom_0';
+        const resourceB = 'res_for_0';
+        G.objects[resourceA] = { id: resourceA, type: 'Resource', owner: '0', resort: 'DOM' } as any;
+        G.objects[resourceB] = { id: resourceB, type: 'Resource', owner: '0', resort: 'FOR' } as any;
+        G.zones['PersonalSupply:0'].items.push(resourceA, resourceB);
+
+        const supply = G.zones['PersonalSupply:0'];
+        const influenceId = supply.items.find(itemId => G.objects[itemId]?.type === 'Influence') as string;
+        supply.items = supply.items.filter(itemId => itemId !== influenceId);
+        G.zones[grassrootsId].items.push(influenceId);
+
+        intents = enumerateLegalIntents(G as any, ctx, '0');
+        hasConvert = intents.some(intent => intent.moveType === 'convertResources');
+        expect(hasConvert).toBe(true);
+    });
+
     it('limits intents to resolveChoice when pending choice exists', () => {
         const ctx = createCtx('politicalAction');
         const G = SetupGame({ ctx });

@@ -32,6 +32,6 @@
 - [x] Task 0031 - CORE-01 v1.0.20 Inventory + Delta Map
 - [x] Task 0032 - Meta-Marker State + Round Return
 - [x] Task 0033 - PlaceOrMoveInfluence Meta-Marker + Start Committee Gates
-- [ ] Task 0034 - ConvertResources Meta-Marker + Anchor Rules
+- [x] Task 0034 - ConvertResources Meta-Marker + Anchor Rules
 - [ ] Task 0035 - Production PingPong Reduction
 - [ ] Task 0036 - CORE-01 v1.0.20 Tests + Golden Replays
