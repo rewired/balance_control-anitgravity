@@ -10,6 +10,14 @@ This file is the operational contract for Codex (and humans). Follow it strictly
 
 ---
 
+Primary Architecture Contracts:
+- /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+- /docs/architecture/ARCH-02-STATE-SHAPE.md
+- /docs/architecture/ARCH-03-MEASURE-CPU.md
+- /docs/architecture/ARCH-04-LLM-BOT-CONTRACT.md
+
+---
+
 # 0. Non-Negotiables
 
 ## 0.1 Rules are Source of Truth
