@@ -3,7 +3,7 @@
 # CORE-01 Simulation Specification (Atomic, Deterministic)
 
 Version: 01
-Scope: Core Rules v1.0.22 only with variants (no expansions)
+Scope: Core Rules v1.0.23 only with variants (no expansions)
 
 ---
 
@@ -29,7 +29,10 @@ ADD56-01 5–6 Player Add-On
 
 CORE-01-00-01 Every game object exists in exactly one zone at any time.
 CORE-01-00-02 Zones are containers; moving an object means transferring it between zones.
+CORE-01-00-02A PersonalSupply Partition: PersonalSupply is a per-player zone: for each player P, there exists exactly one distinct PersonalSupply[P].
+Any Resource object in PersonalSupply[P] is treated as belonging to player P for all payments and effects.
 CORE-01-00-03 Influence zones are: PersonalSupply, Board.
+CORE-01-00-03A Influence Tile Attachment Invariant: Each Influence object in Board is attached to exactly one Tile in Board (‘on that Tile’). An Influence object in PersonalSupply is unattached.
 CORE-01-00-04 Resource zones are: PersonalSupply, Bank, Noise.
 CORE-01-00-04A Bank Supply Invariant: The Bank is an unlimited source and sink for Resources. Whenever a rule instructs moving N Resources of a resort from Bank to another zone, the engine MUST create those N Resource objects in Bank (if not already represented) and then move them. Bank availability never restricts production or legality
 CORE-01-00-05 Tile zones are: DrawPile, Board, DiscardFaceUp.
@@ -39,8 +42,7 @@ CORE-01-00-08 Any rule that references adjacency uses the current topology’s a
 CORE-01-00-09 A topology attachment must be defined before game start.
 CORE-01-00-10 The topology attachment specifies how adjacency between Tiles is determined.
 CORE-01-00-11 The topology attachment does not modify any other rule.
-CORE-01-00-12 Expansion-specific zones
-If an expansion introduces additional zones (e.g., Measure zones), those zones exist separately per expansion.
+CORE-01-00-12 Expansion-specific zones: If an expansion introduces additional zones (e.g., Measure zones), those zones exist separately per expansion.
 Zones introduced by different expansions never share objects unless a rule explicitly defines cross-expansion mixing.
 
 ---
@@ -54,10 +56,9 @@ CORE-01-00-T04 The topology implementation may represent hexagonal, orthogonal, 
 CORE-01-00-T05 Changing topology does not alter any rule outside adjacency evaluation.
 CORE-01-00-T06 Board Position Binding
 Each Tile in Board is bound to exactly one Position value defined by the topology. No two Tiles may share a Position.
-CORE-01-00-T07 Neighbor Positions
-A topology implementation must define NeighborPositions(Position) → ordered list of adjacent Positions.
-CORE-01-00-T08 Canonical Position Order
-A topology implementation must define PositionKey(Position) → a deterministic total-order key used for canonical ordering.
+CORE-01-00-T07 Neighbor Positions: A topology implementation must define NeighborPositions(Position) → ordered list of adjacent Positions.
+CORE-01-00-T07A Adjacency Consistency (Canonical): For Tiles in Board, Adjacent(TileA, TileB) MUST be true iff TileB.Position is contained in NeighborPositions(TileA.Position).
+CORE-01-00-T08 Canonical Position Order: A topology implementation must define PositionKey(Position) → a deterministic total-order key used for canonical ordering.
 CORE-01-00-T09 StartPosition: A topology implementation MUST define a constant StartPosition (a valid Position value). During Setup (CORE-01-03-01), bind the Start Committee tile to StartPosition.
 
 ---
@@ -122,6 +123,8 @@ CORE-01-03-02B Canonical Pre-Shuffle Ordering: Before any shuffle, build the ini
 (2) ResortOrder where DOM < FOR < INF; Tiles without a Resort use ResortOrder = None (sorted after INF).
 (3) WOrder ascending numeric; Tiles without W use WOrder = None (sorted after all W values).
 (4) SerialIndex ascending, assigned starting at 0 within each identical (TileType, Resort, W) group.
+CORE-01-03-02A.1 Canonical Shuffle Algorithm: ‘Shuffle’ means Fisher–Yates shuffle over the list from last index down to 1, swapping index i with index j where j = RNG.nextInt(i+1).
+CORE-01-03-02A.2 Canonical RNG Call Order (Setup): During Setup, perform the DrawPile shuffle (CORE-01-03-02) first. Immediately after that shuffle completes, determine the starting player by k = RNG.nextInt(playerCount), where k is the starting seat index.
 CORE-01-03-03 Setup determines a starting player.
 CORE-01-03-03A Turn Order: Turn order is fixed for the entire game: starting player acts first, then players act in ascending seat order wrapping around.
 
@@ -139,6 +142,8 @@ CORE-01-04-03 Phase 2 is ExactlyOnePoliticalAction.
 
 CORE-01-04-04 DrawAndPlaceTile repeats: draw the top Tile from DrawPile, attempt to place it legally, until either (a) a Tile is placed, or (b) DrawPile is empty.
 CORE-01-04-05 A tile placement is legal only if adjacent to at least one Tile in Board.
+CORE-01-04-05A Placement Choice (Canonical): If the drawn Tile has one or more legal Positions, the active player MUST choose exactly one legal unoccupied Position and place the Tile there.
+A Position is legal iff it is unoccupied (CORE-01-04-08) and is in NeighborPositions(T.Position) for at least one Tile T currently in Board.
 CORE-01-04-06 If the drawn Tile cannot be legally placed, move it from DrawPile to DiscardFaceUp.
 CORE-01-04-07 If a Tile is moved to DiscardFaceUp due to illegality, the player immediately draws again from DrawPile.
 CORE-01-04-08 A tile may be placed only on an unoccupied Position in the current topology.
@@ -165,6 +170,12 @@ A Meta-Marker placed or updated due to PlaceOrMoveInfluence (Move) expires at th
 CORE-01-04-13 FormalizeInfluence may be chosen as the Political Action.
 CORE-01-04-14 FormalizeInfluence is performed via a Committee tile.
 CORE-01-04-14A Start Committee Override: If the selected Committee tile is the Start Committee, resolve FormalizeInfluence using CORE-01-08-07 through CORE-01-08-10A instead of CORE-01-04-15 through CORE-01-04-19
+CORE-01-04-14B Start Committee Formalize — Legality and Failure: Selecting the Start Committee as the Committee for FormalizeInfluence is legal only if:
+(a) CORE-01-08-02 is satisfied,
+(b) the active player has not previously resolved Start Committee formalization (CORE-01-08-07),
+(c) the active player can fully pay the cost defined in CORE-01-08-08, and
+(d) the Influence Cap Check in CORE-01-08-10A passes.
+If any condition (a)–(d) is not satisfied, the action is invalid and does not resolve; no state change occurs (CORE-01-06-00-03).
 CORE-01-04-15 FormalizeInfluence (Standard Committee) cost requires paying 2 Resources of different resorts.
 CORE-01-04-16 FormalizeInfluence (Standard Committee) moves paid Resources from the active player’s PersonalSupply to Bank.
 CORE-01-04-17 FormalizeInfluence (Standard Committee) creates exactly one new Influence in the active player’s PersonalSupply.
@@ -190,6 +201,8 @@ If the Meta-Marker was previously on another Tile, remove it from that Tile.
 CORE-01-04-22F ConvertResources Meta-Marker Expiry: A Meta-Marker placed or updated due to ConvertResources expires at the beginning of the next Round and is returned to its owner’s PersonalSupply.
 CORE-01-04-22G Grassroots ConvertRecipe Requirement: For engine implementations, each Grassroots Tile MUST provide a machine-readable ConvertRecipe descriptor (inputs + outputs) that exactly matches its printed text.
 If the selected Grassroots Tile has no ConvertRecipe descriptor, ConvertResources is invalid and does not resolve (CORE-01-06-00-03).
+CORE-01-04-22H Core Grassroots Definitions (Normative): The CORE-01 ruleset MUST include a complete normative definition for every Grassroots Tile used in CORE-01 (including ADD56-01 additions): (a) its printed text, and (b) its machine-readable ConvertRecipe (inputs + outputs).
+If these definitions are not present as part of the CORE-01 specification artifact, ConvertResources is undefined and may not be executed.
 
 ---
 
@@ -259,11 +272,14 @@ CORE-01-06-03 If full enclosure is detected, Hotspot resolution is executed imme
 CORE-01-06-03A Multiple Hotspots (Canonical Order)
 If multiple Hotspots are fully surrounded as a result of the same Tile placement, resolve them one at a time in ascending PositionKey(Hotspot.Position).
 If resolving one Hotspot affects Influence availability for later Hotspots, later Hotspots resolve using the updated state.
+CORE-01-06-03B Hotspot Single-Resolution Invariant: Each Hotspot Tile resolves at most once per game.
+Immediately after each successful Tile placement (CORE-01-06-02), the engine MUST evaluate all Hotspots in Board that are not yet resolved. Any such Hotspot that is fully surrounded (CORE-01-06-01) MUST resolve now (ordered per CORE-01-06-03A).
+After a Hotspot resolution attempt (including cases where no Influence can be placed due to CORE-01-06-07), mark that Hotspot as resolved; it MUST NOT resolve again.
 CORE-01-06-04 Hotspot resolution follows this order:
 (a) Apply any pre-majority effects explicitly defined as occurring “before majority determination.”
 (b) Determine majority on that Hotspot.
-(c) Resolve majority outcome.
-(d) Apply effect modifiers and prohibitions according to Rule Hierarchy.
+(c) Resolve majority outcome (only after completing step (d); if step (d) prohibits this effect, do not execute step (c)).
+(d) Evaluate any applicable effect modifiers and prohibitions according to Rule Hierarchy. If any prohibition applies, Hotspot resolution does not resolve and no state change occurs (CORE-01-06-00-03).
 CORE-01-06-05 If a player has majority on the Hotspot, place exactly one Influence on that Hotspot for the majority player.
 CORE-01-06-06 Hotspot placement moves one Influence from that player’s PersonalSupply to the Hotspot Tile in Board.
 CORE-01-06-07 If the majority player has no available Influence in PersonalSupply, Hotspot placement cannot occur.
@@ -271,11 +287,10 @@ CORE-01-06-08 Hotspots do not produce Resources.
 
 CORE-01-06-09 Resort Production is resolved only during Round Settlement.
 CORE-01-06-10 Each ResortTile has a printed production value.
-CORE-01-06-11 When a player controls a ResortTile, that ResortTile produces Resources equal to its printed production value.
+CORE-01-06-11 When resolving Resort Production, the produced Resource amount is the production output computed by CORE-01-06-16(a), and the receiving player(s) are determined by CORE-01-06-16(b)/(c)
 CORE-01-06-12 Produced Resources are moved from Bank to the controlling player’s PersonalSupply.
 CORE-01-06-13 If the highest totalInfluence on a ResortTile is 0, that ResortTile produces 0 Resources.
-CORE-01-06-13A Zero-Influence Production
-If the highest totalInfluence on a ResortTile is 0 (i.e., no player has any Influence/modifier advantage on that tile), that ResortTile produces 0 Resources.
+CORE-01-06-13A Definition — totalInfluence for Production: For Resort Production, ‘totalInfluence’ is computed exactly as in CORE-01-05-03A step (1) for that ResortTile (Influence on the Tile plus applicable modifiers).
 CORE-01-06-14 If two or more players tie for highest totalInfluence on a ResortTile and that highest totalInfluence is > 0, divide the produced Resources evenly among those tied players.
 CORE-01-06-15 Any remainder from a tied ResortTile production is moved to Noise.
 CORE-01-06-16 Production Resolution Order (Canonical)
@@ -338,7 +353,8 @@ CORE-01-08-06C.1 Definitions — Path and Connectivity: A Path is a finite seque
 Two Tiles are connected iff at least one Path exists between them.
 CORE-01-08-06D Start Committee “Pass-Through” Prohibition for Influence: If any rule evaluates a path that includes the Start Committee, treat the Start Committee as a connector node only.
 Influence does not move onto or off of the Start Committee as an intermediate step.
-CORE-01-08-06E Start Committee Targeting Restriction: The Start Committee may not be the source or destination of PlaceOrMoveInfluence.
+CORE-01-08-06E Start Committee Targeting Restriction: The Start Committee may not be the destination Tile of PlaceOrMoveInfluence (Place).
+The Start Committee may not be the source or destination Tile of PlaceOrMoveInfluence (Move).
 This does not restrict placing a Meta-Marker on the Start Committee as defined elsewhere in CORE-01.
 CORE-01-08-06F Immunity Interpretation Clarification: Start Committee immunity applies to effects that target or would modify the Start Committee tile. It does not prohibit performing actions via the Start Committee as explicitly defined (CORE-01-04-14A / CORE-01-08-07..10A), and it does not prohibit placing a Meta-Marker on the Start Committee (CORE-01-02-17D).
 CORE-01-08-07 Each player may FormalizeInfluence via the Start Committee at most once per game.
@@ -356,8 +372,8 @@ CORE-01-09-01 The game ends when no further Tiles can be drawn from DrawPile.
 CORE-01-09-01A Final Settlement Trigger: If a player would begin DrawAndPlaceTile and DrawPile is empty, immediately begin the final Round Settlement (CORE-01-07-02) and then end the game (CORE-01-09-02).
 If, during DrawAndPlaceTile, DrawPile becomes empty before a Tile is placed, immediately begin the final Round Settlement and then end the game; skip the Political Action phase of that turn.
 CORE-01-09-02 After the final Round Settlement completes, the game ends immediately.
-CORE-01-09-03 The player with the highest total Influence on Board wins.
-CORE-01-09-04 If two or more players tie for highest total Influence on Board, victory is shared.
+CORE-01-09-03 Compute each player’s score as the count of Influence objects owned by that player that are in Board. Virtual Influence from Lobbyists (CORE-01-05-04/04A) is ignored for scoring. The player with the highest score wins.
+CORE-01-09-04 If two or more players tie for highest score, victory is shared.
 
 ---
 
