@@ -1,7 +1,7 @@
 # Codex Task 0032 — Meta-Marker State + Round Return
 
-**Date:** 2026-02-13  
-**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)  
+**Date:** 2026-02-13
+**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)
 **Primary contract:** `AGENTS.md` (repo root)
 
 Key anchors (ASCII only):
@@ -31,21 +31,21 @@ Introduce Meta-Marker objects into authoritative state, with deterministic lifec
 
 ## Outputs
 
-1. **Rules/types**  
+1. **Rules/types**
    * Add a Meta-Marker object type in `GameObject` with fields needed for:
      * `owner` (playerId)
      * `mode` (PingPong | Shift | Convert)
      * expiry tracking compatible with round-start return
-2. **Setup**  
+2. **Setup**
    * Create exactly one Meta-Marker per player in `PersonalSupply:<playerId>` at game start.
-3. **Placement and storage**  
+3. **Placement and storage**
    * Meta-Markers exist in exactly one zone at any time:
      * `PersonalSupply:<playerId>` or a Tile zone in Board.
    * Allow Meta-Markers on the Start Committee (CORE-01-02-17D).
-4. **Round-start return**  
+4. **Round-start return**
    * At the beginning of each Round, before any player turn, return Meta-Markers that expire this Round to owner’s PersonalSupply (CORE-01-07-03A).
    * Ensure a Meta-Marker placed in a Round is returned at the beginning of the next Round (CORE-01-07-03B).
-5. **UI**  
+5. **UI**
    * Render Meta-Markers in the client token component with a distinct class or label (no gameplay logic).
 
 ---
@@ -79,9 +79,9 @@ Introduce Meta-Marker objects into authoritative state, with deterministic lifec
 
 ## PR Checklist
 
-* [ ] Add Meta-Marker object type and fields
-* [ ] Create one Meta-Marker per player at setup
-* [ ] Implement round-start return step
-* [ ] Render Meta-Markers in client UI
-* [ ] Add unit tests for placement + return
-* [ ] Update `docs/PR_TASK_LIST.md` (add Task 0032)
+* [x] Add Meta-Marker object type and fields
+* [x] Create one Meta-Marker per player at setup
+* [x] Implement round-start return step
+* [x] Render Meta-Markers in client UI
+* [x] Add unit tests for placement + return
+* [x] Update `docs/PR_TASK_LIST.md` (add Task 0032)
