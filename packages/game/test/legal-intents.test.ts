@@ -44,6 +44,30 @@ describe('enumerateLegalIntents', () => {
         }
     });
 
+    it('does not emit moveInfluence intents involving Start Committee', () => {
+        const ctx = createCtx('politicalAction');
+        const G = SetupGame({ ctx });
+        const committeeId = Object.values(G.tiles).find(tile => tile.type === TileType.Committee)?.id as string;
+        G.zones[CoreZoneNames.Board].items.push(committeeId);
+        G.grid['1,0'] = committeeId;
+
+        const supply = G.zones['PersonalSupply:0'];
+        const startInfluenceId = supply.items.find(itemId => G.objects[itemId]?.type === 'Influence') as string;
+        supply.items = supply.items.filter(itemId => itemId !== startInfluenceId);
+        G.zones['tile_start_committee'].items.push(startInfluenceId);
+
+        const otherInfluenceId = supply.items.find(itemId => G.objects[itemId]?.type === 'Influence') as string;
+        supply.items = supply.items.filter(itemId => itemId !== otherInfluenceId);
+        G.zones[committeeId].items.push(otherInfluenceId);
+
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        const moveIntents = intents.filter(intent => intent.moveType === 'moveInfluence');
+        const hasStartCommittee = moveIntents.some(intent => {
+            return intent.payload?.sourceId === 'tile_start_committee' || intent.payload?.targetId === 'tile_start_committee';
+        });
+        expect(hasStartCommittee).toBe(false);
+    });
+
     it('limits intents to resolveChoice when pending choice exists', () => {
         const ctx = createCtx('politicalAction');
         const G = SetupGame({ ctx });

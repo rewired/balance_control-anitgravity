@@ -77,8 +77,8 @@ Implement Move Influence Meta-Marker placement and PingPong/Shift modes, and enf
 
 ## PR Checklist
 
-* [ ] Implement MoveInfluence Meta-Marker placement + modes
-* [ ] Enforce Start Committee source/destination restriction
-* [ ] Update legal intents for new gating
-* [ ] Add unit tests for PingPong/Shift and Start Committee gating
-* [ ] Update `docs/PR_TASK_LIST.md` (add Task 0033)
+* [x] Implement MoveInfluence Meta-Marker placement + modes
+* [x] Enforce Start Committee source/destination restriction
+* [x] Update legal intents for new gating
+* [x] Add unit tests for PingPong/Shift and Start Committee gating
+* [x] Update `docs/PR_TASK_LIST.md` (add Task 0033)

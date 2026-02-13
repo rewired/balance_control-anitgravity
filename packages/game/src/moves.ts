@@ -70,6 +70,41 @@ function isCoreResort(resort: string): boolean {
     return resort === CoreResources.DOM || resort === CoreResources.FOR || resort === CoreResources.INF;
 }
 
+function getPlayerMetaMarker(G: any, playerId: string): any | null {
+    const directId = `meta_${playerId}`;
+    const direct = G.objects?.[directId];
+    if (direct && direct.type === 'MetaMarker') return direct;
+    for (const obj of Object.values(G.objects || {})) {
+        if (obj && obj.type === 'MetaMarker' && obj.owner === playerId) return obj;
+    }
+    return null;
+}
+
+function findObjectZoneId(G: any, objectId: string): string | null {
+    for (const zone of Object.values(G.zones || {})) {
+        if (zone.items.includes(objectId)) return zone.id;
+    }
+    return null;
+}
+
+function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'PingPong' | 'Shift', expiresRound: number) {
+    const currentZoneId = findObjectZoneId(G, marker.id);
+    if (currentZoneId && currentZoneId !== tileId) {
+        const currentZone = G.zones[currentZoneId];
+        if (currentZone) {
+            currentZone.items = currentZone.items.filter((id: string) => id !== marker.id);
+        }
+    }
+
+    const targetZone = G.zones[tileId];
+    if (targetZone && !targetZone.items.includes(marker.id)) {
+        targetZone.items.push(marker.id);
+    }
+
+    marker.mode = mode;
+    marker.expiresRound = expiresRound;
+}
+
 export const CoreMoves = {
     // SYSTEM: Multi-stage Choice Resolution
     resolveChoice: ({ G, ctx }: any, payload: unknown) => {
@@ -145,6 +180,10 @@ export const CoreMoves = {
         const srcZone = G.zones[sourceId];
         if (!srcZone) return INVALID_MOVE;
 
+        // CORE-01-08-06E
+        const sourceTile = G.tiles[sourceId];
+        if (sourceTile && sourceTile.type === TileType.StartCommittee) return INVALID_MOVE;
+
         // CORE-01-08-04: No Influence may be placed on the Start Committee
         const targetTile = G.tiles[targetId];
         if (targetTile && targetTile.type === TileType.StartCommittee) return INVALID_MOVE;
@@ -153,6 +192,11 @@ export const CoreMoves = {
         if (!hasInf) return INVALID_MOVE;
 
         if (!G.zones[targetId]) return INVALID_MOVE;
+
+        // CORE-01-04-12B
+        const marker = getPlayerMetaMarker(G, pid);
+        const markerZoneId = marker ? findObjectZoneId(G, marker.id) : null;
+        const markerOnDestination = markerZoneId === targetId;
 
         // Decoupled Extra Costs
         if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.move', targetId, extraResourceIds)) return INVALID_MOVE;
@@ -165,6 +209,13 @@ export const CoreMoves = {
         });
 
         if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
+
+        if (marker) {
+            // CORE-01-04-12A–12C
+            const expiresRound = (G.roundNumber ?? 0) + 1;
+            const mode = markerOnDestination ? 'PingPong' : 'Shift';
+            placeMetaMarkerOnTile(G, marker, sourceId, mode, expiresRound);
+        }
 
         // Usage tracking
         EffectResolver.incrementUsage(G, 'politicalAction', pid);

@@ -139,11 +139,16 @@ function enumeratePlaceInfluence(G: GameState, playerID: string): LegalIntent[] 
 function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
     const intents: LegalIntent[] = [];
     const boardTiles = getBoardTileIds(G);
-    const sources = boardTiles.filter(tileId => hasPlayerInfluenceOnTile(G, tileId, playerID));
+    const sources = boardTiles.filter(tileId => {
+        const tile = G.tiles[tileId];
+        if (tile && tile.type === TileType.StartCommittee) return false;
+        return hasPlayerInfluenceOnTile(G, tileId, playerID);
+    });
 
     for (const sourceId of sources) {
         for (const targetId of boardTiles) {
-            if (targetId === 'tile_start_committee') continue;
+            const targetTile = G.tiles[targetId];
+            if (targetTile && targetTile.type === TileType.StartCommittee) continue;
             if (EffectResolver.isProhibited(G as any, playerID, 'influence.move', targetId)) continue;
             const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.move', targetId);
             if (!canPayExtraCosts(G, playerID, costSlots)) continue;

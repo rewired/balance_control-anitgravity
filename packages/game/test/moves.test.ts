@@ -24,7 +24,7 @@ describe('Moves', () => {
         G = {
             zones: {
                 [CoreZoneNames.Board]: { id: CoreZoneNames.Board, name: 'Board', items: ['board_t1', 'board_t2', 'board_gr', 'board_start'] },
-                'PersonalSupply:p1': { id: 'PersonalSupply:p1', name: 'PS', items: ['inf_1', 'res_dom', 'res_dom_2', 'res_for', 'res_inf'] },
+                'PersonalSupply:p1': { id: 'PersonalSupply:p1', name: 'PS', items: ['meta_p1', 'inf_1', 'res_dom', 'res_dom_2', 'res_for', 'res_inf'] },
                 board_t1: { id: 'board_t1', name: 'T1', items: [] },
                 board_t2: { id: 'board_t2', name: 'T2', items: [] },
                 board_gr: { id: 'board_gr', name: 'GR', items: [] },
@@ -47,6 +47,7 @@ describe('Moves', () => {
                 offboard_t: { id: 'offboard_t', type: TileType.Lobbyist }
             },
             objects: {
+                meta_p1: { id: 'meta_p1', type: 'MetaMarker', owner: 'p1' },
                 inf_1: { id: 'inf_1', type: 'Influence', owner: 'p1' },
                 res_dom: { id: 'res_dom', type: 'Resource', owner: 'p1', resort: 'DOM' },
                 res_dom_2: { id: 'res_dom_2', type: 'Resource', owner: 'p1', resort: 'DOM' },
@@ -110,9 +111,54 @@ describe('Moves', () => {
         const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
 
         expect(result).not.toBe(INVALID_MOVE);
-        expect(G.zones.board_t1.items.length).toBe(5);
-        expect(G.zones.board_t2.items.length).toBe(1);
+        const sourceInfluence = G.zones.board_t1.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
+        const targetInfluence = G.zones.board_t2.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
+        expect(sourceInfluence).toBe(5);
+        expect(targetInfluence).toBe(1);
         expect(countOwnedInfluence()).toBe(beforeCount);
+    });
+
+    it('moveInfluence should set PingPong mode when meta-marker starts on destination', () => {
+        G.roundNumber = 1;
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones.board_t1.items.push('inf_1');
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'meta_p1');
+        G.zones.board_t2.items.push('meta_p1');
+
+        CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+
+        expect(G.zones.board_t1.items).toContain('meta_p1');
+        expect(G.zones.board_t2.items).not.toContain('meta_p1');
+        expect(G.objects.meta_p1.mode).toBe('PingPong');
+        expect(G.objects.meta_p1.expiresRound).toBe(2);
+    });
+
+    it('moveInfluence should set Shift mode when meta-marker is not on destination', () => {
+        G.roundNumber = 3;
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones.board_t1.items.push('inf_1');
+
+        CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+
+        expect(G.zones.board_t1.items).toContain('meta_p1');
+        expect(G.objects.meta_p1.mode).toBe('Shift');
+        expect(G.objects.meta_p1.expiresRound).toBe(4);
+    });
+
+    it('moveInfluence should reject Start Committee as source or destination', () => {
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones.board_start.items.push('inf_1');
+        const beforeSource = JSON.stringify(G);
+        const resultSource = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_start', targetId: 'board_t2' });
+        expect(resultSource).toBe(INVALID_MOVE);
+        expect(JSON.stringify(G)).toBe(beforeSource);
+
+        G.zones.board_start.items = [];
+        G.zones.board_t1.items.push('inf_1');
+        const beforeTarget = JSON.stringify(G);
+        const resultTarget = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_start' });
+        expect(resultTarget).toBe(INVALID_MOVE);
+        expect(JSON.stringify(G)).toBe(beforeTarget);
     });
 
     it('placeInfluence should remain legal at cap because it uses existing supply marker', () => {
