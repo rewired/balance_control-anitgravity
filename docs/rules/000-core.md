@@ -3,7 +3,7 @@
 # CORE-01 Simulation Specification (Atomic, Deterministic)
 
 Version: 01
-Scope: Core Rules v1.0.21 only with variants (no expansions)
+Scope: Core Rules v1.0.22 only with variants (no expansions)
 
 ---
 
@@ -31,6 +31,7 @@ CORE-01-00-01 Every game object exists in exactly one zone at any time.
 CORE-01-00-02 Zones are containers; moving an object means transferring it between zones.
 CORE-01-00-03 Influence zones are: PersonalSupply, Board.
 CORE-01-00-04 Resource zones are: PersonalSupply, Bank, Noise.
+CORE-01-00-04A Bank Supply Invariant: The Bank is an unlimited source and sink for Resources. Whenever a rule instructs moving N Resources of a resort from Bank to another zone, the engine MUST create those N Resource objects in Bank (if not already represented) and then move them. Bank availability never restricts production or legality
 CORE-01-00-05 Tile zones are: DrawPile, Board, DiscardFaceUp.
 CORE-01-00-06 No object may exist in multiple zones simultaneously.
 CORE-01-00-07 The board uses a topology parameter that defines adjacency between Tiles.
@@ -57,6 +58,7 @@ CORE-01-00-T07 Neighbor Positions
 A topology implementation must define NeighborPositions(Position) → ordered list of adjacent Positions.
 CORE-01-00-T08 Canonical Position Order
 A topology implementation must define PositionKey(Position) → a deterministic total-order key used for canonical ordering.
+CORE-01-00-T09 StartPosition: A topology implementation MUST define a constant StartPosition (a valid Position value). During Setup (CORE-01-03-01), bind the Start Committee tile to StartPosition.
 
 ---
 
@@ -105,6 +107,7 @@ CORE-01-02-17A Each player has exactly one Meta-Marker (Cooldown Token).
 CORE-01-02-17B A Meta-Marker is not Influence, not a Resource, and not an Overlay.
 CORE-01-02-17C A Meta-Marker exists either in the owning player’s PersonalSupply or on exactly one Tile in Board.
 CORE-01-02-17D A Meta-Marker may be placed on the Start Committee despite Start Committee immunity.
+CORE-01-02-17E Meta-Marker Mode Domain: Meta-Marker mode is one of: None, PingPong, Shift, Convert. At game start, mode = None
 
 ---
 
@@ -114,11 +117,13 @@ CORE-01-03-01 Setup places the Start Committee tile into Board.
 CORE-01-03-02 Setup shuffles all non-Start tiles into DrawPile.
 CORE-01-03-02A Deterministic Randomness Contract
 All randomization in CORE-01 (shuffles, starting player selection) MUST use a deterministic RNG seeded at game start, and the seed MUST be part of the initial game state.
-CORE-01-03-02B Canonical Pre-Shuffle Ordering
-Before any shuffle, build the initial DrawPile list in a canonical order: sort by (TileType, Resort if any, W value if any), and within identical entries by an increasing serial index.
+CORE-01-03-02B Canonical Pre-Shuffle Ordering: Before any shuffle, build the initial DrawPile list in a canonical total order using these keys:
+(1) TileTypeOrder where ResortTiles < Committees < Grassroots < Lobbyists < Hotspots.
+(2) ResortOrder where DOM < FOR < INF; Tiles without a Resort use ResortOrder = None (sorted after INF).
+(3) WOrder ascending numeric; Tiles without W use WOrder = None (sorted after all W values).
+(4) SerialIndex ascending, assigned starting at 0 within each identical (TileType, Resort, W) group.
 CORE-01-03-03 Setup determines a starting player.
-CORE-01-03-03A Turn Order
-Turn order is fixed for the entire game: starting player acts first, then players act in ascending seat order wrapping around.
+CORE-01-03-03A Turn Order: Turn order is fixed for the entire game: starting player acts first, then players act in ascending seat order wrapping around.
 
 CORE-01-03-04 For 2 players, assign 4 Influence objects to each player’s PersonalSupply.
 CORE-01-03-05 For 3 players, assign 3 Influence objects to each player’s PersonalSupply.
@@ -159,8 +164,7 @@ A Meta-Marker placed or updated due to PlaceOrMoveInfluence (Move) expires at th
 
 CORE-01-04-13 FormalizeInfluence may be chosen as the Political Action.
 CORE-01-04-14 FormalizeInfluence is performed via a Committee tile.
-CORE-01-04-14A Start Committee Override
-If the selected Committee tile is the Start Committee, resolve FormalizeInfluence using CORE-01-08-07 through CORE-01-08-10 instead of CORE-01-04-15 through CORE-01-04-19.
+CORE-01-04-14A Start Committee Override: If the selected Committee tile is the Start Committee, resolve FormalizeInfluence using CORE-01-08-07 through CORE-01-08-10A instead of CORE-01-04-15 through CORE-01-04-19
 CORE-01-04-15 FormalizeInfluence (Standard Committee) cost requires paying 2 Resources of different resorts.
 CORE-01-04-16 FormalizeInfluence (Standard Committee) moves paid Resources from the active player’s PersonalSupply to Bank.
 CORE-01-04-17 FormalizeInfluence (Standard Committee) creates exactly one new Influence in the active player’s PersonalSupply.
@@ -173,31 +177,18 @@ CORE-01-04-20 ConvertResources may be chosen as the Political Action.
 CORE-01-04-21 ConvertResources is performed via a Grassroots tile.
 CORE-01-04-22 ConvertResources cost and effect are defined by the specific Grassroots tile text.
 
-CORE-01-04-22A ConvertResources Output Unit
-ConvertResources produces exactly 1 Resource object as output per successful ConvertResources action.
+CORE-01-04-22A ConvertResources Output Unit: ConvertResources produces exactly 1 Resource object as output per successful ConvertResources action.
 If a Grassroots tile text specifies multiple output Resource objects, that tile text overrides this rule.
-
-CORE-01-04-22B ConvertResources Availability (Control Requirement)
-ConvertResources is legal only if the active player currently controls at least one Grassroots tile in Board.
+CORE-01-04-22B ConvertResources Availability (Control Requirement): ConvertResources is legal only if the active player currently controls at least one Grassroots tile in Board.
 If the active player controls zero Grassroots tiles, ConvertResources may not be chosen as the Political Action.
-
-CORE-01-04-22C ConvertResources Repeat Penalty (Meta-Marker)
-If, at the moment ConvertResources begins resolution, the active player’s Meta-Marker is currently on any Tile (i.e., not in that player’s PersonalSupply) with mode Convert, then increase the conversion cost by +1 additional Resource of any resort.
+CORE-01-04-22C ConvertResources Repeat Penalty (Meta-Marker): If, at the moment ConvertResources begins resolution, the active player’s Meta-Marker is on any Tile with mode Convert, then increase the conversion cost by +1 additional Resource. The active player chooses the resort for this additional Resource as part of cost declaration; this choice is locked before any payment is performed.
 This penalty applies regardless of which controlled Grassroots tile is selected for the current ConvertResources action.
-
-CORE-01-04-22D ConvertResources Convert Anchor Selection
-When resolving ConvertResources, the active player must select exactly one Grassroots tile that the active player currently controls.
+CORE-01-04-22D ConvertResources Convert Anchor Selection: When resolving ConvertResources, the active player must select exactly one Grassroots tile that the active player currently controls.
 This selected tile is the Convert Anchor for this ConvertResources resolution.
-
-CORE-01-04-22E ConvertResources Meta-Marker Placement
-After a successful ConvertResources resolution, place the active player’s Meta-Marker onto the selected Convert Anchor tile and set its mode to Convert.
+CORE-01-04-22E ConvertResources Meta-Marker Placement: After a successful ConvertResources resolution, place the active player’s Meta-Marker onto the selected Convert Anchor tile and set its mode to Convert.
 If the Meta-Marker was previously on another Tile, remove it from that Tile.
-
-CORE-01-04-22F ConvertResources Meta-Marker Expiry
-A Meta-Marker placed or updated due to ConvertResources expires at the beginning of the next Round and is returned to its owner’s PersonalSupply.
-
-CORE-01-04-22G Grassroots ConvertRecipe Requirement
-For engine implementations, each Grassroots Tile MUST provide a machine-readable ConvertRecipe descriptor (inputs + outputs) that exactly matches its printed text.
+CORE-01-04-22F ConvertResources Meta-Marker Expiry: A Meta-Marker placed or updated due to ConvertResources expires at the beginning of the next Round and is returned to its owner’s PersonalSupply.
+CORE-01-04-22G Grassroots ConvertRecipe Requirement: For engine implementations, each Grassroots Tile MUST provide a machine-readable ConvertRecipe descriptor (inputs + outputs) that exactly matches its printed text.
 If the selected Grassroots Tile has no ConvertRecipe descriptor, ConvertResources is invalid and does not resolve (CORE-01-06-00-03).
 
 ---
@@ -206,11 +197,9 @@ If the selected Grassroots Tile has no ConvertRecipe descriptor, ConvertResource
 
 CORE-01-05-01 A player controls a Tile iff computeMajority(Tile) returns that player (CORE-01-05-03A).
 CORE-01-05-02 If computeMajority(Tile) returns None (tie), no player controls that Tile (CORE-01-05-03A).
-CORE-01-05-03 Control updates immediately after any Influence movement onto, off, or between Board Tiles.
-
+CORE-01-05-03 Control updates immediately after any Influence movement onto, off, or between Board Tiles, and immediately after any Tile is placed into Board (since adjacency-based modifiers can change)
 CORE-01-05-03A Definition — computeMajority(Tile)
-
-computeMajority(Tile):
+0. If Tile is the Start Committee, return None. No modifiers are applied when evaluating the Start Committee.
 
 Applicable modifiers in CORE-01 are limited to Lobbyist adjacency per CORE-01-05-04A and are subject to CORE-01-05-04B.
 
@@ -284,7 +273,7 @@ CORE-01-06-09 Resort Production is resolved only during Round Settlement.
 CORE-01-06-10 Each ResortTile has a printed production value.
 CORE-01-06-11 When a player controls a ResortTile, that ResortTile produces Resources equal to its printed production value.
 CORE-01-06-12 Produced Resources are moved from Bank to the controlling player’s PersonalSupply.
-CORE-01-06-13 If no player controls a ResortTile, that ResortTile produces no Resources.
+CORE-01-06-13 If the highest totalInfluence on a ResortTile is 0, that ResortTile produces 0 Resources.
 CORE-01-06-13A Zero-Influence Production
 If the highest totalInfluence on a ResortTile is 0 (i.e., no player has any Influence/modifier advantage on that tile), that ResortTile produces 0 Resources.
 CORE-01-06-14 If two or more players tie for highest totalInfluence on a ResortTile and that highest totalInfluence is > 0, divide the produced Resources evenly among those tied players.
@@ -300,15 +289,14 @@ When resolving a ResortTile’s production during Round Settlement, use the foll
 1. Start with the tile’s printed production value.
 2. Apply doubling effects (if any).
 3. Apply production output modifiers (reductions or increases).
-4. Apply Ping-Pong reduction, if applicable:
-If the production winner determined in step (b) is exactly one player and that player’s Meta-Marker mode is PingPong, reduce this production output to 50% (rounded down) and cap it at a maximum of 10.
+4. Ping-Pong reduction (evaluated after step (b)): Let baseOutput be the result after steps (1)–(3). After step (b) determines exactly one production winner, if that winner’s Meta-Marker mode is PingPong, set output = floor(baseOutput / 2) and cap it at a maximum of 10. Otherwise, output = baseOutput.
 5. Apply floors (minimum 0).
 
 (b) Determine highest totalInfluence on that Tile using the standard majority rules (including modifiers). If the unique highest player exists, that player is the production winner. If multiple players tie for highest and highest > 0, those players are tied production winners. If highest == 0, there are no production winners.
 
 (c) Distribute the produced Resources:
 - If there is exactly one production winner, that player receives the full amount.
-- If no player controls the Tile, produce 0.
+- If the highest totalInfluence on the Tile is 0, produce 0.
 - If there are tied production winners (highest > 0), split evenly; any remainder is moved to Noise.
 
 CORE-01-06-17 If an effect-level prohibition applies to production (e.g., “Blockade”), production output is treated as 0 and no Resources are distributed.
@@ -320,13 +308,10 @@ CORE-01-06-17 If an effect-level prohibition applies to production (e.g., “Blo
 CORE-01-07-01 A round consists of one complete player cycle in turn order.
 CORE-01-07-02 After the last player completes a turn in a round, Round Settlement begins.
 CORE-01-07-03 Round Settlement resolves Resort Production for all ResortTiles.
-CORE-01-07-03A Meta-Marker Return Step (Round Start)
-At the beginning of each Round, before any player takes a turn, return every Meta-Marker currently on Board to its owner’s PersonalSupply.
-
-CORE-01-07-03B Meta-Marker Duration
-A Meta-Marker placed during a Round remains on its Tile for at most that Round and is returned at the beginning of the next Round.
-CORE-01-07-03C Meta-Marker Mode Reset
-When a Meta-Marker is returned at the beginning of a Round, set its mode to None.
+CORE-01-07-03A Meta-Marker Return Step (Round Start): At the beginning of each Round, before any player takes a turn, return every Meta-Marker currently on Board to its owner’s PersonalSupply.
+CORE-01-07-03B Meta-Marker Duration: A Meta-Marker placed during a Round remains on its Tile for at most that Round and is returned at the beginning of the next Round.
+CORE-01-07-03C Meta-Marker Mode Reset: When a Meta-Marker is returned at the beginning of a Round, set its mode to None.
+CORE-01-07-03D Resort Production Sweep Order (Canonical): During Round Settlement, resolve Resort Production for ResortTiles in Board in ascending PositionKey(ResortTile.Position).
 
 ---
 
@@ -334,35 +319,28 @@ When a Meta-Marker is returned at the beginning of a Round, set its mode to None
 
 CORE-01-08-01 A player may not exceed 7 Influence objects in total.
 
-CORE-01-08-02 FormalizeInfluence may not be performed until all players have placed all of their Starting Influence onto the Board.
+CORE-01-08-02 FormalizeInfluence may not be performed until, for every player, every Influence object assigned to that player during Setup as Starting Influence (CORE-01-03-04/05/06, modified by VAR-01-02 and/or ADD56-01-02) is in Board. Influence created by FormalizeInfluence is not Starting Influence.
 CORE-01-08-03 This restriction applies to all Committees, including the Start Committee.
 
 CORE-01-08-04 No Influence may be placed on the Start Committee.
 CORE-01-08-05 The Start Committee cannot be controlled.
 CORE-01-08-06 The Start Committee is immune to all effects, Measures, and Regulations.
-
-CORE-01-08-06A Immunity Scope:
-When an action is performed via the Start Committee (including Start Committee formalization),
+CORE-01-08-06A Immunity Scope: When an action is performed via the Start Committee (including Start Committee formalization),
 ignore any external modifiers that would:
 (a) prohibit execution (e.g., Blockade),
 (b) increase or alter costs,
 (c) reduce or alter output,
 unless that modifier explicitly states it affects the Start Committee.
-
 CORE-01-08-06B The Start Committee’s immunity does not override CORE-01-08-02 (timing restriction) and does not allow placing or moving Influence onto the Start Committee.
-
-CORE-01-08-06C Start Committee Connectivity Clarification
-The Start Committee may be used as a connector when evaluating adjacency-derived connectivity or paths between Tiles.
+CORE-01-08-06C Start Committee Connectivity Clarification: The Start Committee may be used as a connector when evaluating adjacency-derived connectivity or paths between Tiles.
 This does not allow any Influence object to enter, remain on, or be placed on the Start Committee.
-
-CORE-01-08-06D Start Committee “Pass-Through” Prohibition for Influence
-If any rule evaluates a path that includes the Start Committee, treat the Start Committee as a connector node only.
+CORE-01-08-06C.1 Definitions — Path and Connectivity: A Path is a finite sequence of Tiles in Board where each consecutive pair satisfies Adjacent(TileA, TileB) = true.
+Two Tiles are connected iff at least one Path exists between them.
+CORE-01-08-06D Start Committee “Pass-Through” Prohibition for Influence: If any rule evaluates a path that includes the Start Committee, treat the Start Committee as a connector node only.
 Influence does not move onto or off of the Start Committee as an intermediate step.
-
-CORE-01-08-06E Start Committee Targeting Restriction
-The Start Committee may not be the source or destination of PlaceOrMoveInfluence.
+CORE-01-08-06E Start Committee Targeting Restriction: The Start Committee may not be the source or destination of PlaceOrMoveInfluence.
 This does not restrict placing a Meta-Marker on the Start Committee as defined elsewhere in CORE-01.
-
+CORE-01-08-06F Immunity Interpretation Clarification: Start Committee immunity applies to effects that target or would modify the Start Committee tile. It does not prohibit performing actions via the Start Committee as explicitly defined (CORE-01-04-14A / CORE-01-08-07..10A), and it does not prohibit placing a Meta-Marker on the Start Committee (CORE-01-02-17D).
 CORE-01-08-07 Each player may FormalizeInfluence via the Start Committee at most once per game.
 CORE-01-08-08 Start Committee formalization cost requires paying 3 Resources of different resorts plus 1 additional Resource of any resort.
 CORE-01-08-09 Start Committee formalization moves all paid Resources from the active player’s PersonalSupply to Bank.
@@ -375,8 +353,8 @@ Start Committee formalization does not resolve if it would cause the active play
 # CORE-01-09 END GAME
 
 CORE-01-09-01 The game ends when no further Tiles can be drawn from DrawPile.
-CORE-01-09-01A Final Settlement Trigger
-If a player would begin DrawAndPlaceTile and DrawPile is empty, immediately begin the final Round Settlement (CORE-01-07-02) and then end the game (CORE-01-09-02).
+CORE-01-09-01A Final Settlement Trigger: If a player would begin DrawAndPlaceTile and DrawPile is empty, immediately begin the final Round Settlement (CORE-01-07-02) and then end the game (CORE-01-09-02).
+If, during DrawAndPlaceTile, DrawPile becomes empty before a Tile is placed, immediately begin the final Round Settlement and then end the game; skip the Political Action phase of that turn.
 CORE-01-09-02 After the final Round Settlement completes, the game ends immediately.
 CORE-01-09-03 The player with the highest total Influence on Board wins.
 CORE-01-09-04 If two or more players tie for highest total Influence on Board, victory is shared.
@@ -400,6 +378,8 @@ VAR-01-01-03 When TileRecycling is active, CORE-01-04-07 is not used.
 VAR-01-01-04 If a drawn Tile cannot be legally placed, move it from the draw resolution back into DrawPile.
 VAR-01-01-05 After returning the Tile to DrawPile, shuffle DrawPile.
 VAR-01-01-06 After shuffling DrawPile, the active player immediately draws again as part of DrawAndPlaceTile.
+VAR-01-01-07 Returned Tile Insertion (Canonical): When returning a Tile to DrawPile (VAR-01-01-04), append that Tile to the bottom of the DrawPile list before shuffling (VAR-01-01-05).
+VAR-01-01-08 TileRecycling Termination Guard: If, at any time during DrawAndPlaceTile, there exists no unoccupied Position that is adjacent (per NeighborPositions/Adjacent) to any Tile in Board, then no Tile can be legally placed. In that case, immediately treat DrawPile as empty for CORE-01-09-01A (begin final Round Settlement, then end the game).
 
 VAR-01-02-01 FirstPlayerHandicap is an optional variant.
 VAR-01-02-02 When FirstPlayerHandicap is active, the starting player receives one fewer Starting Influence during setup.
