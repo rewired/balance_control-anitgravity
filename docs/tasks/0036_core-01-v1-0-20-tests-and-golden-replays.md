@@ -1,7 +1,7 @@
 # Codex Task 0036 — CORE-01 v1.0.20 Tests + Golden Replays
 
-**Date:** 2026-02-13  
-**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)  
+**Date:** 2026-02-13
+**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)
 **Primary contract:** `AGENTS.md` (repo root)
 
 Key anchors (ASCII only):
@@ -69,8 +69,8 @@ Update tests and golden replays to reflect CORE-01 v1.0.20 behavior while preser
 
 ## PR Checklist
 
-* [ ] Add/extend unit tests for CORE-01 v1.0.20 deltas
-* [ ] Update golden replay expected hashes with traceability
-* [ ] Add at least one new replay for Meta-Marker behavior
-* [ ] `pnpm -w test` green
-* [ ] Update `docs/PR_TASK_LIST.md` (add Task 0036)
+* [x] Add/extend unit tests for CORE-01 v1.0.20 deltas
+* [x] Update golden replay expected hashes with traceability
+* [x] Add at least one new replay for Meta-Marker behavior
+* [x] `pnpm -w test` green
+* [x] Update `docs/PR_TASK_LIST.md` (add Task 0036)

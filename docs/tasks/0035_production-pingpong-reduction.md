@@ -71,7 +71,7 @@ Implement PingPong production reduction and cap in the canonical production orde
 
 ## PR Checklist
 
-* [ ] Implement PingPong reduction in production resolver
-* [ ] Preserve canonical production order
-* [ ] Add production tests for PingPong reduction
-* [ ] Update `docs/PR_TASK_LIST.md` (add Task 0035)
+* [x] Implement PingPong reduction in production resolver
+* [x] Preserve canonical production order
+* [x] Add production tests for PingPong reduction
+* [x] Update `docs/PR_TASK_LIST.md` (add Task 0035)

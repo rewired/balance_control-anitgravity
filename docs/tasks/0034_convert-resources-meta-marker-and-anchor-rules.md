@@ -1,7 +1,7 @@
 # Codex Task 0034 — ConvertResources Meta-Marker + Anchor Rules
 
-**Date:** 2026-02-13  
-**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)  
+**Date:** 2026-02-13
+**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)
 **Primary contract:** `AGENTS.md` (repo root)
 
 Key anchors (ASCII only):
@@ -77,10 +77,10 @@ Align ConvertResources legality, costs, output unit, and Meta-Marker behavior wi
 
 ## PR Checklist
 
-* [ ] Enforce ConvertResources control requirement
-* [ ] Add Convert Anchor selection semantics
-* [ ] Implement repeat penalty via cost system
-* [ ] Place Meta-Marker on anchor and set mode
-* [ ] Update legal intents enumeration
-* [ ] Add ConvertResources legality tests
-* [ ] Update `docs/PR_TASK_LIST.md` (add Task 0034)
+* [x] Enforce ConvertResources control requirement
+* [x] Add Convert Anchor selection semantics
+* [x] Implement repeat penalty via cost system
+* [x] Place Meta-Marker on anchor and set mode
+* [x] Update legal intents enumeration
+* [x] Add ConvertResources legality tests
+* [x] Update `docs/PR_TASK_LIST.md` (add Task 0034)

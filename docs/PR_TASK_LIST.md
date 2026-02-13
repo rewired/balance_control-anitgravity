@@ -34,4 +34,4 @@
 - [x] Task 0033 - PlaceOrMoveInfluence Meta-Marker + Start Committee Gates
 - [x] Task 0034 - ConvertResources Meta-Marker + Anchor Rules
 - [x] Task 0035 - Production PingPong Reduction
-- [ ] Task 0036 - CORE-01 v1.0.20 Tests + Golden Replays
+- [x] Task 0036 - CORE-01 v1.0.20 Tests + Golden Replays

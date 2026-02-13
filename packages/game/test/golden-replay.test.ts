@@ -7,6 +7,7 @@ import { SetupGame } from '../src/setup';
 import { hashState } from '../src/hash-state';
 import { ExpansionRegistry } from '../src/expansion-registry';
 import { Expansion01 } from '../../expansion-01/src/index';
+import { CoreZoneNames, TileType } from '@balance-control/rules';
 
 interface GoldenMove {
     move: string;
@@ -19,8 +20,16 @@ interface GoldenFixture {
     numPlayers: number;
     config?: unknown;
     registerExpansions?: string[];
+    prelude?: PreludeAction[];
     moves: GoldenMove[];
     expectedFinalHash: string;
+}
+
+interface PreludeAction {
+    action: 'stackDrawPileByType';
+    tileType: TileType;
+    resort?: string;
+    count?: number;
 }
 
 function loadGoldenFixtures(): GoldenFixture[] {
@@ -46,11 +55,69 @@ function registerFixtureExpansions(names?: string[]): void {
     }
 }
 
-function buildReplayGame(seed: string | number, config?: unknown): any {
+function applyPrelude(G: any, prelude?: PreludeAction[]): void {
+    if (!prelude || prelude.length === 0) return;
+    for (const step of prelude) {
+        if (step.action !== 'stackDrawPileByType') continue;
+        const drawPile = G.zones[CoreZoneNames.DrawPile];
+        if (!drawPile) continue;
+        const count = Math.max(1, step.count ?? 1);
+        for (let i = 0; i < count; i++) {
+            const idx = drawPile.items.findIndex((tileId: string) => {
+                const tile = G.tiles[tileId];
+                if (!tile) return false;
+                if (step.tileType && tile.type !== step.tileType) return false;
+                if (step.resort && tile.resort !== step.resort) return false;
+                return true;
+            });
+            if (idx === -1) break;
+            const [tileId] = drawPile.items.splice(idx, 1);
+            drawPile.items.push(tileId);
+        }
+    }
+}
+
+function resolveMoveArgs(G: any, move: string, args: any[]): any[] {
+    if (!args || args.length === 0) return args;
+    return args.map((arg) => {
+        if (!arg || typeof arg !== 'object') return arg;
+        if (move === 'moveInfluence') {
+            const { sourceCoord, targetCoord, ...rest } = arg;
+            const sourceId = sourceCoord ? G.grid[sourceCoord] : rest.sourceId;
+            const targetId = targetCoord ? G.grid[targetCoord] : rest.targetId;
+            return { ...rest, sourceId, targetId };
+        }
+        if (move === 'placeInfluence') {
+            const { targetCoord, ...rest } = arg;
+            const targetTileId = targetCoord ? G.grid[targetCoord] : rest.targetTileId;
+            return { ...rest, targetTileId };
+        }
+        if (move === 'convertResources') {
+            const { grassrootsCoord, ...rest } = arg;
+            const grassrootsTileId = grassrootsCoord ? G.grid[grassrootsCoord] : rest.grassrootsTileId;
+            return { ...rest, grassrootsTileId };
+        }
+        if (move === 'formalizeInfluence') {
+            const { committeeCoord, ...rest } = arg;
+            const committeeTileId = committeeCoord ? G.grid[committeeCoord] : rest.committeeTileId;
+            return { ...rest, committeeTileId };
+        }
+        return arg;
+    });
+}
+
+function buildReplayGame(seed: string | number, numPlayers: number, config?: unknown, prelude?: PreludeAction[]): any {
     return {
         ...BalanceControl,
         seed,
-        setup: (ctx: any) => SetupGame({ ctx, setupData: config }),
+        setup: (ctx: any) => {
+            if (!ctx.numPlayers) {
+                ctx.numPlayers = numPlayers;
+            }
+            const G = SetupGame({ ctx, setupData: config });
+            applyPrelude(G, prelude);
+            return G;
+        },
     };
 }
 
@@ -61,7 +128,7 @@ describe('Golden replays', () => {
         it(`should match golden hash for ${fixture.id}`, () => {
             registerFixtureExpansions(fixture.registerExpansions);
 
-            const game = buildReplayGame(fixture.seed, fixture.config);
+            const game = buildReplayGame(fixture.seed, fixture.numPlayers, fixture.config, fixture.prelude);
             const client = Client({
                 game,
                 numPlayers: fixture.numPlayers,
@@ -69,9 +136,11 @@ describe('Golden replays', () => {
             client.start();
 
             for (const step of fixture.moves) {
+                const state = client.getState();
+                const resolvedArgs = resolveMoveArgs(state!.G, step.move, step.args);
                 const moveFn = (client.moves as any)[step.move];
                 expect(typeof moveFn).toBe('function');
-                moveFn(...step.args);
+                moveFn(...resolvedArgs);
             }
 
             const state = client.getState();

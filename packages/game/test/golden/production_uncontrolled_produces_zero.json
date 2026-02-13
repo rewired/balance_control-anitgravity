@@ -9,6 +9,10 @@
       "ex03": false
     }
   },
+  "notes": {
+    "updatedFor": "CORE-01 v1.0.20 migration",
+    "previousExpectedFinalHash": "609372d9b0bd8b8272ed1e87f77668f7c0f9d7957f4b9ddf923deeace8e29f1c"
+  },
   "moves": [
     { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
     { "move": "pass", "args": [{}] },
@@ -19,5 +23,5 @@
     { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
     { "move": "pass", "args": [{}] }
   ],
-  "expectedFinalHash": "609372d9b0bd8b8272ed1e87f77668f7c0f9d7957f4b9ddf923deeace8e29f1c"
+  "expectedFinalHash": "ebaa222b66dc5dbf67d2c95ae2f609bb373644050554dcafec20907183b1777c"
 }

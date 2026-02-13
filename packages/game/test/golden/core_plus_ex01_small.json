@@ -10,11 +10,15 @@
       "ex03": false
     }
   },
+  "notes": {
+    "updatedFor": "CORE-01 v1.0.20 migration",
+    "previousExpectedFinalHash": "0b62eeecba4e93815caccf77f64c6479f2b116070189aed5ba2be373762437db"
+  },
   "moves": [
     { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
     { "move": "pass", "args": [{}] },
     { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
     { "move": "pass", "args": [{}] }
   ],
-  "expectedFinalHash": "0b62eeecba4e93815caccf77f64c6479f2b116070189aed5ba2be373762437db"
+  "expectedFinalHash": "d3b19ac8391cda02e4e02f19f4852dc6f549142b50e7e84a051df24d21b9bd7c"
 }
