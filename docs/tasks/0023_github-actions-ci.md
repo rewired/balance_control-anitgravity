@@ -108,7 +108,7 @@ Suggested steps (adapt to repo conventions):
 * [x] Uses pnpm with lockfile enforcement (`--frozen-lockfile`)
 * [x] Runs `pnpm -w test`
 * [x] pnpm store caching enabled
-* [ ] Verified CI run is green on a test PR
+* [x] Verified CI run is green on a test PR
 * [x] Updated `docs/PR_TASK_LIST.md` with Task 0023
 * [x] Added `docs/tasks/0023_github-actions-ci.md` and completed checklist after implementation
 
