@@ -185,6 +185,7 @@ Update `packages/client-web/src/components/GameLayout.tsx`:
 
   =============
   ```
+<<<<<<< HEAD
 - `git status -u`
   ```text
   On branch main
@@ -207,11 +208,23 @@ Update `packages/client-web/src/components/GameLayout.tsx`:
           packages/client-web/src/components/BoardViewport.tsx
           packages/client-web/src/ui/fitToBounds.ts
           packages/client-web/test/fitToBounds.test.ts
+=======
+- `git switch -c task/0044-board-viewport-pan-zoom`
+  ```text
+  ```
+- `$env:GIT_PAGER='cat'; git status -u`
+  ```text
+  Changes not staged for commit:
+    (use "git add <file>..." to update what will be committed)
+    (use "git restore <file>..." to discard changes in working directory)
+          modified:   docs/tasks/0044-board-viewport-pan-zoom-fit-to-board.md
+>>>>>>> d8d692b2a935ede04ba2c45a794ce5d29222fd48
 
   no changes added to commit (use "git add" and/or "git commit -a")
   ```
 - `git diff --stat`
   ```text
+<<<<<<< HEAD
    docs/PR_TASK_LIST.md                               |  1 +
    .../0044-board-viewport-pan-zoom-fit-to-board.md   | 32 +++++++++------
    packages/client-web/package.json                   |  3 +-
@@ -221,4 +234,53 @@ Update `packages/client-web/src/components/GameLayout.tsx`:
    packages/client-web/src/ui/hexLayout.ts            | 46 +++++++++++++++++++---
    pnpm-lock.yaml                                     | 15 +++++++
    9 files changed, 117 insertions(+), 38 deletions(-)
+=======
+   1 file changed, 30 insertions(+)
+  ```
+- `$env:GIT_PAGER='cat'; git --no-pager show -1 --stat`
+  ```text
+  commit 2c17e68b93fc9bf13c2e49c5d994a1b3f9ded4b1 (HEAD -> task/0044-board-viewport-pan-zoom, main)
+  Author: Björn Ahlers <rewired.de@gmail.com>
+  Date:   Sun Feb 15 00:06:52 2026 +0100
+      task(0044): add board viewport camera
+
+      - add BoardViewport with pan/zoom and reset fit
+
+      - add fit-to-bounds helper tests and shared layout bounds
+
+      - update client dependency, changelog, and PR task list
+
+   CHANGELOG.md                                       |   1 +
+   docs/PR_TASK_LIST.md                               |   1 +
+   .../0044-board-viewport-pan-zoom-fit-to-board.md   | 118 +++++++++++++++++++--
+   packages/client-web/package.json                   |   3 +-
+   .../client-web/src/components/BoardViewport.tsx    | 114 ++++++++++++++++++++
+   packages/client-web/src/components/GameLayout.tsx  |   4 +-
+   packages/client-web/src/components/HexBoard.tsx    |  20 +---
+   packages/client-web/src/index.css                  |  33 +++++-
+   packages/client-web/src/ui/fitToBounds.ts          |  20 ++++
+   packages/client-web/src/ui/hexLayout.ts            |  46 ++++++--
+   packages/client-web/test/fitToBounds.test.ts       |  29 +++++
+   pnpm-lock.yaml                                     |  15 +++
+   12 files changed, 366 insertions(+), 38 deletions(-)
+  ```
+- `$env:GIT_PAGER='cat'; node scripts/verify-task.mjs 0044`
+  ```text
+  [verify-task] OK: Section "Work Summary" present.
+  [verify-task] OK: Section "Commands Run" present.
+  [verify-task] OK: Latest commit format + task file inclusion OK (task(0044): add board viewport camera).
+
+  [verify-task] PASS ✅
+  ```
+- `git add -A`
+  ```text
+  ```
+- `git commit --amend --no-edit`
+  ```text
+   Date: Sun Feb 15 00:06:52 2026 +0100
+   12 files changed, 380 insertions(+), 38 deletions(-)
+   create mode 100644 packages/client-web/src/components/BoardViewport.tsx
+   create mode 100644 packages/client-web/src/ui/fitToBounds.ts
+   create mode 100644 packages/client-web/test/fitToBounds.test.ts
+>>>>>>> d8d692b2a935ede04ba2c45a794ce5d29222fd48
   ```
