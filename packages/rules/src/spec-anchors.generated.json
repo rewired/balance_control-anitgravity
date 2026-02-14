@@ -1,0 +1,2681 @@
+{
+  "version": 1,
+  "sources": [
+    "docs/rules/000-core.md",
+    "docs/rules/001-expansion01.md",
+    "docs/rules/002-expansion02.md",
+    "docs/rules/003-expansion03.md"
+  ],
+  "anchors": [
+    {
+      "id": "ADD56-01-01-01",
+      "source": "docs/rules/000-core.md",
+      "line": 444
+    },
+    {
+      "id": "ADD56-01-01-02",
+      "source": "docs/rules/000-core.md",
+      "line": 446
+    },
+    {
+      "id": "ADD56-01-01-03",
+      "source": "docs/rules/000-core.md",
+      "line": 447
+    },
+    {
+      "id": "ADD56-01-01-04",
+      "source": "docs/rules/000-core.md",
+      "line": 448
+    },
+    {
+      "id": "ADD56-01-01-05",
+      "source": "docs/rules/000-core.md",
+      "line": 450
+    },
+    {
+      "id": "ADD56-01-01-06",
+      "source": "docs/rules/000-core.md",
+      "line": 451
+    },
+    {
+      "id": "ADD56-01-01-07",
+      "source": "docs/rules/000-core.md",
+      "line": 452
+    },
+    {
+      "id": "ADD56-01-01-08",
+      "source": "docs/rules/000-core.md",
+      "line": 454
+    },
+    {
+      "id": "ADD56-01-01-09",
+      "source": "docs/rules/000-core.md",
+      "line": 455
+    },
+    {
+      "id": "ADD56-01-01-10",
+      "source": "docs/rules/000-core.md",
+      "line": 456
+    },
+    {
+      "id": "ADD56-01-01-11",
+      "source": "docs/rules/000-core.md",
+      "line": 458
+    },
+    {
+      "id": "ADD56-01-01-12",
+      "source": "docs/rules/000-core.md",
+      "line": 459
+    },
+    {
+      "id": "ADD56-01-01-13",
+      "source": "docs/rules/000-core.md",
+      "line": 460
+    },
+    {
+      "id": "ADD56-01-01-13A",
+      "source": "docs/rules/000-core.md",
+      "line": 461
+    },
+    {
+      "id": "ADD56-01-01-14",
+      "source": "docs/rules/000-core.md",
+      "line": 463
+    },
+    {
+      "id": "ADD56-01-01-15",
+      "source": "docs/rules/000-core.md",
+      "line": 464
+    },
+    {
+      "id": "ADD56-01-01-16",
+      "source": "docs/rules/000-core.md",
+      "line": 465
+    },
+    {
+      "id": "ADD56-01-01-16A",
+      "source": "docs/rules/000-core.md",
+      "line": 466
+    },
+    {
+      "id": "ADD56-01-02-01",
+      "source": "docs/rules/000-core.md",
+      "line": 437
+    },
+    {
+      "id": "ADD56-01-02-02",
+      "source": "docs/rules/000-core.md",
+      "line": 438
+    },
+    {
+      "id": "ADD56-01-03-00-01",
+      "source": "docs/rules/000-core.md",
+      "line": 471
+    },
+    {
+      "id": "ADD56-01-03-01",
+      "source": "docs/rules/000-core.md",
+      "line": 472
+    },
+    {
+      "id": "CORE-01-00",
+      "source": "docs/rules/000-core.md",
+      "line": 12
+    },
+    {
+      "id": "CORE-01-00-01",
+      "source": "docs/rules/000-core.md",
+      "line": 30
+    },
+    {
+      "id": "CORE-01-00-02",
+      "source": "docs/rules/000-core.md",
+      "line": 31
+    },
+    {
+      "id": "CORE-01-00-02A",
+      "source": "docs/rules/000-core.md",
+      "line": 33
+    },
+    {
+      "id": "CORE-01-00-03",
+      "source": "docs/rules/000-core.md",
+      "line": 35
+    },
+    {
+      "id": "CORE-01-00-03A",
+      "source": "docs/rules/000-core.md",
+      "line": 36
+    },
+    {
+      "id": "CORE-01-00-04",
+      "source": "docs/rules/000-core.md",
+      "line": 38
+    },
+    {
+      "id": "CORE-01-00-04A",
+      "source": "docs/rules/000-core.md",
+      "line": 39
+    },
+    {
+      "id": "CORE-01-00-05",
+      "source": "docs/rules/000-core.md",
+      "line": 41
+    },
+    {
+      "id": "CORE-01-00-05A",
+      "source": "docs/rules/000-core.md",
+      "line": 42
+    },
+    {
+      "id": "CORE-01-00-06",
+      "source": "docs/rules/000-core.md",
+      "line": 44
+    },
+    {
+      "id": "CORE-01-00-07",
+      "source": "docs/rules/000-core.md",
+      "line": 46
+    },
+    {
+      "id": "CORE-01-00-08",
+      "source": "docs/rules/000-core.md",
+      "line": 47
+    },
+    {
+      "id": "CORE-01-00-09",
+      "source": "docs/rules/000-core.md",
+      "line": 48
+    },
+    {
+      "id": "CORE-01-00-10",
+      "source": "docs/rules/000-core.md",
+      "line": 49
+    },
+    {
+      "id": "CORE-01-00-11",
+      "source": "docs/rules/000-core.md",
+      "line": 50
+    },
+    {
+      "id": "CORE-01-00-12",
+      "source": "docs/rules/000-core.md",
+      "line": 52
+    },
+    {
+      "id": "CORE-01-00-T01",
+      "source": "docs/rules/000-core.md",
+      "line": 58
+    },
+    {
+      "id": "CORE-01-00-T02",
+      "source": "docs/rules/000-core.md",
+      "line": 59
+    },
+    {
+      "id": "CORE-01-00-T03",
+      "source": "docs/rules/000-core.md",
+      "line": 60
+    },
+    {
+      "id": "CORE-01-00-T04",
+      "source": "docs/rules/000-core.md",
+      "line": 61
+    },
+    {
+      "id": "CORE-01-00-T05",
+      "source": "docs/rules/000-core.md",
+      "line": 62
+    },
+    {
+      "id": "CORE-01-00-T06",
+      "source": "docs/rules/000-core.md",
+      "line": 64
+    },
+    {
+      "id": "CORE-01-00-T07",
+      "source": "docs/rules/000-core.md",
+      "line": 66
+    },
+    {
+      "id": "CORE-01-00-T08",
+      "source": "docs/rules/000-core.md",
+      "line": 69
+    },
+    {
+      "id": "CORE-01-00-T09",
+      "source": "docs/rules/000-core.md",
+      "line": 71
+    },
+    {
+      "id": "CORE-01-01",
+      "source": "docs/rules/000-core.md",
+      "line": 13
+    },
+    {
+      "id": "CORE-01-01-01",
+      "source": "docs/rules/000-core.md",
+      "line": 77
+    },
+    {
+      "id": "CORE-01-01-02",
+      "source": "docs/rules/000-core.md",
+      "line": 78
+    },
+    {
+      "id": "CORE-01-01-03",
+      "source": "docs/rules/000-core.md",
+      "line": 79
+    },
+    {
+      "id": "CORE-01-01-04",
+      "source": "docs/rules/000-core.md",
+      "line": 80
+    },
+    {
+      "id": "CORE-01-02",
+      "source": "docs/rules/000-core.md",
+      "line": 14
+    },
+    {
+      "id": "CORE-01-02-01",
+      "source": "docs/rules/000-core.md",
+      "line": 86
+    },
+    {
+      "id": "CORE-01-02-02",
+      "source": "docs/rules/000-core.md",
+      "line": 87
+    },
+    {
+      "id": "CORE-01-02-03",
+      "source": "docs/rules/000-core.md",
+      "line": 88
+    },
+    {
+      "id": "CORE-01-02-03A",
+      "source": "docs/rules/000-core.md",
+      "line": 90
+    },
+    {
+      "id": "CORE-01-02-04",
+      "source": "docs/rules/000-core.md",
+      "line": 92
+    },
+    {
+      "id": "CORE-01-02-04A",
+      "source": "docs/rules/000-core.md",
+      "line": 94
+    },
+    {
+      "id": "CORE-01-02-04B",
+      "source": "docs/rules/000-core.md",
+      "line": 95
+    },
+    {
+      "id": "CORE-01-02-04C",
+      "source": "docs/rules/000-core.md",
+      "line": 96
+    },
+    {
+      "id": "CORE-01-02-04D",
+      "source": "docs/rules/000-core.md",
+      "line": 97
+    },
+    {
+      "id": "CORE-01-02-04E",
+      "source": "docs/rules/000-core.md",
+      "line": 98
+    },
+    {
+      "id": "CORE-01-02-04F",
+      "source": "docs/rules/000-core.md",
+      "line": 99
+    },
+    {
+      "id": "CORE-01-02-04G",
+      "source": "docs/rules/000-core.md",
+      "line": 100
+    },
+    {
+      "id": "CORE-01-02-05",
+      "source": "docs/rules/000-core.md",
+      "line": 102
+    },
+    {
+      "id": "CORE-01-02-06",
+      "source": "docs/rules/000-core.md",
+      "line": 103
+    },
+    {
+      "id": "CORE-01-02-07",
+      "source": "docs/rules/000-core.md",
+      "line": 104
+    },
+    {
+      "id": "CORE-01-02-07A",
+      "source": "docs/rules/000-core.md",
+      "line": 106
+    },
+    {
+      "id": "CORE-01-02-08",
+      "source": "docs/rules/000-core.md",
+      "line": 108
+    },
+    {
+      "id": "CORE-01-02-09",
+      "source": "docs/rules/000-core.md",
+      "line": 109
+    },
+    {
+      "id": "CORE-01-02-10",
+      "source": "docs/rules/000-core.md",
+      "line": 111
+    },
+    {
+      "id": "CORE-01-02-11",
+      "source": "docs/rules/000-core.md",
+      "line": 112
+    },
+    {
+      "id": "CORE-01-02-12",
+      "source": "docs/rules/000-core.md",
+      "line": 113
+    },
+    {
+      "id": "CORE-01-02-13",
+      "source": "docs/rules/000-core.md",
+      "line": 114
+    },
+    {
+      "id": "CORE-01-02-14",
+      "source": "docs/rules/000-core.md",
+      "line": 115
+    },
+    {
+      "id": "CORE-01-02-14A",
+      "source": "docs/rules/000-core.md",
+      "line": 117
+    },
+    {
+      "id": "CORE-01-02-15",
+      "source": "docs/rules/000-core.md",
+      "line": 119
+    },
+    {
+      "id": "CORE-01-02-16",
+      "source": "docs/rules/000-core.md",
+      "line": 120
+    },
+    {
+      "id": "CORE-01-02-17",
+      "source": "docs/rules/000-core.md",
+      "line": 122
+    },
+    {
+      "id": "CORE-01-02-17A",
+      "source": "docs/rules/000-core.md",
+      "line": 124
+    },
+    {
+      "id": "CORE-01-02-17B",
+      "source": "docs/rules/000-core.md",
+      "line": 125
+    },
+    {
+      "id": "CORE-01-02-17C",
+      "source": "docs/rules/000-core.md",
+      "line": 126
+    },
+    {
+      "id": "CORE-01-02-17D",
+      "source": "docs/rules/000-core.md",
+      "line": 127
+    },
+    {
+      "id": "CORE-01-02-17E",
+      "source": "docs/rules/000-core.md",
+      "line": 128
+    },
+    {
+      "id": "CORE-01-03",
+      "source": "docs/rules/000-core.md",
+      "line": 15
+    },
+    {
+      "id": "CORE-01-03-01",
+      "source": "docs/rules/000-core.md",
+      "line": 71
+    },
+    {
+      "id": "CORE-01-03-02",
+      "source": "docs/rules/000-core.md",
+      "line": 135
+    },
+    {
+      "id": "CORE-01-03-02A",
+      "source": "docs/rules/000-core.md",
+      "line": 137
+    },
+    {
+      "id": "CORE-01-03-02A.1",
+      "source": "docs/rules/000-core.md",
+      "line": 139
+    },
+    {
+      "id": "CORE-01-03-02A.1A",
+      "source": "docs/rules/000-core.md",
+      "line": 140
+    },
+    {
+      "id": "CORE-01-03-02A.2",
+      "source": "docs/rules/000-core.md",
+      "line": 142
+    },
+    {
+      "id": "CORE-01-03-02B",
+      "source": "docs/rules/000-core.md",
+      "line": 144
+    },
+    {
+      "id": "CORE-01-03-02B.1",
+      "source": "docs/rules/000-core.md",
+      "line": 150
+    },
+    {
+      "id": "CORE-01-03-03",
+      "source": "docs/rules/000-core.md",
+      "line": 152
+    },
+    {
+      "id": "CORE-01-03-03A",
+      "source": "docs/rules/000-core.md",
+      "line": 153
+    },
+    {
+      "id": "CORE-01-03-03B",
+      "source": "docs/rules/000-core.md",
+      "line": 159
+    },
+    {
+      "id": "CORE-01-03-04",
+      "source": "docs/rules/000-core.md",
+      "line": 155
+    },
+    {
+      "id": "CORE-01-03-05",
+      "source": "docs/rules/000-core.md",
+      "line": 156
+    },
+    {
+      "id": "CORE-01-03-06",
+      "source": "docs/rules/000-core.md",
+      "line": 157
+    },
+    {
+      "id": "CORE-01-04",
+      "source": "docs/rules/000-core.md",
+      "line": 16
+    },
+    {
+      "id": "CORE-01-04-01",
+      "source": "docs/rules/000-core.md",
+      "line": 171
+    },
+    {
+      "id": "CORE-01-04-02",
+      "source": "docs/rules/000-core.md",
+      "line": 172
+    },
+    {
+      "id": "CORE-01-04-03",
+      "source": "docs/rules/000-core.md",
+      "line": 173
+    },
+    {
+      "id": "CORE-01-04-04",
+      "source": "docs/rules/000-core.md",
+      "line": 175
+    },
+    {
+      "id": "CORE-01-04-05",
+      "source": "docs/rules/000-core.md",
+      "line": 176
+    },
+    {
+      "id": "CORE-01-04-05A",
+      "source": "docs/rules/000-core.md",
+      "line": 178
+    },
+    {
+      "id": "CORE-01-04-06",
+      "source": "docs/rules/000-core.md",
+      "line": 180
+    },
+    {
+      "id": "CORE-01-04-07",
+      "source": "docs/rules/000-core.md",
+      "line": 181
+    },
+    {
+      "id": "CORE-01-04-08",
+      "source": "docs/rules/000-core.md",
+      "line": 178
+    },
+    {
+      "id": "CORE-01-04-09",
+      "source": "docs/rules/000-core.md",
+      "line": 184
+    },
+    {
+      "id": "CORE-01-04-09A",
+      "source": "docs/rules/000-core.md",
+      "line": 186
+    },
+    {
+      "id": "CORE-01-04-10",
+      "source": "docs/rules/000-core.md",
+      "line": 190
+    },
+    {
+      "id": "CORE-01-04-11",
+      "source": "docs/rules/000-core.md",
+      "line": 191
+    },
+    {
+      "id": "CORE-01-04-11A",
+      "source": "docs/rules/000-core.md",
+      "line": 193
+    },
+    {
+      "id": "CORE-01-04-12",
+      "source": "docs/rules/000-core.md",
+      "line": 195
+    },
+    {
+      "id": "CORE-01-04-12A",
+      "source": "docs/rules/000-core.md",
+      "line": 197
+    },
+    {
+      "id": "CORE-01-04-12B",
+      "source": "docs/rules/000-core.md",
+      "line": 199
+    },
+    {
+      "id": "CORE-01-04-12C",
+      "source": "docs/rules/000-core.md",
+      "line": 202
+    },
+    {
+      "id": "CORE-01-04-13",
+      "source": "docs/rules/000-core.md",
+      "line": 206
+    },
+    {
+      "id": "CORE-01-04-14",
+      "source": "docs/rules/000-core.md",
+      "line": 207
+    },
+    {
+      "id": "CORE-01-04-14A",
+      "source": "docs/rules/000-core.md",
+      "line": 209
+    },
+    {
+      "id": "CORE-01-04-14B",
+      "source": "docs/rules/000-core.md",
+      "line": 211
+    },
+    {
+      "id": "CORE-01-04-15",
+      "source": "docs/rules/000-core.md",
+      "line": 209
+    },
+    {
+      "id": "CORE-01-04-15A",
+      "source": "docs/rules/000-core.md",
+      "line": 215
+    },
+    {
+      "id": "CORE-01-04-16",
+      "source": "docs/rules/000-core.md",
+      "line": 217
+    },
+    {
+      "id": "CORE-01-04-17",
+      "source": "docs/rules/000-core.md",
+      "line": 218
+    },
+    {
+      "id": "CORE-01-04-17A",
+      "source": "docs/rules/000-core.md",
+      "line": 220
+    },
+    {
+      "id": "CORE-01-04-18",
+      "source": "docs/rules/000-core.md",
+      "line": 222
+    },
+    {
+      "id": "CORE-01-04-19",
+      "source": "docs/rules/000-core.md",
+      "line": 209
+    },
+    {
+      "id": "CORE-01-04-20",
+      "source": "docs/rules/000-core.md",
+      "line": 227
+    },
+    {
+      "id": "CORE-01-04-21",
+      "source": "docs/rules/000-core.md",
+      "line": 228
+    },
+    {
+      "id": "CORE-01-04-22",
+      "source": "docs/rules/000-core.md",
+      "line": 229
+    },
+    {
+      "id": "CORE-01-04-22A",
+      "source": "docs/rules/000-core.md",
+      "line": 231
+    },
+    {
+      "id": "CORE-01-04-22B",
+      "source": "docs/rules/000-core.md",
+      "line": 233
+    },
+    {
+      "id": "CORE-01-04-22C",
+      "source": "docs/rules/000-core.md",
+      "line": 235
+    },
+    {
+      "id": "CORE-01-04-22D",
+      "source": "docs/rules/000-core.md",
+      "line": 237
+    },
+    {
+      "id": "CORE-01-04-22E",
+      "source": "docs/rules/000-core.md",
+      "line": 239
+    },
+    {
+      "id": "CORE-01-04-22F",
+      "source": "docs/rules/000-core.md",
+      "line": 241
+    },
+    {
+      "id": "CORE-01-04-22G",
+      "source": "docs/rules/000-core.md",
+      "line": 243
+    },
+    {
+      "id": "CORE-01-04-22H",
+      "source": "docs/rules/000-core.md",
+      "line": 245
+    },
+    {
+      "id": "CORE-01-04-22I",
+      "source": "docs/rules/000-core.md",
+      "line": 247
+    },
+    {
+      "id": "CORE-01-04-22J",
+      "source": "docs/rules/000-core.md",
+      "line": 249
+    },
+    {
+      "id": "CORE-01-04-22K",
+      "source": "docs/rules/000-core.md",
+      "line": 247
+    },
+    {
+      "id": "CORE-01-04-22L",
+      "source": "docs/rules/000-core.md",
+      "line": 247
+    },
+    {
+      "id": "CORE-01-04-22L.1",
+      "source": "docs/rules/000-core.md",
+      "line": 262
+    },
+    {
+      "id": "CORE-01-05",
+      "source": "docs/rules/000-core.md",
+      "line": 17
+    },
+    {
+      "id": "CORE-01-05-01",
+      "source": "docs/rules/000-core.md",
+      "line": 268
+    },
+    {
+      "id": "CORE-01-05-02",
+      "source": "docs/rules/000-core.md",
+      "line": 269
+    },
+    {
+      "id": "CORE-01-05-03",
+      "source": "docs/rules/000-core.md",
+      "line": 270
+    },
+    {
+      "id": "CORE-01-05-03A",
+      "source": "docs/rules/000-core.md",
+      "line": 268
+    },
+    {
+      "id": "CORE-01-05-04",
+      "source": "docs/rules/000-core.md",
+      "line": 279
+    },
+    {
+      "id": "CORE-01-05-04A",
+      "source": "docs/rules/000-core.md",
+      "line": 280
+    },
+    {
+      "id": "CORE-01-05-04B",
+      "source": "docs/rules/000-core.md",
+      "line": 275
+    },
+    {
+      "id": "CORE-01-05-05",
+      "source": "docs/rules/000-core.md",
+      "line": 282
+    },
+    {
+      "id": "CORE-01-05-06",
+      "source": "docs/rules/000-core.md",
+      "line": 283
+    },
+    {
+      "id": "CORE-01-06",
+      "source": "docs/rules/000-core.md",
+      "line": 18
+    },
+    {
+      "id": "CORE-01-06-00-01",
+      "source": "docs/rules/000-core.md",
+      "line": 289
+    },
+    {
+      "id": "CORE-01-06-00-02",
+      "source": "docs/rules/000-core.md",
+      "line": 290
+    },
+    {
+      "id": "CORE-01-06-00-03",
+      "source": "docs/rules/000-core.md",
+      "line": 211
+    },
+    {
+      "id": "CORE-01-06-00-04",
+      "source": "docs/rules/000-core.md",
+      "line": 293
+    },
+    {
+      "id": "CORE-01-06-00-05",
+      "source": "docs/rules/000-core.md",
+      "line": 294
+    },
+    {
+      "id": "CORE-01-06-00-06",
+      "source": "docs/rules/000-core.md",
+      "line": 302
+    },
+    {
+      "id": "CORE-01-06-01",
+      "source": "docs/rules/000-core.md",
+      "line": 306
+    },
+    {
+      "id": "CORE-01-06-02",
+      "source": "docs/rules/000-core.md",
+      "line": 307
+    },
+    {
+      "id": "CORE-01-06-03",
+      "source": "docs/rules/000-core.md",
+      "line": 308
+    },
+    {
+      "id": "CORE-01-06-03A",
+      "source": "docs/rules/000-core.md",
+      "line": 310
+    },
+    {
+      "id": "CORE-01-06-03B",
+      "source": "docs/rules/000-core.md",
+      "line": 312
+    },
+    {
+      "id": "CORE-01-06-04",
+      "source": "docs/rules/000-core.md",
+      "line": 314
+    },
+    {
+      "id": "CORE-01-06-05",
+      "source": "docs/rules/000-core.md",
+      "line": 318
+    },
+    {
+      "id": "CORE-01-06-06",
+      "source": "docs/rules/000-core.md",
+      "line": 321
+    },
+    {
+      "id": "CORE-01-06-07",
+      "source": "docs/rules/000-core.md",
+      "line": 322
+    },
+    {
+      "id": "CORE-01-06-08",
+      "source": "docs/rules/000-core.md",
+      "line": 323
+    },
+    {
+      "id": "CORE-01-06-09",
+      "source": "docs/rules/000-core.md",
+      "line": 327
+    },
+    {
+      "id": "CORE-01-06-10",
+      "source": "docs/rules/000-core.md",
+      "line": 328
+    },
+    {
+      "id": "CORE-01-06-11",
+      "source": "docs/rules/000-core.md",
+      "line": 329
+    },
+    {
+      "id": "CORE-01-06-12",
+      "source": "docs/rules/000-core.md",
+      "line": 330
+    },
+    {
+      "id": "CORE-01-06-13",
+      "source": "docs/rules/000-core.md",
+      "line": 331
+    },
+    {
+      "id": "CORE-01-06-13A",
+      "source": "docs/rules/000-core.md",
+      "line": 332
+    },
+    {
+      "id": "CORE-01-06-14",
+      "source": "docs/rules/000-core.md",
+      "line": 333
+    },
+    {
+      "id": "CORE-01-06-15",
+      "source": "docs/rules/000-core.md",
+      "line": 334
+    },
+    {
+      "id": "CORE-01-06-16",
+      "source": "docs/rules/000-core.md",
+      "line": 329
+    },
+    {
+      "id": "CORE-01-06-16-00",
+      "source": "docs/rules/000-core.md",
+      "line": 337
+    },
+    {
+      "id": "CORE-01-06-17",
+      "source": "docs/rules/000-core.md",
+      "line": 350
+    },
+    {
+      "id": "CORE-01-07",
+      "source": "docs/rules/000-core.md",
+      "line": 19
+    },
+    {
+      "id": "CORE-01-07-01",
+      "source": "docs/rules/000-core.md",
+      "line": 356
+    },
+    {
+      "id": "CORE-01-07-02",
+      "source": "docs/rules/000-core.md",
+      "line": 357
+    },
+    {
+      "id": "CORE-01-07-03",
+      "source": "docs/rules/000-core.md",
+      "line": 358
+    },
+    {
+      "id": "CORE-01-07-03A",
+      "source": "docs/rules/000-core.md",
+      "line": 202
+    },
+    {
+      "id": "CORE-01-07-03B",
+      "source": "docs/rules/000-core.md",
+      "line": 361
+    },
+    {
+      "id": "CORE-01-07-03C",
+      "source": "docs/rules/000-core.md",
+      "line": 362
+    },
+    {
+      "id": "CORE-01-07-03D",
+      "source": "docs/rules/000-core.md",
+      "line": 363
+    },
+    {
+      "id": "CORE-01-08",
+      "source": "docs/rules/000-core.md",
+      "line": 20
+    },
+    {
+      "id": "CORE-01-08-01",
+      "source": "docs/rules/000-core.md",
+      "line": 369
+    },
+    {
+      "id": "CORE-01-08-02",
+      "source": "docs/rules/000-core.md",
+      "line": 211
+    },
+    {
+      "id": "CORE-01-08-03",
+      "source": "docs/rules/000-core.md",
+      "line": 372
+    },
+    {
+      "id": "CORE-01-08-04",
+      "source": "docs/rules/000-core.md",
+      "line": 374
+    },
+    {
+      "id": "CORE-01-08-05",
+      "source": "docs/rules/000-core.md",
+      "line": 375
+    },
+    {
+      "id": "CORE-01-08-06",
+      "source": "docs/rules/000-core.md",
+      "line": 376
+    },
+    {
+      "id": "CORE-01-08-06A",
+      "source": "docs/rules/000-core.md",
+      "line": 378
+    },
+    {
+      "id": "CORE-01-08-06B",
+      "source": "docs/rules/000-core.md",
+      "line": 379
+    },
+    {
+      "id": "CORE-01-08-06C",
+      "source": "docs/rules/000-core.md",
+      "line": 381
+    },
+    {
+      "id": "CORE-01-08-06C.1",
+      "source": "docs/rules/000-core.md",
+      "line": 382
+    },
+    {
+      "id": "CORE-01-08-06D",
+      "source": "docs/rules/000-core.md",
+      "line": 383
+    },
+    {
+      "id": "CORE-01-08-06E",
+      "source": "docs/rules/000-core.md",
+      "line": 195
+    },
+    {
+      "id": "CORE-01-08-06F",
+      "source": "docs/rules/000-core.md",
+      "line": 386
+    },
+    {
+      "id": "CORE-01-08-07",
+      "source": "docs/rules/000-core.md",
+      "line": 209
+    },
+    {
+      "id": "CORE-01-08-08",
+      "source": "docs/rules/000-core.md",
+      "line": 211
+    },
+    {
+      "id": "CORE-01-08-08A",
+      "source": "docs/rules/000-core.md",
+      "line": 390
+    },
+    {
+      "id": "CORE-01-08-09",
+      "source": "docs/rules/000-core.md",
+      "line": 391
+    },
+    {
+      "id": "CORE-01-08-10",
+      "source": "docs/rules/000-core.md",
+      "line": 392
+    },
+    {
+      "id": "CORE-01-08-10A",
+      "source": "docs/rules/000-core.md",
+      "line": 209
+    },
+    {
+      "id": "CORE-01-09",
+      "source": "docs/rules/000-core.md",
+      "line": 21
+    },
+    {
+      "id": "CORE-01-09-01",
+      "source": "docs/rules/000-core.md",
+      "line": 399
+    },
+    {
+      "id": "CORE-01-09-01A",
+      "source": "docs/rules/000-core.md",
+      "line": 401
+    },
+    {
+      "id": "CORE-01-09-02",
+      "source": "docs/rules/000-core.md",
+      "line": 401
+    },
+    {
+      "id": "CORE-01-09-03",
+      "source": "docs/rules/000-core.md",
+      "line": 405
+    },
+    {
+      "id": "CORE-01-09-04",
+      "source": "docs/rules/000-core.md",
+      "line": 406
+    },
+    {
+      "id": "CORE-01-10",
+      "source": "docs/rules/000-core.md",
+      "line": 22
+    },
+    {
+      "id": "CORE-01-10-01",
+      "source": "docs/rules/000-core.md",
+      "line": 412
+    },
+    {
+      "id": "CORE-01-10-02",
+      "source": "docs/rules/000-core.md",
+      "line": 413
+    },
+    {
+      "id": "CORE-01-10-03",
+      "source": "docs/rules/000-core.md",
+      "line": 414
+    },
+    {
+      "id": "CORE-01-10-04",
+      "source": "docs/rules/000-core.md",
+      "line": 415
+    },
+    {
+      "id": "EXP-01-00",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 10
+    },
+    {
+      "id": "EXP-01-00-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 26
+    },
+    {
+      "id": "EXP-01-00-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 27
+    },
+    {
+      "id": "EXP-01-00-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 28
+    },
+    {
+      "id": "EXP-01-00-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 29
+    },
+    {
+      "id": "EXP-01-00-05",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 30
+    },
+    {
+      "id": "EXP-01-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 11
+    },
+    {
+      "id": "EXP-01-01-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 36
+    },
+    {
+      "id": "EXP-01-01-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 37
+    },
+    {
+      "id": "EXP-01-01-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 38
+    },
+    {
+      "id": "EXP-01-01-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 39
+    },
+    {
+      "id": "EXP-01-01-05",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 40
+    },
+    {
+      "id": "EXP-01-01-06",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 41
+    },
+    {
+      "id": "EXP-01-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 12
+    },
+    {
+      "id": "EXP-01-02-A",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 47
+    },
+    {
+      "id": "EXP-01-02-A-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 49
+    },
+    {
+      "id": "EXP-01-02-A-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 54
+    },
+    {
+      "id": "EXP-01-02-B",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 59
+    },
+    {
+      "id": "EXP-01-02-B-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 61
+    },
+    {
+      "id": "EXP-01-02-B-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 62
+    },
+    {
+      "id": "EXP-01-02-B-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 63
+    },
+    {
+      "id": "EXP-01-02-B-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 64
+    },
+    {
+      "id": "EXP-01-02-B-05",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 65
+    },
+    {
+      "id": "EXP-01-02-C",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 67
+    },
+    {
+      "id": "EXP-01-02-C-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 69
+    },
+    {
+      "id": "EXP-01-02-C-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 70
+    },
+    {
+      "id": "EXP-01-02-C-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 71
+    },
+    {
+      "id": "EXP-01-02-C-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 72
+    },
+    {
+      "id": "EXP-01-02-C-05",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 73
+    },
+    {
+      "id": "EXP-01-02-C-06",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 74
+    },
+    {
+      "id": "EXP-01-02-C-07",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 75
+    },
+    {
+      "id": "EXP-01-02-D",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 77
+    },
+    {
+      "id": "EXP-01-02-D-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 79
+    },
+    {
+      "id": "EXP-01-02-D-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 80
+    },
+    {
+      "id": "EXP-01-02-E",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 82
+    },
+    {
+      "id": "EXP-01-02-E-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 84
+    },
+    {
+      "id": "EXP-01-02-E-01A",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 91
+    },
+    {
+      "id": "EXP-01-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 13
+    },
+    {
+      "id": "EXP-01-03-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 98
+    },
+    {
+      "id": "EXP-01-03-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 99
+    },
+    {
+      "id": "EXP-01-03-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 100
+    },
+    {
+      "id": "EXP-01-03-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 101
+    },
+    {
+      "id": "EXP-01-03-05",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 102
+    },
+    {
+      "id": "EXP-01-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 14
+    },
+    {
+      "id": "EXP-01-04-A",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 108
+    },
+    {
+      "id": "EXP-01-04-A-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 110
+    },
+    {
+      "id": "EXP-01-04-A-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 111
+    },
+    {
+      "id": "EXP-01-04-A-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 112
+    },
+    {
+      "id": "EXP-01-04-B",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 114
+    },
+    {
+      "id": "EXP-01-04-B-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 116
+    },
+    {
+      "id": "EXP-01-04-B-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 117
+    },
+    {
+      "id": "EXP-01-04-B-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 118
+    },
+    {
+      "id": "EXP-01-05",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 15
+    },
+    {
+      "id": "EXP-01-05-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 124
+    },
+    {
+      "id": "EXP-01-05-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 125
+    },
+    {
+      "id": "EXP-01-05-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 126
+    },
+    {
+      "id": "EXP-01-05-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 127
+    },
+    {
+      "id": "EXP-01-06",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 16
+    },
+    {
+      "id": "EXP-01-06-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 133
+    },
+    {
+      "id": "EXP-01-06-01A",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 140
+    },
+    {
+      "id": "EXP-01-06-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 143
+    },
+    {
+      "id": "EXP-01-06-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 144
+    },
+    {
+      "id": "EXP-01-06-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 145
+    },
+    {
+      "id": "EXP-01-06-05",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 147
+    },
+    {
+      "id": "EXP-01-07",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 17
+    },
+    {
+      "id": "EXP-01-07-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 157
+    },
+    {
+      "id": "EXP-01-07-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 158
+    },
+    {
+      "id": "EXP-01-07-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 159
+    },
+    {
+      "id": "EXP-01-07-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 160
+    },
+    {
+      "id": "EXP-01-07-05",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 161
+    },
+    {
+      "id": "EXP-01-07-06",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 163
+    },
+    {
+      "id": "EXP-01-07-07",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 170
+    },
+    {
+      "id": "EXP-01-08",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 18
+    },
+    {
+      "id": "EXP-01-09",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 19
+    },
+    {
+      "id": "EXP-01-09-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 280
+    },
+    {
+      "id": "EXP-01-09-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 281
+    },
+    {
+      "id": "EXP-01-09-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 282
+    },
+    {
+      "id": "EXP-01-09-04",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 283
+    },
+    {
+      "id": "EXP-01-09-05",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 284
+    },
+    {
+      "id": "EXP-01-10",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 20
+    },
+    {
+      "id": "EXP-01-10-01",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 290
+    },
+    {
+      "id": "EXP-01-10-02",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 291
+    },
+    {
+      "id": "EXP-01-10-03",
+      "source": "docs/rules/001-expansion01.md",
+      "line": 292
+    },
+    {
+      "id": "EXP-02-00",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 11
+    },
+    {
+      "id": "EXP-02-00-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 27
+    },
+    {
+      "id": "EXP-02-00-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 28
+    },
+    {
+      "id": "EXP-02-00-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 29
+    },
+    {
+      "id": "EXP-02-00-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 30
+    },
+    {
+      "id": "EXP-02-00-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 31
+    },
+    {
+      "id": "EXP-02-00-06",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 32
+    },
+    {
+      "id": "EXP-02-00-07",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 33
+    },
+    {
+      "id": "EXP-02-00-08",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 34
+    },
+    {
+      "id": "EXP-02-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 12
+    },
+    {
+      "id": "EXP-02-01-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 40
+    },
+    {
+      "id": "EXP-02-01-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 41
+    },
+    {
+      "id": "EXP-02-01-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 42
+    },
+    {
+      "id": "EXP-02-01-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 43
+    },
+    {
+      "id": "EXP-02-01-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 44
+    },
+    {
+      "id": "EXP-02-01-06",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 45
+    },
+    {
+      "id": "EXP-02-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 13
+    },
+    {
+      "id": "EXP-02-02-A",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 51
+    },
+    {
+      "id": "EXP-02-02-A-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 53
+    },
+    {
+      "id": "EXP-02-02-A-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 54
+    },
+    {
+      "id": "EXP-02-02-A-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 55
+    },
+    {
+      "id": "EXP-02-02-A-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 56
+    },
+    {
+      "id": "EXP-02-02-A-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 57
+    },
+    {
+      "id": "EXP-02-02-A-06",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 58
+    },
+    {
+      "id": "EXP-02-02-A-07",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 59
+    },
+    {
+      "id": "EXP-02-02-A-08",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 60
+    },
+    {
+      "id": "EXP-02-02-A-09",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 61
+    },
+    {
+      "id": "EXP-02-02-A-10",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 62
+    },
+    {
+      "id": "EXP-02-02-B",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 66
+    },
+    {
+      "id": "EXP-02-02-B-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 68
+    },
+    {
+      "id": "EXP-02-02-B-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 75
+    },
+    {
+      "id": "EXP-02-02-B-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 77
+    },
+    {
+      "id": "EXP-02-02-B-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 78
+    },
+    {
+      "id": "EXP-02-02-B-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 80
+    },
+    {
+      "id": "EXP-02-02-B-06",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 81
+    },
+    {
+      "id": "EXP-02-02-B-07",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 83
+    },
+    {
+      "id": "EXP-02-02-C",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 87
+    },
+    {
+      "id": "EXP-02-02-C-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 89
+    },
+    {
+      "id": "EXP-02-02-C-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 90
+    },
+    {
+      "id": "EXP-02-02-C-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 91
+    },
+    {
+      "id": "EXP-02-02-C-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 92
+    },
+    {
+      "id": "EXP-02-02-D",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 96
+    },
+    {
+      "id": "EXP-02-02-D-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 98
+    },
+    {
+      "id": "EXP-02-02-D-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 99
+    },
+    {
+      "id": "EXP-02-02-E",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 103
+    },
+    {
+      "id": "EXP-02-02-E-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 105
+    },
+    {
+      "id": "EXP-02-02-E-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 106
+    },
+    {
+      "id": "EXP-02-02-F",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 110
+    },
+    {
+      "id": "EXP-02-02-F-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 112
+    },
+    {
+      "id": "EXP-02-02-F-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 113
+    },
+    {
+      "id": "EXP-02-02-F-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 114
+    },
+    {
+      "id": "EXP-02-02-G",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 118
+    },
+    {
+      "id": "EXP-02-02-G-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 120
+    },
+    {
+      "id": "EXP-02-02-G-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 121
+    },
+    {
+      "id": "EXP-02-02-G-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 122
+    },
+    {
+      "id": "EXP-02-02-G-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 123
+    },
+    {
+      "id": "EXP-02-02-G-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 126
+    },
+    {
+      "id": "EXP-02-02-G-06",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 127
+    },
+    {
+      "id": "EXP-02-02-G-07",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 128
+    },
+    {
+      "id": "EXP-02-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 14
+    },
+    {
+      "id": "EXP-02-03-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 134
+    },
+    {
+      "id": "EXP-02-03-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 135
+    },
+    {
+      "id": "EXP-02-03-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 136
+    },
+    {
+      "id": "EXP-02-03-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 137
+    },
+    {
+      "id": "EXP-02-03-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 138
+    },
+    {
+      "id": "EXP-02-03-06",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 139
+    },
+    {
+      "id": "EXP-02-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 15
+    },
+    {
+      "id": "EXP-02-04-A",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 145
+    },
+    {
+      "id": "EXP-02-04-A-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 147
+    },
+    {
+      "id": "EXP-02-04-A-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 148
+    },
+    {
+      "id": "EXP-02-04-A-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 149
+    },
+    {
+      "id": "EXP-02-04-A-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 150
+    },
+    {
+      "id": "EXP-02-04-A-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 151
+    },
+    {
+      "id": "EXP-02-04-A-06",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 152
+    },
+    {
+      "id": "EXP-02-04-B",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 156
+    },
+    {
+      "id": "EXP-02-04-B-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 158
+    },
+    {
+      "id": "EXP-02-04-B-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 164
+    },
+    {
+      "id": "EXP-02-04-B-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 165
+    },
+    {
+      "id": "EXP-02-04-B-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 166
+    },
+    {
+      "id": "EXP-02-04-C",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 170
+    },
+    {
+      "id": "EXP-02-04-C-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 172
+    },
+    {
+      "id": "EXP-02-04-C-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 173
+    },
+    {
+      "id": "EXP-02-04-C-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 174
+    },
+    {
+      "id": "EXP-02-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 16
+    },
+    {
+      "id": "EXP-02-05-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 180
+    },
+    {
+      "id": "EXP-02-05-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 181
+    },
+    {
+      "id": "EXP-02-05-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 186
+    },
+    {
+      "id": "EXP-02-06",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 17
+    },
+    {
+      "id": "EXP-02-06-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 192
+    },
+    {
+      "id": "EXP-02-06-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 193
+    },
+    {
+      "id": "EXP-02-06-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 194
+    },
+    {
+      "id": "EXP-02-07",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 18
+    },
+    {
+      "id": "EXP-02-07-00-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 203
+    },
+    {
+      "id": "EXP-02-07-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 204
+    },
+    {
+      "id": "EXP-02-07-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 205
+    },
+    {
+      "id": "EXP-02-07-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 216
+    },
+    {
+      "id": "EXP-02-07-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 213
+    },
+    {
+      "id": "EXP-02-08",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 19
+    },
+    {
+      "id": "EXP-02-09",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 20
+    },
+    {
+      "id": "EXP-02-09-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 344
+    },
+    {
+      "id": "EXP-02-09-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 345
+    },
+    {
+      "id": "EXP-02-09-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 346
+    },
+    {
+      "id": "EXP-02-09-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 347
+    },
+    {
+      "id": "EXP-02-09-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 348
+    },
+    {
+      "id": "EXP-02-10",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 21
+    },
+    {
+      "id": "EXP-02-10-01",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 354
+    },
+    {
+      "id": "EXP-02-10-02",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 355
+    },
+    {
+      "id": "EXP-02-10-03",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 356
+    },
+    {
+      "id": "EXP-02-10-04",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 357
+    },
+    {
+      "id": "EXP-02-10-05",
+      "source": "docs/rules/002-expansion02.md",
+      "line": 358
+    },
+    {
+      "id": "EXP-03-00",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 11
+    },
+    {
+      "id": "EXP-03-00-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 27
+    },
+    {
+      "id": "EXP-03-00-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 28
+    },
+    {
+      "id": "EXP-03-00-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 29
+    },
+    {
+      "id": "EXP-03-00-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 30
+    },
+    {
+      "id": "EXP-03-00-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 31
+    },
+    {
+      "id": "EXP-03-00-06",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 32
+    },
+    {
+      "id": "EXP-03-00-07",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 33
+    },
+    {
+      "id": "EXP-03-00-08",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 34
+    },
+    {
+      "id": "EXP-03-00-09",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 35
+    },
+    {
+      "id": "EXP-03-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 12
+    },
+    {
+      "id": "EXP-03-01-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 41
+    },
+    {
+      "id": "EXP-03-01-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 42
+    },
+    {
+      "id": "EXP-03-01-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 43
+    },
+    {
+      "id": "EXP-03-01-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 44
+    },
+    {
+      "id": "EXP-03-01-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 45
+    },
+    {
+      "id": "EXP-03-01-06",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 46
+    },
+    {
+      "id": "EXP-03-01-07",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 47
+    },
+    {
+      "id": "EXP-03-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 13
+    },
+    {
+      "id": "EXP-03-02-A",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 53
+    },
+    {
+      "id": "EXP-03-02-A-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 55
+    },
+    {
+      "id": "EXP-03-02-A-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 59
+    },
+    {
+      "id": "EXP-03-02-A-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 62
+    },
+    {
+      "id": "EXP-03-02-A-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 63
+    },
+    {
+      "id": "EXP-03-02-B",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 67
+    },
+    {
+      "id": "EXP-03-02-B-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 69
+    },
+    {
+      "id": "EXP-03-02-B-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 70
+    },
+    {
+      "id": "EXP-03-02-B-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 71
+    },
+    {
+      "id": "EXP-03-02-B-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 72
+    },
+    {
+      "id": "EXP-03-02-C",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 76
+    },
+    {
+      "id": "EXP-03-02-C-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 78
+    },
+    {
+      "id": "EXP-03-02-C-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 79
+    },
+    {
+      "id": "EXP-03-02-C-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 80
+    },
+    {
+      "id": "EXP-03-02-C-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 81
+    },
+    {
+      "id": "EXP-03-02-C-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 82
+    },
+    {
+      "id": "EXP-03-02-C-06",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 83
+    },
+    {
+      "id": "EXP-03-02-C-07",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 84
+    },
+    {
+      "id": "EXP-03-02-C-08",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 85
+    },
+    {
+      "id": "EXP-03-02-C-09",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 86
+    },
+    {
+      "id": "EXP-03-02-D",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 92
+    },
+    {
+      "id": "EXP-03-02-D-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 94
+    },
+    {
+      "id": "EXP-03-02-D-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 100
+    },
+    {
+      "id": "EXP-03-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 14
+    },
+    {
+      "id": "EXP-03-03-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 106
+    },
+    {
+      "id": "EXP-03-03-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 107
+    },
+    {
+      "id": "EXP-03-03-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 108
+    },
+    {
+      "id": "EXP-03-03-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 109
+    },
+    {
+      "id": "EXP-03-03-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 110
+    },
+    {
+      "id": "EXP-03-03-06",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 111
+    },
+    {
+      "id": "EXP-03-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 15
+    },
+    {
+      "id": "EXP-03-04-A",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 117
+    },
+    {
+      "id": "EXP-03-04-A-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 119
+    },
+    {
+      "id": "EXP-03-04-A-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 120
+    },
+    {
+      "id": "EXP-03-04-A-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 121
+    },
+    {
+      "id": "EXP-03-04-A-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 122
+    },
+    {
+      "id": "EXP-03-04-B",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 126
+    },
+    {
+      "id": "EXP-03-04-B-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 128
+    },
+    {
+      "id": "EXP-03-04-B-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 129
+    },
+    {
+      "id": "EXP-03-04-B-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 130
+    },
+    {
+      "id": "EXP-03-04-B-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 131
+    },
+    {
+      "id": "EXP-03-04-B-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 132
+    },
+    {
+      "id": "EXP-03-04-C",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 136
+    },
+    {
+      "id": "EXP-03-04-C-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 138
+    },
+    {
+      "id": "EXP-03-04-C-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 139
+    },
+    {
+      "id": "EXP-03-04-C-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 140
+    },
+    {
+      "id": "EXP-03-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 16
+    },
+    {
+      "id": "EXP-03-05-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 146
+    },
+    {
+      "id": "EXP-03-05-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 147
+    },
+    {
+      "id": "EXP-03-05-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 148
+    },
+    {
+      "id": "EXP-03-05-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 149
+    },
+    {
+      "id": "EXP-03-05-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 150
+    },
+    {
+      "id": "EXP-03-06",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 17
+    },
+    {
+      "id": "EXP-03-06-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 156
+    },
+    {
+      "id": "EXP-03-06-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 157
+    },
+    {
+      "id": "EXP-03-06-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 158
+    },
+    {
+      "id": "EXP-03-06-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 159
+    },
+    {
+      "id": "EXP-03-06-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 160
+    },
+    {
+      "id": "EXP-03-06-06",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 162
+    },
+    {
+      "id": "EXP-03-06-07",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 163
+    },
+    {
+      "id": "EXP-03-07",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 18
+    },
+    {
+      "id": "EXP-03-07-00-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 169
+    },
+    {
+      "id": "EXP-03-07-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 170
+    },
+    {
+      "id": "EXP-03-07-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 171
+    },
+    {
+      "id": "EXP-03-07-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 181
+    },
+    {
+      "id": "EXP-03-07-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 182
+    },
+    {
+      "id": "EXP-03-07-06",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 183
+    },
+    {
+      "id": "EXP-03-08",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 19
+    },
+    {
+      "id": "EXP-03-09",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 20
+    },
+    {
+      "id": "EXP-03-09-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 360
+    },
+    {
+      "id": "EXP-03-09-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 361
+    },
+    {
+      "id": "EXP-03-09-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 362
+    },
+    {
+      "id": "EXP-03-09-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 363
+    },
+    {
+      "id": "EXP-03-09-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 364
+    },
+    {
+      "id": "EXP-03-09-06",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 365
+    },
+    {
+      "id": "EXP-03-10",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 21
+    },
+    {
+      "id": "EXP-03-10-01",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 371
+    },
+    {
+      "id": "EXP-03-10-02",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 372
+    },
+    {
+      "id": "EXP-03-10-03",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 373
+    },
+    {
+      "id": "EXP-03-10-04",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 374
+    },
+    {
+      "id": "EXP-03-10-05",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 375
+    },
+    {
+      "id": "EXP-03-10-06",
+      "source": "docs/rules/003-expansion03.md",
+      "line": 376
+    },
+    {
+      "id": "VAR-01-01-01",
+      "source": "docs/rules/000-core.md",
+      "line": 421
+    },
+    {
+      "id": "VAR-01-01-02",
+      "source": "docs/rules/000-core.md",
+      "line": 422
+    },
+    {
+      "id": "VAR-01-01-03",
+      "source": "docs/rules/000-core.md",
+      "line": 423
+    },
+    {
+      "id": "VAR-01-01-04",
+      "source": "docs/rules/000-core.md",
+      "line": 424
+    },
+    {
+      "id": "VAR-01-01-05",
+      "source": "docs/rules/000-core.md",
+      "line": 140
+    },
+    {
+      "id": "VAR-01-01-06",
+      "source": "docs/rules/000-core.md",
+      "line": 426
+    },
+    {
+      "id": "VAR-01-01-07",
+      "source": "docs/rules/000-core.md",
+      "line": 427
+    },
+    {
+      "id": "VAR-01-01-08",
+      "source": "docs/rules/000-core.md",
+      "line": 429
+    },
+    {
+      "id": "VAR-01-02-01",
+      "source": "docs/rules/000-core.md",
+      "line": 431
+    },
+    {
+      "id": "VAR-01-02-02",
+      "source": "docs/rules/000-core.md",
+      "line": 165
+    },
+    {
+      "id": "VAR-01-02-03",
+      "source": "docs/rules/000-core.md",
+      "line": 433
+    },
+    {
+      "id": "VAR-01-02-04",
+      "source": "docs/rules/000-core.md",
+      "line": 434
+    },
+    {
+      "id": "VAR-01-02-05",
+      "source": "docs/rules/000-core.md",
+      "line": 435
+    },
+    {
+      "id": "VAR-01-02-06",
+      "source": "docs/rules/000-core.md",
+      "line": 436
+    },
+    {
+      "id": "VAR-01-02-07",
+      "source": "docs/rules/000-core.md",
+      "line": 437
+    },
+    {
+      "id": "VAR-01-02-08",
+      "source": "docs/rules/000-core.md",
+      "line": 438
+    }
+  ]
+}

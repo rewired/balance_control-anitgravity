@@ -11,6 +11,11 @@ Anchoring policy:
 - Headings are not anchors.
 - Code and tests must cite rule IDs when referencing spec behavior.
 
+Anchor registry:
+- Run `pnpm run gen:spec-anchors` after editing any canonical rules.
+- Registry output: packages/rules/src/spec-anchors.generated.json (committed).
+- Tripwire tests fail if any referenced rule ID is missing from the registry.
+
 No drift policy:
 - If behavior is not stated in the rules, it does not exist.
 - If a rule is ambiguous, follow CORE-01-10 and document a design decision before implementing.

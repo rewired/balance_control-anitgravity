@@ -7,6 +7,7 @@
     "test": "pnpm -r --if-present test",
     "lint": "eslint \"packages/**/*.{ts,tsx,js,cjs,mjs}\" \"scripts/**/*.{js,cjs,mjs}\" \"*.{js,cjs,mjs}\"",
     "check:encoding": "node scripts/check-encoding.mjs",
+    "gen:spec-anchors": "node scripts/gen-spec-anchors.mjs",
     "dev": "pnpm -r --parallel dev"
   },
   "devDependencies": {

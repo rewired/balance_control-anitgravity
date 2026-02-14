@@ -36,3 +36,4 @@
 - [x] Task 0035 - Production PingPong Reduction
 - [x] Task 0036 - CORE-01 v1.0.20 Tests + Golden Replays
 - [x] Task 0037 - CORE Ruleset Migration v1.0.26 to v1.1.0 (Docs + Contracts Alignment)
+- [x] Task 0038 - Spec Anchor Registry + Tripwire (ID Existence Enforcement)
