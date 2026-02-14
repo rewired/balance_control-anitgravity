@@ -7,14 +7,18 @@ interface TokenProps {
 
 export const Token: React.FC<TokenProps> = ({ object }) => {
     let className = 'token';
+    const knownResorts = new Set(['dom', 'for', 'inf', 'eco', 'sec', 'clm']);
 
     if (object.type === 'Influence') {
         className += ' influence';
         // Maybe differentiate by owner color?
         // simple border or style override
     } else if (object.type === 'Resource') {
-        if (object.resort) {
-            className += ` resource-${object.resort.toLowerCase()}`;
+        const resort = typeof object.resort === 'string' ? object.resort.trim().toLowerCase() : '';
+        if (resort && knownResorts.has(resort)) {
+            className += ` resource-${resort}`;
+        } else {
+            className += ' resource-unknown';
         }
     } else if (object.type === 'MetaMarker') {
         className += ' meta-marker';
