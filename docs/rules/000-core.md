@@ -3,7 +3,7 @@
 # CORE-01 Simulation Specification (Atomic, Deterministic)
 
 Version: 01
-Scope: Core Rules v1.0.25 only with variants (no expansions)
+Scope: Core Rules v1.0.26 only with variants (no expansions)
 
 ---
 
@@ -129,7 +129,7 @@ CORE-01-03-02B Canonical Pre-Shuffle Ordering: Before any shuffle, build the ini
 (1) TileTypeOrder where ResortTiles < Committees < Grassroots < Lobbyists < Hotspots.
 (2) ResortOrder where DOM < FOR < INF; Tiles without a Resort use ResortOrder = None (sorted after INF).
 (3) WOrder ascending numeric; Tiles without W use WOrder = None (sorted after all W values).
-(4) SerialIndex ascending, assigned starting at 0 within each identical (TileType, Resort, W) group.
+(4) SerialIndex ascending, assigned starting at 0 within each identical (TileTypeOrder, ResortOrder, WOrder) group.
 CORE-01-03-02B.1 Grassroots ResortOrder Binding (Canonical): For the purposes of Canonical Pre-Shuffle Ordering key (2) ResortOrder (CORE-01-03-02B), treat:
 (a) Typed Grassroots with type tag T as having ResortOrder = T, and
 (b) Untyped Grassroots as having ResortOrder = None.
@@ -139,6 +139,13 @@ CORE-01-03-03A Turn Order: Turn order is fixed for the entire game: starting pla
 CORE-01-03-04 For 2 players, assign 4 Influence objects to each player’s PersonalSupply.
 CORE-01-03-05 For 3 players, assign 3 Influence objects to each player’s PersonalSupply.
 CORE-01-03-06 For 4 players, assign 2 Influence objects to each player’s PersonalSupply.
+CORE-01-03-03B Setup Step Order (Canonical):
+(1) Place the Start Committee in Board bound to StartPosition (CORE-01-03-01, CORE-01-00-T09).
+(2) Build the initial DrawPile list in Canonical Pre-Shuffle Ordering (CORE-01-03-02B), including any ADD56-01 tile additions if active (ADD56-01-01-01..16A).
+(3) Shuffle DrawPile (CORE-01-03-02, CORE-01-03-02A.1A).
+(4) Determine starting player (CORE-01-03-02A.2).
+(5) Assign Starting Influence per player count (CORE-01-03-04/05/06 and/or ADD56-01-02-01/02-02 if active).
+(6) If FirstPlayerHandicap is active, apply the reduction to the starting player after step (5) (VAR-01-02-02/03).
 
 ---
 
@@ -295,6 +302,7 @@ Assign ContextTile as follows:
 (c) If the effect is Resort Production during Round Settlement, ContextTile = the producing ResortTile.
 (d) If the effect is Hotspot resolution, ContextTile = that Hotspot Tile.
 (e) If none applies, ContextTile = null.
+(f) If the effect is PlaceOrMoveInfluence (Place or Move), ContextTile = the destination Tile of that placement/move.
 
 CORE-01-06-00-06 Multiple-Tile References
 If an instruction references multiple Tiles, it must explicitly state which Tile is the ContextTile; otherwise the effect is invalid and does not resolve.
@@ -311,7 +319,7 @@ After a Hotspot resolution attempt (including cases where no Influence can be pl
 CORE-01-06-04 Hotspot resolution follows this order:
 (a) Apply any pre-majority effects explicitly defined as occurring “before majority determination.”
 (b) Determine majority on that Hotspot.
-(c) Evaluate any applicable effect modifiers and prohibitions according to Rule Hierarchy. If any prohibition applies, do not execute step (d).
+(c) Evaluate any applicable effect modifiers and prohibitions according to Rule Hierarchy. If any prohibition applies, do not execute step (d). If any prohibition applies in step (c), the Hotspot resolution is considered resolved with step (d) skipped; the Hotspot is still marked resolved per CORE-01-06-03B.
 (d) Resolve majority outcome: If a player has majority, attempt to place exactly one Influence for that player per CORE-01-06-05 through CORE-01-06-07; otherwise do nothing.
 CORE-01-06-05 If a player has majority on the Hotspot, place exactly one Influence on that Hotspot for the majority player.
 CORE-01-06-06 Hotspot placement moves one Influence from that player’s PersonalSupply to the Hotspot Tile in Board.
@@ -337,7 +345,7 @@ When resolving a ResortTile’s production during Round Settlement, use the foll
 1. Start with the tile’s printed production value.
 2. Apply doubling effects (if any).
 3. Apply production output modifiers (reductions or increases).
-4. No additional production reductions apply in CORE-01.
+4. No additional production output modifiers apply in CORE-01 beyond those explicitly defined; effect-level prohibitions are handled by CORE-01-06-17.
 5. Apply floors (minimum 0).
 
 (b) Determine highest totalInfluence on that Tile using the standard majority rules (including modifiers). If the unique highest player exists, that player is the production winner. If multiple players tie for highest and highest > 0, those players are tied production winners. If highest == 0, there are no production winners.
@@ -365,7 +373,7 @@ CORE-01-07-03D Resort Production Sweep Order (Canonical): During Round Settlemen
 
 # CORE-01-08 RESTRICTIONS
 
-CORE-01-08-01 A player may not exceed 7 Influence objects in total.
+CORE-01-08-01 A player may not exceed 7 Influence objects in total across all zones (PersonalSupply + Board).
 
 CORE-01-08-02 FormalizeInfluence may not be performed until, for every player, every Influence object assigned to that player during Setup as Starting Influence (CORE-01-03-04/05/06, modified by VAR-01-02 and/or ADD56-01-02) is in Board. Influence created by FormalizeInfluence is not Starting Influence.
 CORE-01-08-03 This restriction applies to all Committees, including the Start Committee.
@@ -392,6 +400,7 @@ Meta-Marker placement is governed by CORE-01-02-17C/17D.
 CORE-01-08-06F Immunity Interpretation Clarification: Start Committee immunity applies to effects that target or would modify the Start Committee tile. It does not prohibit performing actions via the Start Committee as explicitly defined (CORE-01-04-14A / CORE-01-08-07..10A), Meta-Marker placement is governed by CORE-01-02-17C/17D.
 CORE-01-08-07 Each player may FormalizeInfluence via the Start Committee at most once per game.
 CORE-01-08-08 Start Committee formalization cost requires paying 3 Resources of different resorts plus 1 additional Resource of any resort.
+CORE-01-08-08A Start Committee Formalization — Declaration + Atomic Payment (Canonical): Apply CORE-01-04-15A (declaration locked before any movement; simultaneous payment; failure causes no state change per CORE-01-06-00-03) using the cost defined in CORE-01-08-08.
 CORE-01-08-09 Start Committee formalization moves all paid Resources from the active player’s PersonalSupply to Bank.
 CORE-01-08-10 Start Committee formalization creates exactly one new Influence in the active player’s PersonalSupply.
 CORE-01-08-10A Influence Cap Check (Start Committee)
@@ -402,8 +411,9 @@ Start Committee formalization does not resolve if it would cause the active play
 # CORE-01-09 END GAME
 
 CORE-01-09-01 The game ends when no further Tiles can be drawn from DrawPile.
-CORE-01-09-01A Final Settlement Trigger: If a player would begin DrawAndPlaceTile and DrawPile is empty, immediately begin the final Round Settlement (CORE-01-07-02) and then end the game (CORE-01-09-02).
+CORE-01-09-01A Final Settlement Trigger: If a player would begin DrawAndPlaceTile and DrawPile is empty, immediately begin the final Round Settlement procedure (CORE-01-07-03 through CORE-01-07-03D) and then end the game (CORE-01-09-02).
 If, during DrawAndPlaceTile, DrawPile becomes empty before a Tile is placed, immediately begin the final Round Settlement and then end the game; skip the Political Action phase of that turn.
+Final Round Settlement uses the same Resort Production sweep order as Round Settlement (CORE-01-07-03D), regardless of whether a full round cycle completed.
 CORE-01-09-02 After the final Round Settlement completes, the game ends immediately.
 CORE-01-09-03 Compute each player’s score as the count of Influence objects owned by that player that are in Board. Virtual Influence from Lobbyists (CORE-01-05-04/04A) is ignored for scoring. The player with the highest score wins.
 CORE-01-09-04 If two or more players tie for highest score, victory is shared.
@@ -460,7 +470,7 @@ ADD56-01-01-10 Add INF-W4 ×1 to DrawPile.
 ADD56-01-01-11 Add Committee ×2 to DrawPile.
 ADD56-01-01-12 Add Lobbyist ×3 to DrawPile.
 ADD56-01-01-13 Add Grassroots ×2 to DrawPile.
-ADD56-01-01-13A Added Grassroots Identity (Normative): The 2 additional Grassroots tiles are: Untyped ×2. These tiles follow CORE-01-04-22L with their printed type tags substituted.
+ADD56-01-01-13A Added Grassroots Identity (Normative): The 2 additional Grassroots tiles are: Untyped ×2. These tiles follow CORE-01-04-22K
 
 ADD56-01-01-14 Add Hotspot (DOM) ×1 to DrawPile.
 ADD56-01-01-15 Add Hotspot (FOR) ×1 to DrawPile.
@@ -471,8 +481,8 @@ ADD56-01-02-01 For 5 players, assign 2 Influence objects to each player’s Pers
 ADD56-01-02-02 For 6 players, assign 2 Influence objects to each player’s PersonalSupply during setup.
 
 ADD56-01-03-00-01 Influence cap adjustment
-For 5 players, a player may not exceed 8 Influence objects in total.
-For 6 players, a player may not exceed 8 Influence objects in total.
+For 5 players, a player may not exceed 8 Influence objects in total across all zones (PersonalSupply + Board).
+For 6 players, a player may not exceed 8 Influence objects in total across all zones (PersonalSupply + Board).
 This overrides CORE-01-08-01 while the 5–6 Player Add-On is active.
 
 ADD56-01-03-01 All other CORE-01 rules remain unchanged when the 5–6 Player Add-On is active.
