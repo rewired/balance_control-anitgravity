@@ -1,10 +1,34 @@
-import { GameState, CoreZoneNames, Tile, TileType, CoreResources, GameObject, Zone } from '@balance-control/rules';
+import { GameState, CoreZoneNames, Tile, TileType, CoreResources, GameObject, Zone, RULESET_MANIFEST, RulesetManifest } from '@balance-control/rules';
 import { Ctx } from 'boardgame.io';
 import { ExpansionRegistry } from './expansion-registry';
 import { normalizeGameConfig } from './config';
 
 export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown }): GameState => {
     const gameConfig = normalizeGameConfig(setupData);
+    const rulesetBase: RulesetManifest = RULESET_MANIFEST ?? {
+        coreVersion: 'v1.1.0',
+        expansions: {
+            exp01Version: 'v1.3',
+            exp02Version: 'v1.0',
+            exp03Version: 'v1.0'
+        },
+        specAnchorHash: '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3'
+    };
+    const rulesetExpansions: RulesetManifest['expansions'] = {};
+    if (gameConfig.expansions.ex01) {
+        rulesetExpansions.exp01Version = rulesetBase.expansions.exp01Version;
+    }
+    if (gameConfig.expansions.ex02) {
+        rulesetExpansions.exp02Version = rulesetBase.expansions.exp02Version;
+    }
+    if (gameConfig.expansions.ex03) {
+        rulesetExpansions.exp03Version = rulesetBase.expansions.exp03Version;
+    }
+    const rulesetManifest: RulesetManifest = {
+        coreVersion: rulesetBase.coreVersion,
+        expansions: rulesetExpansions,
+        specAnchorHash: rulesetBase.specAnchorHash,
+    };
 
     const G: GameState = {
         zones: {},
@@ -12,6 +36,9 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         objects: {},
         adjacency: {},
         grid: {},
+        meta: {
+            ruleset: rulesetManifest,
+        },
         engine: {
             idSeq: 0,
             effectQueue: [],

@@ -9,6 +9,11 @@
       "ex03": false
     }
   },
+  "rulesetManifest": {
+    "coreVersion": "v1.1.0",
+    "expansions": {},
+    "specAnchorHash": "5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3"
+  },
   "notes": {
     "updatedFor": "CORE-01 v1.0.20 migration",
     "previousExpectedFinalHash": "716ad9b3870deab369002d989dc24abf502c3060328677f9ab1bddeaaa8b081c"
@@ -27,5 +32,5 @@
     { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
     { "move": "pass", "args": [{}] }
   ],
-  "expectedFinalHash": "2d2d855c9b7fa8f6fb8a6d7af95b6f0a34dec38bfffd77be9fae471f48a62ae9"
+  "expectedFinalHash": "cc52ce347b7d95bac98a3573a5ce74987067da2680b6cb0241dd390240f005ca"
 }

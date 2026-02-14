@@ -2,6 +2,7 @@ import { Client } from 'boardgame.io/client';
 import { BalanceControl } from './index';
 import { SetupGame } from './setup';
 import { hashState } from './hash-state';
+import type { RulesetManifest } from '@balance-control/rules';
 
 export type ReplayMove = {
     move: string;
@@ -16,6 +17,7 @@ export type ReplaySpec = {
     seed?: string | number | null;
     numPlayers: number;
     config?: unknown;
+    rulesetManifest?: RulesetManifest;
     moves: ReplayMove[];
 };
 

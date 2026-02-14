@@ -87,6 +87,7 @@ const App: React.FC = () => {
             seed: getReplaySeed(state),
             numPlayers: state?.ctx?.numPlayers ?? 2,
             config: getReplayConfig(state),
+            rulesetManifest: state?.G?.meta?.ruleset,
             moves: moveLog.map((entry) => ({
                 timestamp: entry.timestamp,
                 playerID: entry.playerID,

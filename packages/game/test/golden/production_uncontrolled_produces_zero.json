@@ -23,5 +23,5 @@
     { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
     { "move": "pass", "args": [{}] }
   ],
-  "expectedFinalHash": "ebaa222b66dc5dbf67d2c95ae2f609bb373644050554dcafec20907183b1777c"
+  "expectedFinalHash": "2900656a0287197eb807c505a99bcb8e9971830c7f4a6c667bffb088f3d80096"
 }

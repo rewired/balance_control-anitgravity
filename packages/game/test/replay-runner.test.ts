@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { runReplay, type ReplaySpec } from '../src/replay';
 
+const EXPECTED_CORE_VERSION = 'v1.1.0';
+const EXPECTED_SPEC_ANCHOR_HASH = '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3';
+
 describe('Replay runner', () => {
     it('replays a small sequence and matches the expected hash', () => {
         const replay: ReplaySpec = {
@@ -22,6 +25,62 @@ describe('Replay runner', () => {
         };
 
         const result = runReplay(replay);
-        expect(result.hash).toBe('5d6caf1bf159cc64b4b00f5ed3ac1f741f9b6196809e6792d1d86cce7ad78599');
+        expect(result.hash).toBe('550b87cc6588d50a17b658b9bb6ab30920c0b211486e1a3fa957bc38b298cfab');
+        expect(result.state.G.meta?.ruleset).toBeTruthy();
+    });
+
+    it('accepts replay manifests and remains backward compatible', () => {
+        const replay: ReplaySpec = {
+            gameName: 'BalanceControl',
+            gameVersion: 'dev',
+            seed: 'replay-test-core-2p',
+            numPlayers: 2,
+            config: {
+                expansions: {
+                    ex01: false,
+                    ex02: false,
+                    ex03: false
+                }
+            },
+            rulesetManifest: {
+                coreVersion: EXPECTED_CORE_VERSION,
+                expansions: {},
+                specAnchorHash: EXPECTED_SPEC_ANCHOR_HASH
+            },
+            moves: [
+                { move: 'placeTile', payload: { targetCoord: '1,0' } },
+                { move: 'pass', payload: {} }
+            ]
+        };
+
+        const result = runReplay(replay);
+        expect(result.state.G.meta?.ruleset?.coreVersion).toBe(EXPECTED_CORE_VERSION);
+    });
+
+    it('includes ruleset manifest in exported replay payload', () => {
+        const replay: ReplaySpec = {
+            gameName: 'BalanceControl',
+            gameVersion: 'dev',
+            seed: 'replay-test-export',
+            numPlayers: 2,
+            config: {
+                expansions: {
+                    ex01: false,
+                    ex02: false,
+                    ex03: false
+                }
+            },
+            moves: [
+                { move: 'placeTile', payload: { targetCoord: '1,0' } },
+                { move: 'pass', payload: {} }
+            ]
+        };
+
+        const result = runReplay(replay);
+        const exportedReplay = {
+            ...replay,
+            rulesetManifest: result.state.G.meta?.ruleset
+        };
+        expect(exportedReplay.rulesetManifest).toBeTruthy();
     });
 });

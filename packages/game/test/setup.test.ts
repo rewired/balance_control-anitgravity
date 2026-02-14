@@ -23,6 +23,9 @@ function createSeededRandom(seed: number) {
     };
 }
 
+const EXPECTED_CORE_VERSION = 'v1.1.0';
+const EXPECTED_SPEC_ANCHOR_HASH = '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3';
+
 describe('SetupGame', () => {
     beforeEach(() => {
         ExpansionRegistry.clear();
@@ -74,6 +77,24 @@ describe('SetupGame', () => {
             const supplyId = `${CoreZoneNames.PersonalSupply}:${marker.owner}`;
             expect(G.zones[supplyId].items).toContain(marker.id);
         }
+    });
+
+    it('should stamp ruleset manifest in game state meta', () => {
+        const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
+        const G = SetupGame({ ctx });
+        expect(G.meta?.ruleset).toEqual({
+            coreVersion: EXPECTED_CORE_VERSION,
+            expansions: {},
+            specAnchorHash: EXPECTED_SPEC_ANCHOR_HASH,
+        });
+    });
+
+    it('should keep ruleset manifest stable for identical setup data', () => {
+        const ctxA: any = { numPlayers: 2, random: createSeededRandom(42) };
+        const ctxB: any = { numPlayers: 2, random: createSeededRandom(42) };
+        const G1 = SetupGame({ ctx: ctxA });
+        const G2 = SetupGame({ ctx: ctxB });
+        expect(G1.meta?.ruleset).toEqual(G2.meta?.ruleset);
     });
 
     it('should not apply ex01 setup when ex01 flag is disabled', () => {

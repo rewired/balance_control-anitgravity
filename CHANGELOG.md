@@ -9,6 +9,7 @@
 - Fix: workspace test recursion now uses `pnpm -r --if-present test` to avoid CI failures on packages without test scripts.
 - Docs: Added README quickstart and repo orientation.
 - Fix: restored expansion-level production modifier application during `production.resolve`.
+- Added ruleset manifest stamping in game state and replay exports.
 - Hardening: EXP-02 exports canonical Inner Order tile id and tests use it (single source of truth).
 - Fix: EXP-02 Inner Order Hotspot id now matches between setup and HOTSPOT_RESOLUTION handler; added regression test.
 - Hardening: Added repo-wide tripwire test enforcing explicit `missingController` policy on CONTROLLER grants.
