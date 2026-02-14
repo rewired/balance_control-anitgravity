@@ -31,23 +31,48 @@ function git(cmd) {
 function getTaskId(argv) {
   const arg = argv[2];
   const env = process.env.TASK_ID;
-  const id = (arg || env || "").trim();
+  const id = (arg || env || "").trim().toLowerCase();
   if (!id) fail("Missing TASK_ID. Provide arg (e.g. 0021) or env TASK_ID=0021.");
-  if (!/^\d{4}$/.test(id)) fail(`TASK_ID must be 4 digits (e.g. 0021). Got: "${id}"`);
+  if (!/^\d{4}[a-z]?$/.test(id)) fail(`TASK_ID must be 4 digits (e.g. 0021) or 4 digits + letter (e.g. 0039a). Got: "${id}"`);
   return id;
 }
 
 function findTaskFile(taskId) {
-  const candidates = [
-    path.join("docs", "tasks", `TASK_${taskId}.md`),
-    path.join("docs", "tasks", `task_${taskId}.md`),
-    path.join("docs", "tasks", `TASK-${taskId}.md`),
-    path.join("docs", "tasks", `${taskId}.md`),
-  ];
-  for (const p of candidates) {
-    if (fs.existsSync(p) && fs.statSync(p).isFile()) return p;
+  const tasksDir = path.join("docs", "tasks");
+  if (!fs.existsSync(tasksDir) || !fs.statSync(tasksDir).isDirectory()) {
+    fail(`Tasks directory not found: ${tasksDir}`);
   }
-  fail(`Task markdown not found for ${taskId}. Tried:\n${candidates.map((c) => `- ${c}`).join("\n")}`);
+
+  const entries = fs.readdirSync(tasksDir, { withFileTypes: true });
+  const mdFiles = entries
+    .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"))
+    .map((entry) => entry.name);
+
+  const findByPrefix = (prefix, re) => {
+    if (prefix) return mdFiles.filter((name) => name.toLowerCase().startsWith(prefix));
+    return mdFiles.filter((name) => re.test(name.toLowerCase()));
+  };
+
+  const hasSuffix = /[a-z]$/.test(taskId);
+  const exactPrefix = `${taskId}-`;
+  let matches = findByPrefix(exactPrefix);
+
+  if (!hasSuffix && matches.length === 0) {
+    matches = findByPrefix("", new RegExp(`^${taskId}[a-z]-`));
+  }
+
+  if (matches.length !== 1) {
+    const candidates = mdFiles.filter((name) => name.toLowerCase().startsWith(taskId));
+    const list = candidates.length ? candidates : mdFiles;
+    fail(`Task markdown not found or ambiguous for ${taskId}. Matches:\n${list.map((c) => `- ${path.join("docs", "tasks", c)}`).join("\n")}`);
+  }
+
+  const fileName = matches[0];
+  const match = fileName.toLowerCase().match(/^(\d{4}[a-z]?)-/);
+  if (!match) {
+    fail(`Task markdown name does not start with task id: ${path.join("docs", "tasks", fileName)}`);
+  }
+  return { path: path.join("docs", "tasks", fileName), resolvedId: match[1] };
 }
 
 
@@ -137,13 +162,13 @@ function verifyCommit(taskId, taskFilePath) {
 
 function main() {
   const taskId = getTaskId(process.argv);
-  const taskFile = findTaskFile(taskId);
+  const { path: taskFile, resolvedId } = findTaskFile(taskId);
   const md = readUtf8(taskFile);
 
   verifyChecklist(md);
   ensureNonEmptySection(md, "Work Summary");
   ensureNonEmptySection(md, "Commands Run");
-  verifyCommit(taskId, taskFile);
+  verifyCommit(resolvedId, taskFile);
 
   console.log("\n[verify-task] PASS ✅\n");
   process.exit(0);

@@ -15,7 +15,7 @@ Implement **one** script: `scripts/verify-task.mjs` (no dependencies). Optionall
 ## Inputs
 
 * Task markdown files live under `docs/tasks/`.
-* Expected file naming: `docs/tasks/TASK_XXXX.md` (primary). Accept a few fallback names.
+* Expected file naming: `docs/tasks/<taskId>-<meaningful_name>.md` (taskId supports optional letter suffix like `0039a`).
 
 ## Outputs
 
@@ -33,6 +33,7 @@ Implement **one** script: `scripts/verify-task.mjs` (no dependencies). Optionall
 
 * `node scripts/verify-task.mjs 0021`
 * `TASK_ID=0021 node scripts/verify-task.mjs`
+* If only digits are provided, resolve a matching suffix task file (e.g. `0039` finds `0039a-...`).
 
 ## Rules Enforced
 
@@ -239,7 +240,7 @@ If a root `package.json` exists, add:
 
 Create **one** meaningful commit for this task:
 
-* Subject: `task(0039): add verify-task guard`
+* Subject: `task(0039a): add verify-task guard`
 * Body: 2–6 bullets describing changes
 
 ## PR Checklist
@@ -255,46 +256,18 @@ Create **one** meaningful commit for this task:
 
 ## Work Summary
 
-* Added verify-task guard script to enforce task markdown and commit rules.
-* Wired a root verify:task script for consistent invocation.
-* Aligned the task file name with the guard’s TASK_XXXX lookup.
-* Logged task execution commands for auditability.
+* Updated task file resolution to use `<taskId>-<meaningful_name>.md` naming.
+* Accepted optional letter suffixes in task ids and resolved them for commit checks.
+* Clarified task naming expectations in the task contract.
 
 ## Commands Run
 
-* `git status -sb` (shows modified package.json and new scripts/verify-task.mjs)
-* `git diff --stat` (1 file changed, 2 insertions, 1 deletion)
-* `pnpm lint` (pass; TypeScript version warning emitted)
-* `pnpm test` (pass)
-* `git add scripts/verify-task.mjs package.json docs/tasks/0039a-verify-task-guard.md` (staged changes)
-* `git commit -m "task(0039): add verify-task guard" -m "- add verify-task script with markdown and commit checks" -m "- wire verify:task npm script" -m "- update task checklist and command log"` (failed: unexpected argument 'add')
-* `git commit -m 'task(0039): add verify-task guard' -m '- add verify-task script with markdown and commit checks' -m '- wire verify:task npm script' -m '- update task checklist and command log'` (success)
-* `node scripts/verify-task.mjs 0039` (failed: task markdown not found)
-<<<<<<< HEAD
-* `node scripts/verify-task.mjs 0039`
-  ```text
-  [verify-task] OK: Section "Work Summary" present.
-  [verify-task] OK: Section "Commands Run" present.
-  [verify-task] OK: Latest commit format + task file inclusion OK (task(0039): add verify-task guard).
-
-  [verify-task] PASS ✅
-  ```
 * `git status`
   ```text
-  Your branch is up to date with 'origin/main'.
-
-  Changes not staged for commit:
-    (use "git add <file>..." to update what will be committed)
-    (use "git restore <file>..." to discard changes in working directory)
-        modified:   docs/tasks/TASK_0039.md
-        modified:   scripts/verify-task.mjs
-
-  no changes added to commit (use "git add" and/or "git commit -a")
+  nothing to commit, working tree clean
   ```
 * `git diff --stat`
   ```text
-   scripts/verify-task.mjs |  1 +
-   2 files changed, 50 insertions(+)
   ```
 * `pnpm lint`
   ```text
@@ -314,92 +287,6 @@ Create **one** meaningful commit for this task:
   Please only submit bug reports when using the officially supported version.
 
   =============
-  ```
-* `pnpm test`
-  ```text
-
-  > balance-control-monorepo@0.0.0 test D:\__DEV\balance_control-anitgravity
-  > pnpm -r --if-present test
-
-  Scope: 9 of 10 workspace projects
-  [52 lines collapsed]
-  │  ✓ test/expansion.test.ts  (2 tests) 5ms
-  │ stdout | test/expansion.test.ts > Expansion System > should register an expansion
-  │ Expansion registered: TestExp
-  │ stdout | test/expansion.test.ts > Expansion System > should apply production modifiers
-  │ Expansion registered: ModExp
-  │  ✓ test/production-uncontrolled.test.ts  (1 test) 4ms
-  │  Test Files  20 passed (20)
-  │       Tests  74 passed (74)
-  │    Start at  08:32:24
-  │    Duration  26.92s (transform 5.47s, setup 6ms, collect 47.13s, tests 1.41s, environment 4ms, prepare 54.59s)
-  └─ Done in 29.4s
-  packages/client-web test$ vitest run
-  │  RUN  v0.30.1 D:/__DEV/balance_control-anitgravity/packages/client-web
-  │  ✓ test/Board.test.tsx  (1 test) 2ms
-  │  ✓ test/controls-start-committee.test.tsx  (1 test) 20ms
-  │  Test Files  2 passed (2)
-  │       Tests  2 passed (2)
-  │    Start at  08:32:54
-  │    Duration  22.01s (transform 101ms, setup 0ms, collect 1.59s, tests 22ms, environment 12.72s, prepare 1.74s)
-  └─ Done in 24.6s
-  ```
-* `git add -A` (staged task rename + script update)
-* `git commit --amend --no-edit` (amended commit with task rename and logs)
-* `node scripts/verify-task.mjs 0039`
-  ```text
-  [verify-task] OK: Section "Work Summary" present.
-  [verify-task] OK: Section "Commands Run" present.
-  [verify-task] OK: Latest commit format + task file inclusion OK (task(0039): add verify-task guard).
-
-  [verify-task] PASS ✅
-  ```
-* `git status`
-  ```text
-  Your branch and 'origin/main' have diverged,
-  and have 1 and 1 different commits each, respectively.
-    (use "git pull" if you want to integrate the remote branch with yours)
-
-  nothing to commit, working tree clean
-  ```
-* `git diff --stat`
-  ```text
-  ```
-* `git show -1 --stat`
-  ```text
-  Author: Björn Ahlers <rewired.de@gmail.com>
-  Date:   Sat Feb 14 07:59:06 2026 +0100
-
-      task(0039): add verify-task guard
-
-      - add verify-task script with markdown and commit checks
-
-      - wire verify:task npm script
-
-      - update task checklist and command log
-
-   docs/tasks/TASK_0039.md                            | 486 +++++++++++++++++++++
-   package.json                                       |   3 +-
-   .../verify-task.mjs                                | 108 +----
-   3 files changed, 489 insertions(+), 108 deletions(-)
-  ```
-=======
->>>>>>> 43834fce60bfdda3dee893314eddcfd8e2414fd5
-* `git add -A docs/tasks` (staged task rename + updates)
-* `git commit --amend --no-edit` (amended commit with task rename)
-* `node scripts/verify-task.mjs 0039` (pass)
-* `git add docs/tasks/TASK_0039.md` (staged command log update)
-* `git commit --amend --no-edit` (amended commit with final command log)
-* `node scripts/verify-task.mjs 0039` (pass)
-* `git status`
-  ```text
-  Your branch is ahead of 'origin/main' by 1 commit.
-    (use "git push" to publish your local commits)
-
-  nothing to commit, working tree clean
-  ```
-* `git diff --stat`
-  ```text
   ```
 * `pnpm test`
   ```text
@@ -413,119 +300,45 @@ Create **one** meaningful commit for this task:
   │ Expansion registered: TestExp
   │ stdout | test/expansion.test.ts > Expansion System > should apply production modifiers
   │ Expansion registered: ModExp
-  │  ✓ test/controller-fallback-hardening.test.ts  (3 tests) 4ms
-  │  ✓ test/production-uncontrolled.test.ts  (1 test) 3ms
-  │  Test Files  20 passed (20)
-  │       Tests  74 passed (74)
-  │    Start at  08:12:25
-  │    Duration  27.04s (transform 5.78s, setup 0ms, collect 46.29s, tests 1.42s, environment 4ms, prepare 54.80s)
-  └─ Done in 29.6s
-  packages/client-web test$ vitest run
-  │  RUN  v0.30.1 D:/__DEV/balance_control-anitgravity/packages/client-web
-  │  ✓ test/Board.test.tsx  (1 test) 2ms
-  │  ✓ test/controls-start-committee.test.tsx  (1 test) 20ms
-  │  Test Files  2 passed (2)
-  │       Tests  2 passed (2)
-  │    Start at  08:12:55
-  │    Duration  21.95s (transform 102ms, setup 0ms, collect 1.58s, tests 22ms, environment 12.69s, prepare 1.49s)
-  └─ Done in 24.5s
-  ```
-* `pnpm lint`
-  ```text
-  > balance-control-monorepo@0.0.0 lint D:\__DEV\balance_control-anitgravity
-  > eslint "packages/**/*.{ts,tsx,js,cjs,mjs}" "scripts/**/*.{js,cjs,mjs}" "*.{js,cjs,mjs}"
-
-  =============
-
-  WARNING: You are currently running a version of TypeScript which is not officially supported by @typescript-eslint/typescript-estree.
-
-  You may find that it works just fine, or you may not.
-
-  SUPPORTED TYPESCRIPT VERSIONS: >=4.7.4 <5.6.0
-
-  YOUR TYPESCRIPT VERSION: 5.9.3
-
-  Please only submit bug reports when using the officially supported version.
-
-  =============
-  ```
-* `git show -1 --stat`
-  ```text
-  Author: Björn Ahlers <rewired.de@gmail.com>
-  Date:   Sat Feb 14 07:59:06 2026 +0100
-
-      task(0039): add verify-task guard
-
-      - add verify-task script with markdown and commit checks
-
-      - wire verify:task npm script
-
-      - update task checklist and command log
-
-   .../{0039a-verify-task-guard.md => TASK_0039.md}   |  36 +++--
-   package.json                                       |   3 +-
-   scripts/verify-task.mjs                            | 151 +++++++++++++++++++++
-   3 files changed, 181 insertions(+), 9 deletions(-)
-  ```
-* `git add docs/tasks/TASK_0039.md` (staged command output additions)
-* `git commit --amend --no-edit` (amended commit with command outputs)
-* `node scripts/verify-task.mjs 0039`
-  ```text
-  [verify-task] OK: Section "Work Summary" present.
-  [verify-task] OK: Section "Commands Run" present.
-  [verify-task] OK: Latest commit format + task file inclusion OK (task(0039): add verify-task guard).
-
-  [verify-task] PASS ✅
-  ```
-<<<<<<< HEAD
-* `pnpm lint`
-  ```text
-  > balance-control-monorepo@0.0.0 lint D:\__DEV\balance_control-anitgravity
-  > eslint "packages/**/*.{ts,tsx,js,cjs,mjs}" "scripts/**/*.{js,cjs,mjs}" "*.{js,cjs,mjs}"
-
-  =============
-
-  WARNING: You are currently running a version of TypeScript which is not officially supported by @typescript-eslint/typescript-estree.
-
-  You may find that it works just fine, or you may not.
-
-  SUPPORTED TYPESCRIPT VERSIONS: >=4.7.4 <5.6.0
-
-  YOUR TYPESCRIPT VERSION: 5.9.3
-
-  Please only submit bug reports when using the officially supported version.
-
-  =============
-  ```
-* `pnpm test`
-  ```text
-
-  > balance-control-monorepo@0.0.0 test D:\__DEV\balance_control-anitgravity
-  > pnpm -r --if-present test
-
-  Scope: 9 of 10 workspace projects
-  [52 lines collapsed]
-  │  ✓ test/resolver.test.ts  (6 tests) 9ms
-  │ stdout | test/resolver.test.ts > EffectResolver cost and production behavior > should apply PingPong reduction after produc…
-  │ Expansion registered: PingPongModExp
-  │  ✓ test/controller-fallback-hardening.test.ts  (3 tests) 5ms
   │  ✓ test/computeMajorirty.test.ts  (4 tests) 5ms
   │  ✓ test/production-uncontrolled.test.ts  (1 test) 3ms
   │  Test Files  20 passed (20)
   │       Tests  74 passed (74)
-  │    Start at  08:26:46
-  │    Duration  26.69s (transform 5.41s, setup 2ms, collect 45.25s, tests 1.49s, environment 4ms, prepare 54.00s)
-  └─ Done in 29.2s
+  │    Start at  08:51:45
+  │    Duration  28.48s (transform 6.63s, setup 4ms, collect 54.86s, tests 1.70s, environment 5ms, prepare 56.76s)
+  └─ Done in 31.4s
   packages/client-web test$ vitest run
   │  RUN  v0.30.1 D:/__DEV/balance_control-anitgravity/packages/client-web
-  │  ✓ test/Board.test.tsx  (1 test) 2ms
-  │  ✓ test/controls-start-committee.test.tsx  (1 test) 22ms
+  │  ✓ test/Board.test.tsx  (1 test) 3ms
+  │  ✓ test/controls-start-committee.test.tsx  (1 test) 23ms
   │  Test Files  2 passed (2)
   │       Tests  2 passed (2)
-  │    Start at  08:27:15
-  │    Duration  21.98s (transform 96ms, setup 0ms, collect 1.54s, tests 24ms, environment 12.80s, prepare 1.68s)
-  └─ Done in 24.6s
+  │    Start at  08:52:17
+  │    Duration  23.10s (transform 111ms, setup 0ms, collect 1.67s, tests 26ms, environment 13.51s, prepare 1.47s)
+  └─ Done in 25.9s
   ```
-* `node scripts/verify-task.mjs 0039` (failed: task markdown not found)
-=======
->>>>>>> 43834fce60bfdda3dee893314eddcfd8e2414fd5
+* `node scripts/verify-task.mjs 0039a`
+  ```text
+  [verify-task] OK: Section "Work Summary" present.
+  [verify-task] OK: Section "Commands Run" present.
+  [verify-task] OK: Latest commit format + task file inclusion OK (task(0039a): update task file resolution).
+
+  [verify-task] PASS ✅
+  ```
+* `git show -1 --stat`
+  ```text
+  Author: Björn Ahlers <rewired.de@gmail.com>
+  Date:   Sat Feb 14 08:55:19 2026 +0100
+
+      task(0039a): update task file resolution
+
+      - align task lookup with taskId-name convention
+
+      - accept optional letter suffix ids and resolve commit checks
+
+      - refresh task doc naming and command log
+
+   docs/tasks/0039a-verify_task_guard.md | 241 ++++------------------------------
+   scripts/verify-task.mjs               |  51 +++++--
+   2 files changed, 65 insertions(+), 227 deletions(-)
+  ```
