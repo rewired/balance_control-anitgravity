@@ -40,5 +40,5 @@
 - [x] Task 0038 - Spec Anchor Registry + Tripwire (ID Existence Enforcement)
 - [x] Task 0039 - Ruleset Version Manifest + Replay/State Stamping
 - [x] Task 0039a - Verify Task Guard (scripts/verify-task.mjs)
-- [ ] Task 0040 - CORE-01 Compliance Invariants (High-Risk Rules as Tests)
+- [x] Task 0040 - CORE-01 Compliance Invariants (High-Risk Rules as Tests)
 - [x] Task 0041 - "Spec Audit" Command + CI Gate
