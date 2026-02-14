@@ -232,6 +232,54 @@ body {
     border-color: rgba(255,255,255,0.5);
 }
 
+.hex-board {
+    position: relative;
+    margin: 0 auto;
+}
+
+.hex-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.hex-layer-tiles {
+    z-index: 1;
+}
+
+.hex-layer-ghosts {
+    z-index: 2;
+}
+
+.hex-cell {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+}
+
+.hex-ghost {
+    border: 1px dashed rgba(6, 182, 212, 0.45);
+    background: rgba(6, 182, 212, 0.08);
+    color: var(--text-secondary);
+    border-radius: 12px;
+    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+    transition: all 0.2s ease;
+}
+
+.hex-ghost:hover {
+    border-color: rgba(6, 182, 212, 0.8);
+    box-shadow: 0 0 18px rgba(6, 182, 212, 0.35);
+    color: var(--text-primary);
+}
+
+.hex-ghost:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
 .player-info {
     display: flex;
     align-items: center;
