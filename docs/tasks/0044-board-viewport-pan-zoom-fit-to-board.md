@@ -185,30 +185,6 @@ Update `packages/client-web/src/components/GameLayout.tsx`:
 
   =============
   ```
-<<<<<<< HEAD
-- `git status -u`
-  ```text
-  On branch main
-  Your branch is up to date with 'origin/main'.
-  Changes not staged for commit:
-    (use "git add <file>..." to update what will be committed)
-    (use "git restore <file>..." to discard changes in working directory)
-          modified:   CHANGELOG.md
-          modified:   docs/PR_TASK_LIST.md
-          modified:   docs/tasks/0044-board-viewport-pan-zoom-fit-to-board.md
-          modified:   packages/client-web/package.json
-          modified:   packages/client-web/src/components/GameLayout.tsx
-          modified:   packages/client-web/src/components/HexBoard.tsx
-          modified:   packages/client-web/src/index.css
-          modified:   packages/client-web/src/ui/hexLayout.ts
-          modified:   pnpm-lock.yaml
-
-  Untracked files:
-    (use "git add <file>..." to include in what will be committed)
-          packages/client-web/src/components/BoardViewport.tsx
-          packages/client-web/src/ui/fitToBounds.ts
-          packages/client-web/test/fitToBounds.test.ts
-=======
 - `git switch -c task/0044-board-viewport-pan-zoom`
   ```text
   ```
@@ -218,23 +194,11 @@ Update `packages/client-web/src/components/GameLayout.tsx`:
     (use "git add <file>..." to update what will be committed)
     (use "git restore <file>..." to discard changes in working directory)
           modified:   docs/tasks/0044-board-viewport-pan-zoom-fit-to-board.md
->>>>>>> d8d692b2a935ede04ba2c45a794ce5d29222fd48
 
   no changes added to commit (use "git add" and/or "git commit -a")
   ```
 - `git diff --stat`
   ```text
-<<<<<<< HEAD
-   docs/PR_TASK_LIST.md                               |  1 +
-   .../0044-board-viewport-pan-zoom-fit-to-board.md   | 32 +++++++++------
-   packages/client-web/package.json                   |  3 +-
-   packages/client-web/src/components/GameLayout.tsx  |  4 +-
-   packages/client-web/src/components/HexBoard.tsx    | 20 ++--------
-   packages/client-web/src/index.css                  | 33 +++++++++++++++-
-   packages/client-web/src/ui/hexLayout.ts            | 46 +++++++++++++++++++---
-   pnpm-lock.yaml                                     | 15 +++++++
-   9 files changed, 117 insertions(+), 38 deletions(-)
-=======
    1 file changed, 30 insertions(+)
   ```
 - `$env:GIT_PAGER='cat'; git --no-pager show -1 --stat`
@@ -282,5 +246,4 @@ Update `packages/client-web/src/components/GameLayout.tsx`:
    create mode 100644 packages/client-web/src/components/BoardViewport.tsx
    create mode 100644 packages/client-web/src/ui/fitToBounds.ts
    create mode 100644 packages/client-web/test/fitToBounds.test.ts
->>>>>>> d8d692b2a935ede04ba2c45a794ce5d29222fd48
   ```
