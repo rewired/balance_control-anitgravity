@@ -3,7 +3,7 @@ import type { GameState } from '@balance-control/rules';
 import { enumerateLegalIntents, type LegalIntent } from '@balance-control/game';
 import { Zone } from './Zone';
 import { Controls } from './Controls';
-import { HexBoard } from './HexBoard';
+import { BoardViewport } from './BoardViewport';
 
 interface GameLayoutProps {
     G: GameState;
@@ -58,7 +58,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
             {/* Center: Board */}
             <main className="center-panel glass-panel">
                 <h3>Board</h3>
-                <HexBoard
+                <BoardViewport
                     G={G}
                     moves={moves}
                     intents={intents}
