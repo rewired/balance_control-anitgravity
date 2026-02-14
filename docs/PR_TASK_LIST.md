@@ -28,7 +28,7 @@
 - [x] Task 0026 - Enumerate Legal Intents (Canonical)
 - [x] Task 0027 - Client-Web Intent-Driven UI
 - [x] Task 0028 - PendingChoice Intent Priority
-- [ ] Task 0029 - Network Mode Baseline (Client + Server) + PlayerView Guardrails
+- [x] Task 0029 - Network Mode Baseline (Client + Server) + PlayerView Guardrails
 - [x] Task 0030 - Deterministic Move Log + Replay Export
 - [x] Task 0031 - CORE-01 v1.0.20 Inventory + Delta Map
 - [x] Task 0032 - Meta-Marker State + Round Return

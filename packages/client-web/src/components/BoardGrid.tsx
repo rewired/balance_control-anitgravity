@@ -7,6 +7,7 @@ interface BoardGridProps {
     G: GameState;
     moves: any;
     intents: LegalIntent[];
+    isInteractive: boolean;
     selectedTileId?: string | null;
     onSelectTile?: (tileId: string) => void;
 }
@@ -15,6 +16,7 @@ export const BoardGrid: React.FC<BoardGridProps> = ({
     G,
     moves,
     intents,
+    isInteractive,
     selectedTileId,
     onSelectTile
 }) => {
@@ -36,14 +38,14 @@ export const BoardGrid: React.FC<BoardGridProps> = ({
                 const tileId = G.grid[coordStr];
                 const tile = G.tiles[tileId];
                 const isSelected = selectedTileId === tileId;
-                const disabled = false;
+                const disabled = !isInteractive;
                 const tooltip = `coord ${coordStr}`;
                 return (
                     <div key={coordStr} className="board-cell">
                         <Tile
                             tileId={tileId}
                             G={G}
-                            onClick={() => onSelectTile && onSelectTile(tileId)}
+                            onClick={disabled ? undefined : () => onSelectTile && onSelectTile(tileId)}
                             selected={isSelected}
                             disabled={disabled}
                             tooltip={tooltip}
@@ -61,7 +63,8 @@ export const BoardGrid: React.FC<BoardGridProps> = ({
                     <button
                         key={`ghost-${coordStr}`}
                         className="ghost-cell"
-                        onClick={() => moves[intent.moveType](intent.payload)}
+                        disabled={!isInteractive}
+                        onClick={!isInteractive ? undefined : () => moves[intent.moveType](intent.payload)}
                         data-testid={`ghost-${coordStr}`}
                         title={`Place at ${coordStr}`}
                     >

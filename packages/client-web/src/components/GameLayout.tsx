@@ -62,6 +62,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     G={G}
                     moves={moves}
                     intents={intents}
+                    isInteractive={isActive}
                     selectedTileId={selectedTileId}
                     onSelectTile={setSelectedTileId}
                 />

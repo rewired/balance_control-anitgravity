@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Client: added network transport switch, connection status, and playerView guardrails.
 - Tests: added core compliance invariants and a golden replay covering hotspot, convert penalty, and ping-pong reduction.
 - Docs: migrated canonical CORE ruleset reference to v1.1.0 and retained v1.0.26 in legacy for audit.
 - Tooling: added a baseline ESLint configuration and updated lint targets so `pnpm run lint` works reliably in CI.
