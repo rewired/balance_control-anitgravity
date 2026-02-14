@@ -18,6 +18,42 @@ Primary Architecture Contracts:
 
 ---
 
+## Execution Protocol (Non-Negotiable)
+
+You must execute this task end-to-end. You are NOT DONE until every item below is completed.
+
+### 1) Progress Discipline
+- Treat every section of this task as mandatory.
+- If a section is not applicable, write "N/A" explicitly (do not omit).
+
+### 2) PR Checklist is a Repo Artifact
+- Update `docs/tasks/TASK_XXXX.md`:
+  - Fill the "PR Checklist" by checking the boxes.
+  - Add a short "Work Summary" (3-7 bullets).
+  - Add "Commands Run" with exact commands and outcomes.
+
+### 3) Postflight Proof (must be produced)
+Run and record outputs (copy/paste into `docs/tasks/TASK_XXXX.md`):
+- `git status`
+- `git diff --stat`
+- project tests (e.g. `pnpm test` or `pnpm vitest run`)
+
+### 4) Single Meaningful Commit (required)
+- Create exactly ONE commit on a dedicated branch.
+- Commit message MUST follow:
+  - Subject: `task(XXXX): <imperative summary>`
+  - Body: 2-6 bullet points describing what changed and why.
+- Commit must include the updated `docs/tasks/TASK_XXXX.md`.
+- After commit, include proof:
+  - `git show -1 --stat`
+
+### 5) Failure Mode
+If any requirement above cannot be satisfied, STOP and explain why.
+Do not mark the task as complete.
+
+
+---
+
 # 0. Non-Negotiables
 
 ## 0.1 Rules are Source of Truth

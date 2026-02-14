@@ -68,8 +68,8 @@ Patterns to support (examples):
 - Introducing a fake rule reference anywhere in repo fails CI with a clear error.
 
 ## PR Checklist
-- [ ] Generator implemented and deterministic
-- [ ] Generated registry committed (or explicitly generated in CI, but pick one and enforce)
-- [ ] Tripwire test added
-- [ ] Docs updated
-- [ ] CI green
+- [x] Generator implemented and deterministic
+- [x] Generated registry committed (or explicitly generated in CI, but pick one and enforce)
+- [x] Tripwire test added
+- [x] Docs updated
+- [x] CI green

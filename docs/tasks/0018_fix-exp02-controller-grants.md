@@ -1,16 +1,16 @@
 # Codex Task 0018 — Fix EXP-02 `CONTROLLER` grants: add explicit `missingController` policy (no throws)
 
-**Date:** 2026-02-12  
+**Date:** 2026-02-12
 **Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)
 
 **Primary contract:** `AGENTS.md` (repo root)
 
 **Key anchors (ASCII only):**
-- Determinism: AGENTS 0.2  
-- Rules anchoring & no drift: AGENTS 0.1, 0.5, 0.6  
-- Canonical resolver: AGENTS 3.5, 3.6  
-- Expansions modular + isolation: AGENTS 3.4, 3.8, 5.4, 5.5  
-- Tests + golden replays + hashing: AGENTS 5.1–5.3  
+- Determinism: AGENTS 0.2
+- Rules anchoring & no drift: AGENTS 0.1, 0.5, 0.6
+- Canonical resolver: AGENTS 3.5, 3.6
+- Expansions modular + isolation: AGENTS 3.4, 3.8, 5.4, 5.5
+- Tests + golden replays + hashing: AGENTS 5.1–5.3
 
 ---
 
@@ -28,8 +28,8 @@ This task is a **compatibility fix** for EXP-02 under the new resolver semantics
 
 ## Goal
 
-1) Ensure **every** EXP-02 `resource.grant` atom targeting `CONTROLLER` declares explicit missing-controller behavior.  
-2) Default intent for EXP-02: if no controller exists, the grant must **not** occur (**SKIP**, not NOISE).  
+1) Ensure **every** EXP-02 `resource.grant` atom targeting `CONTROLLER` declares explicit missing-controller behavior.
+2) Default intent for EXP-02: if no controller exists, the grant must **not** occur (**SKIP**, not NOISE).
 3) Add a regression test that proves EXP-02 does not crash on uncontrolled tiles under the hardened resolver.
 
 ---
@@ -57,7 +57,7 @@ In EXP-02 sources (typically `packages/expansion-02/src/index.ts` plus any submo
 - `missingController: 'SKIP'`
 
 Notes:
-- Applies to positive and negative grant amounts (reductions).  
+- Applies to positive and negative grant amounts (reductions).
 - If there is no controller, there is nothing to reduce: **SKIP** is correct.
 
 ### B) Regression test
@@ -104,9 +104,9 @@ Test requirements:
 
 ## Acceptance Criteria
 
-1) There are **zero** EXP-02 `resource.grant` atoms with `playerId: 'CONTROLLER'` lacking `missingController`.  
-2) New test `exp02-controller-grants-no-throw` passes and fails on prior EXP-02 (pre-fix) behavior due to throw.  
-3) Full test suite passes.  
+1) There are **zero** EXP-02 `resource.grant` atoms with `playerId: 'CONTROLLER'` lacking `missingController`.
+2) New test `exp02-controller-grants-no-throw` passes and fails on prior EXP-02 (pre-fix) behavior due to throw.
+3) Full test suite passes.
 4) Docs updated: Task file + PR task list + changelog.
 
 ---
@@ -116,7 +116,7 @@ Test requirements:
 - [x] Updated all EXP-02 `resource.grant` atoms targeting `CONTROLLER` to include `missingController: 'SKIP'`
 - [x] Added deterministic regression test covering uncontrolled tile scenario under EXP-02
 - [x] Verified no implicit NOISE grants occur from these atoms
-- [ ] `pnpm test` (repo standard) passes
+- [x] `pnpm test` (repo standard) passes
 - [x] `CHANGELOG.md` updated under Unreleased
 - [x] `docs/PR_TASK_LIST.md` updated
 - [x] Added `docs/tasks/0018_fix-exp02-controller-grants.md` and completed checklist after implementation

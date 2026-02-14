@@ -61,10 +61,10 @@ This enables long-term auditing ("was that bug under v1.0.26 or v1.1.0?") withou
 - Backward-compat replay fixtures still pass.
 
 ## PR Checklist
-- [ ] Manifest added
-- [ ] State stamping implemented
-- [ ] Replay stamping implemented
-- [ ] Backward-compat handled
-- [ ] Tests updated + new golden fixture
-- [ ] Changelog updated
-- [ ] CI green
+- [x] Manifest added
+- [x] State stamping implemented
+- [x] Replay stamping implemented
+- [x] Backward-compat handled
+- [x] Tests updated + new golden fixture
+- [x] Changelog updated
+- [x] CI green

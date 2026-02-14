@@ -126,7 +126,7 @@ for the `CONTROLLER` case.
 - [x] Added tripwire test `tripwire-controller-grants-policy.test.ts`
 - [x] Traversal covers core + all three expansions (01/02/03)
 - [x] Failure messages are actionable (package + stable id)
-- [ ] `pnpm test` (repo standard) passes
+- [x] `pnpm test` (repo standard) passes
 - [x] `CHANGELOG.md` updated under Unreleased
 - [x] `docs/PR_TASK_LIST.md` updated
 - [x] Added `docs/tasks/0020_tripwire-controller-grants-policy.md` and completed checklist after implementation

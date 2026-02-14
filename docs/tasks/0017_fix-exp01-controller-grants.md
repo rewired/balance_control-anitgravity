@@ -125,7 +125,7 @@ Keep the test deterministic and minimal.
 * [x] Updated all EXP-01 `resource.grant` atoms targeting `CONTROLLER` to include `missingController: 'SKIP'`
 * [x] Added deterministic regression test covering uncontrolled tile scenario under EXP-01
 * [x] Verified no NOISE fallback grants occur from these atoms
-* [ ] `pnpm test` (repo standard) passes
+* [x] `pnpm test` (repo standard) passes
 * [x] `CHANGELOG.md` updated under Unreleased
 * [x] `docs/PR_TASK_LIST.md` updated
 * [x] Added `docs/tasks/0017_fix-exp01-controller-grants.md` and completed checklist after implementation
