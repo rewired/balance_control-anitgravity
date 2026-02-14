@@ -3,7 +3,7 @@
 # CORE-01 Simulation Specification (Atomic, Deterministic)
 
 Version: 01
-Scope: Core Rules v1.0.24 only with variants (no expansions)
+Scope: Core Rules v1.0.25 only with variants (no expansions)
 
 ---
 
@@ -36,6 +36,7 @@ CORE-01-00-03A Influence Tile Attachment Invariant: Each Influence object in Boa
 CORE-01-00-04 Resource zones are: PersonalSupply, Bank, Noise.
 CORE-01-00-04A Bank Supply Invariant: The Bank is an unlimited source and sink for Resources. Whenever a rule instructs moving N Resources of a resort from Bank to another zone, the engine MUST create those N Resource objects in Bank (if not already represented) and then move them. Bank availability never restricts production or legality
 CORE-01-00-05 Tile zones are: DrawPile, Board, DiscardFaceUp.
+CORE-01-00-05A Ordered Zone Conventions (Canonical): DrawPile and DiscardFaceUp are ordered lists. 'Top of DrawPile' means the first element of the DrawPile list; 'bottom of DrawPile' means the last element. Whenever a Tile is moved to DiscardFaceUp, append it to the end of the DiscardFaceUp list.
 CORE-01-00-06 No object may exist in multiple zones simultaneously.
 CORE-01-00-07 The board uses a topology parameter that defines adjacency between Tiles.
 CORE-01-00-08 Any rule that references adjacency uses the current topology’s adjacency definition.
@@ -122,6 +123,7 @@ CORE-01-03-02 Setup shuffles all non-Start tiles into DrawPile.
 CORE-01-03-02A Deterministic Randomness Contract
 All randomization in CORE-01 (shuffles, starting player selection) MUST use a deterministic RNG seeded at game start, and the seed MUST be part of the initial game state.
 CORE-01-03-02A.1 Canonical Shuffle Algorithm: ‘Shuffle’ means Fisher–Yates shuffle over the list from last index down to 1, swapping index i with index j where j = RNG.nextInt(i+1).
+CORE-01-03-02A.1A Shuffle Scope (Canonical): Any rule in this specification that instructs to 'shuffle' (including VAR-01-01-05) MUST use the Fisher–Yates algorithm defined in CORE-01-03-02A.1 and MUST consume randomness from the same deterministic RNG instance seeded at game start (CORE-01-03-02A).
 CORE-01-03-02A.2 Canonical RNG Call Order (Setup): During Setup, perform the DrawPile shuffle (CORE-01-03-02) first. Immediately after that shuffle completes, determine the starting player by k = RNG.nextInt(playerCount), where k is the starting seat index.
 CORE-01-03-02B Canonical Pre-Shuffle Ordering: Before any shuffle, build the initial DrawPile list in a canonical total order using these keys:
 (1) TileTypeOrder where ResortTiles < Committees < Grassroots < Lobbyists < Hotspots.
@@ -170,7 +172,7 @@ CORE-01-04-12B PlaceOrMoveInfluence (Move) Ping-Pong Penalty (Meta-Marker): If, 
 Let R be the total count of Resource objects in PersonalSupply[activePlayer] at that moment. Let N = min(10, floor(R / 2)).
 If N > 0, the active player chooses any N Resources from PersonalSupply[activePlayer] and moves them to Noise. This choice is locked before any movement occurs.
 
-CORE-01-04-12C PlaceOrMoveInfluence (Move) Meta-Marker Expiry: Delete. (Meta-Marker persistence is governed by CORE-01-07-03A/B and CORE-01-04-09A.)”
+CORE-01-04-12C PlaceOrMoveInfluence (Move) Meta-Marker Expiry: Reserved. (Meta-Marker persistence is governed by CORE-01-07-03A/B and CORE-01-04-09A.)
 
 CORE-01-04-13 FormalizeInfluence may be chosen as the Political Action.
 CORE-01-04-14 FormalizeInfluence is performed via a Committee tile.
@@ -182,6 +184,7 @@ CORE-01-04-14B Start Committee Formalize — Legality and Failure: Selecting the
 (d) the Influence Cap Check in CORE-01-08-10A passes.
 If any condition (a)–(d) is not satisfied, the action is invalid and does not resolve; no state change occurs (CORE-01-06-00-03).
 CORE-01-04-15 FormalizeInfluence (Standard Committee) cost requires paying 2 Resources of different resorts.
+CORE-01-04-15A FormalizeInfluence Declaration + Atomic Payment (Canonical): The active player MUST declare the two paid Resources (their resorts) before any Resource movement occurs; this declaration is locked for the resolution. Payment is simultaneous; if the declared cost cannot be fully paid, FormalizeInfluence fails and does not resolve; no state change occurs (CORE-01-06-00-03).
 CORE-01-04-16 FormalizeInfluence (Standard Committee) moves paid Resources from the active player’s PersonalSupply to Bank.
 CORE-01-04-17 FormalizeInfluence (Standard Committee) creates exactly one new Influence in the active player’s PersonalSupply.
 CORE-01-04-17A Influence Cap Check
@@ -203,7 +206,7 @@ CORE-01-04-22D ConvertResources Convert Anchor Selection: When resolving Convert
 This selected tile is the Convert Anchor for this ConvertResources resolution.
 CORE-01-04-22E ConvertResources Meta-Marker Placement: After a successful ConvertResources resolution, place the active player’s Meta-Marker onto the selected Convert Anchor tile and set its mode to Convert.
 If the Meta-Marker was previously on another Tile, remove it from that Tile.
-CORE-01-04-22F ConvertResources Meta-Marker Expiry: Delete. (Meta-Marker persistence/return is governed by CORE-01-07-03A/B and CORE-01-04-09A.)”
+CORE-01-04-22F ConvertResources Meta-Marker Expiry: Reserved. (Meta-Marker persistence/return is governed by CORE-01-07-03A/B and CORE-01-04-09A.)
 CORE-01-04-22G Grassroots ConvertRecipe Requirement: For engine implementations, each Grassroots Tile MUST provide a machine-readable ConvertRecipe descriptor (inputs + outputs) that exactly matches its printed text.
 If the selected Grassroots Tile has no ConvertRecipe descriptor, ConvertResources is invalid and does not resolve (CORE-01-06-00-03).
 CORE-01-04-22H Core Grassroots Definitions (Normative): The CORE-01 ruleset MUST include a complete normative definition for every Grassroots Tile used in CORE-01 (including ADD56-01 additions): (a) its printed text, and (b) its machine-readable ConvertRecipe (inputs + outputs).
@@ -232,6 +235,7 @@ Variant B (Off-Type 3:1):
 Inputs: 3× Resource(any resort)
 Outputs: 1× Resource(output resort chosen by the active player, where output resort ∈ {DOM, FOR, INF} and output resort ≠ T)
 Legality constraint: If the declared output resort equals T, Variant B is illegal and Variant A MUST be used.
+CORE-01-04-22L.1 Illegal Declaration Handling (Canonical): If the active player declares an illegal ConvertRecipe variant or an illegal output resort (including declaring Variant B with output resort = T), ConvertResources is invalid and does not resolve; no state change occurs (CORE-01-06-00-03).
 
 ---
 
@@ -303,12 +307,12 @@ If multiple Hotspots are fully surrounded as a result of the same Tile placement
 If resolving one Hotspot affects Influence availability for later Hotspots, later Hotspots resolve using the updated state.
 CORE-01-06-03B Hotspot Single-Resolution Invariant: Each Hotspot Tile resolves at most once per game.
 Immediately after each successful Tile placement (CORE-01-06-02), the engine MUST evaluate all Hotspots in Board that are not yet resolved. Any such Hotspot that is fully surrounded (CORE-01-06-01) MUST resolve now (ordered per CORE-01-06-03A).
-After a Hotspot resolution attempt (including cases where no Influence can be placed due to CORE-01-06-07), mark that Hotspot as resolved; it MUST NOT resolve again.
+After a Hotspot resolution attempt (including cases where no Influence can be placed due to CORE-01-06-07, or where step (c) in CORE-01-06-04 prohibits step (d)), mark that Hotspot as resolved; it MUST NOT resolve again. This resolved-marking is an explicit state change permitted even if the Hotspot places no Influence.
 CORE-01-06-04 Hotspot resolution follows this order:
 (a) Apply any pre-majority effects explicitly defined as occurring “before majority determination.”
 (b) Determine majority on that Hotspot.
-(c) Resolve majority outcome (only after completing step (d); if step (d) prohibits this effect, do not execute step (c)).
-(d) Evaluate any applicable effect modifiers and prohibitions according to Rule Hierarchy. If any prohibition applies, Hotspot resolution does not resolve and no state change occurs (CORE-01-06-00-03).
+(c) Evaluate any applicable effect modifiers and prohibitions according to Rule Hierarchy. If any prohibition applies, do not execute step (d).
+(d) Resolve majority outcome: If a player has majority, attempt to place exactly one Influence for that player per CORE-01-06-05 through CORE-01-06-07; otherwise do nothing.
 CORE-01-06-05 If a player has majority on the Hotspot, place exactly one Influence on that Hotspot for the majority player.
 CORE-01-06-06 Hotspot placement moves one Influence from that player’s PersonalSupply to the Hotspot Tile in Board.
 CORE-01-06-07 If the majority player has no available Influence in PersonalSupply, Hotspot placement cannot occur.
@@ -317,7 +321,7 @@ CORE-01-06-08 Hotspots do not produce Resources.
 CORE-01-06-09 Resort Production is resolved only during Round Settlement.
 CORE-01-06-10 Each ResortTile has a printed production value.
 CORE-01-06-11 When resolving Resort Production, the produced Resource amount is the production output computed by CORE-01-06-16(a), and the receiving player(s) are determined by CORE-01-06-16(b)/(c)
-CORE-01-06-12 Produced Resources are moved from Bank to the controlling player’s PersonalSupply.
+CORE-01-06-12 Produced Resources are moved from Bank to the production winner(s) determined by CORE-01-06-16(b)/(c).
 CORE-01-06-13 If the highest totalInfluence on a ResortTile is 0, that ResortTile produces 0 Resources.
 CORE-01-06-13A Definition — totalInfluence for Production: For Resort Production, ‘totalInfluence’ is computed exactly as in CORE-01-05-03A step (1) for that ResortTile (Influence on the Tile plus applicable modifiers).
 CORE-01-06-14 If two or more players tie for highest totalInfluence on a ResortTile and that highest totalInfluence is > 0, divide the produced Resources evenly among those tied players.
@@ -456,10 +460,12 @@ ADD56-01-01-10 Add INF-W4 ×1 to DrawPile.
 ADD56-01-01-11 Add Committee ×2 to DrawPile.
 ADD56-01-01-12 Add Lobbyist ×3 to DrawPile.
 ADD56-01-01-13 Add Grassroots ×2 to DrawPile.
+ADD56-01-01-13A Added Grassroots Identity (Normative): The 2 additional Grassroots tiles are: Untyped ×2. These tiles follow CORE-01-04-22L with their printed type tags substituted.
 
 ADD56-01-01-14 Add Hotspot (DOM) ×1 to DrawPile.
 ADD56-01-01-15 Add Hotspot (FOR) ×1 to DrawPile.
 ADD56-01-01-16 These Hotspot labels do not modify Hotspot resolution rules.
+ADD56-01-01-16A Hotspot Label Non-Semantics (Canonical): The '(DOM)'/'(FOR)' labels are informational only and do not assign a Resort attribute. For Canonical Pre-Shuffle Ordering (CORE-01-03-02B key (2)), all Hotspots have ResortOrder = None unless a rule explicitly defines a Resort attribute for that Hotspot.
 
 ADD56-01-02-01 For 5 players, assign 2 Influence objects to each player’s PersonalSupply during setup.
 ADD56-01-02-02 For 6 players, assign 2 Influence objects to each player’s PersonalSupply during setup.
