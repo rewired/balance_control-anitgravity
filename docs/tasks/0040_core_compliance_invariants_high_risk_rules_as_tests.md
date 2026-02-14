@@ -74,7 +74,79 @@ Add/extend tests covering at least the following invariant families:
   - convert-repeat penalty edge case
 
 ## PR Checklist
-- [ ] Invariant tests added
-- [ ] Golden fixtures added/updated
-- [ ] Changelog updated
+- [x] Invariant tests added
+- [x] Golden fixtures added/updated
+- [x] Changelog updated
 - [ ] CI green
+
+## Work Summary
+- Added invariant coverage for zone exclusivity, influence caps, and hotspot majority behavior.
+- Added golden replay fixture for hotspot/convert/ping-pong and updated hash handling.
+- Updated expected hash for the new golden fixture and noted changes in the changelog.
+
+## Commands Run
+- `pnpm -C packages/game test -- golden-replay.test.ts` (fail: TBD hash + zone exclusivity; rerun pass)
+- `pnpm lint` (first run failed due to terminal noise; rerun pass with TypeScript version warning)
+- `pnpm -r build` (pass)
+- `pnpm test` (pass)
+- `git status`
+- `git diff --stat`
+
+## Postflight Proof
+
+### git status
+```
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   CHANGELOG.md
+        modified:   packages/game/test/computeMajorirty.test.ts
+        modified:   packages/game/test/golden-replay.test.ts
+        modified:   packages/game/test/moves.test.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        packages/game/test/golden/core_hotspot_convert_pingpong.json
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+### git diff --stat
+```
+ CHANGELOG.md                                |  1 +
+ packages/game/test/computeMajorirty.test.ts | 11 ++++
+ packages/game/test/golden-replay.test.ts    | 87 ++++++++++++++++++++++-------
+ packages/game/test/moves.test.ts            | 84 ++++++++++++++++++++++++++++
+ 4 files changed, 162 insertions(+), 21 deletions(-)
+```
+
+### pnpm test
+```
+> balance-control-monorepo@0.0.0 test D:\__DEV\balance_control-anitgravity
+> pnpm -r --if-present test
+
+Scope: 9 of 10 workspace projects
+[54 lines collapsed]
+│  ✓ test/exp02-hotspot-ids.test.ts  (1 test) 4ms
+│ stdout | test/exp02-hotspot-ids.test.ts > EXP-02 Inner Order hotspot id consistency > should resolve HOTSPOT_RESOLUTION for the setup Inner …
+│ Expansion registered: EXP-02 Security & Order
+│ EXP-02 Setup Complete.
+│  ✓ test/controller-fallback-hardening.test.ts  (3 tests) 5ms
+│  ✓ test/production-uncontrolled.test.ts  (1 test) 3ms
+│  Test Files  20 passed (20)
+│       Tests  81 passed (81)
+│    Start at  16:23:40
+│    Duration  26.09s (transform 5.56s, setup 2ms, collect 44.20s, tests 1.51s, environment 4ms, prepare 53.05s)
+└─ Done in 28.4s
+packages/client-web test$ vitest run
+│  RUN  v0.30.1 D:/__DEV/balance_control-anitgravity/packages/client-web
+│  ✓ test/Board.test.tsx  (1 test) 3ms
+│  ✓ test/controls-start-committee.test.tsx  (1 test) 20ms
+│  Test Files  2 passed (2)
+│       Tests  2 passed (2)
+│    Start at  16:24:08
+│    Duration  21.49s (transform 127ms, setup 0ms, collect 1.53s, tests 23ms, environment 12.45s, prepare 1.81s)
+└─ Done in 24s
+```

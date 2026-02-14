@@ -19,6 +19,18 @@ describe('Moves', () => {
     const countOwnedInfluence = () =>
         Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === 'p1').length;
 
+    const assertZoneExclusivity = (state: GameState) => {
+        const membership: Record<string, number> = {};
+        for (const zone of Object.values(state.zones)) {
+            for (const itemId of zone.items) {
+                membership[itemId] = (membership[itemId] || 0) + 1;
+            }
+        }
+        for (const objectId of Object.keys(state.objects)) {
+            expect(membership[objectId]).toBe(1);
+        }
+    };
+
     beforeEach(() => {
         events = { endTurn: () => { }, endStage: () => { } };
         G = {
@@ -145,6 +157,16 @@ describe('Moves', () => {
         expect(G.objects.meta_p1.expiresRound).toBe(4);
     });
 
+    it('moveInfluence should preserve zone exclusivity', () => {
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones.board_t1.items.push('inf_1');
+
+        const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+
+        expect(result).not.toBe(INVALID_MOVE);
+        assertZoneExclusivity(G);
+    });
+
     it('moveInfluence should reject Start Committee as source or destination', () => {
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_start.items.push('inf_1');
@@ -224,6 +246,22 @@ describe('Moves', () => {
         expect(G.objects[newInfId].type).toBe('Influence');
     });
 
+    it('formalizeInfluence should ignore prohibitions on Start Committee', () => {
+        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'res_inf', 'res_dom_2'];
+        G.engine.attributes.prohibitions = { 'influence.formalize': true };
+
+        const result = CoreMoves.formalizeInfluence(
+            { G, ctx, events },
+            { committeeTileId: 'board_start', paymentResourceIds: ['res_dom', 'res_for', 'res_inf', 'res_dom_2'] }
+        );
+
+        expect(result).not.toBe(INVALID_MOVE);
+        expect(G.zones.Bank.items).toContain('res_dom');
+        expect(G.zones.Bank.items).toContain('res_for');
+        expect(G.zones.Bank.items).toContain('res_inf');
+        expect(G.zones.Bank.items).toContain('res_dom_2');
+    });
+
     it('convertResources should follow grassroots conversion spec without formalizing influence', () => {
         G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1'];
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
@@ -297,6 +335,52 @@ describe('Moves', () => {
         expect(G.zones.board_gr.items).toContain('meta_p1');
         expect(G.objects.meta_p1.mode).toBe('Convert');
         expect(G.objects.meta_p1.expiresRound).toBe(6);
+    });
+
+    it('convertResources should preserve zone exclusivity', () => {
+        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1', 'meta_p1'];
+        G.zones.Bank.items = ['res_inf_bank', 'res_dom_2', 'res_inf'];
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones.board_gr.items.push('inf_1');
+
+        const result = CoreMoves.convertResources(
+            { G, ctx, events },
+            { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'], outputResort: 'INF' }
+        );
+
+        expect(result).not.toBe(INVALID_MOVE);
+        assertZoneExclusivity(G);
+    });
+
+    it('formalizeInfluence should allow up to cap for 5 players', () => {
+        ctx.numPlayers = 5;
+        seedPlayerInfluenceAtCap();
+
+        const result = CoreMoves.formalizeInfluence(
+            { G, ctx, events },
+            { committeeTileId: 'board_t2', paymentResourceIds: ['res_dom', 'res_for'] }
+        );
+
+        expect(result).not.toBe(INVALID_MOVE);
+        expect(countOwnedInfluence()).toBe(8);
+    });
+
+    it('formalizeInfluence should reject at cap for 5 players without mutation', () => {
+        ctx.numPlayers = 5;
+        for (let i = 2; i <= 8; i++) {
+            const infId = `inf_cap_${i}`;
+            G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
+            G.zones.board_t1.items.push(infId);
+        }
+
+        const before = JSON.stringify(G);
+        const result = CoreMoves.formalizeInfluence(
+            { G, ctx, events },
+            { committeeTileId: 'board_t2', paymentResourceIds: ['res_dom', 'res_for'] }
+        );
+
+        expect(result).toBe(INVALID_MOVE);
+        expect(JSON.stringify(G)).toBe(before);
     });
 
     it('placeInfluence should reject malformed payload without mutation', () => {

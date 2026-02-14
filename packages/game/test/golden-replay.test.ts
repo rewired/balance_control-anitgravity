@@ -25,12 +25,26 @@ interface GoldenFixture {
     expectedFinalHash: string;
 }
 
-interface PreludeAction {
-    action: 'stackDrawPileByType';
-    tileType: TileType;
-    resort?: string;
-    count?: number;
-}
+type PreludeAction =
+    | {
+          action: 'stackDrawPileByType';
+          tileType: TileType;
+          resort?: string;
+          count?: number;
+      }
+    | {
+          action: 'seedResources';
+          playerId: string;
+          resort: string;
+          count?: number;
+      }
+    | {
+          action: 'setMetaMarker';
+          playerId: string;
+          zoneId: string;
+          mode?: string;
+          expiresRound?: number;
+      };
 
 function loadGoldenFixtures(): GoldenFixture[] {
     const goldenDir = path.resolve(__dirname, './golden');
@@ -58,21 +72,52 @@ function registerFixtureExpansions(names?: string[]): void {
 function applyPrelude(G: any, prelude?: PreludeAction[]): void {
     if (!prelude || prelude.length === 0) return;
     for (const step of prelude) {
-        if (step.action !== 'stackDrawPileByType') continue;
-        const drawPile = G.zones[CoreZoneNames.DrawPile];
-        if (!drawPile) continue;
-        const count = Math.max(1, step.count ?? 1);
-        for (let i = 0; i < count; i++) {
-            const idx = drawPile.items.findIndex((tileId: string) => {
-                const tile = G.tiles[tileId];
-                if (!tile) return false;
-                if (step.tileType && tile.type !== step.tileType) return false;
-                if (step.resort && tile.resort !== step.resort) return false;
-                return true;
-            });
-            if (idx === -1) break;
-            const [tileId] = drawPile.items.splice(idx, 1);
-            drawPile.items.push(tileId);
+        if (step.action === 'stackDrawPileByType') {
+            const drawPile = G.zones[CoreZoneNames.DrawPile];
+            if (!drawPile) continue;
+            const count = Math.max(1, step.count ?? 1);
+            for (let i = 0; i < count; i++) {
+                const idx = drawPile.items.findIndex((tileId: string) => {
+                    const tile = G.tiles[tileId];
+                    if (!tile) return false;
+                    if (step.tileType && tile.type !== step.tileType) return false;
+                    if (step.resort && tile.resort !== step.resort) return false;
+                    return true;
+                });
+                if (idx === -1) break;
+                const [tileId] = drawPile.items.splice(idx, 1);
+                drawPile.items.push(tileId);
+            }
+            continue;
+        }
+        if (step.action === 'seedResources') {
+            const supplyId = `${CoreZoneNames.PersonalSupply}:${step.playerId}`;
+            const supply = G.zones[supplyId];
+            if (!supply) continue;
+            const count = Math.max(1, step.count ?? 1);
+            for (let i = 0; i < count; i++) {
+                const id = `pre_res_${step.playerId}_${step.resort}_${i + 1}`;
+                if (G.objects[id]) continue;
+                G.objects[id] = { id, type: 'Resource', resort: step.resort, owner: step.playerId };
+                supply.items.push(id);
+            }
+            continue;
+        }
+        if (step.action === 'setMetaMarker') {
+            const markerId = `meta_${step.playerId}`;
+            const marker = G.objects[markerId];
+            if (!marker) continue;
+            for (const zone of Object.values(G.zones)) {
+                const idx = zone.items.indexOf(markerId);
+                if (idx >= 0) {
+                    zone.items.splice(idx, 1);
+                }
+            }
+            const targetZone = G.zones[step.zoneId];
+            if (!targetZone) continue;
+            targetZone.items.push(markerId);
+            if (step.mode !== undefined) marker.mode = step.mode;
+            if (step.expiresRound !== undefined) marker.expiresRound = step.expiresRound;
         }
     }
 }

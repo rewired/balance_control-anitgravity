@@ -76,4 +76,15 @@ describe('computeMajority', () => {
         result = computeMajority('tile_1', G);
         expect(result.controller).toBe('p2');
     });
+
+    it('should not allow control on Start Committee', () => {
+        const G = stubG();
+        G.tiles['tile_start'] = { id: 'tile_start', type: TileType.StartCommittee };
+        G.zones['tile_start'] = { id: 'tile_start', name: 'Start', items: ['inf_p1'] };
+        G.objects['inf_p1'] = { id: 'inf_p1', type: 'Influence', owner: 'p1' };
+
+        const result = computeMajority('tile_start', G);
+        expect(result.controller).toBeNull();
+        expect(result.winners).toHaveLength(0);
+    });
 });
