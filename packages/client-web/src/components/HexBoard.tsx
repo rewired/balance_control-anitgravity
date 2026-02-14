@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import { Tile } from './Tile';
-import { axialToPixel, computeBounds, parseCoordString, stableSortCoords } from '../ui/hexLayout';
+import { axialToPixel, computeBoardLayout, parseCoordString, stableSortCoords } from '../ui/hexLayout';
 
 interface HexBoardProps {
     G: GameState;
@@ -13,7 +13,7 @@ interface HexBoardProps {
     onSelectTile?: (tileId: string) => void;
 }
 
-const HEX_SIZE = 110;
+export const HEX_SIZE = 110;
 
 export const HexBoard: React.FC<HexBoardProps> = ({
     G,
@@ -40,21 +40,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     }, [occupiedCoords, ghostCoords]);
 
     const { width, height, offsetX, offsetY, cellWidth, cellHeight } = useMemo(() => {
-        const coords = allCoords.map(parseCoordString);
-        const bounds = computeBounds(coords, HEX_SIZE);
-        const padding = HEX_SIZE * 1.5;
-        const minWidth = HEX_SIZE * 4;
-        const minHeight = HEX_SIZE * 4;
-        const width = Math.max(bounds.maxX - bounds.minX + padding * 2, minWidth);
-        const height = Math.max(bounds.maxY - bounds.minY + padding * 2, minHeight);
-        return {
-            width,
-            height,
-            offsetX: -bounds.minX + padding,
-            offsetY: -bounds.minY + padding,
-            cellWidth: Math.sqrt(3) * HEX_SIZE,
-            cellHeight: 2 * HEX_SIZE
-        };
+        return computeBoardLayout(allCoords, HEX_SIZE);
     }, [allCoords]);
 
     return (
