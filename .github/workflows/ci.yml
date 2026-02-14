@@ -43,5 +43,8 @@ jobs:
       - name: Build workspace packages
         run: pnpm -w build
 
+      - name: Run spec audit
+        run: pnpm run audit:spec
+
       - name: Run test suite
         run: pnpm -w test

@@ -18,6 +18,7 @@
 - Fix: EXP-02 controller-targeted grants now explicitly SKIP when no controller (compatible with resolver hardening).
 - Fix: EXP-01 controller-targeted grants now explicitly SKIP when no controller (compatible with resolver hardening).
 - Hardening: `CONTROLLER` grants now require explicit missing-controller behavior; no implicit reroute to Noise.
+- Tooling: added spec audit command and CI gate for anchor, invariants, and golden replays.
 - Fix: Uncontrolled ResortTile production now yields 0 (no Noise grant).
 - Fixed Grassroots conversion plumbing so ConvertResources works in real matches.
 - Corrected Influence cap enforcement to apply only to marker creation, not relocation.
