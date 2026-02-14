@@ -8,7 +8,8 @@
     "lint": "eslint \"packages/**/*.{ts,tsx,js,cjs,mjs}\" \"scripts/**/*.{js,cjs,mjs}\" \"*.{js,cjs,mjs}\"",
     "check:encoding": "node scripts/check-encoding.mjs",
     "gen:spec-anchors": "node scripts/gen-spec-anchors.mjs",
-    "dev": "pnpm -r --parallel dev"
+    "dev": "pnpm -r --parallel dev",
+    "verify:task": "node scripts/verify-task.mjs"
   },
   "devDependencies": {
     "@typescript-eslint/parser": "^7.18.0",
