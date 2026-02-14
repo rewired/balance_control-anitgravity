@@ -24,7 +24,7 @@ Primary Architecture Contracts:
 
 The game must implement the normative rule specifications in `/docs/rules/`:
 
-* `000-core.md` — CORE-01 Simulation Specification (v1.0.14)
+* `000-core.md` — CORE-01 Simulation Specification (v1.1.0)
 * `001-expansion01.md` — EXP-01 Economy & Labor (v1.3)
 * `002-expansion02.md` — EXP-02 Security & Order (v1.0)
 * `003-expansion03.md` — EXP-03 Climate & Future (v1.0)
@@ -69,6 +69,12 @@ Implementation rule:
 * Each move or effect implementation must contain a comment referencing the exact rule section.
 * Format: `// CORE-01-06-16(a)(3)`
 * If no rule reference can be cited → do not implement.
+
+Anchor rules:
+
+* Rule IDs are canonical anchors.
+* Headings are not anchors.
+* Code/tests MUST cite rule IDs when referencing spec behavior.
 
 No silent interpretation allowed.
 

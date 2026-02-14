@@ -71,10 +71,10 @@ Ensure all rule anchoring is ID-based and never heading-based.
 - No remaining doc references claiming CORE requires v1.0.xx unless explicitly justified.
 
 ## PR Checklist
-- [ ] Updated AGENTS.md
-- [ ] Added docs/rules/README.md
-- [ ] Ensured docs/rules/legacy/ contains v1.0.26
-- [ ] Added/updated rules_migration_map.yaml
-- [ ] Updated docs/PR_TASK_LIST.md
-- [ ] Updated CHANGELOG.md
-- [ ] CI green
+- [x] Updated AGENTS.md
+- [x] Added docs/rules/README.md
+- [x] Ensured docs/rules/legacy/ contains v1.0.26
+- [x] Added/updated rules_migration_map.yaml
+- [x] Updated docs/PR_TASK_LIST.md
+- [x] Updated CHANGELOG.md
+- [x] CI green

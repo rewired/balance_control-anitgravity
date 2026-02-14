@@ -2,10 +2,12 @@
 # BALANCE // CONTROL — CORE-01 rules migration map
 # Purpose: machine-readable mapping to help update/verify source-code anchors and rule references.
 # Assumption (based on the provided 1.0.26 + 1.1.0 texts): IDs are stable; changes are editorial only.
-# Reference: /docs/rules/legacy/000-core-1.0.26.md [v1.0.26] & /docs/rules/000-core.md [v1.1.0]
+# Reference: /docs/rules/legacy/000-core-v1.0.26.md [v1.0.26] & /docs/rules/000-core.md [v1.1.0]
 
 schema_version: 1
 project: "BALANCE // CONTROL"
+version_map:
+  "v1.0.26": "v1.1.0"
 ruleset:
   from:
     name: "CORE-01"
