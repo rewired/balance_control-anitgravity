@@ -42,3 +42,4 @@
 - [x] Task 0039a - Verify Task Guard (scripts/verify-task.mjs)
 - [x] Task 0040 - CORE-01 Compliance Invariants (High-Risk Rules as Tests)
 - [x] Task 0041 - "Spec Audit" Command + CI Gate
+- [x] Task 0042 - Client-Web UX Baseline: Load CSS + Visual States + Resource Palette
