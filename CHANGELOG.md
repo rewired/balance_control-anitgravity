@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Client: spatial hex board rendering for tiles and placement ghosts.
 - Client: added network transport switch, connection status, and playerView guardrails.
 - Client: load global styles, tile state visuals, and full resource palette.
 - Tests: added core compliance invariants and a golden replay covering hotspot, convert penalty, and ping-pong reduction.

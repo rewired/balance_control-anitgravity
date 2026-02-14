@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import { TileType } from '@balance-control/rules';
 import { Tile } from '../src/components/Tile';
 import { Token } from '../src/components/Token';
+import { HexBoard } from '../src/components/HexBoard';
 
 const baseG = {
     zones: {
@@ -69,5 +70,35 @@ describe('Token', () => {
             <Token object={{ id: 'res_unknown_1', type: 'Resource', resort: '???' } as any} />
         );
         expect((container.firstChild as HTMLElement).className).toContain('resource-unknown');
+    });
+});
+
+describe('HexBoard', () => {
+    it('dispatches placeTile when a ghost is clicked', () => {
+        const moves = { placeTile: vi.fn() };
+        const intents = [
+            { moveType: 'placeTile', payload: { targetCoord: '0,1' } }
+        ];
+        const G = {
+            grid: {},
+            tiles: {},
+            zones: {},
+            objects: {},
+            adjacency: {},
+        } as any;
+
+        render(
+            <HexBoard
+                G={G}
+                moves={moves}
+                intents={intents as any}
+                isInteractive={true}
+            />
+        );
+
+        const ghost = screen.getByTestId('hex-ghost-0_1');
+        fireEvent.click(ghost);
+        expect(moves.placeTile).toHaveBeenCalledTimes(1);
+        expect(moves.placeTile).toHaveBeenCalledWith({ targetCoord: '0,1' });
     });
 });
