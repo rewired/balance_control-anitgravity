@@ -177,6 +177,12 @@ body {
     cursor: pointer;
 }
 
+.ghost-cell:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: rgba(255,255,255,0.2);
+}
+
 .ghost-cell:hover {
     color: var(--text-primary);
     border-color: rgba(255,255,255,0.5);
@@ -202,6 +208,19 @@ body {
     display: flex;
     gap: var(--space-md);
     padding: var(--space-md) var(--space-lg);
+}
+
+.connection-status {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-xs) var(--space-md);
+    background: var(--bg-panel);
+    border: var(--border-glass);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    z-index: 150;
 }
 
 .debug-replay-panel {

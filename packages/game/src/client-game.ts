@@ -21,12 +21,53 @@ const politicalActionMoves = {
     ...expansionMoves
 };
 
+function isZoneVisible(zoneId: string, playerID: string): boolean {
+    if (zoneId.startsWith('staging_')) return zoneId === `staging_${playerID}`;
+    if (zoneId.startsWith(`${CoreZoneNames.PersonalSupply}:`)) {
+        return zoneId === `${CoreZoneNames.PersonalSupply}:${playerID}`;
+    }
+    if (zoneId.startsWith(`${CoreZoneNames.PlayerHand}:`)) {
+        return zoneId === `${CoreZoneNames.PlayerHand}:${playerID}`;
+    }
+    return true;
+}
+
+function buildPlayerView(G: GameState, playerID?: string | null): GameState {
+    if (!playerID) return G;
+    const zones: GameState['zones'] = {};
+    const objectIds = new Set<string>();
+
+    for (const [zoneId, zone] of Object.entries(G.zones)) {
+        if (!isZoneVisible(zoneId, playerID)) continue;
+        zones[zoneId] = zone;
+        for (const itemId of zone.items) {
+            objectIds.add(itemId);
+        }
+    }
+
+    const objects: GameState['objects'] = {};
+    for (const itemId of objectIds) {
+        const obj = G.objects[itemId];
+        if (obj) objects[itemId] = obj;
+    }
+
+    const engine = { ...G.engine };
+    if (engine.pendingChoice && engine.pendingChoice.player !== playerID) {
+        engine.pendingChoice = undefined;
+    }
+
+    return { ...G, zones, objects, engine };
+}
+
 export const BalanceControl: Game<GameState> = {
     name: 'balance-control',
     setup: (ctx: any, setupData: unknown) => SetupGame({ ctx, setupData }),
     moves: {
         ...CoreMoves,
         ...expansionMoves
+    },
+    playerView: ({ G, playerID }: { G: GameState; playerID: string | null }) => {
+        return buildPlayerView(G, playerID);
     },
     endIf: ({ G }: { G: GameState }) => {
         const drawPile = G.zones[CoreZoneNames.DrawPile];

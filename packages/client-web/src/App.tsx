@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Client } from 'boardgame.io/client';
+import { Client, SocketIO } from 'boardgame.io/client';
 import { BalanceControl } from '@balance-control/game';
 import { Board } from './Board';
 
@@ -14,11 +14,32 @@ type MoveLogEntry = {
 
 const DEBUG_REPLAY = import.meta.env.VITE_DEBUG_REPLAY === '1';
 const REPLAY_RING_SIZE = 200;
+const MULTIPLAYER_MODE = import.meta.env.VITE_MULTIPLAYER ?? 'local';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
 
-const client = Client({
-    game: BalanceControl,
-    numPlayers: 2
-});
+function getRuntimeParams() {
+    const params = new URLSearchParams(window.location.search);
+    const playerID = params.get('player') ?? import.meta.env.VITE_PLAYER_ID ?? '0';
+    const matchID = params.get('match') ?? import.meta.env.VITE_MATCH_ID ?? 'default';
+    return { playerID, matchID };
+}
+
+function createClient(playerID: string, matchID: string) {
+    if (MULTIPLAYER_MODE === 'server') {
+        return Client({
+            game: BalanceControl,
+            numPlayers: 2,
+            multiplayer: SocketIO({ server: SERVER_URL }),
+            matchID,
+            playerID
+        });
+    }
+    return Client({
+        game: BalanceControl,
+        numPlayers: 2,
+        playerID
+    });
+}
 
 function getStateID(state: any): number | null {
     if (!state) return null;
@@ -36,10 +57,12 @@ function getReplaySeed(state: any): string | number | null {
 }
 
 const App: React.FC = () => {
+    const [{ playerID, matchID }] = useState(getRuntimeParams);
+    const client = useMemo(() => createClient(playerID, matchID), [playerID, matchID]);
     const [state, setState] = useState<any>(client.getState());
     const [moveLog, setMoveLog] = useState<MoveLogEntry[]>([]);
     const pendingMovesRef = useRef<MoveLogEntry[]>([]);
-    const playerID = '0';
+    const wasConnectedRef = useRef(false);
 
     useEffect(() => {
         client.start();
@@ -56,7 +79,13 @@ const App: React.FC = () => {
             unsubscribe();
             client.stop();
         };
-    }, []);
+    }, [client]);
+
+    useEffect(() => {
+        if (state?.isConnected) {
+            wasConnectedRef.current = true;
+        }
+    }, [state?.isConnected]);
 
     const moves = useMemo(() => {
         const wrapped: Record<string, (...args: any[]) => void> = {};
@@ -108,10 +137,19 @@ const App: React.FC = () => {
 
     if (!state) return null;
 
-    const isActive = state.ctx?.currentPlayer === playerID;
+    const isConnected = state?.isConnected ?? true;
+    const isActive = Boolean(state?.isActive) && isConnected;
+    const connectionLabel = MULTIPLAYER_MODE === 'server'
+        ? (isConnected ? 'Connected' : (wasConnectedRef.current ? 'Disconnected' : 'Connecting'))
+        : 'Local';
 
     return (
         <>
+            {MULTIPLAYER_MODE === 'server' && (
+                <div className="connection-status">
+                    {connectionLabel} · Match {matchID} · Player {playerID}
+                </div>
+            )}
             <Board
                 G={state.G}
                 ctx={state.ctx}

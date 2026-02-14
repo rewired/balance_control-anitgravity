@@ -28,6 +28,21 @@ pnpm -w lint
 pnpm -w build
 ```
 
+## Network Play (Dev)
+
+```bash
+pnpm -w dev
+```
+
+Set environment variables for the web client:
+
+- VITE_MULTIPLAYER=server
+- VITE_SERVER_URL=http://localhost:8000
+- VITE_PLAYER_ID=0
+- VITE_MATCH_ID=default
+
+Client default: http://localhost:5173
+
 ## Repo Map
 
 - `docs/rules/`
