@@ -3,7 +3,7 @@
 # CORE-01 Simulation Specification (Atomic, Deterministic)
 
 Version: 01
-Scope: Core Rules v1.0.23 only with variants (no expansions)
+Scope: Core Rules v1.0.24 only with variants (no expansions)
 
 ---
 
@@ -93,6 +93,7 @@ CORE-01-02-04G Each Resource object has exactly one resort attribute.
 CORE-01-02-05 ResortTiles produce Resources during Round Settlement.
 CORE-01-02-06 Committees enable the FormalizeInfluence action.
 CORE-01-02-07 Grassroots enable the ConvertResources action.
+CORE-01-02-07A Grassroots Type Tag (Normative): A Typed Grassroots tile has a printed type tag T where T ∈ {DOM, FOR, INF}. An Untyped Grassroots tile has no type tag.
 CORE-01-02-08 Lobbyists contribute virtual Influence for majority calculation only.
 CORE-01-02-09 Hotspots resolve when fully surrounded.
 
@@ -101,14 +102,16 @@ CORE-01-02-11 Core tile counts (FOR ResortTiles): W1×2, W2×4, W3×4, W4×1, W5
 CORE-01-02-12 Core tile counts (INF ResortTiles): W1×2, W2×4, W3×4, W4×1, W5×1.
 CORE-01-02-13 Core tile counts (Committees): ×10.
 CORE-01-02-14 Core tile counts (Grassroots): ×8.
+CORE-01-02-14A Grassroots Composition (Normative): The 8 Grassroots tiles consist of: Untyped ×2, Typed(DOM) ×2, Typed(FOR) ×2, Typed(INF) ×2.
+The counts MUST sum to 8.
 CORE-01-02-15 Core tile counts (Lobbyists): ×9.
 CORE-01-02-16 Core tile counts (Hotspots): ×8.
 CORE-01-02-17 ResortTiles have printed production value equal to their W number.
 CORE-01-02-17A Each player has exactly one Meta-Marker (Cooldown Token).
 CORE-01-02-17B A Meta-Marker is not Influence, not a Resource, and not an Overlay.
-CORE-01-02-17C A Meta-Marker exists either in the owning player’s PersonalSupply or on exactly one Tile in Board.
-CORE-01-02-17D A Meta-Marker may be placed on the Start Committee despite Start Committee immunity.
-CORE-01-02-17E Meta-Marker Mode Domain: Meta-Marker mode is one of: None, PingPong, Shift, Convert. At game start, mode = None
+CORE-01-02-17C A Meta-Marker exists either in the owning player’s PersonalSupply or on exactly one ResortTile or exactly one Grassroots tile in Board.
+CORE-01-02-17D A Meta-Marker may not be placed on the Start Committee.
+CORE-01-02-17E Meta-Marker Mode Domain: Meta-Marker mode is one of: None, PingPong, Convert. At game start, mode = None.
 
 ---
 
@@ -118,16 +121,19 @@ CORE-01-03-01 Setup places the Start Committee tile into Board.
 CORE-01-03-02 Setup shuffles all non-Start tiles into DrawPile.
 CORE-01-03-02A Deterministic Randomness Contract
 All randomization in CORE-01 (shuffles, starting player selection) MUST use a deterministic RNG seeded at game start, and the seed MUST be part of the initial game state.
+CORE-01-03-02A.1 Canonical Shuffle Algorithm: ‘Shuffle’ means Fisher–Yates shuffle over the list from last index down to 1, swapping index i with index j where j = RNG.nextInt(i+1).
+CORE-01-03-02A.2 Canonical RNG Call Order (Setup): During Setup, perform the DrawPile shuffle (CORE-01-03-02) first. Immediately after that shuffle completes, determine the starting player by k = RNG.nextInt(playerCount), where k is the starting seat index.
 CORE-01-03-02B Canonical Pre-Shuffle Ordering: Before any shuffle, build the initial DrawPile list in a canonical total order using these keys:
 (1) TileTypeOrder where ResortTiles < Committees < Grassroots < Lobbyists < Hotspots.
 (2) ResortOrder where DOM < FOR < INF; Tiles without a Resort use ResortOrder = None (sorted after INF).
 (3) WOrder ascending numeric; Tiles without W use WOrder = None (sorted after all W values).
 (4) SerialIndex ascending, assigned starting at 0 within each identical (TileType, Resort, W) group.
-CORE-01-03-02A.1 Canonical Shuffle Algorithm: ‘Shuffle’ means Fisher–Yates shuffle over the list from last index down to 1, swapping index i with index j where j = RNG.nextInt(i+1).
-CORE-01-03-02A.2 Canonical RNG Call Order (Setup): During Setup, perform the DrawPile shuffle (CORE-01-03-02) first. Immediately after that shuffle completes, determine the starting player by k = RNG.nextInt(playerCount), where k is the starting seat index.
+CORE-01-03-02B.1 Grassroots ResortOrder Binding (Canonical): For the purposes of Canonical Pre-Shuffle Ordering key (2) ResortOrder (CORE-01-03-02B), treat:
+(a) Typed Grassroots with type tag T as having ResortOrder = T, and
+(b) Untyped Grassroots as having ResortOrder = None.
+This binding affects ordering only and does not change any rule behavior.
 CORE-01-03-03 Setup determines a starting player.
 CORE-01-03-03A Turn Order: Turn order is fixed for the entire game: starting player acts first, then players act in ascending seat order wrapping around.
-
 CORE-01-03-04 For 2 players, assign 4 Influence objects to each player’s PersonalSupply.
 CORE-01-03-05 For 3 players, assign 3 Influence objects to each player’s PersonalSupply.
 CORE-01-03-06 For 4 players, assign 2 Influence objects to each player’s PersonalSupply.
@@ -149,23 +155,22 @@ CORE-01-04-07 If a Tile is moved to DiscardFaceUp due to illegality, the player 
 CORE-01-04-08 A tile may be placed only on an unoccupied Position in the current topology.
 
 CORE-01-04-09 ExactlyOnePoliticalAction allows exactly one action type from: PlaceOrMoveInfluence, FormalizeInfluence, ConvertResources.
+CORE-01-04-09A Meta-Marker Carryover (Canonical): After resolving the active player’s ExactlyOnePoliticalAction, if that action did not place or update the active player’s Meta-Marker on a ResortTile or Grassroots tile as part of its resolution, return the Meta-Marker to PersonalSupply[activePlayer] and set its mode to None.
 
 CORE-01-04-10 PlaceOrMoveInfluence may be chosen as the Political Action.
 CORE-01-04-11 PlaceOrMoveInfluence (Place) moves exactly one Influence from the active player’s PersonalSupply to Board on a chosen Tile.
 CORE-01-04-11A PlaceOrMoveInfluence (Place) Legality
 Place is legal only if the active player has at least one Influence in PersonalSupply and the chosen Tile is not prohibited by restrictions (e.g., Start Committee per CORE-01-08-04/06E).
 CORE-01-04-12 PlaceOrMoveInfluence (Move) moves exactly one active-player-owned Influence from a source Board Tile to a different destination Board Tile. The Start Committee may not be source or destination (CORE-01-08-06E).
-CORE-01-04-12A PlaceOrMoveInfluence (Move) Meta-Marker Placement
-After a successful PlaceOrMoveInfluence (Move) resolution, place the active player’s Meta-Marker onto the source Tile (the Tile the Influence was moved from).
+CORE-01-04-12A PlaceOrMoveInfluence (Move) Meta-Marker Update: After a successful PlaceOrMoveInfluence (Move) resolution, if the source Tile is a ResortTile, place the active player’s Meta-Marker onto the source Tile and set its mode to PingPong.
+Otherwise, do not place the Meta-Marker on Board as part of this move (see CORE-01-04-09A).
 If the Meta-Marker was previously on another Tile, remove it from that Tile.
 
-CORE-01-04-12B PlaceOrMoveInfluence (Move) Ping-Pong Classification
-If, at the moment PlaceOrMoveInfluence (Move) begins resolution, the active player’s Meta-Marker is on the destination Tile of that move, then that move is a Ping-Pong Move.
-If the move is a Ping-Pong Move, set the Meta-Marker’s mode to PingPong for the remainder of the Round.
-If the move is not a Ping-Pong Move, set the Meta-Marker’s mode to Shift for the remainder of the Round.
+CORE-01-04-12B PlaceOrMoveInfluence (Move) Ping-Pong Penalty (Meta-Marker): If, at the moment PlaceOrMoveInfluence (Move) begins resolution, the active player’s Meta-Marker is on the destination Tile and its mode is PingPong, the active player MUST pay a Ping-Pong penalty before the Influence is moved.
+Let R be the total count of Resource objects in PersonalSupply[activePlayer] at that moment. Let N = min(10, floor(R / 2)).
+If N > 0, the active player chooses any N Resources from PersonalSupply[activePlayer] and moves them to Noise. This choice is locked before any movement occurs.
 
-CORE-01-04-12C PlaceOrMoveInfluence (Move) Meta-Marker Expiry
-A Meta-Marker placed or updated due to PlaceOrMoveInfluence (Move) expires at the beginning of the next Round and is returned to its owner’s PersonalSupply.
+CORE-01-04-12C PlaceOrMoveInfluence (Move) Meta-Marker Expiry: Delete. (Meta-Marker persistence is governed by CORE-01-07-03A/B and CORE-01-04-09A.)”
 
 CORE-01-04-13 FormalizeInfluence may be chosen as the Political Action.
 CORE-01-04-14 FormalizeInfluence is performed via a Committee tile.
@@ -198,11 +203,35 @@ CORE-01-04-22D ConvertResources Convert Anchor Selection: When resolving Convert
 This selected tile is the Convert Anchor for this ConvertResources resolution.
 CORE-01-04-22E ConvertResources Meta-Marker Placement: After a successful ConvertResources resolution, place the active player’s Meta-Marker onto the selected Convert Anchor tile and set its mode to Convert.
 If the Meta-Marker was previously on another Tile, remove it from that Tile.
-CORE-01-04-22F ConvertResources Meta-Marker Expiry: A Meta-Marker placed or updated due to ConvertResources expires at the beginning of the next Round and is returned to its owner’s PersonalSupply.
+CORE-01-04-22F ConvertResources Meta-Marker Expiry: Delete. (Meta-Marker persistence/return is governed by CORE-01-07-03A/B and CORE-01-04-09A.)”
 CORE-01-04-22G Grassroots ConvertRecipe Requirement: For engine implementations, each Grassroots Tile MUST provide a machine-readable ConvertRecipe descriptor (inputs + outputs) that exactly matches its printed text.
 If the selected Grassroots Tile has no ConvertRecipe descriptor, ConvertResources is invalid and does not resolve (CORE-01-06-00-03).
 CORE-01-04-22H Core Grassroots Definitions (Normative): The CORE-01 ruleset MUST include a complete normative definition for every Grassroots Tile used in CORE-01 (including ADD56-01 additions): (a) its printed text, and (b) its machine-readable ConvertRecipe (inputs + outputs).
 If these definitions are not present as part of the CORE-01 specification artifact, ConvertResources is undefined and may not be executed.
+CORE-01-04-22I Grassroots Tile Kinds (Canonical): Each Grassroots tile in CORE-01 is exactly one of:
+(a) Untyped Grassroots, or
+(b) Typed Grassroots with a printed type tag T where T ∈ {DOM, FOR, INF}.
+The Grassroots tile set composition is defined by CORE-01-02-14A.
+All Untyped Grassroots tiles share the definition in CORE-01-04-22K.
+All Typed Grassroots tiles share the definition in CORE-01-04-22L with their own printed type tag T substituted.
+CORE-01-04-22J ConvertResources — Canonical Declaration, Payment, and Failure: The active player MUST declare the chosen recipe variant and any required choices (e.g., output resort where applicable) before any Resource movement occurs; this declaration is locked for the resolution.
+If CORE-01-04-22C applies, the additional +1 Resource (including its chosen resort) is part of this locked declaration.
+If the active player cannot fully pay the declared total input cost (recipe inputs plus any CORE-01-04-22C additional Resource), ConvertResources fails and does not resolve; no state change occurs (CORE-01-06-00-03).
+On success, move all paid input Resources from PersonalSupply[activePlayer] to Bank, then move the output Resource(s) from Bank to PersonalSupply[activePlayer].
+CORE-01-04-22K Untyped Grassroots — Printed Text + ConvertRecipe (Normative): Printed text: ‘Convert 3 Resources into 1 Resource of your choice.’
+ConvertRecipe: exactly one variant:
+Inputs: 3× Resource(any resort)
+Outputs: 1× Resource(output resort chosen by the active player, where output resort ∈ {DOM, FOR, INF})
+CORE-01-04-22L Typed Grassroots — Printed Text + ConvertRecipe (Normative): Let T be the tile’s printed type tag (DOM/FOR/INF).
+Printed text: ‘Convert 2 Resources into 1 {T} Resource. Or convert 3 Resources into 1 Resource of your choice, but not {T}.’
+ConvertRecipe: exactly two variants; the active player MUST choose exactly one variant during the locked declaration step (CORE-01-04-22J):
+Variant A (Typed):
+Inputs: 2× Resource(any resort)
+Outputs: 1× Resource(resort = T)
+Variant B (Off-Type 3:1):
+Inputs: 3× Resource(any resort)
+Outputs: 1× Resource(output resort chosen by the active player, where output resort ∈ {DOM, FOR, INF} and output resort ≠ T)
+Legality constraint: If the declared output resort equals T, Variant B is illegal and Variant A MUST be used.
 
 ---
 
@@ -304,7 +333,7 @@ When resolving a ResortTile’s production during Round Settlement, use the foll
 1. Start with the tile’s printed production value.
 2. Apply doubling effects (if any).
 3. Apply production output modifiers (reductions or increases).
-4. Ping-Pong reduction (evaluated after step (b)): Let baseOutput be the result after steps (1)–(3). After step (b) determines exactly one production winner, if that winner’s Meta-Marker mode is PingPong, set output = floor(baseOutput / 2) and cap it at a maximum of 10. Otherwise, output = baseOutput.
+4. No additional production reductions apply in CORE-01.
 5. Apply floors (minimum 0).
 
 (b) Determine highest totalInfluence on that Tile using the standard majority rules (including modifiers). If the unique highest player exists, that player is the production winner. If multiple players tie for highest and highest > 0, those players are tied production winners. If highest == 0, there are no production winners.
@@ -323,9 +352,9 @@ CORE-01-06-17 If an effect-level prohibition applies to production (e.g., “Blo
 CORE-01-07-01 A round consists of one complete player cycle in turn order.
 CORE-01-07-02 After the last player completes a turn in a round, Round Settlement begins.
 CORE-01-07-03 Round Settlement resolves Resort Production for all ResortTiles.
-CORE-01-07-03A Meta-Marker Return Step (Round Start): At the beginning of each Round, before any player takes a turn, return every Meta-Marker currently on Board to its owner’s PersonalSupply.
-CORE-01-07-03B Meta-Marker Duration: A Meta-Marker placed during a Round remains on its Tile for at most that Round and is returned at the beginning of the next Round.
-CORE-01-07-03C Meta-Marker Mode Reset: When a Meta-Marker is returned at the beginning of a Round, set its mode to None.
+CORE-01-07-03A Meta-Marker Round Start: At the beginning of each Round, do not move Meta-Markers.
+CORE-01-07-03B Meta-Marker Persistence: A Meta-Marker remains at its current location until updated or returned to PersonalSupply by a rule.
+CORE-01-07-03C Meta-Marker Mode Reset: When a Meta-Marker is returned to PersonalSupply, set its mode to None.
 CORE-01-07-03D Resort Production Sweep Order (Canonical): During Round Settlement, resolve Resort Production for ResortTiles in Board in ascending PositionKey(ResortTile.Position).
 
 ---
@@ -355,8 +384,8 @@ CORE-01-08-06D Start Committee “Pass-Through” Prohibition for Influence: If 
 Influence does not move onto or off of the Start Committee as an intermediate step.
 CORE-01-08-06E Start Committee Targeting Restriction: The Start Committee may not be the destination Tile of PlaceOrMoveInfluence (Place).
 The Start Committee may not be the source or destination Tile of PlaceOrMoveInfluence (Move).
-This does not restrict placing a Meta-Marker on the Start Committee as defined elsewhere in CORE-01.
-CORE-01-08-06F Immunity Interpretation Clarification: Start Committee immunity applies to effects that target or would modify the Start Committee tile. It does not prohibit performing actions via the Start Committee as explicitly defined (CORE-01-04-14A / CORE-01-08-07..10A), and it does not prohibit placing a Meta-Marker on the Start Committee (CORE-01-02-17D).
+Meta-Marker placement is governed by CORE-01-02-17C/17D.
+CORE-01-08-06F Immunity Interpretation Clarification: Start Committee immunity applies to effects that target or would modify the Start Committee tile. It does not prohibit performing actions via the Start Committee as explicitly defined (CORE-01-04-14A / CORE-01-08-07..10A), Meta-Marker placement is governed by CORE-01-02-17C/17D.
 CORE-01-08-07 Each player may FormalizeInfluence via the Start Committee at most once per game.
 CORE-01-08-08 Start Committee formalization cost requires paying 3 Resources of different resorts plus 1 additional Resource of any resort.
 CORE-01-08-09 Start Committee formalization moves all paid Resources from the active player’s PersonalSupply to Bank.
