@@ -338,7 +338,7 @@ Create **one** meaningful commit for this task:
 
       - refresh task doc naming and command log
 
-   docs/tasks/0039a-verify_task_guard.md | 241 ++++------------------------------
+  docs/tasks/0039a-verify-task-guard.md | 241 ++++------------------------------
    scripts/verify-task.mjs               |  51 +++++--
    2 files changed, 65 insertions(+), 227 deletions(-)
   ```

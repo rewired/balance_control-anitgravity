@@ -80,7 +80,7 @@ Test requirements:
 
 ### C) Documentation updates
 
-- Add `docs/tasks/0019_fix-exp03-controller-grants.md` with this contract + checklist.
+- Add `docs/tasks/0019-fix-exp03-controller-grants.md` with this contract + checklist.
 - Update `docs/PR_TASK_LIST.md` to include Task 0019.
 - Update `CHANGELOG.md` under **Unreleased**:
   - “Fix: EXP-03 controller-targeted grants now explicitly SKIP when no controller (compatible with resolver hardening).”
@@ -121,4 +121,4 @@ Test requirements:
 - [x] `pnpm test` (repo standard) passes
 - [x] `CHANGELOG.md` updated under Unreleased
 - [x] `docs/PR_TASK_LIST.md` updated
-- [x] Added `docs/tasks/0019_fix-exp03-controller-grants.md` and completed checklist after implementation
+- [x] Added `docs/tasks/0019-fix-exp03-controller-grants.md` and completed checklist after implementation

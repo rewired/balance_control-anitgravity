@@ -105,7 +105,7 @@ Add tests (names flexible):
 
 ### D) Docs bookkeeping
 
-* Add `docs/tasks/0016_hardening-controller-fallback.md` with this contract and checklist.
+* Add `docs/tasks/0016-hardening-controller-fallback.md` with this contract and checklist.
 * Update `docs/PR_TASK_LIST.md` to include Task 0016.
 * Update `CHANGELOG.md` under **Unreleased**:
 

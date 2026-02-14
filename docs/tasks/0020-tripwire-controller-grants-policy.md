@@ -1,16 +1,16 @@
 # Codex Task 0020 — Repo-wide Tripwire: enforce explicit `missingController` on all `CONTROLLER` grants
 
-**Date:** 2026-02-12  
+**Date:** 2026-02-12
 **Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)
 
 **Primary contract:** `AGENTS.md` (repo root)
 
 **Key anchors (ASCII only):**
-- Determinism: AGENTS 0.2  
-- Rules anchoring & no drift: AGENTS 0.1, 0.5, 0.6  
-- Canonical resolver: AGENTS 3.5, 3.6  
-- Expansions modular + isolation: AGENTS 3.4, 3.8, 5.4, 5.5  
-- Tests + golden replays + hashing: AGENTS 5.1–5.3  
+- Determinism: AGENTS 0.2
+- Rules anchoring & no drift: AGENTS 0.1, 0.5, 0.6
+- Canonical resolver: AGENTS 3.5, 3.6
+- Expansions modular + isolation: AGENTS 3.4, 3.8, 5.4, 5.5
+- Tests + golden replays + hashing: AGENTS 5.1–5.3
 
 ---
 
@@ -87,7 +87,7 @@ for the `CONTROLLER` case.
 
 ### C) Documentation updates
 
-- Add `docs/tasks/0020_tripwire-controller-grants-policy.md` with this contract + checklist.
+- Add `docs/tasks/0020-tripwire-controller-grants-policy.md` with this contract + checklist.
 - Update `docs/PR_TASK_LIST.md` to include Task 0020.
 - Update `CHANGELOG.md` under **Unreleased**:
   - “Hardening: Added repo-wide tripwire test enforcing explicit `missingController` policy on CONTROLLER grants.”
@@ -114,9 +114,9 @@ for the `CONTROLLER` case.
 
 ## Acceptance Criteria
 
-1) New tripwire test exists and fails if any `CONTROLLER` grant lacks `missingController`.  
-2) Tripwire test passes on current repo after 0017–0019 are complete.  
-3) Full test suite passes.  
+1) New tripwire test exists and fails if any `CONTROLLER` grant lacks `missingController`.
+2) Tripwire test passes on current repo after 0017–0019 are complete.
+3) Full test suite passes.
 4) Docs updated: Task file + PR task list + changelog.
 
 ---
@@ -129,4 +129,4 @@ for the `CONTROLLER` case.
 - [x] `pnpm test` (repo standard) passes
 - [x] `CHANGELOG.md` updated under Unreleased
 - [x] `docs/PR_TASK_LIST.md` updated
-- [x] Added `docs/tasks/0020_tripwire-controller-grants-policy.md` and completed checklist after implementation
+- [x] Added `docs/tasks/0020-tripwire-controller-grants-policy.md` and completed checklist after implementation

@@ -110,7 +110,7 @@ Suggested steps (adapt to repo conventions):
 * [x] pnpm store caching enabled
 * [x] Verified CI run is green on a test PR
 * [x] Updated `docs/PR_TASK_LIST.md` with Task 0023
-* [x] Added `docs/tasks/0023_github-actions-ci.md` and completed checklist after implementation
+* [x] Added `docs/tasks/0023-github-actions-ci.md` and completed checklist after implementation
 
 ---
 

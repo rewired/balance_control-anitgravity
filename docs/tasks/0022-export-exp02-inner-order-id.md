@@ -89,7 +89,7 @@ import { Expansion02, EXP02_TILE_INNER_ORDER_ID } from '@bc/expansion-02';
 
 ### D) Documentation updates
 
-* Add `docs/tasks/0022_export-exp02-inner-order-id.md` containing this contract + checklist.
+* Add `docs/tasks/0022-export-exp02-inner-order-id.md` containing this contract + checklist.
 * Update `docs/PR_TASK_LIST.md` to include Task 0022.
 * Update `CHANGELOG.md` under **Unreleased**:
 
@@ -132,4 +132,4 @@ import { Expansion02, EXP02_TILE_INNER_ORDER_ID } from '@bc/expansion-02';
 * [x] `pnpm test` passes
 * [x] Updated `CHANGELOG.md` (Unreleased)
 * [x] Updated `docs/PR_TASK_LIST.md`
-* [x] Added `docs/tasks/0022_export-exp02-inner-order-id.md` and completed checklist after implementation
+* [x] Added `docs/tasks/0022-export-exp02-inner-order-id.md` and completed checklist after implementation

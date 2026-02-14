@@ -87,7 +87,7 @@ Optional (nice-to-have):
 
 ### B) Minimal doc/task bookkeeping
 
-* Add `docs/tasks/0024_readme-quickstart.md` containing this contract + checklist.
+* Add `docs/tasks/0024-readme-quickstart.md` containing this contract + checklist.
 * Update `docs/PR_TASK_LIST.md` to include Task 0024.
 * Update `CHANGELOG.md` under **Unreleased**:
 
@@ -128,4 +128,4 @@ Optional (nice-to-have):
 * [x] `pnpm -w test` passes
 * [x] Updated `CHANGELOG.md` (Unreleased)
 * [x] Updated `docs/PR_TASK_LIST.md`
-* [x] Added `docs/tasks/0024_readme-quickstart.md` and completed checklist after implementation
+* [x] Added `docs/tasks/0024-readme-quickstart.md` and completed checklist after implementation

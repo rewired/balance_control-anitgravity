@@ -99,7 +99,7 @@ If the handler uses the wrong id, the queue stays unchanged (no-op), and the tes
 
 ### C) Docs bookkeeping
 
-* Add `docs/tasks/0021_fix-exp02-inner-order-hotspot-id.md` containing this contract + checklist.
+* Add `docs/tasks/0021-fix-exp02-inner-order-hotspot-id.md` containing this contract + checklist.
 * Update `docs/PR_TASK_LIST.md` to include Task 0021.
 * Update `CHANGELOG.md` under **Unreleased**:
 
@@ -142,6 +142,6 @@ If the handler uses the wrong id, the queue stays unchanged (no-op), and the tes
 * [x] `pnpm test` passes
 * [x] Updated `CHANGELOG.md` (Unreleased)
 * [x] Updated `docs/PR_TASK_LIST.md`
-* [x] Added `docs/tasks/0021_fix-exp02-inner-order-hotspot-id.md` and completed checklist after implementation
+* [x] Added `docs/tasks/0021-fix-exp02-inner-order-hotspot-id.md` and completed checklist after implementation
 
 ---
