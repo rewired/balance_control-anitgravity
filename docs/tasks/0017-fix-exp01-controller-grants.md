@@ -86,7 +86,7 @@ Keep the test deterministic and minimal.
 
 ### C) Documentation updates
 
-* Add `docs/tasks/0017_fix-exp01-controller-grants.md` with this contract + checklist.
+* Add `docs/tasks/0017-fix-exp01-controller-grants.md` with this contract + checklist.
 * Update `docs/PR_TASK_LIST.md` to include Task 0017.
 * Update `CHANGELOG.md` under **Unreleased**:
 
@@ -128,4 +128,4 @@ Keep the test deterministic and minimal.
 * [x] `pnpm test` (repo standard) passes
 * [x] `CHANGELOG.md` updated under Unreleased
 * [x] `docs/PR_TASK_LIST.md` updated
-* [x] Added `docs/tasks/0017_fix-exp01-controller-grants.md` and completed checklist after implementation
+* [x] Added `docs/tasks/0017-fix-exp01-controller-grants.md` and completed checklist after implementation

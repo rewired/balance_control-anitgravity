@@ -90,7 +90,7 @@ Add a small `vitest` test in `packages/client-web`:
 
 #### D) Bookkeeping
 
-* Add `docs/tasks/0025_client-web-core-playability.md` (this contract + checklist)
+* Add `docs/tasks/0025-client-web-core-playability.md` (this contract + checklist)
 * Update:
 
   * `docs/PR_TASK_LIST.md` add Task 0025 unchecked → checked when done
@@ -130,7 +130,7 @@ Add a small `vitest` test in `packages/client-web`:
 * [x] Implement stage-aware `Controls` (drawAndPlace vs politicalAction)
 * [x] Remove hardcoded `tile_start_committee` targeting
 * [x] Add minimal client regression test
-* [x] Update `docs/tasks/0025_...md`
+* [x] Update `docs/tasks/0025-...md`
 * [x] Update `docs/PR_TASK_LIST.md`
 * [x] Update `CHANGELOG.md` (Unreleased)
 * [x] CI green

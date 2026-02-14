@@ -73,7 +73,7 @@ No gut feeling, no "works on my machine".
 - `pnpm -w build` (pass)
 - `pnpm test` (pass)
 - `node scripts/verify-task.mjs 0041` (fail: task file name did not match guard pattern)
-- `Move-Item -Path "docs/tasks/0041_spec_audit_command_and_ci_gate.md" -Destination "docs/tasks/0041-spec-audit-command-and-ci-gate.md"`
+- `Move-Item -Path "docs/tasks/0041-spec-audit-command-and-ci-gate.md" -Destination "docs/tasks/0041-spec-audit-command-and-ci-gate.md"`
 - `git status`
 - `git diff --stat`
 - `git add -A`
@@ -133,7 +133,7 @@ Changes not staged for commit:
   (use "git restore <file>..." to discard changes in working directory)
         modified:   .github/workflows/ci.yml
         modified:   CHANGELOG.md
-        deleted:    docs/tasks/0041_spec_audit_command_and_ci_gate.md
+        deleted:    docs/tasks/0041-spec-audit-command-and-ci-gate.md
         modified:   package.json
 
 Untracked files:
@@ -147,7 +147,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 ### git diff --stat
 ```
  CHANGELOG.md                                      |  1 +
- docs/tasks/0041_spec_audit_command_and_ci_gate.md | 61 -----------------------
+ docs/tasks/0041-spec-audit-command-and-ci-gate.md | 61 -----------------------
  package.json                                      |  1 +
  4 files changed, 5 insertions(+), 61 deletions(-)
 ```

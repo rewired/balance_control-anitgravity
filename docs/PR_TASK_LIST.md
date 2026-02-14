@@ -28,6 +28,7 @@
 - [x] Task 0026 - Enumerate Legal Intents (Canonical)
 - [x] Task 0027 - Client-Web Intent-Driven UI
 - [x] Task 0028 - PendingChoice Intent Priority
+- [ ] Task 0029 - Network Mode Baseline (Client + Server) + PlayerView Guardrails
 - [x] Task 0030 - Deterministic Move Log + Replay Export
 - [x] Task 0031 - CORE-01 v1.0.20 Inventory + Delta Map
 - [x] Task 0032 - Meta-Marker State + Round Return
@@ -38,3 +39,6 @@
 - [x] Task 0037 - CORE Ruleset Migration v1.0.26 to v1.1.0 (Docs + Contracts Alignment)
 - [x] Task 0038 - Spec Anchor Registry + Tripwire (ID Existence Enforcement)
 - [x] Task 0039 - Ruleset Version Manifest + Replay/State Stamping
+- [x] Task 0039a - Verify Task Guard (scripts/verify-task.mjs)
+- [ ] Task 0040 - CORE-01 Compliance Invariants (High-Risk Rules as Tests)
+- [x] Task 0041 - "Spec Audit" Command + CI Gate
