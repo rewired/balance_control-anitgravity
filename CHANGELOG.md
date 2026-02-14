@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Client: board selection and inspector panel for tile details and token counts.
 - Client: board camera with pan/zoom and fit-to-board framing.
 - Client: spatial hex board rendering for tiles and placement ghosts.
 - Client: added network transport switch, connection status, and playerView guardrails.

@@ -10,7 +10,8 @@ interface HexBoardProps {
     intents: LegalIntent[];
     isInteractive: boolean;
     selectedTileId?: string | null;
-    onSelectTile?: (tileId: string) => void;
+    selectedCoord?: string | null;
+    onSelectTile?: (tileId: string, coordStr: string) => void;
 }
 
 export const HEX_SIZE = 110;
@@ -21,6 +22,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     intents,
     isInteractive,
     selectedTileId,
+    selectedCoord,
     onSelectTile
 }) => {
     const occupiedCoords = useMemo(() => {
@@ -51,13 +53,13 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     if (!G.tiles[tileId]) return null;
                     const coord = parseCoordString(coordStr);
                     const { x, y } = axialToPixel(coord, HEX_SIZE);
-                    const isSelected = selectedTileId === tileId;
+                    const isSelected = selectedTileId === tileId || selectedCoord === coordStr;
                     const disabled = !isInteractive;
                     const testId = `hex-tile-${coordStr.replace(',', '_')}`;
                     return (
                         <div
                             key={coordStr}
-                            className="hex-cell"
+                            className={isSelected ? 'hex-cell hex-cell-selected' : 'hex-cell'}
                             style={{
                                 left: x + offsetX,
                                 top: y + offsetY,
@@ -69,7 +71,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             <Tile
                                 tileId={tileId}
                                 G={G}
-                                onClick={disabled ? undefined : () => onSelectTile && onSelectTile(tileId)}
+                                onClick={disabled ? undefined : () => onSelectTile && onSelectTile(tileId, coordStr)}
                                 selected={isSelected}
                                 disabled={disabled}
                                 tooltip={`coord ${coordStr}`}

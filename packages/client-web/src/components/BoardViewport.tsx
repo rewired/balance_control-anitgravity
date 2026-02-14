@@ -12,7 +12,8 @@ interface BoardViewportProps {
     intents: LegalIntent[];
     isInteractive: boolean;
     selectedTileId?: string | null;
-    onSelectTile?: (tileId: string) => void;
+    selectedCoord?: string | null;
+    onSelectTile?: (tileId: string, coordStr: string) => void;
 }
 
 const FIT_PADDING = 48;
@@ -23,6 +24,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = ({
     intents,
     isInteractive,
     selectedTileId,
+    selectedCoord,
     onSelectTile
 }) => {
     const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -102,6 +104,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = ({
                                     intents={intents}
                                     isInteractive={isInteractive}
                                     selectedTileId={selectedTileId}
+                                    selectedCoord={selectedCoord}
                                     onSelectTile={onSelectTile}
                                 />
                             </TransformComponent>

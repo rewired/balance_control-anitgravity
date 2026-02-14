@@ -45,3 +45,4 @@
 - [x] Task 0042 - Client-Web UX Baseline: Load CSS + Visual States + Resource Palette
 - [x] Task 0043 - Hex Board Rendering v1: Spatial Layout for Tiles + Ghost Targets
 - [x] Task 0044 - Board Viewport: Pan/Zoom + Fit-to-Board (Playable Camera)
+- [x] Task 0045 - Selection + Inspector Panel: "What am I looking at?" (UX Clarity)
