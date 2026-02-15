@@ -1,5 +1,6 @@
 import { GameState, CoreZoneNames, TileType } from '@balance-control/rules';
-import { coordToString, getNeighbors, stringToCoord } from './topology';
+import { coordToString, getNeighbors, stringToCoord, positionKeyFromCoordString } from './topology';
+import { EffectResolver } from './engine/resolver';
 
 /**
  * CORE-01-04-04: Draw one tile from DrawPile to staging.
@@ -147,5 +148,28 @@ function findObjectZoneId(G: GameState, objectId: string): string | null {
 export function drawMeasure(G: GameState, ctx: any) {
     // Basic drawMeasure for EXP-01/02
     // ... logic would go here, or just stub for now if not used yet
+}
+
+/** CORE-01-09-01A: Run final Round Settlement (production sweep in PositionKey order). */
+export function runFinalRoundSettlement(G: GameState & { engine: any; grid?: Record<string, string> }, ctx: any): void {
+    const boardZone = G.zones[CoreZoneNames.Board];
+    const grid = G.grid ?? {};
+    if (!boardZone) return;
+
+    const resortTilesWithCoord: { tileId: string; posKey: string }[] = [];
+    for (const tileId of boardZone.items) {
+        const tile = G.tiles[tileId];
+        if (tile?.type !== TileType.Resort) continue;
+        const coordStr = Object.entries(grid).find(([, id]) => id === tileId)?.[0];
+        resortTilesWithCoord.push({
+            tileId,
+            posKey: coordStr ? positionKeyFromCoordString(coordStr) : tileId
+        });
+    }
+    resortTilesWithCoord.sort((a, b) => a.posKey.localeCompare(b.posKey));
+    for (const { tileId } of resortTilesWithCoord) {
+        G.engine.effectQueue.push({ kind: 'production.resolve', tileId });
+    }
+    EffectResolver.resolve(G, ctx);
 }
 

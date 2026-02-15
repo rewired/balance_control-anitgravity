@@ -1,4 +1,5 @@
 import { GameState, CoreZoneNames, Tile, TileType, CoreResources, GameObject, Zone, RULESET_MANIFEST, RulesetManifest } from '@balance-control/rules';
+import { positionKeyFromCoordString } from './topology';
 import { Ctx } from 'boardgame.io';
 import { ExpansionRegistry } from './expansion-registry';
 import { normalizeGameConfig } from './config';
@@ -123,6 +124,9 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
     // 4. Apply enabled expansions before the one final setup shuffle.
     ExpansionRegistry.applySetup(G, ctx, gameConfig);
 
+    // CORE-01-03-02B: Canonical Pre-Shuffle Ordering before shuffle
+    G.zones[CoreZoneNames.DrawPile].items = sortDrawPileCanonical(G);
+
     // CORE-01-03-02: Shuffle all non-Start tiles after composition is finalized.
     if (ctx && (ctx as any).random) {
         G.zones[CoreZoneNames.DrawPile].items = (ctx as any).random.Shuffle(G.zones[CoreZoneNames.DrawPile].items);
@@ -160,10 +164,15 @@ function generateCoreTiles(): Tile[] {
     // Committees x10
     add(TileType.Committee, 10);
 
-    // Grassroots x8
-    add(TileType.Grassroots, 8, {
-        // CORE-01-04-22: conversion parameters come from tile text metadata.
-        conversion: { inputSlots: 2, outputSlots: 1 }
+    // CORE-01-02-14A: Grassroots — Untyped ×2, Typed(DOM) ×2, Typed(FOR) ×2, Typed(INF) ×2
+    add(TileType.Grassroots, 2, {
+        conversion: { inputSlots: 3, outputSlots: 1 }
+    }); // Untyped: CORE-01-04-22K
+    [CoreResources.DOM, CoreResources.FOR, CoreResources.INF].forEach(res => {
+        add(TileType.Grassroots, 2, {
+            resort: res,
+            conversion: { inputSlots: 2, outputSlots: 1, typedResort: res }
+        }); // Typed: CORE-01-04-22L
     });
 
     // Lobbyists x9
@@ -173,4 +182,44 @@ function generateCoreTiles(): Tile[] {
     add(TileType.Hotspot, 8);
 
     return tiles;
+}
+
+/** CORE-01-03-02B: Canonical Pre-Shuffle Ordering. */
+function sortDrawPileCanonical(G: GameState): string[] {
+    const items = G.zones[CoreZoneNames.DrawPile]?.items ?? [];
+    const TILE_TYPE_ORDER: Record<string, number> = {
+        [TileType.Resort]: 0,
+        [TileType.Committee]: 1,
+        [TileType.Grassroots]: 2,
+        [TileType.Lobbyist]: 3,
+        [TileType.Hotspot]: 4
+    };
+    const RESORT_ORDER: Record<string, number> = {
+        [CoreResources.DOM]: 0,
+        [CoreResources.FOR]: 1,
+        [CoreResources.INF]: 2
+    };
+
+    return [...items].sort((aId, bId) => {
+        const a = G.tiles[aId];
+        const b = G.tiles[bId];
+        if (!a || !b) return 0;
+
+        const typeA = TILE_TYPE_ORDER[a.type] ?? 99;
+        const typeB = TILE_TYPE_ORDER[b.type] ?? 99;
+        if (typeA !== typeB) return typeA - typeB;
+
+        // CORE-01-03-02B.1: Typed Grassroots use resort; Untyped use None
+        const resortA = a.resort ?? a.conversion?.typedResort ?? null;
+        const resortB = b.resort ?? b.conversion?.typedResort ?? null;
+        const orderA = resortA ? (RESORT_ORDER[resortA] ?? 3) : 4;
+        const orderB = resortB ? (RESORT_ORDER[resortB] ?? 3) : 4;
+        if (orderA !== orderB) return orderA - orderB;
+
+        const wA = a.weight ?? 99;
+        const wB = b.weight ?? 99;
+        if (wA !== wB) return wA - wB;
+
+        return aId.localeCompare(bId);
+    });
 }

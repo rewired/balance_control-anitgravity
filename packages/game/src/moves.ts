@@ -1,7 +1,7 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneNames, CoreResources, TileType, PlayerID } from '@balance-control/rules';
-import { stringToCoord, coordToString, getNeighbors, isSurrounded } from './topology';
-import { drawMeasure, allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from './mechanics-turn';
+import { stringToCoord, coordToString, getNeighbors, isSurrounded, positionKeyFromCoordString } from './topology';
+import { drawMeasure, allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap, runFinalRoundSettlement } from './mechanics-turn';
 import { computeMajority } from './mechanics';
 import { EffectResolver } from './engine/resolver';
 import {
@@ -52,19 +52,34 @@ function isBoardTile(G: any, tileId: string): boolean {
     return Boolean(boardZone?.items?.includes(tileId));
 }
 
-function getGrassrootsConversionSpec(tile: any): GrassrootsConversionSpec | null {
+/**
+ * CORE-01-04-22K/22L: Validates declared variant and returns spec.
+ * Untyped: 3 inputs only. Typed: 2 inputs (Variant A) or 3 inputs (Variant B, output ≠ T).
+ * Legacy: tile with inputSlots:2 but no resort = Typed 2:1 only (Variant A).
+ */
+function getGrassrootsConversionSpec(tile: any, inputCount: number, outputResort?: string): GrassrootsConversionSpec | null {
     const spec = tile?.conversion;
-    if (!spec || typeof spec.inputSlots !== 'number') {
+    if (!spec || typeof spec.inputSlots !== 'number') return null;
+
+    const typedResort = spec.typedResort ?? tile?.resort;
+    const isTyped = Boolean(typedResort) || spec.inputSlots === 2;
+
+    if (isTyped) {
+        if (inputCount === 2) {
+            return { inputSlots: 2, outputSlots: 1 };
+        }
+        if (inputCount === 3 && typedResort) {
+            // CORE-01-04-22L Variant B: output must be ≠ T (only when tile has resort)
+            if (outputResort && outputResort === typedResort) return null;
+            return { inputSlots: 3, outputSlots: 1 };
+        }
         return null;
     }
-
-    if (!Number.isInteger(spec.inputSlots) || spec.inputSlots <= 0) return null;
-    const outputSlots = Number.isInteger(spec.outputSlots) && spec.outputSlots > 0 ? spec.outputSlots : 1;
-
-    return {
-        inputSlots: spec.inputSlots,
-        outputSlots
-    };
+    // Untyped CORE-01-04-22K: 3 inputs only
+    if (inputCount === 3) {
+        return { inputSlots: 3, outputSlots: 1 };
+    }
+    return null;
 }
 
 function isCoreResort(resort: string): boolean {
@@ -201,8 +216,25 @@ export const CoreMoves = {
         const markerZoneId = marker ? findObjectZoneId(G, marker.id) : null;
         const markerOnDestination = markerZoneId === targetId;
 
-        // Decoupled Extra Costs
-        if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.move', targetId, extraResourceIds)) return INVALID_MOVE;
+        const penaltySlots = EffectResolver.getExtraCostSlots(G, pid, 'influence.move', targetId);
+        if (penaltySlots.length > 0) {
+            // CORE-01-04-12B: Ping-Pong penalty — validate and queue move to Noise
+            if (!extraResourceIds || extraResourceIds.length !== penaltySlots.length) return INVALID_MOVE;
+            const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+            const supply = G.zones[supplyId];
+            for (const rid of extraResourceIds) {
+                if (!supply?.items.includes(rid)) return INVALID_MOVE;
+                if (G.objects[rid]?.owner !== pid || G.objects[rid]?.type !== 'Resource') return INVALID_MOVE;
+            }
+            if (hasDuplicateIds(extraResourceIds)) return INVALID_MOVE;
+            G.engine.effectQueue.push({
+                kind: 'resource.penaltyToNoise',
+                playerId: pid,
+                resourceIds: extraResourceIds
+            });
+        } else if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.move', targetId, extraResourceIds)) {
+            return INVALID_MOVE;
+        }
 
         G.engine.effectQueue.push({
             kind: 'influence.move',
@@ -340,7 +372,8 @@ export const CoreMoves = {
         // Generic Prohibition check
         if (EffectResolver.isProhibited(G, 'convertResources', pid, grassrootsTileId)) return INVALID_MOVE;
 
-        const conversionSpec = getGrassrootsConversionSpec(tile);
+        // CORE-01-04-22K/22L/22L.1: Validate recipe variant and output (Typed Variant B: output ≠ T)
+        const conversionSpec = getGrassrootsConversionSpec(tile, inputResourceIds.length, outputResort);
         if (!conversionSpec) return INVALID_MOVE;
 
         const { controller } = computeMajority(grassrootsTileId, G);
@@ -449,17 +482,20 @@ export const CoreMoves = {
             }
         });
 
-        // CORE-01-06-02/03: Hotspot check — skip StartCommittee (CORE-01-08-06)
-        const candidates = [coord, ...neighbors];
-        candidates.forEach(c => {
-            const tId = G.grid[coordToString(c)];
-            if (!tId) return;
+        // CORE-01-06-02/03/03A: Hotspot check — skip StartCommittee; resolve in ascending PositionKey order
+        const resolved = G.engine.attributes.resolvedHotspots ?? [];
+        const candidatePairs: { coordStr: string; tileId: string }[] = [];
+        [coord, ...neighbors].forEach(c => {
+            const cStr = coordToString(c);
+            const tId = G.grid[cStr];
+            if (!tId || resolved.includes(tId)) return;
             const candidateTile = G.tiles[tId];
-            if (candidateTile && candidateTile.type === TileType.StartCommittee) return;
-            if (isSurrounded(c, G.grid)) {
-                G.engine.effectQueue.push({ kind: 'hotspot.resolve', tileId: tId });
-            }
+            if (candidateTile?.type === TileType.StartCommittee) return;
+            if (isSurrounded(c, G.grid)) candidatePairs.push({ coordStr: cStr, tileId: tId });
         });
+        candidatePairs
+            .sort((a, b) => positionKeyFromCoordString(a.coordStr).localeCompare(positionKeyFromCoordString(b.coordStr)))
+            .forEach(({ tileId }) => G.engine.effectQueue.push({ kind: 'hotspot.resolve', tileId }));
         EffectResolver.resolve(G, ctx);
 
         // End Stage → politicalAction
@@ -470,7 +506,7 @@ export const CoreMoves = {
         }
     },
 
-    // CORE-01-09-01 / CORE-01-07-02: Allow round completion when DrawPile is empty mid-round.
+    // CORE-01-09-01 / CORE-01-07-02 / CORE-01-09-01A: DrawPile empty at turn start → final settlement, skip Political Action
     passTilePlacement: ({ G, ctx, events }: any, payload?: unknown) => {
         const validated = validateMovePayload('passTilePlacement', passPayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
@@ -481,6 +517,17 @@ export const CoreMoves = {
         const stagingId = `staging_${pid}`;
         const staging = G.zones[stagingId];
         if (!staging || staging.items.length > 0) return INVALID_MOVE;
+
+        // CORE-01-09-01A: DrawPile was empty at turn start → final Round Settlement, then end (skip Political Action)
+        if (G.engine.attributes.drawPileEmptyAtTurnStart) {
+            delete G.engine.attributes.drawPileEmptyAtTurnStart;
+            if (!G.roundNumber) G.roundNumber = 0;
+            G.roundNumber++;
+            runFinalRoundSettlement(G, ctx);
+            G.roundSettlementDone = true;
+            events.endTurn();
+            return;
+        }
 
         if (events && events.endStage) {
             events.endStage();

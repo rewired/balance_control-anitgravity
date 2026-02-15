@@ -54,6 +54,8 @@ export enum TileType {
 export interface GrassrootsConversionMetadata {
     inputSlots: number;
     outputSlots: number;
+    /** CORE-01-04-22L: Typed Grassroots have resort T; Variant B allows 3:1 with output ≠ T */
+    typedResort?: ResourceType;
 }
 
 export interface Tile {

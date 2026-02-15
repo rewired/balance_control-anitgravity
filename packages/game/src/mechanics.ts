@@ -13,6 +13,9 @@ export function computeMajority(tileId: string, G: GameState, visited: Set<strin
         return { controller: null, winners: [] };
     }
 
+    // CORE-01-05-04B: When computing majority FOR a Lobbyist Tile, apply no Lobbyist adjacency bonuses
+    const skipLobbyistBonus = tile?.type === TileType.Lobbyist;
+
     if (visited.has(tileId)) {
         return { controller: null, winners: [] };
     }
@@ -30,14 +33,16 @@ export function computeMajority(tileId: string, G: GameState, visited: Set<strin
         }
     }
 
-    // CORE-01-05-04: Lobbyist adjacency bonus
-    const neighbors = G.adjacency[tileId] || [];
-    for (const nId of neighbors) {
-        const neighborTile = G.tiles[nId];
-        if (neighborTile && neighborTile.type === TileType.Lobbyist) {
-            const { controller } = computeMajority(nId, G, new Set(visited));
-            if (controller) {
-                influenceCounts[controller] = (influenceCounts[controller] || 0) + 1;
+    // CORE-01-05-04 / CORE-01-05-04B: Lobbyist adjacency bonus (excluded when target is Lobbyist)
+    if (!skipLobbyistBonus) {
+        const neighbors = G.adjacency[tileId] || [];
+        for (const nId of neighbors) {
+            const neighborTile = G.tiles[nId];
+            if (neighborTile && neighborTile.type === TileType.Lobbyist) {
+                const { controller } = computeMajority(nId, G, new Set(visited));
+                if (controller) {
+                    influenceCounts[controller] = (influenceCounts[controller] || 0) + 1;
+                }
             }
         }
     }

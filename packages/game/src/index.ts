@@ -1,6 +1,7 @@
 import { Game } from 'boardgame.io';
-import { GameState, CoreZoneNames } from '@balance-control/rules';
+import { GameState, CoreZoneNames, TileType } from '@balance-control/rules';
 import { SetupGame } from './setup';
+import { positionKeyFromCoordString } from './topology';
 import { CoreMoves } from './moves';
 import { drawTileToStaging, returnMetaMarkersAtRoundStart } from './mechanics-turn';
 import { EffectResolver } from './engine/resolver';
@@ -120,6 +121,13 @@ export const BalanceControl: Game<GameState> = {
             }
             EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
             drawTileToStaging(G, ctx);
+            // CORE-01-09-01A: Flag when DrawPile was empty at turn start (staging stays empty)
+            const drawPile = G.zones[CoreZoneNames.DrawPile];
+            const stagingId = `staging_${ctx.currentPlayer}`;
+            const staging = G.zones[stagingId];
+            if (drawPile?.items.length === 0 && (!staging || staging.items.length === 0)) {
+                G.engine.attributes.drawPileEmptyAtTurnStart = true;
+            }
             EffectResolver.triggerHook(G as any, ctx, 'onTurnBegin', { playerId: ctx.currentPlayer });
         },
         onEnd: ({ G, ctx }: any) => {
@@ -133,14 +141,24 @@ export const BalanceControl: Game<GameState> = {
                 if (!G.roundNumber) G.roundNumber = 0;
                 G.roundNumber++;
 
-                // Round Settlement: resolve production for all Resort tiles on Board
+                // CORE-01-07-03D: Round Settlement — resolve production in ascending PositionKey order
                 const boardZone = G.zones[CoreZoneNames.Board];
+                const grid = G.grid ?? {};
                 if (boardZone) {
+                    const resortTilesWithCoord: { tileId: string; posKey: string }[] = [];
                     for (const tileId of boardZone.items) {
-                        (G as any).engine.effectQueue.push({
-                            kind: 'production.resolve',
-                            tileId
-                        });
+                        const tile = G.tiles[tileId];
+                        if (tile?.type !== TileType.Resort) continue;
+                        const coordStr = Object.entries(grid).find(([, id]) => id === tileId)?.[0];
+                        if (coordStr) {
+                            resortTilesWithCoord.push({ tileId, posKey: positionKeyFromCoordString(coordStr) });
+                        } else {
+                            resortTilesWithCoord.push({ tileId, posKey: tileId });
+                        }
+                    }
+                    resortTilesWithCoord.sort((a, b) => a.posKey.localeCompare(b.posKey));
+                    for (const { tileId } of resortTilesWithCoord) {
+                        (G as any).engine.effectQueue.push({ kind: 'production.resolve', tileId });
                     }
                     EffectResolver.resolve(G as any, ctx);
                 }

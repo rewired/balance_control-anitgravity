@@ -12,6 +12,21 @@ export function stringToCoord(s: string): Coordinate {
     return { q, r };
 }
 
+/**
+ * CORE-01-00-T08: Deterministic total-order key for canonical ordering.
+ * Primary sort: r (row), secondary: q (column).
+ */
+export function positionKey(c: Coordinate): string {
+    const R = c.r + 10000;
+    const Q = c.q + 10000;
+    return `${R.toString().padStart(6, '0')}_${Q.toString().padStart(6, '0')}`;
+}
+
+/** Derive positionKey from grid coord string "q,r". */
+export function positionKeyFromCoordString(coordStr: string): string {
+    return positionKey(stringToCoord(coordStr));
+}
+
 export function getNeighbors(c: Coordinate): Coordinate[] {
     const directions = [
         { q: 1, r: 0 }, { q: 1, r: -1 }, { q: 0, r: -1 },

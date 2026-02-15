@@ -318,6 +318,21 @@ export class EffectResolver {
             }
         }
 
+        // CORE-01-04-12B: Ping-Pong Penalty — N = min(10, floor(R/2)) resources to Noise
+        if (actionType === 'influence.move' && tileId) {
+            const marker = this.getPlayerMetaMarker(G, pid);
+            if (marker && marker.mode === 'PingPong') {
+                const markerZoneId = this.findObjectZoneId(G, marker.id);
+                if (markerZoneId === tileId) {
+                    const supplyId = `PersonalSupply:${pid}`;
+                    const supply = G.zones[supplyId];
+                    const R = supply?.items?.filter((id: string) => G.objects[id]?.type === 'Resource').length ?? 0;
+                    const N = Math.min(10, Math.floor(R / 2));
+                    for (let i = 0; i < N; i++) costSlots.push('ANY');
+                }
+            }
+        }
+
         if (attr[`ignoreCostIncrease:${pid}`] && costSlots.length > 0) {
             costSlots.shift();
         }
@@ -382,6 +397,9 @@ export class EffectResolver {
         switch (atom.kind) {
             case 'resource.pay':
                 if (!this.handleResourcePay(G, atom)) return false;
+                break;
+            case 'resource.penaltyToNoise':
+                if (!this.handleResourcePenaltyToNoise(G, atom)) return false;
                 break;
             case 'resource.grant':
                 this.handleResourceGrant(G, atom);
@@ -503,6 +521,26 @@ export class EffectResolver {
         if (atom.kind.startsWith('influence.')) return 'Action';
         if (atom.kind.startsWith('tile.')) return 'Action';
         return null;
+    }
+
+    private static handleResourcePenaltyToNoise(G: GameState & { engine: EngineState }, atom: any): boolean {
+        // CORE-01-04-12B: Move chosen resources from PersonalSupply to Noise
+        const { playerId, resourceIds } = atom;
+        const supplyId = `PersonalSupply:${playerId}`;
+        const supply = G.zones[supplyId];
+        const noise = G.zones['Noise'];
+        if (!supply || !noise) return false;
+
+        for (const rid of resourceIds) {
+            const idx = supply.items.indexOf(rid);
+            if (idx < 0) return false;
+            const obj = G.objects[rid];
+            if (!obj || obj.type !== 'Resource') return false;
+            supply.items.splice(idx, 1);
+            noise.items.push(rid);
+            obj.owner = undefined;
+        }
+        return true;
     }
 
     private static handleResourcePay(G: GameState & { engine: EngineState }, atom: any): boolean {
@@ -908,6 +946,10 @@ export class EffectResolver {
         const tile = G.tiles[tileId];
         if (!tile) return;
 
+        // CORE-01-06-03B: Single-Resolution Invariant — skip if already resolved
+        const resolved = G.engine.attributes.resolvedHotspots ?? [];
+        if (resolved.includes(tileId)) return;
+
         // 1. Prohibitions & Modifiers
         if (this.isProhibited(G, 'hotspot.resolve', 'NONE', tileId)) return;
         this.applyModifiers(G, ctx, 'beforeAction', atom);
@@ -923,6 +965,10 @@ export class EffectResolver {
                 context: { source: 'hotspot.resolve', tileId }
             });
         }
+
+        // CORE-01-06-03B: Mark Hotspot as resolved
+        if (!G.engine.attributes.resolvedHotspots) G.engine.attributes.resolvedHotspots = [];
+        G.engine.attributes.resolvedHotspots.push(tileId);
 
         this.applyModifiers(G, ctx, 'afterAction', atom);
     }

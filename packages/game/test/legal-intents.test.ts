@@ -71,7 +71,10 @@ describe('enumerateLegalIntents', () => {
     it('emits convertResources intents only when Grassroots is controlled', () => {
         const ctx = createCtx('politicalAction');
         const G = SetupGame({ ctx });
-        const grassrootsId = Object.values(G.tiles).find(tile => tile.type === TileType.Grassroots)?.id as string;
+        // Use Typed Grassroots (2:1) so 2 resources suffice
+        const grassrootsId = Object.values(G.tiles).find(
+            tile => tile.type === TileType.Grassroots && (tile.conversion?.inputSlots === 2 || tile.resort)
+        )?.id as string;
         G.zones[CoreZoneNames.Board].items.push(grassrootsId);
         G.grid['1,0'] = grassrootsId;
 

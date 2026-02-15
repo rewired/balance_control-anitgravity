@@ -17,7 +17,10 @@ function prepareGameWithBoardGrassroots() {
     const ctx = createCtx();
     const G = SetupGame({ ctx });
     const drawPile = G.zones[CoreZoneNames.DrawPile];
-    const grassrootsTileId = drawPile.items.find((tileId) => G.tiles[tileId]?.type === TileType.Grassroots);
+    // Use Typed Grassroots (2:1) for this test
+    const grassrootsTileId = drawPile.items.find(
+        (tileId) => G.tiles[tileId]?.type === TileType.Grassroots && (G.tiles[tileId]?.conversion?.inputSlots === 2 || G.tiles[tileId]?.resort)
+    );
 
     if (!grassrootsTileId) {
         throw new Error('Expected SetupGame to generate at least one Grassroots tile.');

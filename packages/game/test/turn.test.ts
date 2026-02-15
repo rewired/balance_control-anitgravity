@@ -150,7 +150,7 @@ describe('Turn Structure (Stages)', () => {
         expect(afterState.ctx.activePlayers[pid]).toBe('drawAndPlace');
     });
 
-    it('should allow passTilePlacement when staging is empty and continue turn flow', () => {
+    it('should end turn and game when passTilePlacement with empty staging (DrawPile empty, CORE-01-09-01A)', () => {
         const client = Client({ game: createTinyDrawPileGame(), numPlayers: 2 });
         client.start();
 
@@ -164,9 +164,10 @@ describe('Turn Structure (Stages)', () => {
 
         client.moves.passTilePlacement({});
 
-        const afterStageSkip = client.getState();
-        expect(afterStageSkip.ctx.currentPlayer).toBe(secondPid);
-        expect(afterStageSkip.ctx.activePlayers[secondPid]).toBe('politicalAction');
+        // CORE-01-09-01A: DrawPile empty at turn start → final settlement, skip Political Action, game ends
+        const afterState = client.getState();
+        expect(afterState.G.roundSettlementDone).toBe(true);
+        expect(afterState.ctx.gameover).toBeDefined();
     });
 
     it('should end only after round settlement when draw pile empties mid-round', () => {
