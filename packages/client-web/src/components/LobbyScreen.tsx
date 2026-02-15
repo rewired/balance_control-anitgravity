@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { LobbyClient } from 'boardgame.io/client';
 import { BalanceControl } from '@balance-control/game';
+import { clearLastSession, readLastSession, type LastSession } from '../lobby/session';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
 const GAME_NAME = BalanceControl.name;
@@ -10,6 +11,7 @@ export type LobbyJoinPayload = {
     playerID: string;
     credentials: string;
     playerName: string;
+    serverUrl: string;
 };
 
 interface LobbyScreenProps {
@@ -51,6 +53,10 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
     const [matches, setMatches] = useState<LobbyMatch[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const [lastSession, setLastSession] = useState<LastSession | null>(() => readLastSession());
+    const [isLeavingLastSession, setIsLeavingLastSession] = useState(false);
+    const [leaveLastSessionError, setLeaveLastSessionError] = useState<string | null>(null);
 
     const [playerName, setPlayerName] = useState('');
     const [numPlayers, setNumPlayers] = useState(2);
@@ -113,13 +119,45 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
             if (!credentials) {
                 throw new Error('Lobby join did not return playerCredentials.');
             }
-            onJoin({ matchID, playerID: joinedPlayerID, credentials, playerName: name });
+            onJoin({ matchID, playerID: joinedPlayerID, credentials, playerName: name, serverUrl: SERVER_URL });
         } catch (err) {
             const message = err instanceof Error ? err.message : String(err);
             setError(`Failed to join match: ${message}`);
         } finally {
             setJoiningSeat(null);
         }
+    };
+
+    const handleResumeLastMatch = () => {
+        if (!lastSession) return;
+        setLeaveLastSessionError(null);
+        onJoin(lastSession);
+    };
+
+    const handleLeaveLastMatch = async () => {
+        if (!lastSession) return;
+        setIsLeavingLastSession(true);
+        setLeaveLastSessionError(null);
+        try {
+            const sessionLobbyClient = new LobbyClient({ server: lastSession.serverUrl });
+            await sessionLobbyClient.leaveMatch(GAME_NAME, lastSession.matchID, {
+                playerID: lastSession.playerID,
+                credentials: lastSession.credentials,
+            });
+            clearLastSession();
+            setLastSession(null);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            setLeaveLastSessionError(`Failed to leave match: ${message}`);
+        } finally {
+            setIsLeavingLastSession(false);
+        }
+    };
+
+    const handleForceForget = () => {
+        clearLastSession();
+        setLastSession(null);
+        setLeaveLastSessionError(null);
     };
 
     return (
@@ -129,6 +167,48 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
                 <div className="lobby-subtitle">
                     Game: {GAME_NAME} | Server: {SERVER_URL}
                 </div>
+                {lastSession && (
+                    <div className="lobby-last-session glass-panel" data-testid="lobby-last-session">
+                        <div className="lobby-last-session-title">Last session</div>
+                        <div className="lobby-last-session-meta">
+                            Match {lastSession.matchID} | Player {lastSession.playerID} | Name {lastSession.playerName} | Server{' '}
+                            {lastSession.serverUrl}
+                        </div>
+                        <div className="lobby-last-session-actions">
+                            <button
+                                className="btn-primary"
+                                onClick={handleResumeLastMatch}
+                                disabled={isLeavingLastSession}
+                                data-testid="lobby-resume-last-match"
+                            >
+                                Resume last match
+                            </button>
+                            <button
+                                className="btn-secondary"
+                                onClick={() => void handleLeaveLastMatch()}
+                                disabled={isLeavingLastSession}
+                                data-testid="lobby-leave-last-match"
+                            >
+                                {isLeavingLastSession ? 'Leaving...' : 'Leave'}
+                            </button>
+                            {leaveLastSessionError && (
+                                <div className="lobby-error" data-testid="lobby-leave-last-match-error">
+                                    {leaveLastSessionError}
+                                </div>
+                            )}
+                            {leaveLastSessionError && (
+                                <button
+                                    className="btn-secondary"
+                                    onClick={handleForceForget}
+                                    disabled={isLeavingLastSession}
+                                    data-testid="lobby-force-forget"
+                                >
+                                    Force forget
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
                 <div className="lobby-row">
                     <label className="lobby-field">
                         <span className="lobby-label">Player name</span>

@@ -4,6 +4,7 @@ import { SocketIO } from 'boardgame.io/multiplayer';
 import { BalanceControl } from '@balance-control/game';
 import { Board } from './Board';
 import { LobbyScreen, type LobbyJoinPayload } from './components/LobbyScreen';
+import { clearLastSession, writeLastSession } from './lobby/session';
 
 type MoveLogEntry = {
     timestamp?: number;
@@ -35,16 +36,20 @@ function getReplaySeed(state: any): string | number | null {
 }
 
 const App: React.FC = () => {
-    const lobbyClient = useMemo(() => new LobbyClient({ server: SERVER_URL }), []);
     const [session, setSession] = useState<LobbyJoinPayload | null>(null);
     const [leaveError, setLeaveError] = useState<string | null>(null);
     const [isLeaving, setIsLeaving] = useState(false);
+
+    const lobbyClient = useMemo(() => {
+        const serverUrl = session?.serverUrl ?? SERVER_URL;
+        return new LobbyClient({ server: serverUrl });
+    }, [session?.serverUrl]);
 
     const client = useMemo(() => {
         if (!session) return null;
         return Client({
             game: BalanceControl,
-            multiplayer: SocketIO({ server: SERVER_URL }),
+            multiplayer: SocketIO({ server: session.serverUrl }),
             matchID: session.matchID,
             playerID: session.playerID,
             credentials: session.credentials,
@@ -137,6 +142,7 @@ const App: React.FC = () => {
         setMoveLog([]);
         wasConnectedRef.current = false;
         setLeaveError(null);
+        writeLastSession(payload);
         setSession(payload);
     };
 
@@ -149,6 +155,7 @@ const App: React.FC = () => {
                 playerID: session.playerID,
                 credentials: session.credentials,
             });
+            clearLastSession();
             pendingMovesRef.current = [];
             setMoveLog([]);
             wasConnectedRef.current = false;

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import App from '../src/App';
-import { clearLastSession } from '../src/lobby/session';
+import { clearLastSession, readLastSession, writeLastSession } from '../src/lobby/session';
 
 const clientInstances: Array<{ config: any; stop: ReturnType<typeof vi.fn> }> = [];
 
@@ -53,16 +53,18 @@ function jsonResponse(body: any, status = 200): Response {
     });
 }
 
-describe('LobbyScreen flow', () => {
+describe('Lobby session persistence', () => {
     const serverUrl = 'http://localhost:8000';
     const gameName = 'balance-control';
 
-    let matches: any[] = [];
     let fetchMock: ReturnType<typeof vi.fn>;
+    let matches: any[];
+    let leaveShouldFail: boolean;
 
     beforeEach(() => {
         clientInstances.splice(0, clientInstances.length);
         clearLastSession();
+        leaveShouldFail = false;
 
         matches = [
             {
@@ -82,14 +84,6 @@ describe('LobbyScreen flow', () => {
                 return jsonResponse({ matches });
             }
 
-            if (url === `${serverUrl}/games/${gameName}/create` && method === 'POST') {
-                const numPlayers = body?.numPlayers ?? 2;
-                const matchID = `m${matches.length + 1}`;
-                const players = Array.from({ length: numPlayers }, (_, i) => ({ id: i }));
-                matches.push({ matchID, gameName, players, setupData: body?.setupData ?? null });
-                return jsonResponse({ matchID });
-            }
-
             const joinMatch = url.match(new RegExp(`^${serverUrl}/games/${gameName}/([^/]+)/join$`));
             if (joinMatch && method === 'POST') {
                 const matchID = joinMatch[1];
@@ -102,6 +96,9 @@ describe('LobbyScreen flow', () => {
 
             const leaveMatch = url.match(new RegExp(`^${serverUrl}/games/${gameName}/([^/]+)/leave$`));
             if (leaveMatch && method === 'POST') {
+                if (leaveShouldFail) {
+                    return jsonResponse({ error: 'nope' }, 500);
+                }
                 return jsonResponse({});
             }
 
@@ -117,61 +114,92 @@ describe('LobbyScreen flow', () => {
         clearLastSession();
     });
 
-    it('lists matches and renders seat join buttons', async () => {
-        render(<App />);
-
-        await screen.findByTestId('lobby-match-m1');
-
-        expect(screen.getByTestId('lobby-seat-m1-0').textContent).toContain('Alice');
-        expect(screen.getByTestId('lobby-seat-m1-1').textContent).toContain('Empty');
-
-        const joinBtn = screen.getByTestId('lobby-join-m1-1') as HTMLButtonElement;
-        expect(joinBtn.disabled).toBe(true);
-    });
-
-    it('joins a seat and transitions to the game screen using credentials', async () => {
+    it('writes last session to localStorage on join', async () => {
         render(<App />);
 
         await screen.findByTestId('lobby-match-m1');
 
         fireEvent.change(screen.getByTestId('lobby-player-name'), { target: { value: 'Bob' } });
-
-        const joinBtn = screen.getByTestId('lobby-join-m1-1') as HTMLButtonElement;
+        const joinBtn = (await screen.findByTestId('lobby-join-m1-1')) as HTMLButtonElement;
         await waitFor(() => expect(joinBtn.disabled).toBe(false));
         fireEvent.click(joinBtn);
 
         await screen.findByTestId('game-screen');
-        expect(screen.getByTestId('game-topbar').textContent).toContain('Match m1');
+
+        expect(readLastSession()).toMatchObject({
+            matchID: 'm1',
+            playerID: '1',
+            credentials: 'cred-1',
+            playerName: 'Bob',
+            serverUrl,
+        });
+    });
+
+    it('resumes using stored matchID/playerID/credentials (no re-join)', async () => {
+        writeLastSession({
+            matchID: 'm1',
+            playerID: '0',
+            credentials: 'cred-0',
+            playerName: 'Alice',
+            serverUrl,
+        });
+
+        render(<App />);
+
+        await screen.findByTestId('lobby-last-session');
+        fireEvent.click(screen.getByTestId('lobby-resume-last-match'));
+
+        await screen.findByTestId('game-screen');
 
         expect(clientInstances).toHaveLength(1);
         expect(clientInstances[0].config).toMatchObject({
             matchID: 'm1',
-            playerID: '1',
-            credentials: 'cred-1',
+            playerID: '0',
+            credentials: 'cred-0',
         });
 
-        const joinCall = fetchMock.mock.calls.find(([url]) => String(url).endsWith('/join'));
-        expect(joinCall).toBeTruthy();
-        const joinInit = joinCall?.[1] as RequestInit | undefined;
-        expect(JSON.parse(String(joinInit?.body))).toMatchObject({ playerID: '1', playerName: 'Bob' });
+        expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith('/join'))).toBe(false);
     });
 
-    it('quits the game via leaveMatch and returns to the lobby', async () => {
+    it('leave clears saved session on success', async () => {
+        writeLastSession({
+            matchID: 'm1',
+            playerID: '0',
+            credentials: 'cred-0',
+            playerName: 'Alice',
+            serverUrl,
+        });
+
         render(<App />);
 
-        await screen.findByTestId('lobby-match-m1');
+        await screen.findByTestId('lobby-last-session');
+        fireEvent.click(screen.getByTestId('lobby-leave-last-match'));
 
-        fireEvent.change(screen.getByTestId('lobby-player-name'), { target: { value: 'Bob' } });
-        const joinBtn = screen.getByTestId('lobby-join-m1-1') as HTMLButtonElement;
-        await waitFor(() => expect(joinBtn.disabled).toBe(false));
-        fireEvent.click(joinBtn);
-        await screen.findByTestId('game-screen');
+        await waitFor(() => expect(readLastSession()).toBeNull());
+        await waitFor(() => expect(screen.queryByTestId('lobby-last-session')).toBeNull());
 
-        fireEvent.click(screen.getByTestId('quit-game'));
-
-        await screen.findByTestId('lobby-screen');
         expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith('/leave'))).toBe(true);
+    });
 
-        await waitFor(() => expect(clientInstances[0]?.stop).toHaveBeenCalledTimes(1));
+    it('leave failure keeps saved session and enables force forget', async () => {
+        leaveShouldFail = true;
+        writeLastSession({
+            matchID: 'm1',
+            playerID: '0',
+            credentials: 'cred-0',
+            playerName: 'Alice',
+            serverUrl,
+        });
+
+        render(<App />);
+
+        await screen.findByTestId('lobby-last-session');
+        fireEvent.click(screen.getByTestId('lobby-leave-last-match'));
+
+        await screen.findByTestId('lobby-leave-last-match-error');
+        expect(readLastSession()).not.toBeNull();
+
+        fireEvent.click(screen.getByTestId('lobby-force-forget'));
+        await waitFor(() => expect(readLastSession()).toBeNull());
     });
 });
