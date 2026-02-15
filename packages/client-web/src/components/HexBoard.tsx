@@ -46,7 +46,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     }, [allCoords]);
 
     return (
-        <div className="hex-board" style={{ width, height }}>
+        <div className="hex-board" style={{ width, height }} data-testid="hex-board">
             <div className="hex-layer hex-layer-tiles">
                 {occupiedCoords.map((coordStr) => {
                     const tileId = G.grid[coordStr];

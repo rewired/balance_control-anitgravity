@@ -36,3 +36,7 @@ pnpm-debug.log*
 # Generated test artifacts
 packages/**/test_output*.txt
 packages/**/tmp/**
+
+# Playwright
+playwright-report/
+test-results/
