@@ -75,7 +75,7 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         G.zones[z] = { id: z, name: z, items: [] };
     });
 
-    // Personal Zones
+    // Personal Zones (Meta-Marker only; CORE-01-03-03B: Influence after Shuffle)
     for (let i = 0; i < ctx.numPlayers; i++) {
         const pid = i.toString();
         const zoneId = `${CoreZoneNames.PersonalSupply}:${pid}`;
@@ -85,8 +85,45 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         const meta: GameObject = { id: metaId, type: 'MetaMarker', owner: pid };
         G.objects[metaId] = meta;
         G.zones[zoneId].items.push(metaId);
+    }
 
-        // CORE-01-03-04/05/06: Influence Assignment
+    // 2. Initialize Tiles (Start Committee)
+    const startId = 'tile_start_committee';
+    G.tiles[startId] = { id: startId, type: TileType.StartCommittee };
+    G.zones[CoreZoneNames.Board].items.push(startId);
+    // Also create a "zone" for the tile itself?
+    // Our mechanics assume G.zones[tileId] exists for placement.
+    G.zones[startId] = { id: startId, name: 'Start Committee', items: [] };
+    // Fix B: Start Committee needs a grid coordinate for adjacency checks
+    G.grid['0,0'] = startId;
+
+    // 3. Initialize DrawPile (core + ADD56 when 5-6 players)
+    const coreTiles = generateCoreTiles(ctx.numPlayers);
+    coreTiles.forEach(t => {
+        G.tiles[t.id] = t;
+        G.zones[CoreZoneNames.DrawPile].items.push(t.id);
+        // Create context zone for every tile to handle items on it
+        G.zones[t.id] = { id: t.id, name: t.name || t.id, items: [] };
+    });
+
+    // 4. Apply enabled expansions before the one final setup shuffle.
+    ExpansionRegistry.applySetup(G, ctx, gameConfig);
+
+    // CORE-01-03-02B: Canonical Pre-Shuffle Ordering before shuffle
+    G.zones[CoreZoneNames.DrawPile].items = sortDrawPileCanonical(G);
+
+    // CORE-01-03-02 / CORE-01-03-02A.1: Canonical Fisher-Yates shuffle (i from n-1 down to 1, j = RNG.nextInt(i+1))
+    if (ctx && (ctx as any).random) {
+        G.zones[CoreZoneNames.DrawPile].items = shuffleFisherYates(
+            G.zones[CoreZoneNames.DrawPile].items,
+            (ctx as any).random
+        );
+    }
+
+    // CORE-01-03-03B(5): Assign Starting Influence after Shuffle
+    for (let i = 0; i < ctx.numPlayers; i++) {
+        const pid = i.toString();
+        const zoneId = `${CoreZoneNames.PersonalSupply}:${pid}`;
         let influenceCount = 0;
         if (ctx.numPlayers === 2) influenceCount = 4;
         else if (ctx.numPlayers === 3) influenceCount = 3;
@@ -102,41 +139,11 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         }
     }
 
-    // 2. Initialize Tiles
-    const startId = 'tile_start_committee';
-    G.tiles[startId] = { id: startId, type: TileType.StartCommittee };
-    G.zones[CoreZoneNames.Board].items.push(startId);
-    // Also create a "zone" for the tile itself?
-    // Our mechanics assume G.zones[tileId] exists for placement.
-    G.zones[startId] = { id: startId, name: 'Start Committee', items: [] };
-    // Fix B: Start Committee needs a grid coordinate for adjacency checks
-    G.grid['0,0'] = startId;
-
-    // 3. Initialize DrawPile
-    const coreTiles = generateCoreTiles();
-    coreTiles.forEach(t => {
-        G.tiles[t.id] = t;
-        G.zones[CoreZoneNames.DrawPile].items.push(t.id);
-        // Create context zone for every tile to handle items on it
-        G.zones[t.id] = { id: t.id, name: t.name || t.id, items: [] };
-    });
-
-    // 4. Apply enabled expansions before the one final setup shuffle.
-    ExpansionRegistry.applySetup(G, ctx, gameConfig);
-
-    // CORE-01-03-02B: Canonical Pre-Shuffle Ordering before shuffle
-    G.zones[CoreZoneNames.DrawPile].items = sortDrawPileCanonical(G);
-
-    // CORE-01-03-02: Shuffle all non-Start tiles after composition is finalized.
-    if (ctx && (ctx as any).random) {
-        G.zones[CoreZoneNames.DrawPile].items = (ctx as any).random.Shuffle(G.zones[CoreZoneNames.DrawPile].items);
-    }
-
     return G;
 };
 
 // CORE-01-02-10 to CORE-01-02-16
-function generateCoreTiles(): Tile[] {
+function generateCoreTiles(numPlayers: number): Tile[] {
     const tiles: Tile[] = [];
     let idCounter = 1;
 
@@ -181,7 +188,46 @@ function generateCoreTiles(): Tile[] {
     // Hotspots x8
     add(TileType.Hotspot, 8);
 
+    // ADD56-01-01-02 to 01-16: 5-6 Player Add-On tiles
+    if (numPlayers >= 5) {
+        // DOM-W2 ×1, DOM-W3 ×1, DOM-W4 ×1 (ADD56-01-01-02/03/04)
+        add(TileType.Resort, 1, { resort: CoreResources.DOM, weight: 2 });
+        add(TileType.Resort, 1, { resort: CoreResources.DOM, weight: 3 });
+        add(TileType.Resort, 1, { resort: CoreResources.DOM, weight: 4 });
+        // FOR-W2/3/4 (ADD56-01-01-05/06/07)
+        add(TileType.Resort, 1, { resort: CoreResources.FOR, weight: 2 });
+        add(TileType.Resort, 1, { resort: CoreResources.FOR, weight: 3 });
+        add(TileType.Resort, 1, { resort: CoreResources.FOR, weight: 4 });
+        // INF-W2/3/4 (ADD56-01-01-08/09/10)
+        add(TileType.Resort, 1, { resort: CoreResources.INF, weight: 2 });
+        add(TileType.Resort, 1, { resort: CoreResources.INF, weight: 3 });
+        add(TileType.Resort, 1, { resort: CoreResources.INF, weight: 4 });
+        // Committee ×2 (ADD56-01-01-11)
+        add(TileType.Committee, 2);
+        // Lobbyist ×3 (ADD56-01-01-12)
+        add(TileType.Lobbyist, 3);
+        // Grassroots Untyped ×2 (ADD56-01-01-13, 01-13A)
+        add(TileType.Grassroots, 2, { conversion: { inputSlots: 3, outputSlots: 1 } });
+        // Hotspot (DOM) ×1, Hotspot (FOR) ×1 (ADD56-01-01-14/15/16)
+        add(TileType.Hotspot, 1);
+        add(TileType.Hotspot, 1);
+    }
+
     return tiles;
+}
+
+/** CORE-01-03-02A.1: Fisher-Yates shuffle; j = RNG.nextInt(i+1). Uses ctx.random for determinism. */
+function shuffleFisherYates<T>(arr: T[], random: { Die?: (n: number) => number; Shuffle?: (a: T[]) => T[] }): T[] {
+    if (typeof random.Die === 'function') {
+        const result = [...arr];
+        for (let i = result.length - 1; i >= 1; i--) {
+            const j = random.Die!(i + 1) - 1; // 0..i inclusive
+            [result[i], result[j]] = [result[j], result[i]];
+        }
+        return result;
+    }
+    // Fallback if Die not available (boardgame.io API may vary)
+    return random.Shuffle ? random.Shuffle([...arr]) : arr;
 }
 
 /** CORE-01-03-02B: Canonical Pre-Shuffle Ordering. */

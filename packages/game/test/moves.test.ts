@@ -145,7 +145,7 @@ describe('Moves', () => {
         expect(G.objects.meta_p1.expiresRound).toBe(2);
     });
 
-    it('moveInfluence should set Shift mode when meta-marker is not on destination', () => {
+    it('moveInfluence should set PingPong mode when source is ResortTile (CORE-01-04-12A)', () => {
         G.roundNumber = 3;
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
@@ -153,7 +153,7 @@ describe('Moves', () => {
         CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
 
         expect(G.zones.board_t1.items).toContain('meta_p1');
-        expect(G.objects.meta_p1.mode).toBe('Shift');
+        expect(G.objects.meta_p1.mode).toBe('PingPong');
         expect(G.objects.meta_p1.expiresRound).toBe(4);
     });
 
@@ -241,9 +241,10 @@ describe('Moves', () => {
         expect(G.zones.Bank.items).toContain('res_for');
         expect(G.zones.Bank.items).toContain('res_inf');
         expect(G.zones.Bank.items).toContain('res_dom_2');
-        expect(G.zones['PersonalSupply:p1'].items).toHaveLength(1);
-        const newInfId = G.zones['PersonalSupply:p1'].items[0];
-        expect(G.objects[newInfId].type).toBe('Influence');
+        // CORE-01-04-09A: formalizeInfluence returns Meta-Marker to supply → 2 items (new Influence + meta)
+        expect(G.zones['PersonalSupply:p1'].items).toHaveLength(2);
+        const infIds = G.zones['PersonalSupply:p1'].items.filter((id: string) => G.objects[id]?.type === 'Influence');
+        expect(infIds).toHaveLength(1);
     });
 
     it('formalizeInfluence should ignore prohibitions on Start Committee', () => {

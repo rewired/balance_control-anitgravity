@@ -1,7 +1,7 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneNames, CoreResources, TileType, PlayerID } from '@balance-control/rules';
 import { stringToCoord, coordToString, getNeighbors, isSurrounded, positionKeyFromCoordString } from './topology';
-import { drawMeasure, allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap, runFinalRoundSettlement } from './mechanics-turn';
+import { drawMeasure, allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap, runFinalRoundSettlement, returnMetaMarkerToSupply } from './mechanics-turn';
 import { computeMajority } from './mechanics';
 import { EffectResolver } from './engine/resolver';
 import {
@@ -105,7 +105,7 @@ function findObjectZoneId(G: any, objectId: string): string | null {
     return null;
 }
 
-function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'PingPong' | 'Shift' | 'Convert', expiresRound: number) {
+function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'PingPong' | 'Convert', expiresRound: number) {
     const currentZoneId = findObjectZoneId(G, marker.id);
     if (currentZoneId && currentZoneId !== tileId) {
         const currentZone = G.zones[currentZoneId];
@@ -174,6 +174,9 @@ export const CoreMoves = {
         });
 
         if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
+
+        // CORE-01-04-09A: PlaceInfluence does not place Meta-Marker → return to supply
+        returnMetaMarkerToSupply(G, pid);
 
         // Usage tracking
         EffectResolver.incrementUsage(G, 'politicalAction', pid);
@@ -245,11 +248,12 @@ export const CoreMoves = {
 
         if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
 
-        if (marker) {
-            // CORE-01-04-12A–12C
+        // CORE-01-04-12A: Only place Meta-Marker when source is ResortTile; set mode = PingPong
+        if (marker && sourceTile?.type === TileType.Resort) {
             const expiresRound = (G.roundNumber ?? 0) + 1;
-            const mode = markerOnDestination ? 'PingPong' : 'Shift';
-            placeMetaMarkerOnTile(G, marker, sourceId, mode, expiresRound);
+            placeMetaMarkerOnTile(G, marker, sourceId, 'PingPong', expiresRound);
+        } else if (marker) {
+            returnMetaMarkerToSupply(G, pid);
         }
 
         // Usage tracking
@@ -340,6 +344,9 @@ export const CoreMoves = {
         });
 
         if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
+
+        // CORE-01-04-09A: FormalizeInfluence does not place Meta-Marker → return to supply
+        returnMetaMarkerToSupply(G, pid);
 
         // Track usage (Generalized)
         if (isStartCommittee) {
@@ -543,6 +550,9 @@ export const CoreMoves = {
         const pid = ctx.currentPlayer;
         if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'pass')) return INVALID_MOVE;
         if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
+
+        // CORE-01-04-09A: Pass does not place Meta-Marker → return to supply
+        returnMetaMarkerToSupply(G, pid);
 
         EffectResolver.incrementUsage(G, 'politicalAction', pid);
         events.endTurn();

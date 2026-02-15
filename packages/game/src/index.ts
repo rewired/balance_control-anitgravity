@@ -3,7 +3,7 @@ import { GameState, CoreZoneNames, TileType } from '@balance-control/rules';
 import { SetupGame } from './setup';
 import { positionKeyFromCoordString } from './topology';
 import { CoreMoves } from './moves';
-import { drawTileToStaging, returnMetaMarkersAtRoundStart } from './mechanics-turn';
+import { drawTileToStaging, returnMetaMarkersAtRoundStart, canBeLegallyPlaced } from './mechanics-turn';
 import { EffectResolver } from './engine/resolver';
 import { ExpansionRegistry } from './expansion-registry';
 
@@ -121,11 +121,12 @@ export const BalanceControl: Game<GameState> = {
             }
             EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
             drawTileToStaging(G, ctx);
-            // CORE-01-09-01A: Flag when DrawPile was empty at turn start (staging stays empty)
+            // CORE-01-09-01A / VAR-01-01-08: Flag when DrawPile empty or no legal placement (staging stays empty)
             const drawPile = G.zones[CoreZoneNames.DrawPile];
             const stagingId = `staging_${ctx.currentPlayer}`;
             const staging = G.zones[stagingId];
-            if (drawPile?.items.length === 0 && (!staging || staging.items.length === 0)) {
+            const stagingEmpty = !staging || staging.items.length === 0;
+            if (stagingEmpty && (drawPile?.items.length === 0 || !canBeLegallyPlaced(G))) {
                 G.engine.attributes.drawPileEmptyAtTurnStart = true;
             }
             EffectResolver.triggerHook(G as any, ctx, 'onTurnBegin', { playerId: ctx.currentPlayer });

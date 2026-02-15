@@ -19,6 +19,9 @@ export function drawTileToStaging(G: GameState, ctx: any) {
     // If already has a tile, don't draw (idempotency)
     if (staging.items.length > 0) return;
 
+    // VAR-01-01-08: If no legal placement exists, immediately treat DrawPile as empty (no draw/discard loop)
+    if (!canBeLegallyPlaced(G)) return;
+
     // Redraw loop (CORE-01-04-06/07)
     let attempts = 0;
     const maxAttempts = drawPile.items.length; // Safety: can't loop more than pile size
@@ -51,9 +54,9 @@ export function drawTileToStaging(G: GameState, ctx: any) {
 /**
  * Check if there exists at least one empty hex adjacent to any Board tile.
  * If so, the drawn tile CAN be legally placed.
- * (Any tile type can be placed on any empty adjacent hex.)
+ * VAR-01-01-08: Used to immediately treat DrawPile as empty when false.
  */
-function canBeLegallyPlaced(G: GameState): boolean {
+export function canBeLegallyPlaced(G: GameState): boolean {
     // Find all occupied coordinates
     const occupied = new Set(Object.keys(G.grid));
 
@@ -143,6 +146,31 @@ function findObjectZoneId(G: GameState, objectId: string): string | null {
         if (zone.items.includes(objectId)) return zone.id;
     }
     return null;
+}
+
+/** CORE-01-04-09A: Return Meta-Marker to PersonalSupply and set mode = None when Political Action did not place/update it. */
+export function returnMetaMarkerToSupply(G: GameState, playerId: string): void {
+    const supplyId = `${CoreZoneNames.PersonalSupply}:${playerId}`;
+    const supply = G.zones[supplyId];
+    if (!supply) return;
+
+    for (const obj of Object.values(G.objects)) {
+        if (!obj || obj.type !== 'MetaMarker' || obj.owner !== playerId) continue;
+
+        const currentZoneId = findObjectZoneId(G, obj.id);
+        if (currentZoneId && currentZoneId !== supplyId) {
+            const currentZone = G.zones[currentZoneId];
+            if (currentZone) {
+                currentZone.items = currentZone.items.filter((id: string) => id !== obj.id);
+            }
+        }
+
+        if (!supply.items.includes(obj.id)) {
+            supply.items.push(obj.id);
+        }
+        obj.mode = undefined;
+        obj.expiresRound = undefined;
+    }
 }
 
 export function drawMeasure(G: GameState, ctx: any) {

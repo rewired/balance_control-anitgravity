@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- CORE-01-04-12A: Meta-Marker only placed when Move source is ResortTile; mode always PingPong (removed non-spec Shift).
+- CORE-01-04-09A: Meta-Marker carryover — return to PersonalSupply and mode=None when Political Action does not place/update it (placeInfluence, formalizeInfluence, pass, moveInfluence from non-Resort).
+- CORE-01-03-03B: Setup order corrected — Influence assigned after Shuffle (canonical step order).
+- CORE-01-03-02A.1: Canonical Fisher-Yates shuffle implemented using ctx.random.Die; fallback to Shuffle if Die unavailable.
+- VAR-01-01-08: TileRecycling termination — when no legal placement exists, immediately treat DrawPile as empty (no draw/discard loop).
+- ADD56: 5–6 Player Add-On tiles added when numPlayers >= 5 (DOM/FOR/INF W2–W4, Committees, Lobbyists, Grassroots, Hotspots).
+- Golden replays and replay-runner hashes updated for new setup/shuffle/meta-marker behavior.
 - Client: contextual action panel replaces intent button spam.
 - Client: board selection and inspector panel for tile details and token counts.
 - Client: board camera with pan/zoom and fit-to-board framing.

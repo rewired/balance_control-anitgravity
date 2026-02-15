@@ -57,6 +57,27 @@ describe('SetupGame', () => {
         expect(hotspots.length).toBe(8);
     });
 
+    it('should add ADD56 tiles when 5-6 players', () => {
+        const ctx: any = { numPlayers: 5, random: { Shuffle: (arr: any[]) => arr } };
+        const G = SetupGame({ ctx });
+
+        const drawPile = G.zones[CoreZoneNames.DrawPile].items;
+        // Core 71 + ADD56 5-6 Player Add-On: 9 Resort(W2-4) + 2 Committee + 3 Lobbyist + 2 Grassroots + 2 Hotspot = 89
+        expect(drawPile.length).toBe(89);
+
+        const tiles = drawPile.map(id => G.tiles[id]);
+        const resorts = tiles.filter(t => t.type === TileType.Resort);
+        expect(resorts.length).toBe(45); // 36 + 9
+        const committees = tiles.filter(t => t.type === TileType.Committee);
+        expect(committees.length).toBe(12); // 10 + 2
+        const lobbyists = tiles.filter(t => t.type === TileType.Lobbyist);
+        expect(lobbyists.length).toBe(12); // 9 + 3
+        const grassroots = tiles.filter(t => t.type === TileType.Grassroots);
+        expect(grassroots.length).toBe(10); // 8 + 2
+        const hotspots = tiles.filter(t => t.type === TileType.Hotspot);
+        expect(hotspots.length).toBe(10); // 8 + 2
+    });
+
     it('should place Start Committee on Board', () => {
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
