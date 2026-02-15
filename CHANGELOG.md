@@ -6,6 +6,7 @@
 - Client: board selection and inspector panel for tile details and token counts.
 - Client: board camera with pan/zoom and fit-to-board framing.
 - Client: spatial hex board rendering for tiles and placement ghosts.
+- Client: pending choice modal blocks play until resolveChoice is dispatched.
 - Client: added network transport switch, connection status, and playerView guardrails.
 - Client: load global styles, tile state visuals, and full resource palette.
 - Tests: added core compliance invariants and a golden replay covering hotspot, convert penalty, and ping-pong reduction.

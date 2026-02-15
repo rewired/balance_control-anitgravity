@@ -47,3 +47,4 @@
 - [x] Task 0044 - Board Viewport: Pan/Zoom + Fit-to-Board (Playable Camera)
 - [x] Task 0045 - Selection + Inspector Panel: "What am I looking at?" (UX Clarity)
 - [x] Task 0046 - Controls v2: Contextual Action Panel (No Button Spam)
+- [x] Task 0047 - PendingChoice Modal: Block Until Resolved (No UX Dead Ends)
