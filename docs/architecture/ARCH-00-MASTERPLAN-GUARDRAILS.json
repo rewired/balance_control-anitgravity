@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schema_version": "1.0",
+  "id": "bc-masterplan-guardrails",
+  "status": "normative",
+  "scope": {
+    "repo": "BALANCE // CONTROL",
+    "applies_to": ["packages/game", "packages/client-web", "packages/bot-llm", "docs"]
+  },
+  "source_of_truth": [
+    { "id": "SPEC-CORE", "path": "/docs/rules/000-core.md", "version": "v1.1.0" },
+    { "id": "ARCH-01", "path": "/docs/arch/ARCH-01-ENGINE-CLIENT-SEPARATION.md", "version": "v1.1" },
+    { "id": "ARCH-02", "path": "/docs/arch/ARCH-02-STATE-SHAPE.md", "version": "v1.1" },
+    { "id": "ARCH-03", "path": "/docs/arch/ARCH-03-MEASURE-CPU.md", "version": "v1.1" },
+    { "id": "ARCH-04", "path": "/docs/arch/ARCH-04-LLM-BOT-CONTRACT.md", "version": "v1.1" },
+    { "id": "UI-ICONS", "path": "/docs/ui/icon-mapping.md", "note": "Presentation-only; keep stable" }
+  ],
+  "guardrails": [
+    {
+      "id": "GR-001",
+      "level": "MUST",
+      "title": "Engine State Authority",
+      "applies_to": ["packages/game"],
+      "rule": "All authoritative state lives exclusively in packages/game and is JSON-serializable.",
+      "forbidden": ["Persist functions in state", "Persist derived caches/computed fields in state"],
+      "references": ["ARCH-01:STATE_AUTHORITY", "ARCH-02:SERIALIZATION", "CORE-01:CORE-01-00"]
+    },
+    {
+      "id": "GR-002",
+      "level": "MUST",
+      "title": "Engine-only Rule Execution",
+      "applies_to": ["packages/game", "packages/client-web"],
+      "rule": "Rule execution (legality, costs, majority, modifiers, production) occurs only in packages/game.",
+      "forbidden": ["Client computes legality/costs/majority/modifiers"],
+      "references": ["ARCH-01:CLIENT_RESTRICTIONS"]
+    },
+    {
+      "id": "GR-003",
+      "level": "MUST",
+      "title": "Determinism Contract",
+      "applies_to": ["packages/game"],
+      "rule": "Identical move sequence produces identical state hash; RNG seeded at game start; canonical shuffle.",
+      "references": ["CORE-01:CORE-01-03-02A", "CORE-01:CORE-01-03-02A.1", "ARCH-01:DETERMINISM"]
+    },
+    {
+      "id": "GR-004",
+      "level": "MUST",
+      "title": "Single Legal Action Interface",
+      "applies_to": ["packages/game"],
+      "rule": "Legal actions enumerated only via enumerateLegalIntents(G, ctx, playerID); enumeration is pure.",
+      "references": ["ARCH-01:LEGALITY_ENUMERATION"]
+    },
+    {
+      "id": "GR-005",
+      "level": "MUST",
+      "title": "No Phantom Moves",
+      "applies_to": ["packages/game", "packages/bot-llm", "packages/client-web"],
+      "rule": "Do not introduce intents/moves not defined by rules (e.g., pass) unless explicitly specified.",
+      "references": ["CORE-01:CORE-01-04-09", "ARCH-01:LEGALITY_ENUMERATION"]
+    },
+    {
+      "id": "GR-006",
+      "level": "MUST",
+      "title": "Pending Choice Gate",
+      "applies_to": ["packages/game", "packages/bot-llm", "packages/client-web"],
+      "rule": "If pendingChoice exists, only ResolveChoice intents are legal.",
+      "references": ["ARCH-03:PENDING_CHOICE"]
+    },
+    {
+      "id": "GR-007",
+      "level": "MUST",
+      "title": "Effect CPU Resolution Order",
+      "applies_to": ["packages/game"],
+      "rule": "Resolve effects in order: Prohibition -> Cost -> Payment -> Output modifiers -> Mutation.",
+      "references": ["ARCH-03:RESOLUTION_ORDER"]
+    },
+    {
+      "id": "GR-008",
+      "level": "MUST",
+      "title": "No Implicit Effects",
+      "applies_to": ["packages/game"],
+      "rule": "No implicit triggers/hidden state/unstated stacking. Only explicit spec text.",
+      "references": ["CORE-01:CORE-01-10-04", "ARCH-03:NO_IMPLICIT_EFFECTS"]
+    },
+    {
+      "id": "GR-009",
+      "level": "MUST",
+      "title": "Zone Invariants",
+      "applies_to": ["packages/game"],
+      "rule": "Every object exists in exactly one zone; expansions have isolated zones; no mixing unless explicit.",
+      "references": ["CORE-01:CORE-01-00-01", "ARCH-02:ZONE_MODEL", "ARCH-02:EXPANSION_ZONES"]
+    },
+    {
+      "id": "GR-010",
+      "level": "MUST",
+      "title": "Start Committee Immunity & Targeting",
+      "applies_to": ["packages/game"],
+      "rule": "Start Committee is immune, not controllable; no Influence placement on it.",
+      "references": ["CORE-01:CORE-01-08-04", "CORE-01:CORE-01-08-06"]
+    },
+    {
+      "id": "GR-011",
+      "level": "MUST",
+      "title": "Production Canon",
+      "applies_to": ["packages/game"],
+      "rule": "Production must follow CORE-01-06-16 and canonical sweep order.",
+      "references": ["CORE-01:CORE-01-06-16", "CORE-01:CORE-01-07-03D"]
+    },
+    {
+      "id": "GR-012",
+      "level": "MUST",
+      "title": "Match Config is Canonical",
+      "applies_to": ["packages/game"],
+      "rule": "Single read-only match config (e.g., G.cfg) is the sole authority for expansion enablement; guard mismatches.",
+      "forbidden": ["Derive enabled expansions from arbitrary state slices"],
+      "references": ["ARCH-02:EXPANSION_ZONES", "ARCH-01:DETERMINISM"]
+    },
+    {
+      "id": "GR-013",
+      "level": "MUST",
+      "title": "Bot Contract",
+      "applies_to": ["packages/bot-llm"],
+      "rule": "Bot selects only from enumerateLegalIntents; no bypass; no engine introspection.",
+      "references": ["ARCH-04:INTERACTION_MODEL", "ARCH-04:RESTRICTIONS"]
+    },
+    {
+      "id": "GR-014",
+      "level": "SHOULD",
+      "title": "UI Iconography Stability",
+      "applies_to": ["packages/client-web"],
+      "rule": "Tile-type to icon mapping is treated as stable presentation contract.",
+      "references": ["UI-ICONS:mapping"]
+    }
+  ],
+  "enforcement": {
+    "codex_task_contract": {
+      "must_include": ["affected_guardrails", "spec_anchor_refs", "pr_checklist_tickboxes"]
+    }
+  }
+}

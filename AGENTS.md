@@ -11,6 +11,7 @@ This file is the operational contract for Codex (and humans). Follow it strictly
 ---
 
 Primary Architecture Contracts:
+- /docs/arch/ARCH-00-MASTERPLAN-GUARDRAILS.json (all changes must be compliant)
 - /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
 - /docs/architecture/ARCH-02-STATE-SHAPE.md
 - /docs/architecture/ARCH-03-MEASURE-CPU.md
