@@ -48,3 +48,4 @@
 - [x] Task 0045 - Selection + Inspector Panel: "What am I looking at?" (UX Clarity)
 - [x] Task 0046 - Controls v2: Contextual Action Panel (No Button Spam)
 - [x] Task 0047 - PendingChoice Modal: Block Until Resolved (No UX Dead Ends)
+- [x] Task 0048 - Production Resolve: Restore Tie-Split Guard (No stray block)

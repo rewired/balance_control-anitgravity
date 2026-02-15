@@ -145,6 +145,35 @@ describe('Moves', () => {
         expect(G.objects.meta_p1.expiresRound).toBe(2);
     });
 
+    it('moveInfluence should require and apply PingPong penalty resources to Noise (CORE-01-04-12B)', () => {
+        G.roundNumber = 1;
+        (G.zones as any).Noise = { id: 'Noise', name: 'Noise', items: [] };
+
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones.board_t1.items.push('inf_1');
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'meta_p1');
+        G.zones.board_t2.items.push('meta_p1');
+        (G.objects.meta_p1 as any).mode = 'PingPong';
+
+        const before = JSON.stringify(G);
+        const invalid = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+        expect(invalid).toBe(INVALID_MOVE);
+        expect(JSON.stringify(G)).toBe(before);
+
+        const result = CoreMoves.moveInfluence(
+            { G, ctx, events },
+            { sourceId: 'board_t1', targetId: 'board_t2', extraResourceIds: ['res_dom', 'res_for'] }
+        );
+
+        expect(result).not.toBe(INVALID_MOVE);
+        expect(G.zones.Noise.items).toEqual(expect.arrayContaining(['res_dom', 'res_for']));
+        expect(G.zones['PersonalSupply:p1'].items).not.toContain('res_dom');
+        expect(G.zones['PersonalSupply:p1'].items).not.toContain('res_for');
+        expect(G.zones.board_t2.items).toContain('inf_1');
+        expect(G.zones.board_t1.items).toContain('meta_p1');
+        expect(G.zones.board_t2.items).not.toContain('meta_p1');
+    });
+
     it('moveInfluence should set PingPong mode when source is ResortTile (CORE-01-04-12A)', () => {
         G.roundNumber = 3;
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');

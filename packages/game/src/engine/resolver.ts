@@ -707,11 +707,7 @@ export class EffectResolver {
         if (majority.controller) {
             const cap = G.engine.attributes[`productionCap:${majority.controller}`];
             let finalAmount = baseAmount;
-            const marker = this.getPlayerMetaMarker(G, majority.controller);
-            if (marker && marker.mode === 'PingPong') {
-                // CORE-01-06-16(a)4
-                finalAmount = Math.min(Math.floor(finalAmount / 2), 10);
-            }
+            // CORE-01-06-16(a): Apply production cap if set
             if (cap !== undefined) {
                 finalAmount = Math.min(finalAmount, cap);
             }

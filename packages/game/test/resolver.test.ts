@@ -83,7 +83,7 @@ describe('EffectResolver cost and production behavior', () => {
         expect(G.zones.Bank.items).toHaveLength(1);
     });
 
-    it('should reduce production by PingPong and cap at 10', () => {
+    it('should not reduce production when PingPong marker is on the tile (CORE-01-04-12B is Move-only)', () => {
         const bankIds = Array.from({ length: 20 }, (_, i) => `res_dom_${i}`);
         const G: any = {
             zones: {
@@ -119,8 +119,9 @@ describe('EffectResolver cost and production behavior', () => {
         const ok = EffectResolver.resolve(G, {});
 
         expect(ok).toBe(true);
-        expect(G.zones['PersonalSupply:p1'].items).toHaveLength(10);
-        expect(G.zones.Bank.items).toHaveLength(10);
+        expect(G.zones['PersonalSupply:p1'].items).toHaveLength(25);
+        expect(G.zones.Noise.items).toHaveLength(0);
+        expect(G.zones.Bank.items).toHaveLength(0);
     });
 
     it('should not reduce production when controller is missing', () => {
@@ -168,7 +169,7 @@ describe('EffectResolver cost and production behavior', () => {
         expect(G.zones.Bank.items).toHaveLength(0);
     });
 
-    it('should apply PingPong reduction after production modifiers and round down', () => {
+    it('should apply production modifiers (no PingPong production reduction)', () => {
         ExpansionRegistry.clear();
         ExpansionRegistry.register({
             name: 'PingPongModExp',
@@ -216,8 +217,9 @@ describe('EffectResolver cost and production behavior', () => {
         ExpansionRegistry.clear();
 
         expect(ok).toBe(true);
-        expect(G.zones['PersonalSupply:p1'].items).toHaveLength(3);
-        expect(G.zones.Bank.items).toHaveLength(4);
+        expect(G.zones['PersonalSupply:p1'].items).toHaveLength(7);
+        expect(G.zones.Noise.items).toHaveLength(0);
+        expect(G.zones.Bank.items).toHaveLength(0);
     });
 
     it('should produce 0 when production is prohibited', () => {
