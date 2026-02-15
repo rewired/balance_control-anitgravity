@@ -11,11 +11,12 @@ This file is the operational contract for Codex (and humans). Follow it strictly
 ---
 
 Primary Architecture Contracts:
-- /docs/arch/ARCH-00-MASTERPLAN-GUARDRAILS.json (all changes must be compliant)
-- /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
-- /docs/architecture/ARCH-02-STATE-SHAPE.md
-- /docs/architecture/ARCH-03-MEASURE-CPU.md
-- /docs/architecture/ARCH-04-LLM-BOT-CONTRACT.md
+
+* /docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json (all changes MUST be compliant)
+* /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+* /docs/architecture/ARCH-02-STATE-SHAPE.md
+* /docs/architecture/ARCH-03-MEASURE-CPU.md
+* /docs/architecture/ARCH-04-LLM-BOT-CONTRACT.md
 
 ---
 
@@ -23,35 +24,73 @@ Primary Architecture Contracts:
 
 You must execute this task end-to-end. You are NOT DONE until every item below is completed.
 
+### 0) Masterplan Guardrails Gate (mandatory preflight)
+
+* You MUST read: `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json` before changing any code.
+* Every task MUST explicitly list "affected_guardrails" (GR-xxx IDs) in its task file.
+* If a change would violate any GR-xxx:
+
+  * STOP implementation.
+  * Create `/docs/design-decisions/DD-XXXX-<topic>.md` describing the conflict and the proposed deterministic resolution.
+  * Wait for approval before continuing.
+* No silent interpretation. No "helpful" deviations. Guardrails are the brake pedal.
+
 ### 1) Progress Discipline
-- Treat every section of this task as mandatory.
-- If a section is not applicable, write "N/A" explicitly (do not omit).
+
+* Treat every section of this task as mandatory.
+* If a section is not applicable, write "N/A" explicitly (do not omit).
+* Sections 0–9 are frozen before implementation; after freezing, only Section 15 may change (append-only).
 
 ### 2) PR Checklist is a Repo Artifact
-- Update `docs/tasks/TASK_XXXX.md`:
-  - Fill the "PR Checklist" by checking the boxes.
-  - Add a short "Work Summary" (3-7 bullets).
-  - Add "Commands Run" with exact commands and outcomes.
+
+* Update the task file in `docs/tasks/`:
+
+  * Naming: `<task_id>-<meaningful_name>.md` (task_id = 000x)
+  * Fill the "PR Checklist" by checking the boxes.
+  * Add a short "Work Summary" (3-7 bullets).
+  * Add "Commands Run" with exact commands and outcomes.
+  * Include "Guardrails" section with affected GR-xxx IDs (or explicit NONE).
 
 ### 3) Postflight Proof (must be produced)
-Run and record outputs (copy/paste into `docs/tasks/TASK_XXXX.md`):
-- `git status`
-- `git diff --stat`
-- project tests (e.g. `pnpm test` or `pnpm vitest run`)
+
+Run and record outputs (copy/paste into the task file in `docs/tasks/`):
+
+* `git status`
+* `git diff --stat`
+* project tests (e.g. `pnpm test` or `pnpm vitest run`)
 
 ### 4) Single Meaningful Commit (required)
-- Create exactly ONE commit on a dedicated branch.
-- Commit message MUST follow:
-  - Subject: `task(XXXX): <imperative summary>`
-  - Body: 2-6 bullet points describing what changed and why.
-- Commit must include the updated `docs/tasks/TASK_XXXX.md`.
-- After commit, include proof:
-  - `git show -1 --stat`
+
+* Create exactly ONE commit on a dedicated branch.
+* Commit message MUST follow:
+
+  * Subject: `task(XXXX): <imperative summary>`
+  * Body: 2-6 bullet points describing what changed and why.
+* Commit must include the updated task file in `docs/tasks/`.
+* After commit, include proof:
+
+  * `git show -1 --stat`
 
 ### 5) Failure Mode
+
 If any requirement above cannot be satisfied, STOP and explain why.
 Do not mark the task as complete.
 
+---
+
+# 0.0 Masterplan Guardrails (Hard Policy)
+
+The masterplan guardrails are normative and binding:
+
+* `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`
+
+Requirements:
+
+* Any change MUST be compliant with the guardrails.
+* Tasks/PRs MUST list affected GR-xxx IDs (or explicit NONE).
+* If compliance cannot be demonstrated → do not implement; escalate via DD doc.
+
+This policy is stronger than convenience and overrides "quick fixes".
 
 ---
 
