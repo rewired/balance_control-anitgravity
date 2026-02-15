@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Client } from 'boardgame.io/client';
+import { Client, LobbyClient } from 'boardgame.io/client';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { BalanceControl } from '@balance-control/game';
 import { Board } from './Board';
+import { LobbyScreen, type LobbyJoinPayload } from './components/LobbyScreen';
 
 type MoveLogEntry = {
     timestamp?: number;
@@ -15,32 +16,8 @@ type MoveLogEntry = {
 
 const DEBUG_REPLAY = import.meta.env.VITE_DEBUG_REPLAY === '1';
 const REPLAY_RING_SIZE = 200;
-const MULTIPLAYER_MODE = import.meta.env.VITE_MULTIPLAYER ?? 'local';
 const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
-
-function getRuntimeParams() {
-    const params = new URLSearchParams(window.location.search);
-    const playerID = params.get('player') ?? import.meta.env.VITE_PLAYER_ID ?? '0';
-    const matchID = params.get('match') ?? import.meta.env.VITE_MATCH_ID ?? 'default';
-    return { playerID, matchID };
-}
-
-function createClient(playerID: string, matchID: string) {
-    if (MULTIPLAYER_MODE === 'server') {
-        return Client({
-            game: BalanceControl,
-            numPlayers: 2,
-            multiplayer: SocketIO({ server: SERVER_URL }),
-            matchID,
-            playerID
-        });
-    }
-    return Client({
-        game: BalanceControl,
-        numPlayers: 2,
-        playerID
-    });
-}
+const GAME_NAME = BalanceControl.name;
 
 function getStateID(state: any): number | null {
     if (!state) return null;
@@ -58,14 +35,32 @@ function getReplaySeed(state: any): string | number | null {
 }
 
 const App: React.FC = () => {
-    const [{ playerID, matchID }] = useState(getRuntimeParams);
-    const client = useMemo(() => createClient(playerID, matchID), [playerID, matchID]);
-    const [state, setState] = useState<any>(client.getState());
+    const lobbyClient = useMemo(() => new LobbyClient({ server: SERVER_URL }), []);
+    const [session, setSession] = useState<LobbyJoinPayload | null>(null);
+    const [leaveError, setLeaveError] = useState<string | null>(null);
+    const [isLeaving, setIsLeaving] = useState(false);
+
+    const client = useMemo(() => {
+        if (!session) return null;
+        return Client({
+            game: BalanceControl,
+            multiplayer: SocketIO({ server: SERVER_URL }),
+            matchID: session.matchID,
+            playerID: session.playerID,
+            credentials: session.credentials,
+        });
+    }, [session]);
+
+    const [state, setState] = useState<any>(null);
     const [moveLog, setMoveLog] = useState<MoveLogEntry[]>([]);
     const pendingMovesRef = useRef<MoveLogEntry[]>([]);
     const wasConnectedRef = useRef(false);
 
     useEffect(() => {
+        if (!client) {
+            setState(null);
+            return;
+        }
         client.start();
         setState(client.getState());
         const unsubscribe = client.subscribe((nextState: any) => {
@@ -89,6 +84,7 @@ const App: React.FC = () => {
     }, [state?.isConnected]);
 
     const moves = useMemo(() => {
+        if (!client || !session) return {};
         const wrapped: Record<string, (...args: any[]) => void> = {};
         for (const [name, fn] of Object.entries(client.moves)) {
             wrapped[name] = (...args: any[]) => {
@@ -97,7 +93,7 @@ const App: React.FC = () => {
                     const payload = args.length <= 1 ? (args[0] ?? null) : args;
                     pendingMovesRef.current.push({
                         timestamp: Date.now(),
-                        playerID,
+                        playerID: session.playerID,
                         moveName: name,
                         payload,
                         stateID_before: getStateID(beforeState),
@@ -108,7 +104,7 @@ const App: React.FC = () => {
             };
         }
         return wrapped;
-    }, [client, playerID]);
+    }, [client, session?.playerID]);
 
     const replayPayload = useMemo(() => {
         return {
@@ -136,7 +132,43 @@ const App: React.FC = () => {
         }
     };
 
+    const handleJoin = (payload: LobbyJoinPayload) => {
+        pendingMovesRef.current = [];
+        setMoveLog([]);
+        wasConnectedRef.current = false;
+        setLeaveError(null);
+        setSession(payload);
+    };
+
+    const handleQuitGame = async () => {
+        if (!session) return;
+        setIsLeaving(true);
+        setLeaveError(null);
+        try {
+            await lobbyClient.leaveMatch(GAME_NAME, session.matchID, {
+                playerID: session.playerID,
+                credentials: session.credentials,
+            });
+            pendingMovesRef.current = [];
+            setMoveLog([]);
+            wasConnectedRef.current = false;
+            setSession(null);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            setLeaveError(`Failed to leave match: ${message}`);
+        } finally {
+            setIsLeaving(false);
+        }
+    };
+
+    if (!session) {
+        return <LobbyScreen onJoin={handleJoin} />;
+    }
+
     if (!state) return null;
+
+    const playerID = session.playerID;
+    const matchID = session.matchID;
 
     const isConnected = state?.isConnected ?? true;
     const ctx = state?.ctx;
@@ -144,24 +176,37 @@ const App: React.FC = () => {
     const isMyTurn = ctx?.currentPlayer === playerID;
     const isActiveByStage = Boolean(ctx?.activePlayers?.[playerID]);
     const isActive = isConnected && !gameover && (isMyTurn || isActiveByStage);
-    const connectionLabel = MULTIPLAYER_MODE === 'server'
-        ? (isConnected ? 'Connected' : (wasConnectedRef.current ? 'Disconnected' : 'Connecting'))
-        : 'Local';
+    const connectionLabel = isConnected ? 'Connected' : (wasConnectedRef.current ? 'Disconnected' : 'Connecting');
 
     return (
         <>
-            {MULTIPLAYER_MODE === 'server' && (
-                <div className="connection-status">
-                    {connectionLabel} · Match {matchID} · Player {playerID}
+            <div className="game-topbar glass-panel" data-testid="game-topbar">
+                <div className="game-topbar-text">
+                    {connectionLabel} | Match {matchID} | Player {playerID}
+                </div>
+                <button
+                    className="btn-secondary"
+                    onClick={() => void handleQuitGame()}
+                    disabled={isLeaving}
+                    data-testid="quit-game"
+                >
+                    {isLeaving ? 'Quitting...' : 'Quit game'}
+                </button>
+            </div>
+            {leaveError && (
+                <div className="game-topbar-error glass-panel" data-testid="quit-error">
+                    {leaveError}
                 </div>
             )}
-            <Board
-                G={state.G}
-                ctx={state.ctx}
-                moves={moves}
-                playerID={playerID}
-                isActive={isActive}
-            />
+            <div data-testid="game-screen">
+                <Board
+                    G={state.G}
+                    ctx={state.ctx}
+                    moves={moves}
+                    playerID={playerID}
+                    isActive={isActive}
+                />
+            </div>
             {DEBUG_REPLAY && (
                 <div className="debug-replay-panel">
                     <div className="debug-replay-title">Replay Debug</div>
