@@ -4,6 +4,7 @@
 
 - Fix: client active-state now derived from `ctx` (no reliance on `state.isActive`); legal-intents fall back when `ctx.activePlayers` is missing and prohibitions are respected.
 - Client: added classic boardgame.io Lobby start screen (list/create/join) and in-game Quit that leaves via Lobby `leaveMatch`.
+- Client: persist last lobby session in `localStorage` with explicit Resume/Leave + Force forget on leave failure.
 - Fix: CORE-01-04-12B Ping-Pong penalty only applies to Move actions (resources to Noise), not production. Removed incorrect production halving.
 - CORE-01-04-12A: Meta-Marker only placed when Move source is ResortTile; mode always PingPong (removed non-spec Shift).
 - CORE-01-04-09A: Meta-Marker carryover — return to PersonalSupply and mode=None when Political Action does not place/update it (placeInfluence, formalizeInfluence, pass, moveInfluence from non-Resort).
