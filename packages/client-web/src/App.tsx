@@ -108,7 +108,7 @@ const App: React.FC = () => {
             };
         }
         return wrapped;
-    }, [playerID]);
+    }, [client, playerID]);
 
     const replayPayload = useMemo(() => {
         return {
@@ -139,7 +139,11 @@ const App: React.FC = () => {
     if (!state) return null;
 
     const isConnected = state?.isConnected ?? true;
-    const isActive = Boolean(state?.isActive) && isConnected;
+    const ctx = state?.ctx;
+    const gameover = Boolean(ctx?.gameover);
+    const isMyTurn = ctx?.currentPlayer === playerID;
+    const isActiveByStage = Boolean(ctx?.activePlayers?.[playerID]);
+    const isActive = isConnected && !gameover && (isMyTurn || isActiveByStage);
     const connectionLabel = MULTIPLAYER_MODE === 'server'
         ? (isConnected ? 'Connected' : (wasConnectedRef.current ? 'Disconnected' : 'Connecting'))
         : 'Local';

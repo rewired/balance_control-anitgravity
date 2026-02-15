@@ -50,9 +50,6 @@ export interface LegalIntent {
 export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string): LegalIntent[] {
     if (!playerID) return [];
     if (ctx.currentPlayer !== playerID) return [];
-    const stage = ctx.activePlayers?.[playerID];
-    if (!stage) return [];
-
     const pendingChoice = G.engine?.pendingChoice;
     if (pendingChoice) {
         if (pendingChoice.player !== playerID) return [];
@@ -60,6 +57,7 @@ export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string):
         return sortIntents(intents);
     }
 
+    const stage = ctx.activePlayers?.[playerID] ?? inferStageBestEffort(G, playerID);
     const intents: LegalIntent[] = [];
 
     if (stage === 'drawAndPlace') {
@@ -69,7 +67,7 @@ export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string):
         if (stagedTileId) {
             const stagedTile = G.tiles[stagedTileId];
             const actionType = stagedTile?.type === TileType.Resort ? 'placeResort' : 'placeTile';
-            if (!EffectResolver.isProhibited(G as any, playerID, actionType)) {
+            if (!EffectResolver.isProhibited(G as any, actionType, playerID)) {
                 const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, actionType);
                 const canPay = canPayExtraCosts(G, playerID, costSlots);
                 if (canPay) {
@@ -107,6 +105,14 @@ function buildResolveChoiceIntents(G: GameState, ctx: any, pendingChoice: any): 
         moveType: 'resolveChoice',
         payload: { choiceId: pendingChoice.choiceId, selection }
     }));
+}
+
+function inferStageBestEffort(G: GameState, playerID: string): string {
+    const stagingId = `staging_${playerID}`;
+    const stagedTileId = G.zones[stagingId]?.items?.[0];
+    if (stagedTileId) return 'drawAndPlace';
+    if (G.engine?.attributes?.drawPileEmptyAtTurnStart) return 'drawAndPlace';
+    return 'politicalAction';
 }
 
 function getChoiceSelections(G: GameState, ctx: any, pendingChoice: any): any[] {
@@ -157,7 +163,7 @@ function enumeratePlaceInfluence(G: GameState, playerID: string): LegalIntent[] 
 
     for (const tileId of boardTiles) {
         if (tileId === 'tile_start_committee') continue;
-        if (EffectResolver.isProhibited(G as any, playerID, 'influence.place', tileId)) continue;
+        if (EffectResolver.isProhibited(G as any, 'influence.place', playerID, tileId)) continue;
         const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.place', tileId);
         if (!canPayExtraCosts(G, playerID, costSlots)) continue;
         intents.push({
@@ -183,7 +189,7 @@ function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
         for (const targetId of boardTiles) {
             const targetTile = G.tiles[targetId];
             if (targetTile && targetTile.type === TileType.StartCommittee) continue;
-            if (EffectResolver.isProhibited(G as any, playerID, 'influence.move', targetId)) continue;
+            if (EffectResolver.isProhibited(G as any, 'influence.move', playerID, targetId)) continue;
             const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.move', targetId);
             if (!canPayExtraCosts(G, playerID, costSlots)) continue;
             intents.push({
@@ -213,7 +219,7 @@ function enumerateFormalize(G: GameState, ctx: any, playerID: string): LegalInte
             if (!allStartingInfluencePlaced(G, ctx)) continue;
             if (!EffectResolver.checkUsageLimit(G as any, 'startCommittee', playerID)) continue;
         } else {
-            if (EffectResolver.isProhibited(G as any, playerID, 'influence.formalize', tileId)) continue;
+            if (EffectResolver.isProhibited(G as any, 'influence.formalize', playerID, tileId)) continue;
         }
 
         const requiredCount = isStartCommittee ? 4 : 2;
@@ -251,7 +257,7 @@ function enumerateConvertResources(G: GameState, playerID: string): LegalIntent[
     for (const tileId of boardTiles) {
         const tile = G.tiles[tileId];
         if (!tile || tile.type !== TileType.Grassroots) continue;
-        if (EffectResolver.isProhibited(G as any, playerID, 'convertResources', tileId)) continue;
+        if (EffectResolver.isProhibited(G as any, 'convertResources', playerID, tileId)) continue;
         const conversionSpec = tile.conversion;
         if (!conversionSpec || conversionSpec.inputSlots <= 0) continue;
         const { controller } = computeMajority(tileId, G);

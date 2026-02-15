@@ -4,12 +4,20 @@ import { CoreZoneNames, TileType } from '@balance-control/rules';
 import { enumerateLegalIntents } from '../src/engine/legal-intents';
 import { SetupGame } from '../src/setup';
 import { CoreMoves } from '../src/moves';
+import { drawTileToStaging } from '../src/mechanics-turn';
 
 function createCtx(stage: string) {
     return {
         numPlayers: 2,
         currentPlayer: '0',
         activePlayers: { '0': stage }
+    } as any;
+}
+
+function createCtxNoActivePlayers() {
+    return {
+        numPlayers: 2,
+        currentPlayer: '0'
     } as any;
 }
 
@@ -113,5 +121,25 @@ describe('enumerateLegalIntents', () => {
         const moveTypes = new Set(intents.map(intent => intent.moveType));
         expect(moveTypes).toEqual(new Set(['resolveChoice']));
         expect(intents).toHaveLength(2);
+    });
+
+    it('emits draw-and-place intents even when ctx.activePlayers is missing (best-effort stage)', () => {
+        const ctx = createCtxNoActivePlayers();
+        const G = SetupGame({ ctx });
+        drawTileToStaging(G as any, ctx);
+
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        expect(intents.some(intent => intent.moveType === 'placeTile')).toBe(true);
+    });
+
+    it('respects global prohibitions when enumerating draw-and-place intents', () => {
+        const ctx = createCtx('drawAndPlace');
+        const G = SetupGame({ ctx });
+        drawTileToStaging(G as any, ctx);
+        G.engine.attributes.prohibitions['placeTile'] = true;
+        G.engine.attributes.prohibitions['placeResort'] = true;
+
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        expect(intents).toHaveLength(0);
     });
 });
