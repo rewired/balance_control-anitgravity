@@ -48,3 +48,47 @@ jobs:
 
       - name: Run test suite
         run: pnpm -w test
+
+  e2e:
+    runs-on: windows-latest
+    needs: ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Resolve pnpm store path
+        shell: pwsh
+        run: |
+          "PNPM_STORE_PATH=$(pnpm store path --silent)" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PNPM_STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -w build
+
+      - name: Install Playwright browsers (Chromium)
+        run: pnpm exec playwright install chromium
+
+      - name: Run Playwright E2E
+        run: pnpm -w e2e
