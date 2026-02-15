@@ -4,6 +4,11 @@
   "private": true,
   "scripts": {
     "build": "pnpm -r build",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:report": "playwright show-report",
+    "e2e:serve:dev": "concurrently -k -s first -n server,client \"pnpm -C packages/server run dev\" \"pnpm -C packages/client-web run dev --port 4173 --strictPort\"",
+    "e2e:serve:ci": "concurrently -k -s first -n server,client \"pnpm -C packages/server run start\" \"pnpm -C packages/client-web run preview --port 4173 --strictPort\"",
     "test": "pnpm -r --if-present test",
     "lint": "eslint \"packages/**/*.{ts,tsx,js,cjs,mjs}\" \"scripts/**/*.{js,cjs,mjs}\" \"*.{js,cjs,mjs}\"",
     "check:encoding": "node scripts/check-encoding.mjs",
@@ -13,8 +18,9 @@
     "verify:task": "node scripts/verify-task.mjs"
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "^7.18.0",
+    "@playwright/test": "^1.58.2",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "concurrently": "^9.2.1",
     "eslint": "^8.0.0",
     "prettier": "^3.0.0",

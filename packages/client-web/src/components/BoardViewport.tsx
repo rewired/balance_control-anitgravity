@@ -29,6 +29,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = ({
 }) => {
     const viewportRef = useRef<HTMLDivElement | null>(null);
     const setTransformRef = useRef<((x: number, y: number, scale: number) => void) | null>(null);
+    const baselineTransformRef = useRef<{ x: number; y: number; scale: number } | null>(null);
     const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
     useEffect(() => {
@@ -71,29 +72,52 @@ export const BoardViewport: React.FC<BoardViewportProps> = ({
         if (!setTransformRef.current) return;
         if (!viewportSize.width || !viewportSize.height) return;
         const transform = computeFitTransform(layout.contentBounds, viewportSize, FIT_PADDING);
+        if (!baselineTransformRef.current) {
+            baselineTransformRef.current = transform;
+        }
         setTransformRef.current(transform.x, transform.y, transform.scale);
     }, [layout.contentBounds, viewportSize]);
+
+    const resetView = useCallback(() => {
+        const baseline = baselineTransformRef.current;
+        if (!setTransformRef.current || !baseline) return;
+        setTransformRef.current(baseline.x, baseline.y, baseline.scale);
+    }, []);
+
+    const handleTransformed = useCallback((_ref: any, state: { scale: number; positionX: number; positionY: number }) => {
+        const node = viewportRef.current;
+        if (!node) return;
+        node.dataset.scale = String(state.scale);
+        node.dataset.tx = String(state.positionX);
+        node.dataset.ty = String(state.positionY);
+    }, []);
 
     useEffect(() => {
         applyFit();
     }, [applyFit]);
 
     return (
-        <div className="board-viewport" ref={viewportRef}>
+        <div className="board-viewport" ref={viewportRef} data-testid="board-viewport">
             <TransformWrapper
                 minScale={0.25}
                 maxScale={2.5}
                 wheel={{ step: 0.1 }}
                 panning={{ disabled: false }}
                 doubleClick={{ disabled: true }}
+                onTransformed={handleTransformed}
             >
                 {({ setTransform }) => {
                     setTransformRef.current = setTransform;
                     return (
                         <>
-                            <button className="board-viewport-reset" onClick={applyFit}>
-                                Reset view
-                            </button>
+                            <div className="board-viewport-controls">
+                                <button className="board-viewport-fit" onClick={applyFit} data-testid="btn-fit-to-board">
+                                    Fit to board
+                                </button>
+                                <button className="board-viewport-reset" onClick={resetView} data-testid="btn-reset-view">
+                                    Reset view
+                                </button>
+                            </div>
                             <TransformComponent
                                 wrapperClass="board-viewport-wrapper"
                                 contentClass="board-viewport-content"
