@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Client, SocketIO } from 'boardgame.io/client';
+import { Client } from 'boardgame.io/client';
+import { SocketIO } from 'boardgame.io/multiplayer';
 import { BalanceControl } from '@balance-control/game';
 import { Board } from './Board';
 
