@@ -200,6 +200,7 @@ This section MUST be completed in this task file before declaring done.
 * Add Playwright E2E runner at workspace root with `playwright.config.ts` and `pnpm e2e` scripts that boot server + client.
 * Add stable `data-testid` hooks for viewport + fit/reset controls + `hex-board`, plus a `data-*` transform signal for robust assertions.
 * Add Playwright E2E acceptance test for camera: load/no-console-errors, fit, wheel zoom, drag pan, reset.
+* De-flake camera controls + E2E: exclude viewport controls from pan/wheel capture and make the lobby join deterministic per created match.
 * Ignore Playwright artifacts (`playwright-report/`, `test-results/`) via `.gitignore`.
 * Add `windows-latest` CI job that installs Chromium and runs `pnpm -w e2e`.
 
@@ -207,10 +208,10 @@ This section MUST be completed in this task file before declaring done.
 
 ## 12) Commands Run (with outcomes)
 
-* `pnpm lint` → ok
-* `pnpm test` → ok
-* `pnpm exec playwright install chromium` → ok
-* `pnpm e2e` → ok
+* `pnpm lint` -> ok
+* `pnpm test` -> ok
+* `pnpm run e2e` -> ok
+* `pnpm exec playwright test --repeat-each 5 --workers 1` -> ok
 
 ---
 
@@ -220,22 +221,14 @@ This section MUST be completed in this task file before declaring done.
 
 ```text
 On branch task/0052-client-web-playwright-e2e-board-viewport
+Your branch is up to date with 'origin/task/0052-client-web-playwright-e2e-board-viewport'.
+
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
-	modified:   .github/workflows/ci.yml
-	modified:   .gitignore
-	modified:   package.json
+	modified:   docs/tasks/0052-client-web-playwright-e2e-board-viewport.md
+	modified:   e2e/client-web/board-viewport.spec.ts
 	modified:   packages/client-web/src/components/BoardViewport.tsx
-	modified:   packages/client-web/src/components/HexBoard.tsx
-	modified:   packages/client-web/src/index.css
-	modified:   pnpm-lock.yaml
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-	docs/tasks/0052-client-web-playwright-e2e-board-viewport.md
-	e2e/
-	playwright.config.ts
 
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
@@ -243,14 +236,10 @@ no changes added to commit (use "git add" and/or "git commit -a")
 ### 13.2 git diff --stat
 
 ```text
- .github/workflows/ci.yml                           | 44 +++++++++++++++++++++
- .gitignore                                         |  4 ++
- package.json                                       |  8 +++-
- .../client-web/src/components/BoardViewport.tsx    | 32 +++++++++++++--
- packages/client-web/src/components/HexBoard.tsx    |  2 +-
- packages/client-web/src/index.css                  |  8 +++-
- pnpm-lock.yaml                                     | 45 ++++++++++++++++++++--
- 7 files changed, 133 insertions(+), 10 deletions(-)
+ ...052-client-web-playwright-e2e-board-viewport.md |  51 +++++-----
+ e2e/client-web/board-viewport.spec.ts              | 113 +++++++++++++--------
+ .../client-web/src/components/BoardViewport.tsx    |  12 ++-
+ 3 files changed, 105 insertions(+), 71 deletions(-)
 ```
 
 ### 13.3 Tests
@@ -364,9 +353,19 @@ Chrome Headless Shell 145.0.7632.6 (playwright chromium-headless-shell v1208) do
 
 Running 1 test using 1 worker
 
-  ok 1 [chromium] › e2e\\client-web\\board-viewport.spec.ts:26:5 › board viewport: load + fit/zoom/pan/reset (2.6s)
+  ok 1 [chromium] › e2e\client-web\board-viewport.spec.ts:59:5 › board viewport: load + fit/zoom/pan/reset (3.1s)
 
-  1 passed (8.4s)
+  1 passed (8.6s)
+
+Running 5 tests using 1 worker
+
+  ok 1 [chromium] › e2e\client-web\board-viewport.spec.ts:59:5 › board viewport: load + fit/zoom/pan/reset (3.0s)
+  ok 2 [chromium] › e2e\client-web\board-viewport.spec.ts:59:5 › board viewport: load + fit/zoom/pan/reset (3.0s)
+  ok 3 [chromium] › e2e\client-web\board-viewport.spec.ts:59:5 › board viewport: load + fit/zoom/pan/reset (3.1s)
+  ok 4 [chromium] › e2e\client-web\board-viewport.spec.ts:59:5 › board viewport: load + fit/zoom/pan/reset (3.1s)
+  ok 5 [chromium] › e2e\client-web\board-viewport.spec.ts:59:5 › board viewport: load + fit/zoom/pan/reset (3.0s)
+
+  5 passed (28.3s)
 ```
 
 ---
@@ -390,15 +389,15 @@ Date:   Sun Feb 15 17:52:22 2026 +0100
 
  .github/workflows/ci.yml                           |  44 +++
  .gitignore                                         |   4 +
- ...052-client-web-playwright-e2e-board-viewport.md | 408 +++++++++++++++++++++
- e2e/client-web/board-viewport.spec.ts              | 158 ++++++++
+ ...052-client-web-playwright-e2e-board-viewport.md | 407 +++++++++++++++++++++
+ e2e/client-web/board-viewport.spec.ts              | 189 ++++++++++
  package.json                                       |   8 +-
- .../client-web/src/components/BoardViewport.tsx    |  32 +-
+ .../client-web/src/components/BoardViewport.tsx    |  40 +-
  packages/client-web/src/components/HexBoard.tsx    |   2 +-
  packages/client-web/src/index.css                  |   8 +-
  playwright.config.ts                               |  33 ++
  pnpm-lock.yaml                                     |  45 ++-
- 10 files changed, 732 insertions(+), 10 deletions(-)
+ 10 files changed, 768 insertions(+), 12 deletions(-)
 ```
 
 ---

@@ -72,8 +72,17 @@ export const BoardViewport: React.FC<BoardViewportProps> = ({
         if (!setTransformRef.current) return;
         if (!viewportSize.width || !viewportSize.height) return;
         const transform = computeFitTransform(layout.contentBounds, viewportSize, FIT_PADDING);
+<<<<<<< HEAD
+        baselineTransformRef.current = transform;
+        const node = viewportRef.current;
+        if (node) {
+            node.dataset.baselineScale = String(transform.scale);
+            node.dataset.baselineTx = String(transform.x);
+            node.dataset.baselineTy = String(transform.y);
+=======
         if (!baselineTransformRef.current) {
             baselineTransformRef.current = transform;
+>>>>>>> 0fb5f2c821b98258fac84e3203d82072a965d7c0
         }
         setTransformRef.current(transform.x, transform.y, transform.scale);
     }, [layout.contentBounds, viewportSize]);
@@ -101,8 +110,8 @@ export const BoardViewport: React.FC<BoardViewportProps> = ({
             <TransformWrapper
                 minScale={0.25}
                 maxScale={2.5}
-                wheel={{ step: 0.1 }}
-                panning={{ disabled: false }}
+                wheel={{ step: 0.1, excluded: ['board-viewport-controls'] }}
+                panning={{ disabled: false, excluded: ['board-viewport-controls'] }}
                 doubleClick={{ disabled: true }}
                 onTransformed={handleTransformed}
             >
