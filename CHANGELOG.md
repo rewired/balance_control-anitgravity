@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: CORE-01-04-12B Ping-Pong penalty only applies to Move actions (resources to Noise), not production. Removed incorrect production halving.
 - CORE-01-04-12A: Meta-Marker only placed when Move source is ResortTile; mode always PingPong (removed non-spec Shift).
 - CORE-01-04-09A: Meta-Marker carryover — return to PersonalSupply and mode=None when Political Action does not place/update it (placeInfluence, formalizeInfluence, pass, moveInfluence from non-Resort).
 - CORE-01-03-03B: Setup order corrected — Influence assigned after Shuffle (canonical step order).

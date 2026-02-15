@@ -10,14 +10,20 @@
     }
   },
   "notes": {
-    "purpose": "Exercise PingPong meta-marker production reduction",
-    "updatedFor": "CORE-01 v1.0.20 migration"
+    "purpose": "Exercise PingPong meta-marker Move penalty (resources to Noise)",
+    "updatedFor": "CORE-01 v1.1.0"
   },
   "prelude": [
     {
       "action": "stackDrawPileByType",
       "tileType": "Resort",
       "count": 1
+    },
+    {
+      "action": "seedResources",
+      "playerId": "0",
+      "resort": "DOM",
+      "count": 20
     }
   ],
   "moves": [
@@ -30,9 +36,29 @@
     { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
     { "move": "pass", "args": [{}] },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
-    { "move": "moveInfluence", "args": [{ "sourceCoord": "1,-1", "targetCoord": "1,0" }] },
+    {
+      "move": "moveInfluence",
+      "args": [
+        {
+          "sourceCoord": "1,-1",
+          "targetCoord": "1,0",
+          "extraResourceIds": [
+            "pre_res_0_DOM_1",
+            "pre_res_0_DOM_2",
+            "pre_res_0_DOM_3",
+            "pre_res_0_DOM_4",
+            "pre_res_0_DOM_5",
+            "pre_res_0_DOM_6",
+            "pre_res_0_DOM_7",
+            "pre_res_0_DOM_8",
+            "pre_res_0_DOM_9",
+            "pre_res_0_DOM_10"
+          ]
+        }
+      ]
+    },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,1" }] },
     { "move": "pass", "args": [{}] }
   ],
-  "expectedFinalHash": "aac363231a264bf04b016bbafb5ff7f28895c6bbc276cae9fe41e2ab9077e85d"
+  "expectedFinalHash": "dfc14985518ed878e841944a9937541e04fa638dce97b25977afe1d122720493"
 }
