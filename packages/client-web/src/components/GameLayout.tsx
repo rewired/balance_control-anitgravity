@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { GameState } from '@balance-control/rules';
 import { enumerateLegalIntents, type LegalIntent } from '@balance-control/game';
 import { Zone } from './Zone';
@@ -31,12 +31,80 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
         return ap[pid] || null;
     }, [ctx, playerID]);
 
+    const [selectedCoord, setSelectedCoord] = useState<string | null>(null);
     const [selectedTileId, setSelectedTileId] = useState<string | null>(null);
     const stagingZoneId = `staging_${myPid}`;
     const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
     const intents: LegalIntent[] = useMemo(() => {
         return enumerateLegalIntents(G, ctx, myPid);
     }, [G, ctx, myPid]);
+
+    const handleSelectTile = useCallback((tileId: string | null, coordStr: string | null) => {
+        setSelectedTileId(tileId);
+        setSelectedCoord(coordStr);
+    }, []);
+
+    useEffect(() => {
+        if (selectedCoord) {
+            const tileAtCoord = G.grid?.[selectedCoord] ?? null;
+            if (!tileAtCoord) {
+                if (selectedTileId) {
+                    setSelectedTileId(null);
+                    setSelectedCoord(null);
+                }
+                return;
+            }
+            if (tileAtCoord !== selectedTileId) {
+                setSelectedTileId(tileAtCoord);
+            }
+            return;
+        }
+
+        if (selectedTileId) {
+            const match = Object.entries(G.grid || {}).find(([, tileId]) => tileId === selectedTileId);
+            if (match) {
+                setSelectedCoord(match[0]);
+            }
+        }
+    }, [G.grid, selectedCoord, selectedTileId]);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setSelectedTileId(null);
+                setSelectedCoord(null);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
+    const inspectorData = useMemo(() => {
+        if (!selectedTileId) return null;
+        const tile = G.tiles[selectedTileId];
+        if (!tile) return null;
+        const coord = selectedCoord
+            ?? Object.entries(G.grid || {}).find(([, tileId]) => tileId === selectedTileId)?.[0]
+            ?? null;
+        const influenceByOwner: Record<string, number> = {};
+        const resourceByResort: Record<string, number> = {};
+        const zoneItems = G.zones[selectedTileId]?.items || [];
+        for (const itemId of zoneItems) {
+            const obj = G.objects[itemId];
+            if (!obj) continue;
+            if (obj.type === 'Influence') {
+                const owner = obj.owner ?? 'Unknown';
+                influenceByOwner[owner] = (influenceByOwner[owner] || 0) + 1;
+            }
+            if (obj.type === 'Resource') {
+                const resort = obj.resort ?? 'Unknown';
+                resourceByResort[resort] = (resourceByResort[resort] || 0) + 1;
+            }
+        }
+        return { tile, coord, influenceByOwner, resourceByResort };
+    }, [G, selectedCoord, selectedTileId]);
 
     return (
         <div className="game-layout">
@@ -64,12 +132,73 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     intents={intents}
                     isInteractive={isActive}
                     selectedTileId={selectedTileId}
-                    onSelectTile={setSelectedTileId}
+                    selectedCoord={selectedCoord}
+                    onSelectTile={handleSelectTile}
                 />
             </main>
 
             {/* Right Panel: Opponents / Deck / Info */}
             <aside className="right-panel glass-panel">
+                <div className="inspector-panel" data-testid="inspector-panel">
+                    <h3>Inspector</h3>
+                    {!inspectorData && (
+                        <div className="inspector-empty" data-testid="inspector-empty">
+                            No tile selected
+                        </div>
+                    )}
+                    {inspectorData && (
+                        <div className="inspector-details">
+                            <div className="inspector-row">
+                                <span className="inspector-label">Coord</span>
+                                <span className="inspector-value" data-testid="inspector-coord">
+                                    {inspectorData.coord ?? 'N/A'}
+                                </span>
+                            </div>
+                            <div className="inspector-row">
+                                <span className="inspector-label">Type</span>
+                                <span className="inspector-value">{inspectorData.tile.type}</span>
+                            </div>
+                            <div className="inspector-row">
+                                <span className="inspector-label">Resort</span>
+                                <span className="inspector-value">{inspectorData.tile.resort ?? 'N/A'}</span>
+                            </div>
+                            <div className="inspector-row">
+                                <span className="inspector-label">Weight</span>
+                                <span className="inspector-value">
+                                    {typeof inspectorData.tile.weight === 'number' ? inspectorData.tile.weight : 'N/A'}
+                                </span>
+                            </div>
+                            <div className="inspector-section">
+                                <div className="inspector-subtitle">Influence</div>
+                                {Object.keys(inspectorData.influenceByOwner).length === 0 && (
+                                    <div className="inspector-empty">None</div>
+                                )}
+                                {Object.entries(inspectorData.influenceByOwner)
+                                    .sort(([a], [b]) => a.localeCompare(b))
+                                    .map(([owner, count]) => (
+                                        <div key={owner} className="inspector-row">
+                                            <span className="inspector-label">{owner}</span>
+                                            <span className="inspector-value">{count}</span>
+                                        </div>
+                                    ))}
+                            </div>
+                            <div className="inspector-section">
+                                <div className="inspector-subtitle">Resources</div>
+                                {Object.keys(inspectorData.resourceByResort).length === 0 && (
+                                    <div className="inspector-empty">None</div>
+                                )}
+                                {Object.entries(inspectorData.resourceByResort)
+                                    .sort(([a], [b]) => a.localeCompare(b))
+                                    .map(([resort, count]) => (
+                                        <div key={resort} className="inspector-row">
+                                            <span className="inspector-label">{resort}</span>
+                                            <span className="inspector-value">{count}</span>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
                 <Zone zoneId={zoneNames.DrawPile} G={G} title="Draw Pile" />
                 <Zone zoneId={zoneNames.Noise} G={G} title="Noise" />
             </aside>

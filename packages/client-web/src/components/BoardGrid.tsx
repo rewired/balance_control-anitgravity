@@ -9,7 +9,8 @@ interface BoardGridProps {
     intents: LegalIntent[];
     isInteractive: boolean;
     selectedTileId?: string | null;
-    onSelectTile?: (tileId: string) => void;
+    selectedCoord?: string | null;
+    onSelectTile?: (tileId: string, coordStr: string) => void;
 }
 
 export const BoardGrid: React.FC<BoardGridProps> = ({
@@ -18,6 +19,7 @@ export const BoardGrid: React.FC<BoardGridProps> = ({
     intents,
     isInteractive,
     selectedTileId,
+    selectedCoord,
     onSelectTile
 }) => {
     const occupiedCoords = useMemo(() => {
@@ -37,7 +39,7 @@ export const BoardGrid: React.FC<BoardGridProps> = ({
             {occupiedCoords.map((coordStr) => {
                 const tileId = G.grid[coordStr];
                 const tile = G.tiles[tileId];
-                const isSelected = selectedTileId === tileId;
+                const isSelected = selectedTileId === tileId || selectedCoord === coordStr;
                 const disabled = !isInteractive;
                 const tooltip = `coord ${coordStr}`;
                 return (
@@ -45,7 +47,7 @@ export const BoardGrid: React.FC<BoardGridProps> = ({
                         <Tile
                             tileId={tileId}
                             G={G}
-                            onClick={disabled ? undefined : () => onSelectTile && onSelectTile(tileId)}
+                            onClick={disabled ? undefined : () => onSelectTile && onSelectTile(tileId, coordStr)}
                             selected={isSelected}
                             disabled={disabled}
                             tooltip={tooltip}
