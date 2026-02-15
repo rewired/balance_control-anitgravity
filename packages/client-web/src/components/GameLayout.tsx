@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { GameState } from '@balance-control/rules';
 import { enumerateLegalIntents, type LegalIntent } from '@balance-control/game';
 import { Zone } from './Zone';
-import { Controls } from './Controls';
+import { ActionPanel } from './ActionPanel';
 import { BoardViewport } from './BoardViewport';
 
 interface GameLayoutProps {
@@ -205,7 +205,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
 
             {/* Bottom Controls */}
             <div className="controls-container glass-panel">
-                <Controls
+                <ActionPanel
                     moves={moves}
                     isActive={isActive}
                     stage={stage}

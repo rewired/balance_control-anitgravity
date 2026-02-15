@@ -1,12 +1,16 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import { TileType } from '@balance-control/rules';
 import { GameLayout } from '../src/components/GameLayout';
 
 vi.mock('@balance-control/game', () => ({
     enumerateLegalIntents: () => []
 }));
+
+afterEach(() => {
+    cleanup();
+});
 
 class ResizeObserverMock {
     observe() {}
@@ -57,7 +61,7 @@ describe('Selection inspector', () => {
             />
         );
 
-        const tileCell = screen.getByTestId('hex-tile-0_0');
+        const tileCell = screen.getAllByTestId('hex-tile-0_0')[0];
         const tileNode = tileCell.querySelector('.tile') as HTMLElement;
         fireEvent.click(tileNode);
 
@@ -89,7 +93,7 @@ describe('Selection inspector', () => {
             />
         );
 
-        const tileCell = screen.getByTestId('hex-tile-0_0');
+        const tileCell = screen.getAllByTestId('hex-tile-0_0')[0];
         const tileNode = tileCell.querySelector('.tile') as HTMLElement;
         fireEvent.click(tileNode);
 
