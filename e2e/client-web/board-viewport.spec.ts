@@ -11,6 +11,7 @@ async function waitForViewportTransform(page: any) {
     });
 }
 
+<<<<<<< HEAD
 async function waitForViewportBaseline(page: any) {
     await page.waitForFunction(() => {
         const el = document.querySelector('[data-testid="board-viewport"]') as HTMLElement | null;
@@ -22,6 +23,8 @@ async function waitForViewportBaseline(page: any) {
     });
 }
 
+=======
+>>>>>>> 0fb5f2c821b98258fac84e3203d82072a965d7c0
 async function readViewportTransform(page: any) {
     return await page.evaluate(() => {
         const el = document.querySelector('[data-testid="board-viewport"]') as HTMLElement | null;
@@ -34,6 +37,7 @@ async function readViewportTransform(page: any) {
     });
 }
 
+<<<<<<< HEAD
 async function readViewportDeltaToBaseline(page: any) {
     return await page.evaluate(() => {
         const el = document.querySelector('[data-testid="board-viewport"]') as HTMLElement | null;
@@ -56,6 +60,8 @@ async function readViewportDeltaToBaseline(page: any) {
     });
 }
 
+=======
+>>>>>>> 0fb5f2c821b98258fac84e3203d82072a965d7c0
 test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     const consoleErrors: string[] = [];
     page.on('console', (msg) => {
@@ -68,6 +74,7 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     await expect(page.getByTestId('lobby-screen')).toBeVisible();
 
     await page.getByTestId('lobby-player-name').fill('E2E');
+<<<<<<< HEAD
     const createResponse = page.waitForResponse((resp) => {
         return resp.request().method() === 'POST' && /\/games\/[^/]+\/create$/.test(resp.url());
     });
@@ -82,6 +89,15 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     await joinButton.click();
 
     await expect(page.getByTestId('game-screen')).toBeVisible({ timeout: 30_000 });
+=======
+    await page.getByTestId('lobby-create-match').click();
+
+    const joinButton = page.locator('[data-testid^="lobby-join-"]').first();
+    await expect(joinButton).toBeVisible({ timeout: 15_000 });
+    await joinButton.click();
+
+    await expect(page.getByTestId('game-screen')).toBeVisible({ timeout: 15_000 });
+>>>>>>> 0fb5f2c821b98258fac84e3203d82072a965d7c0
     await expect(page.getByTestId('hex-board')).toBeVisible();
 
     const viewport = page.getByTestId('board-viewport');
@@ -92,10 +108,13 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     // Baseline: fit on load
     await page.getByTestId('btn-fit-to-board').click();
     await waitForViewportTransform(page);
+<<<<<<< HEAD
     await waitForViewportBaseline(page);
     await expect
         .poll(async () => await readViewportDeltaToBaseline(page))
         .toBeLessThan(1);
+=======
+>>>>>>> 0fb5f2c821b98258fac84e3203d82072a965d7c0
     const baseline = await readViewportTransform(page);
     expect(baseline).not.toBeNull();
 
@@ -126,6 +145,7 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
 
     // Wheel zoom out then in (assert transform deltas, not pixels).
     await page.mouse.move(viewportBox.x + viewportBox.width / 2, viewportBox.y + viewportBox.height / 2);
+<<<<<<< HEAD
     let zoomedOut: { scale: number; tx: number; ty: number } | null = null;
     for (let i = 0; i < 10; i++) {
         await page.mouse.wheel(0, 250);
@@ -147,14 +167,45 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     }
     expect(zoomedIn).not.toBeNull();
     expect(zoomedIn!.scale).toBeGreaterThan(zoomedOut!.scale + 0.01);
+=======
+    for (let i = 0; i < 3; i++) {
+        await page.mouse.wheel(0, 250);
+        await page.waitForTimeout(50);
+    }
+    let zoomedOut: { scale: number; tx: number; ty: number } | null = null;
+    await expect
+        .poll(async () => {
+            zoomedOut = await readViewportTransform(page);
+            return zoomedOut?.scale ?? null;
+        })
+        .toBeLessThan(baseline!.scale - 0.001);
+    expect(zoomedOut!.scale).toBeGreaterThanOrEqual(0.25);
+
+    await page.waitForTimeout(150);
+    for (let i = 0; i < 3; i++) {
+        await page.mouse.wheel(0, -250);
+        await page.waitForTimeout(50);
+    }
+    let zoomedIn: { scale: number; tx: number; ty: number } | null = null;
+    await expect
+        .poll(async () => {
+            zoomedIn = await readViewportTransform(page);
+            return zoomedIn?.scale ?? null;
+        })
+        .toBeGreaterThan(zoomedOut!.scale + 0.001);
+>>>>>>> 0fb5f2c821b98258fac84e3203d82072a965d7c0
     expect(zoomedIn!.scale).toBeLessThanOrEqual(2.5);
 
     // Drag pan changes translation.
     await page.mouse.move(viewportBox.x + viewportBox.width / 2, viewportBox.y + viewportBox.height / 2);
     await page.mouse.down();
+<<<<<<< HEAD
     await page.mouse.move(viewportBox.x + viewportBox.width / 2 + 240, viewportBox.y + viewportBox.height / 2 + 160, {
         steps: 10,
     });
+=======
+    await page.mouse.move(viewportBox.x + viewportBox.width / 2 + 120, viewportBox.y + viewportBox.height / 2 + 80);
+>>>>>>> 0fb5f2c821b98258fac84e3203d82072a965d7c0
     await page.mouse.up();
     let panned: { scale: number; tx: number; ty: number } | null = null;
     await expect
@@ -163,6 +214,7 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
             if (!panned) return null;
             return Math.abs(panned.tx - zoomedIn!.tx) + Math.abs(panned.ty - zoomedIn!.ty);
         })
+<<<<<<< HEAD
         .toBeGreaterThan(1);
 
     // Fit-to-board returns to baseline framing.
@@ -183,6 +235,39 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     await page.getByTestId('btn-reset-view').click();
     await expect
         .poll(async () => await readViewportDeltaToBaseline(page))
+=======
+        .toBeGreaterThan(5);
+
+    // Fit-to-board returns to baseline framing.
+    await page.getByTestId('btn-fit-to-board').click();
+    let fitAgain: { scale: number; tx: number; ty: number } | null = null;
+    await expect
+        .poll(async () => {
+            fitAgain = await readViewportTransform(page);
+            if (!fitAgain) return null;
+            return (
+                Math.abs(fitAgain.tx - baseline!.tx)
+                + Math.abs(fitAgain.ty - baseline!.ty)
+                + Math.abs(fitAgain.scale - baseline!.scale)
+            );
+        })
+        .toBeLessThan(1);
+
+    // Reset returns to the stored baseline.
+    await page.mouse.wheel(0, 600);
+    await page.getByTestId('btn-reset-view').click();
+    let reset: { scale: number; tx: number; ty: number } | null = null;
+    await expect
+        .poll(async () => {
+            reset = await readViewportTransform(page);
+            if (!reset) return null;
+            return (
+                Math.abs(reset.tx - baseline!.tx)
+                + Math.abs(reset.ty - baseline!.ty)
+                + Math.abs(reset.scale - baseline!.scale)
+            );
+        })
+>>>>>>> 0fb5f2c821b98258fac84e3203d82072a965d7c0
         .toBeLessThan(1);
 
     expect(consoleErrors, consoleErrors.join('\n')).toEqual([]);
