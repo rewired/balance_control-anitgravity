@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Client: contextual action panel replaces intent button spam.
 - Client: board selection and inspector panel for tile details and token counts.
 - Client: board camera with pan/zoom and fit-to-board framing.
 - Client: spatial hex board rendering for tiles and placement ghosts.
