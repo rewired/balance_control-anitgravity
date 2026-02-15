@@ -4,6 +4,7 @@ import { enumerateLegalIntents, type LegalIntent } from '@balance-control/game';
 import { Zone } from './Zone';
 import { ActionPanel } from './ActionPanel';
 import { BoardViewport } from './BoardViewport';
+import { PendingChoiceModal } from './PendingChoiceModal';
 
 interface GameLayoutProps {
     G: GameState;
@@ -106,8 +107,15 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
         return { tile, coord, influenceByOwner, resourceByResort };
     }, [G, selectedCoord, selectedTileId]);
 
+    const hasPendingChoice = useMemo(() => {
+        return intents.some((intent) => intent.moveType === 'resolveChoice');
+    }, [intents]);
+
+    const isInteractive = isActive && !hasPendingChoice;
+
     return (
         <div className="game-layout">
+            <PendingChoiceModal intents={intents} moves={moves} />
 
             {/* Left Panel: Bank & Supply */}
             <aside className="left-panel glass-panel">
@@ -130,7 +138,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     G={G}
                     moves={moves}
                     intents={intents}
-                    isInteractive={isActive}
+                    isInteractive={isInteractive}
                     selectedTileId={selectedTileId}
                     selectedCoord={selectedCoord}
                     onSelectTile={handleSelectTile}
@@ -204,16 +212,18 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
             </aside>
 
             {/* Bottom Controls */}
-            <div className="controls-container glass-panel">
-                <ActionPanel
-                    moves={moves}
-                    isActive={isActive}
-                    stage={stage}
-                    intents={intents}
-                    selectedTileId={selectedTileId}
-                    stagedTileId={stagedTileId}
-                />
-            </div>
+            {!hasPendingChoice && (
+                <div className="controls-container glass-panel">
+                    <ActionPanel
+                        moves={moves}
+                        isActive={isActive}
+                        stage={stage}
+                        intents={intents}
+                        selectedTileId={selectedTileId}
+                        stagedTileId={stagedTileId}
+                    />
+                </div>
+            )}
         </div>
     );
 };

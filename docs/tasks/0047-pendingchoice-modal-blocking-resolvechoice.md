@@ -1,7 +1,7 @@
 # Codex Task 0047 - PendingChoice Modal: Block Until Resolved (No UX Dead Ends)
 
-**Date:** 2026-02-14  
-**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)  
+**Date:** 2026-02-14
+**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)
 **Primary contract:** `AGENTS.md` (repo root)
 
 Key anchors (ASCII only):
@@ -105,22 +105,94 @@ Add RTL tests:
 
 ## PR Checklist
 
-- [ ] Add `PendingChoiceModal` component
-- [ ] Wire modal into `GameLayout` as blocking overlay
-- [ ] Disable/hide other controls while modal visible
-- [ ] Tests for modal visibility + dispatch + blocking behavior
-- [ ] Update `docs/PR_TASK_LIST.md`
-- [ ] Update `CHANGELOG.md` (Unreleased)
-- [ ] CI green
+- [x] Add `PendingChoiceModal` component
+- [x] Wire modal into `GameLayout` as blocking overlay
+- [x] Disable/hide other controls while modal visible
+- [x] Tests for modal visibility + dispatch + blocking behavior
+- [x] Update `docs/PR_TASK_LIST.md`
+- [x] Update `CHANGELOG.md` (Unreleased)
+- [x] CI green
 
 ---
 
 ## Work Summary
 
-(Replace this section at the end with 3-7 bullets: what changed + why.)
+- Added PendingChoice modal that renders resolveChoice intents deterministically.
+- Blocked board and action panel interactions while a choice is pending.
+- Styled the modal overlay and buttons for clear focus/hover states.
+- Added RTL coverage for modal visibility, blocking, and resolveChoice dispatch.
+- Updated changelog and PR task list entries.
 
 ---
 
 ## Commands Run
 
-(Replace this section at the end with the exact commands executed and outcomes.)
+- `git -c core.pager=cat status -sb`
+  ```text
+   M CHANGELOG.md
+   M docs/PR_TASK_LIST.md
+   M docs/tasks/0047-pendingchoice-modal-blocking-resolvechoice.md
+   M packages/client-web/src/components/GameLayout.tsx
+   M packages/client-web/src/index.css
+  ?? packages/client-web/src/components/PendingChoiceModal.tsx
+  ?? packages/client-web/test/pending-choice-modal.test.tsx
+  ```
+- `git -c core.pager=cat diff --stat`
+  ```text
+   docs/PR_TASK_LIST.md                               |  1 +
+   ...7-pendingchoice-modal-blocking-resolvechoice.md | 88 +++++++++++++++++++---
+   packages/client-web/src/components/GameLayout.tsx  | 32 +++++---
+   packages/client-web/src/index.css                  | 52 +++++++++++++
+   5 files changed, 154 insertions(+), 20 deletions(-)
+  ```
+- `pnpm -w test`
+  ```text
+  > balance-control-monorepo@0.0.0 test D:\__DEV\balance_control-anitgravity
+  > pnpm -r --if-present test
+
+  Scope: 9 of 10 workspace projects
+  packages/game test$ vitest run
+  [56 lines collapsed]
+  │ stdout | test/exp02-hotspot-ids.test.ts > EXP-02 Inner Order hotspot id consistency > should resolve HOTSPOT_RESOLUTION for the setup Inn…
+  │ Expansion registered: EXP-02 Security & Order
+  │  ✓ test/convert-resources-real-setup.test.ts  (2 tests) 8ms
+  │  ✓ test/production-uncontrolled.test.ts  (1 test) 4ms
+  │  ✓ test/player-view.test.ts  (2 tests) 5ms
+  │  Test Files  22 passed (22)
+  │       Tests  84 passed (84)
+  │    Start at  01:58:45
+  │    Duration  28.98s (transform 5.23s, setup 3ms, collect 38.19s, tests 1.71s, environment 4ms, prepare 57.91s)
+  └─ Done in 31.4s
+  packages/client-web test$ vitest run
+  [2 lines collapsed]
+  │  ✓ test/hexLayout.test.ts  (2 tests) 4ms
+  │  ✓ test/selection-inspector.test.tsx  (2 tests) 103ms
+  │  ✓ test/action-panel.test.tsx  (3 tests) 66ms
+  │  ✓ test/controls-start-committee.test.tsx  (1 test) 41ms
+  │  ✓ test/Board.test.tsx  (7 tests) 59ms
+  │  ✓ test/pending-choice-modal.test.tsx  (3 tests) 68ms
+  │  Test Files  7 passed (7)
+  │       Tests  21 passed (21)
+  │    Start at  01:59:16
+  │    Duration  35.94s (transform 497ms, setup 1ms, collect 21.46s, tests 347ms, environment 116.68s, prepare 11.34s)
+  └─ Done in 38.5s
+  ```
+- `pnpm lint`
+  ```text
+  > balance-control-monorepo@0.0.0 lint D:\__DEV\balance_control-anitgravity
+  > eslint "packages/**/*.{ts,tsx,js,cjs,mjs}" "scripts/**/*.{js,cjs,mjs}" "*.{js,cjs,mjs}"
+
+  =============
+
+  WARNING: You are currently running a version of TypeScript which is not officially supported by @typescript-eslint/typescript-estree.
+
+  You may find that it works just fine, or you may not.
+
+  SUPPORTED TYPESCRIPT VERSIONS: >=4.7.4 <5.6.0
+
+  YOUR TYPESCRIPT VERSION: 5.9.3
+
+  Please only submit bug reports when using the officially supported version.
+
+  =============
+  ```
