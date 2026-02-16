@@ -3,6 +3,8 @@
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
+**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+
 ## 0) Metadata (frozen)
 
 - **Task ID:** 0002
@@ -23,6 +25,11 @@ Introduce an engine-level module registry that allows:
 - a hard prohibition on overrides (duplicate `atom.kind` registration is an error)
 
 Core is treated as a mandatory module that is always enabled.
+
+Failure behavior requirements:
+
+- Duplicate `atom.kind` registration must throw an error with a deterministic message (stable text; stable listing order).
+- If multiple conflicts exist, the conflict list must be ordered deterministically (e.g. by canonical module order, then by `atom.kind`).
 
 ## 3) Non-goals (frozen)
 
@@ -49,6 +56,7 @@ Core is treated as a mandatory module that is always enabled.
 - Single canonical resolver remains the only place the queue is executed (AGENTS 3.5)
 - Dispatch lookup must be deterministic (explicit ordering; no object-key iteration semantics)
 - No changes to rules or legality enumeration behavior
+- Core module is always enabled; expansion modules are enabled only when their canonical flag is `true`
 
 ## 7) Guardrails + Spec anchors (frozen)
 
@@ -90,4 +98,3 @@ TBD
 ### Commands Run
 
 TBD
-

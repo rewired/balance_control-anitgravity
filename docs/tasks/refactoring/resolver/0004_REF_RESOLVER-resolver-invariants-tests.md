@@ -3,6 +3,8 @@
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
+**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+
 ## 0) Metadata (frozen)
 
 - **Task ID:** 0004
@@ -26,6 +28,11 @@ Add a small suite of focused invariants tests that act as refactor tripwires:
 - stable effect-queue behavior across runs (where feasible)
 - preserve golden replay expectations (existing test remains green)
 
+Minimum additional tripwires:
+
+- Disabled expansions register nothing (no modules, no deck providers, no handlers) when their flag is `false`
+- Module ordering is exactly the canonical order list (not "accidentally stable")
+
 ## 3) Non-goals (frozen)
 
 - No changes to production/cost logic in this task
@@ -42,6 +49,8 @@ Add a small suite of focused invariants tests that act as refactor tripwires:
 - New tests (Vitest) for:
   - duplicate atom handler registration fails
   - deterministic ordering does not depend on JS insertion order
+  - disabled expansion registers nothing (flag=false)
+  - module order equals canonical order list exactly
   - (optional) a small order proof for a representative hook path
 
 ## 6) Constraints (frozen)
@@ -86,4 +95,3 @@ TBD
 ### Commands Run
 
 TBD
-

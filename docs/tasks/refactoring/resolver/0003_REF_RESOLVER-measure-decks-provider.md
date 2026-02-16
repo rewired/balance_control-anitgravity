@@ -3,6 +3,8 @@
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
+**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+
 ## 0) Metadata (frozen)
 
 - **Task ID:** 0003
@@ -21,6 +23,11 @@ Make core measure handling generic by introducing a "measure deck provider" conc
 - Core owns `measure.take`, `measure.play`, and `measure.recycle` semantics
 - Expansions provide deck definitions (zone ids + object-id matching) via registration
 - Resolver stops switching on string prefixes
+
+Determinism requirements:
+
+- If deck lookup is implemented as a scan, it must scan in canonical module order (never "first registered wins" via incidental side effects).
+- If multiple deck providers match the same `measureObjectId`, fail deterministically with a stable error message.
 
 ## 3) Non-goals (frozen)
 
@@ -48,6 +55,7 @@ Make core measure handling generic by introducing a "measure deck provider" conc
 - Must preserve zone invariants (one object in exactly one zone; no ghost expansion zones when disabled)
 - Must preserve determinism (shuffles from seeded RNG only; stable ordering)
 - Deck provider lookup must be deterministic and not depend on registration side effects
+- When an expansion is disabled, its deck providers must not be registered; core measure handlers must not touch that expansion's zones at all (avoid even "exists? then ignore" patterns)
 
 ## 7) Guardrails + Spec anchors (frozen)
 
@@ -88,4 +96,3 @@ TBD
 ### Commands Run
 
 TBD
-

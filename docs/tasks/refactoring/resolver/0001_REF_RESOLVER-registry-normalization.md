@@ -3,6 +3,8 @@
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
+**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+
 ## 0) Metadata (frozen)
 
 - **Task ID:** 0001
@@ -21,6 +23,12 @@ Normalize expansion identity and iteration order so that:
 - expansion enablement is determined via a canonical id/flag mapping, not free-form `name` strings
 - registry iteration order is deterministic and explicit
 - later tasks can safely rely on stable module ordering when registering resolver-adjacent behavior
+
+Additionally, explicitly define a canonical module/expansion order list (example):
+
+- `['core', 'exp01', 'exp02', 'exp03']`
+
+This order must be the single source of truth for ordering and must not be derived indirectly from object keys, map insertion order, or registration side effects.
 
 ## 3) Non-goals (frozen)
 
@@ -44,7 +52,7 @@ Normalize expansion identity and iteration order so that:
 ## 6) Constraints (frozen)
 
 - Must preserve determinism (no reliance on JS object insertion order as semantics)
-- Must not introduce "enabled expansions" derived from arbitrary state slices (see GR-012)
+- Enablement MUST come only from match config (canonical source). It must not be derived from arbitrary state slices (see GR-012), including but not limited to: `G.engine.attributes.*`, "zone exists", or similar heuristics.
 - Keep changes minimal and localized to registry/config
 
 ## 7) Guardrails + Spec anchors (frozen)
@@ -63,8 +71,9 @@ Normalize expansion identity and iteration order so that:
 ## 8) Acceptance Criteria (frozen)
 
 - Expansion enable/disable behavior matches current behavior for ex01/ex02/ex03
-- Registry iteration order is explicit, documented, and deterministic
+- Registry iteration order is explicit, documented, and deterministic (exactly the canonical list; no hidden secondary ordering)
 - No changes required in `packages/game/src/engine/resolver.ts` in this task
+- Negative: registry does not read enablement from state slices (e.g. `G.engine.attributes.enabledExpansions`) and does not infer enablement from zone existence
 - Existing tests pass
 
 ## 9) PR Checklist (frozen)
@@ -84,4 +93,3 @@ TBD
 ### Commands Run
 
 TBD
-

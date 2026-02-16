@@ -3,6 +3,8 @@
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
+**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+
 ## 0) Metadata (frozen)
 
 - **Task ID:** 0005
@@ -32,7 +34,7 @@ All semantic behavior remains unchanged.
 
 - No rules changes
 - No functional changes to atom semantics, costs, production, or majority behavior
-- No reformatting-only churn beyond what is required by file moves/imports
+- No reformatting-only churn beyond what is required by file moves/imports/exports
 
 ## 4) Inputs (frozen)
 
@@ -73,9 +75,13 @@ All semantic behavior remains unchanged.
 ## 8) Acceptance Criteria (frozen)
 
 - `resolver.ts` becomes primarily orchestration + dispatch (no large domain logic blocks)
-- Atom behavior is unchanged (golden replay remains identical)
+- Atom behavior is unchanged (golden replay final hash/result remains identical)
 - Rule anchors remain present, accurate, and colocated with logic
 - All tests pass
+ 
+Reviewability requirements:
+
+- Avoid diff churn: do not reformat unrelated code. Keep changes to mechanical moves + required imports/exports only.
 
 ## 9) PR Checklist (frozen)
 
@@ -95,4 +101,3 @@ TBD
 ### Commands Run
 
 TBD
-
