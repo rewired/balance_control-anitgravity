@@ -155,6 +155,7 @@ function buildReplayGame(seed: string | number, numPlayers: number, config?: unk
     return {
         ...BalanceControl,
         seed,
+        playerView: ({ G }: any) => G,
         setup: (ctx: any) => {
             if (!ctx.numPlayers) {
                 ctx.numPlayers = numPlayers;

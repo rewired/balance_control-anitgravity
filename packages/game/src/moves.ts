@@ -12,7 +12,7 @@ import {
     formalizeInfluencePayloadSchema,
     convertResourcesPayloadSchema,
     placeTilePayloadSchema,
-    passPayloadSchema,
+    passTilePlacementPayloadSchema,
     validateMovePayload
 } from './move-contracts';
 
@@ -525,7 +525,7 @@ export const CoreMoves = {
 
     // CORE-01-09-01 / CORE-01-07-02 / CORE-01-09-01A: DrawPile empty at turn start → final settlement, skip Political Action
     passTilePlacement: ({ G, ctx, events }: any, payload?: unknown) => {
-        const validated = validateMovePayload('passTilePlacement', passPayloadSchema, payload);
+        const validated = validateMovePayload('passTilePlacement', passTilePlacementPayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
 
         const pid = ctx.currentPlayer;
@@ -551,20 +551,5 @@ export const CoreMoves = {
         } else if (events && events.setStage) {
             events.setStage(POLITICAL_ACTION_STAGE);
         }
-    },
-
-    // Pass = choose no political action, just end turn
-    pass: ({ G, ctx, events }: any, payload?: unknown) => {
-        const validated = validateMovePayload('pass', passPayloadSchema, payload);
-        if (!validated.ok) return INVALID_MOVE;
-        const pid = ctx.currentPlayer;
-        if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'pass')) return INVALID_MOVE;
-        if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
-
-        // CORE-01-04-09A: Pass does not place Meta-Marker → return to supply
-        returnMetaMarkerToSupply(G, pid);
-
-        EffectResolver.incrementUsage(G, 'politicalAction', pid);
-        events.endTurn();
     }
 };

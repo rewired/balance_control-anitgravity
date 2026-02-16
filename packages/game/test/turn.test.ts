@@ -4,6 +4,11 @@ import { BalanceControl } from '../src/index';
 import { CoreZoneNames } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
 
+const BalanceControlNoPlayerView = {
+    ...BalanceControl,
+    playerView: ({ G }: any) => G
+};
+
 const HEX_DIRECTIONS: Array<[number, number]> = [
     [1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]
 ];
@@ -24,7 +29,7 @@ function findFirstOpenNeighborCoord(grid: Record<string, string>): string {
 
 function createTinyDrawPileGame() {
     return {
-        ...BalanceControl,
+        ...BalanceControlNoPlayerView,
         setup: (ctx: any) => {
             const G = SetupGame({ ctx });
             const drawPile = G.zones[CoreZoneNames.DrawPile];
@@ -36,7 +41,7 @@ function createTinyDrawPileGame() {
 
 function createMetaMarkerRoundReturnGame() {
     return {
-        ...BalanceControl,
+        ...BalanceControlNoPlayerView,
         setup: (ctx: any) => {
             const G = SetupGame({ ctx });
             const markerId = 'meta_0';
@@ -58,9 +63,17 @@ function createMetaMarkerRoundReturnGame() {
     };
 }
 
+function getTileIdAtCoord(G: any, coord: string): string {
+    const tileId = G.grid?.[coord];
+    if (!tileId || typeof tileId !== 'string') {
+        throw new Error(`Expected tile at coord ${coord}`);
+    }
+    return tileId;
+}
+
 describe('Turn Structure (Stages)', () => {
     it('should start in drawAndPlace stage', () => {
-        const client = Client({ game: BalanceControl, numPlayers: 2 });
+        const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
         client.start();
 
         const state = client.store.getState();
@@ -79,7 +92,7 @@ describe('Turn Structure (Stages)', () => {
     });
 
     it('should transition to politicalAction stage after placing tile', () => {
-        const client = Client({ game: BalanceControl, numPlayers: 2 });
+        const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
         client.start();
 
         const pid = client.getState().ctx.currentPlayer;
@@ -92,16 +105,18 @@ describe('Turn Structure (Stages)', () => {
         expect(state.ctx.activePlayers[pid]).toBe('politicalAction');
     });
 
-    it('should end turn after passing', () => {
-        const client = Client({ game: BalanceControl, numPlayers: 2 });
+    it('should end turn after taking a political action', () => {
+        const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
         client.start();
         const initialPlayer = client.getState().ctx.currentPlayer;
 
         // 1. Place Tile
-        client.moves.placeTile({ targetCoord: '1,0' });
+        const targetCoord = '1,0';
+        client.moves.placeTile({ targetCoord });
 
-        // 2. Pass
-        client.moves.pass({});
+        // 2. Take a CORE political action (PlaceInfluence)
+        const tileId = getTileIdAtCoord(client.getState().G, targetCoord);
+        client.moves.placeInfluence({ targetTileId: tileId });
 
         const state = client.store.getState();
         expect(state.ctx.currentPlayer).not.toBe(initialPlayer);
@@ -112,7 +127,7 @@ describe('Turn Structure (Stages)', () => {
     });
 
     it('should reject placeTile during politicalAction stage without mutation', () => {
-        const client = Client({ game: BalanceControl, numPlayers: 2 });
+        const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
         client.start();
 
         const pid = client.getState().ctx.currentPlayer;
@@ -133,7 +148,7 @@ describe('Turn Structure (Stages)', () => {
     });
 
     it('should reject passTilePlacement when a staging tile exists', () => {
-        const client = Client({ game: BalanceControl, numPlayers: 2 });
+        const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
         client.start();
 
         const beforeState = client.getState();
@@ -155,7 +170,7 @@ describe('Turn Structure (Stages)', () => {
         client.start();
 
         client.moves.placeTile({ targetCoord: '1,0' });
-        client.moves.pass({});
+        client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, '1,0') });
 
         const secondState = client.getState();
         const secondPid = secondState.ctx.currentPlayer;
@@ -178,7 +193,7 @@ describe('Turn Structure (Stages)', () => {
         expect(stateAfterStart.G.zones[CoreZoneNames.DrawPile].items.length).toBe(0);
 
         client.moves.placeTile({ targetCoord: '1,0' });
-        client.moves.pass({});
+        client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, '1,0') });
 
         const midRoundState = client.getState();
         const secondPid = midRoundState.ctx.currentPlayer;
@@ -189,7 +204,6 @@ describe('Turn Structure (Stages)', () => {
         expect(midRoundState.G.zones[`staging_${secondPid}`].items.length).toBe(0);
 
         client.moves.passTilePlacement({});
-        client.moves.pass({});
 
         const finalState = client.getState();
         expect(finalState.G.roundNumber).toBe(1);
@@ -208,12 +222,12 @@ describe('Turn Structure (Stages)', () => {
 
         const firstCoord = findFirstOpenNeighborCoord(startState.G.grid);
         client.moves.placeTile({ targetCoord: firstCoord });
-        client.moves.pass({});
+        client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, firstCoord) });
 
         const secondState = client.getState();
         const secondCoord = findFirstOpenNeighborCoord(secondState.G.grid);
         client.moves.placeTile({ targetCoord: secondCoord });
-        client.moves.pass({});
+        client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, secondCoord) });
 
         const roundStartState = client.getState();
         expect(roundStartState.ctx.currentPlayer).toBe('0');
@@ -222,7 +236,7 @@ describe('Turn Structure (Stages)', () => {
     });
 
     it('should complete two full rounds in 3-player hotseat without softlock', () => {
-        const client = Client({ game: BalanceControl, numPlayers: 3 });
+        const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 3 });
         client.start();
 
         for (let turn = 0; turn < 6; turn++) {
@@ -237,10 +251,11 @@ describe('Turn Structure (Stages)', () => {
             expect(afterPlace.ctx.currentPlayer).toBe(pid);
             expect(afterPlace.ctx.activePlayers[pid]).toBe('politicalAction');
 
-            client.moves.pass({});
+            const tileId = getTileIdAtCoord(client.getState().G, targetCoord);
+            client.moves.placeInfluence({ targetTileId: tileId });
 
-            const afterPass = client.getState();
-            expect(afterPass.ctx.currentPlayer).not.toBe(pid);
+            const afterAction = client.getState();
+            expect(afterAction.ctx.currentPlayer).not.toBe(pid);
         }
 
         const finalState = client.getState();

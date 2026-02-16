@@ -13,7 +13,6 @@ describe('intent view model', () => {
             intent('placeTile', { targetCoord: '0,0' }),
             intent('passTilePlacement', {}),
             intent('convertResources', { outputResort: 'INF' }),
-            intent('pass', {})
         ];
 
         const vm = buildIntentViewModel({
@@ -30,14 +29,13 @@ describe('intent view model', () => {
         expect(vm.ghostCoords).toEqual(['0,0', '1,0']);
         expect(vm.drawAndPlace.passTilePlacement?.moveType).toBe('passTilePlacement');
 
-        expect(vm.political.others.map((i) => i.moveType)).toEqual(['convertResources', 'pass']);
+        expect(vm.political.others.map((i) => i.moveType)).toEqual(['convertResources']);
     });
 
     it('moves passTilePlacement to trailing actions outside drawAndPlace', () => {
         const intents: LegalIntent[] = [
             intent('convertResources', { outputResort: 'FOR' }),
             intent('passTilePlacement', {}),
-            intent('pass', {})
         ];
 
         const vm = buildIntentViewModel({
@@ -49,7 +47,7 @@ describe('intent view model', () => {
         });
 
         expect(vm.stage).toBe('politicalAction');
-        expect(vm.political.others.map((i) => i.moveType)).toEqual(['convertResources', 'passTilePlacement', 'pass']);
+        expect(vm.political.others.map((i) => i.moveType)).toEqual(['convertResources', 'passTilePlacement']);
     });
 
     it('selects placeInfluence intent for selected tile and excludes all placeInfluence from others', () => {
@@ -57,7 +55,6 @@ describe('intent view model', () => {
             intent('placeInfluence', { targetTileId: 'A' }),
             intent('placeInfluence', { targetTileId: 'B' }),
             intent('moveInfluence', { sourceId: 'x', targetId: 'y' }),
-            intent('pass', {})
         ];
 
         const vm = buildIntentViewModel({
@@ -69,14 +66,13 @@ describe('intent view model', () => {
         });
 
         expect(vm.political.placeInfluenceForSelected?.payload?.targetTileId).toBe('A');
-        expect(vm.political.others.map((i) => i.moveType)).toEqual(['moveInfluence', 'pass']);
+        expect(vm.political.others.map((i) => i.moveType)).toEqual(['moveInfluence']);
     });
 
     it('surfaces pending choice intents and removes resolveChoice from others', () => {
         const intents: LegalIntent[] = [
             intent('resolveChoice', { choiceId: 'c1', selection: 'x' }),
             intent('resolveChoice', { choiceId: 'c1', selection: 'y' }),
-            intent('pass', {})
         ];
 
         const vm = buildIntentViewModel({
@@ -89,7 +85,6 @@ describe('intent view model', () => {
 
         expect(vm.hasPendingChoice).toBe(true);
         expect(vm.pendingChoice.resolveChoice).toHaveLength(2);
-        expect(vm.political.others.map((i) => i.moveType)).toEqual(['pass']);
+        expect(vm.political.others.map((i) => i.moveType)).toEqual([]);
     });
 });
-

@@ -34,7 +34,7 @@ export const placeTilePayloadSchema = z.object({
     extraResourceIds: z.array(z.string()).optional(),
 }).strict();
 
-export const passPayloadSchema = z.union([
+export const passTilePlacementPayloadSchema = z.union([
     z.undefined(),
     z.object({}).strict(),
 ]);
@@ -45,7 +45,7 @@ export type MoveInfluencePayload = z.infer<typeof moveInfluencePayloadSchema>;
 export type FormalizeInfluencePayload = z.infer<typeof formalizeInfluencePayloadSchema>;
 export type ConvertResourcesPayload = z.infer<typeof convertResourcesPayloadSchema>;
 export type PlaceTilePayload = z.infer<typeof placeTilePayloadSchema>;
-export type PassPayload = z.infer<typeof passPayloadSchema>;
+export type PassTilePlacementPayload = z.infer<typeof passTilePlacementPayloadSchema>;
 
 export function validateMovePayload<TSchema extends z.ZodTypeAny>(
     moveName: string,

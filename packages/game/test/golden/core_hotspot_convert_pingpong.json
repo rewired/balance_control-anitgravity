@@ -26,7 +26,7 @@
     { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
     { "move": "placeInfluence", "args": [{ "targetCoord": "0,0" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,-1" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "2,-1" }] },
     {
       "move": "convertResources",
@@ -40,19 +40,19 @@
       ]
     },
     { "move": "placeTile", "args": [{ "targetCoord": "2,0" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "moveInfluence", "args": [{ "sourceCoord": "1,-1", "targetCoord": "2,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "1,1" }] },
     { "move": "placeInfluence", "args": [{ "targetCoord": "1,-1" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "moveInfluence", "args": [{ "sourceCoord": "2,0", "targetCoord": "0,1" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
     { "move": "moveInfluence", "args": [{ "sourceCoord": "1,-1", "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,1" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "moveInfluence", "args": [{ "sourceCoord": "0,1", "targetCoord": "-1,1" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "-2,1" }] },
     { "move": "moveInfluence", "args": [{ "sourceCoord": "1,0", "targetCoord": "1,-1" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "-2,0" }] },
-    { "move": "pass", "args": [{}] }
+    { "move": "moveInfluence", "args": [{ "sourceCoord": "-1,1", "targetCoord": "-2,0" }] }
   ],
-  "expectedFinalHash": "55b6b8281271518f075dcb0db69bc3441e1de74a8100d9c0f3a260966db04687"
+  "expectedFinalHash": "f5f1ea0478bc7317c3a47e8625113a8f77b03f6c1c683645dafc00c0a900a6a1"
 }

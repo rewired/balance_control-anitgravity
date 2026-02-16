@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -45,9 +45,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -181,32 +181,119 @@ Changelog / DD / ERRATA:
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] pass move removed (engine + client-game)
-* [ ] pass intent removed (enumerator)
-* [ ] client UI updated
-* [ ] golden fixtures updated
-* [ ] `pnpm -w lint` passes
-* [ ] `$env:NO_COLOR=1; pnpm -w test` passes
-* [ ] No temporary files
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] pass move removed (engine + client-game)
+* [x] pass intent removed (enumerator)
+* [x] client UI updated
+* [x] golden fixtures updated
+* [x] `pnpm -w lint` passes
+* [x] `$env:NO_COLOR=1; pnpm -w test` passes
+* [x] No temporary files
 
 ---
 
 ## 11) Work Summary (3-7 bullets)
 
-* TODO
+* Removed non-spec `pass` political action from engine stage move maps and legal intent enumeration.
+* Removed pass-specific UI branches and updated intent view-model/test expectations.
+* Updated golden replay fixtures + replay runner test hashes to use spec-valid political actions.
+* Hardened `SetupGame` to accept boardgame.io setup wrapper ctx (`{ ctx, random, ... }`) so PersonalSupply zones exist in Client-based runs.
+* Updated `CHANGELOG.md` with the spec-aligned removal note.
 
 ---
 
 ## 12) Commands Run (exact)
 
-* TODO
+* `git checkout -b task/0074-engine-remove-pass-political-action` (ok)
+* `pnpm -w lint` (ok)
+* `$env:NO_COLOR=1; pnpm -w test` (ok)
+* `git status` (see Proof)
+* `git diff --stat` (see Proof)
+* `git add -A` (ok)
+* `git commit -m "task(0074): remove pass political action" -m "...bullets..."` (ok)
+* `git show -1 --stat` (see Proof)
 
 ---
 
 ## 13) Proof (screenshots / logs)
 
-* TODO
+### git status
+
+```
+On branch task/0074-engine-remove-pass-political-action
+nothing to commit, working tree clean
+```
+
+### git diff --stat
+
+```
+(no output; working tree clean)
+```
+
+### pnpm -w lint
+
+```
+> balance-control-monorepo@0.0.0 lint D:\__DEV\balance_control-anitgravity
+> eslint "packages/**/*.{ts,tsx,js,cjs,mjs}" "scripts/**/*.{js,cjs,mjs}" "*.{js,cjs,mjs}"
+```
+
+### $env:NO_COLOR=1; pnpm -w test
+
+```
+> balance-control-monorepo@0.0.0 test D:\__DEV\balance_control-anitgravity
+> pnpm -r --if-present test
+
+Scope: 9 of 10 workspace projects
+packages/game test$ vitest run
+packages/game test:  Test Files  23 passed (23)
+packages/game test:       Tests  91 passed (91)
+packages/game test: Done
+packages/client-web test$ vitest run
+packages/client-web test:  Test Files  15 passed (15)
+packages/client-web test:       Tests  47 passed (47)
+packages/client-web test: Done
+```
+
+### git show -1 --stat
+
+```
+Author: Björn Ahlers <rewired.de@gmail.com>
+Date:   Mon Feb 16 16:14:35 2026 +0100
+
+    task(0074): remove pass political action
+
+- Remove non-spec pass from political-action stage moves and intent enumeration.
+
+- Update client UI, tests, replay fixtures/hashes to use CORE-01 actions only.
+
+- Normalize boardgame.io setup ctx so SetupGame receives numPlayers + RNG deterministically.
+
+ CHANGELOG.md                                       |   3 +-
+ .../0074-engine-remove-pass-political-action.md    | 125 ++++++++++++++++++---
+ packages/client-web/src/components/ActionPanel.tsx |   3 -
+ .../src/ui/__tests__/intentViewModel.test.ts       |  13 +--
+ packages/client-web/src/ui/useIntentViewModel.ts   |   2 -
+ packages/client-web/test/action-panel.test.tsx     |   3 +-
+ .../test/controls-start-committee.test.tsx         |   4 +-
+ packages/game/src/client-game.ts                   |   1 -
+ packages/game/src/engine/legal-intents.ts          |   1 -
+ packages/game/src/index.ts                         |   1 -
+ packages/game/src/move-contracts.ts                |   4 +-
+ packages/game/src/moves.ts                         |  19 +---
+ packages/game/src/replay.ts                        |  34 +++++-
+ packages/game/src/setup.ts                         |  31 +++--
+ packages/game/test/golden-replay.test.ts           |   1 +
+ .../test/golden/core_hotspot_convert_pingpong.json |  12 +--
+ .../game/test/golden/core_only_3p_2rounds.json     |  17 +--
+ .../test/golden/core_pingpong_meta_marker.json     |   8 +-
+ .../game/test/golden/core_plus_ex01_small.json     |   9 +-
+ .../production_uncontrolled_produces_zero.json     |  14 ++-
+ packages/game/test/hotspot.test.ts                 |   2 +-
+ packages/game/test/legal-intents.test.ts           |   1 +
+ packages/game/test/replay-runner.test.ts           |   8 +-
+ packages/game/test/turn.test.ts                    |  55 ++++++----
+ 24 files changed, 253 insertions(+), 118 deletions(-)
+```
 
 ---
 
@@ -219,6 +306,14 @@ Required format:
 
   - `- ...`
   - `- ...`
+
+Committed:
+
+* Subject: `task(0074): remove pass political action`
+* Body:
+  - `- Remove non-spec pass from political-action stage moves and intent enumeration.`
+  - `- Update client UI, tests, replay fixtures/hashes to use CORE-01 actions only.`
+  - `- Normalize boardgame.io setup ctx so SetupGame receives numPlayers + RNG deterministically.`
 
 ---
 

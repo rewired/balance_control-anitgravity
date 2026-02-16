@@ -10,15 +10,18 @@
       "ex03": false
     }
   },
+  "prelude": [
+    { "action": "stackDrawPileByType", "tileType": "Committee", "count": 1 }
+  ],
   "notes": {
     "updatedFor": "CORE-01 v1.0.20 migration",
     "previousExpectedFinalHash": "0b62eeecba4e93815caccf77f64c6479f2b116070189aed5ba2be373762437db"
   },
   "moves": [
     { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
-    { "move": "pass", "args": [{}] }
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] }
   ],
-  "expectedFinalHash": "33385235f69e3912bea972f31b565ab748b1aa5fe58d7fcd65ba2c68a90dbc03"
+  "expectedFinalHash": "671ddb5169fd65f7d763b3b1c5430c93a891f0f63dd7bf642e1b9745b76e3f41"
 }

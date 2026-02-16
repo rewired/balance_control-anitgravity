@@ -14,7 +14,6 @@ const politicalActionMoves = {
     moveInfluence: CoreMoves.moveInfluence,
     formalizeInfluence: CoreMoves.formalizeInfluence,
     convertResources: CoreMoves.convertResources,
-    pass: CoreMoves.pass,
     resolveChoice: CoreMoves.resolveChoice,
     ...expansionMoves
 };
