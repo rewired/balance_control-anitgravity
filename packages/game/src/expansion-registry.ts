@@ -59,21 +59,44 @@ class Registry {
         return all;
     }
 
+    getById(expId: ExpansionId): ExpansionDefinition | undefined {
+        return this.expansions[expId];
+    }
+
     clear() {
         this.expansions = {};
     }
 
-    getMergedMoves(config?: GameConfig) {
-        const flags = config ? this.resolveFlags(undefined, config) : null;
-        let allMoves: Record<string, (arg0: any, arg1: any) => any> = {};
+    getEnabledMoveModules(config?: GameConfig): Array<{ moduleId: EngineModuleId; expansionId: ExpansionId; moves: Record<string, (...args: any[]) => any> }> {
+        const flags = this.resolveFlags(undefined, config);
+        const modules: Array<{ moduleId: EngineModuleId; expansionId: ExpansionId; moves: Record<string, (...args: any[]) => any> }> = [];
+
         for (const expId of CANONICAL_EXPANSION_ORDER) {
             const exp = this.expansions[expId];
             if (!exp) continue;
-            if (flags && !this.isEnabled(expId, flags)) continue;
-            if (!exp.moves) continue;
-            allMoves = { ...allMoves, ...exp.moves };
+            if (!this.isEnabled(expId, flags)) continue;
+            const moves = exp.moves ?? {};
+            modules.push({ moduleId: expId as EngineModuleId, expansionId: expId, moves });
         }
-        return allMoves;
+
+        return modules;
+    }
+
+    getMergedMoves(config?: GameConfig) {
+        const modules = this.getEnabledMoveModules(config);
+        const merged: Record<string, (...args: any[]) => any> = {};
+
+        for (const mod of modules) {
+            const keys = Object.keys(mod.moves).sort((a, b) => a.localeCompare(b));
+            for (const key of keys) {
+                if (Object.prototype.hasOwnProperty.call(merged, key)) {
+                    throw new Error(`[moves] duplicate move id "${key}" while merging expansion "${mod.expansionId}".`);
+                }
+                merged[key] = mod.moves[key];
+            }
+        }
+
+        return merged;
     }
 
     // Hook Executors
