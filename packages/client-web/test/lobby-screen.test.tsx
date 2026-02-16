@@ -119,6 +119,7 @@ describe('LobbyScreen flow', () => {
 
     it('lists matches and renders seat join buttons', async () => {
         render(<App />);
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
 
         await screen.findByTestId('lobby-match-m1');
 
@@ -131,6 +132,7 @@ describe('LobbyScreen flow', () => {
 
     it('joins a seat and transitions to the game screen using credentials', async () => {
         render(<App />);
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
 
         await screen.findByTestId('lobby-match-m1');
 
@@ -158,6 +160,7 @@ describe('LobbyScreen flow', () => {
 
     it('quits the game via leaveMatch and returns to the lobby', async () => {
         render(<App />);
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
 
         await screen.findByTestId('lobby-match-m1');
 
@@ -169,7 +172,7 @@ describe('LobbyScreen flow', () => {
 
         fireEvent.click(screen.getByTestId('quit-game'));
 
-        await screen.findByTestId('lobby-screen');
+        await screen.findByTestId('start-screen');
         expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith('/leave'))).toBe(true);
 
         await waitFor(() => expect(clientInstances[0]?.stop).toHaveBeenCalledTimes(1));
