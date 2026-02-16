@@ -24,6 +24,10 @@ const DevHexTilePlayground = import.meta.env.DEV
     ? React.lazy(() => import('./dev/HexTilePlayground'))
     : null;
 
+const HotseatShell = React.lazy(() =>
+    import('./hotseat/HotseatShell').then((m) => ({ default: m.HotseatShell }))
+);
+
 function getStateID(state: any): number | null {
     if (!state) return null;
     return state.ctx?._stateID ?? state.ctx?.stateID ?? state._stateID ?? null;
@@ -44,14 +48,26 @@ const App: React.FC = () => {
     const [leaveError, setLeaveError] = useState<string | null>(null);
     const [isLeaving, setIsLeaving] = useState(false);
 
+    const mode = useMemo(() => {
+        return new URLSearchParams(window.location.search).get('mode');
+    }, []);
+
     const devScene = useMemo(() => {
         if (!import.meta.env.DEV) return null;
         return new URLSearchParams(window.location.search).get('dev');
     }, []);
 
+    if (mode === 'hotseat') {
+        return (
+            <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading hotseat…</div>}>
+                <HotseatShell />
+            </Suspense>
+        );
+    }
+
     if (devScene === 'hex-tile' && DevHexTilePlayground) {
         return (
-            <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading playground…</div>}>
+            <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading playgroundâ€¦</div>}>
                 <DevHexTilePlayground />
             </Suspense>
         );
@@ -245,3 +261,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
