@@ -1,4 +1,4 @@
-import type { ExpansionDefinition, ExpansionFlags, ExpansionId, GameConfig, GameState } from '@balance-control/rules';
+import type { ExpansionDefinition, ExpansionFlags, ExpansionId, GameConfig, GameState, MeasureDeckDescriptor } from '@balance-control/rules';
 import { DEFAULT_EXPANSION_FLAGS } from './config';
 
 /**
@@ -99,6 +99,25 @@ class Registry {
             }
         }
         return null;
+    }
+
+    getMeasureDeckDescriptors(G: GameState): Array<{ expansionId: ExpansionId; deck: MeasureDeckDescriptor }> {
+        const flags = this.resolveFlags(G);
+        const out: Array<{ expansionId: ExpansionId; deck: MeasureDeckDescriptor }> = [];
+
+        for (const expId of CANONICAL_EXPANSION_ORDER) {
+            const exp = this.expansions[expId];
+            if (!exp) continue;
+            if (!this.isEnabled(expId, flags)) continue;
+            if (!exp.measureDecks || exp.measureDecks.length === 0) continue;
+
+            const decksSorted = [...exp.measureDecks].sort((a, b) => a.id.localeCompare(b.id));
+            for (const deck of decksSorted) {
+                out.push({ expansionId: expId, deck });
+            }
+        }
+
+        return out;
     }
 
     applyEffect(G: GameState, ctx: any, effect: any, contextTileId?: string, utils?: any, config?: GameConfig) {

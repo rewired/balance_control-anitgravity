@@ -1,6 +1,7 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { EffectResolver } from './engine/resolver';
 import { CoreZoneNames } from '@balance-control/rules';
+import { lookupMeasureDeckForObjectId } from './engine/measure-deck-provider';
 
 /**
  * Standard Expansion Move: Take a measure from the open display.
@@ -8,10 +9,13 @@ import { CoreZoneNames } from '@balance-control/rules';
  */
 export const takeMeasure = ({ G, ctx, events }: any, measureObjectId: string) => {
     const pid = ctx.currentPlayer;
-    // Determine open zone (legacy or namespaced)
-    let openZoneId = 'OpenMeasures';
-    if (measureObjectId.startsWith('exp02_')) openZoneId = 'EXP02_OpenMeasures';
-    else if (measureObjectId.startsWith('exp03_')) openZoneId = 'EXP03_OpenMeasures';
+
+    let openZoneId: string;
+    try {
+        openZoneId = lookupMeasureDeckForObjectId(G, measureObjectId).openZoneId;
+    } catch {
+        return INVALID_MOVE;
+    }
 
     const openZone = G.zones[openZoneId];
     if (!openZone || !openZone.items.includes(measureObjectId)) return INVALID_MOVE;

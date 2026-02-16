@@ -80,19 +80,104 @@ Determinism requirements:
 
 ## 9) PR Checklist (frozen)
 
-- [ ] Measure deck provider interface introduced
-- [ ] Deck lookup used by core measure handlers
-- [ ] Prefix switches removed from resolver
-- [ ] Expansion gating respected (disabled expansions do not contribute deck providers)
-- [ ] Tests cover deck lookup for EXP-02/EXP-03
-- [ ] `affected_guardrails` and `spec_anchor_refs` present
+- [x] Measure deck provider interface introduced
+- [x] Deck lookup used by core measure handlers
+- [x] Prefix switches removed from resolver
+- [x] Expansion gating respected (disabled expansions do not contribute deck providers)
+- [x] Tests cover deck lookup for EXP-02/EXP-03
+- [x] `affected_guardrails` and `spec_anchor_refs` present
 
 ## 15) Execution Log (append-only)
 
 ### Work Summary
 
-TBD
+- Introduced deterministic measure deck descriptors (`measureDecks`) on `ExpansionDefinition` and wired EXP-02 / EXP-03 decks.
+- Added canonical provider scan + deterministic failure behavior via `lookupMeasureDeckForObjectId`.
+- Refactored core `measure.take` / `measure.play` flows to use deck lookup (removed prefix switches).
+- Refactored `takeMeasure` move validation to use the same deck lookup (no prefix routing).
+- Added unit tests for routing, expansion gating, and deterministic conflict errors.
+- Updated `CHANGELOG.md` entry for the refactor.
 
 ### Commands Run
 
-TBD
+```bash
+git status
+```
+```
+On branch task/0079-measure-decks-provider
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   CHANGELOG.md
+	modified:   packages/expansion-02/src/index.ts
+	modified:   packages/expansion-03/src/index.ts
+	modified:   packages/game/src/engine/resolver.ts
+	modified:   packages/game/src/expansion-moves.ts
+	modified:   packages/game/src/expansion-registry.ts
+	modified:   packages/rules/src/index.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	packages/game/src/engine/measure-deck-provider.ts
+	packages/game/test/measure-deck-provider.test.ts
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+```bash
+git diff --stat
+```
+```
+ CHANGELOG.md                            |  1 +
+ packages/expansion-02/src/index.ts      | 12 +++++++++++
+ packages/expansion-03/src/index.ts      | 12 +++++++++++
+ packages/game/src/engine/resolver.ts    | 37 +++++++--------------------------
+ packages/game/src/expansion-moves.ts    | 12 +++++++----
+ packages/game/src/expansion-registry.ts | 21 ++++++++++++++++++-
+ packages/rules/src/index.ts             | 20 ++++++++++++++++++
+ 7 files changed, 80 insertions(+), 35 deletions(-)
+```
+
+```bash
+pnpm test
+```
+```
+> balance-control-monorepo@0.0.0 test D:\__DEV\balance_control-anitgravity
+> pnpm -r --if-present test
+
+Scope: 9 of 10 workspace projects
+packages/game test$ vitest run
+packages/game test:  Test Files  26 passed (26)
+packages/game test:       Tests  102 passed (102)
+packages/game test: Done
+packages/client-web test$ vitest run
+packages/client-web test:  Test Files  16 passed (16)
+packages/client-web test:       Tests  48 passed (48)
+packages/client-web test: Done
+```
+
+```bash
+git show -1 --stat
+```
+```
+Author: Björn Ahlers <rewired.de@gmail.com>
+Date:   Mon Feb 16 18:11:56 2026 +0100
+
+    task(0079): add measure deck providers
+
+- Add expansion-provided measure deck descriptors for deterministic routing
+- Refactor measure take/play flows to use provider lookup (no prefix switches)
+- Add unit tests for routing, gating, and conflicts
+
+ CHANGELOG.md                                       |   1 +
+ .../0079-REF_RESOLVER-measure-decks-provider.md    | 101 ++++++++++++++++++--
+ packages/expansion-02/src/index.ts                 |  12 +++
+ packages/expansion-03/src/index.ts                 |  12 +++
+ packages/game/src/engine/measure-deck-provider.ts  |  42 +++++++++
+ packages/game/src/engine/resolver.ts               |  37 ++------
+ packages/game/src/expansion-moves.ts               |  12 ++-
+ packages/game/src/expansion-registry.ts            |  21 ++++-
+ packages/game/test/measure-deck-provider.test.ts   | 102 +++++++++++++++++++++
+ packages/rules/src/index.ts                        |  20 ++++
+ 10 files changed, 317 insertions(+), 43 deletions(-)
+```

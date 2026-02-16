@@ -5,6 +5,7 @@ import { computeMajority } from '../mechanics';
 import { countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
 import { ExpansionRegistry } from '../expansion-registry';
 import { EngineModuleRegistry, type AtomHandler } from './engine-module-registry';
+import { lookupMeasureDeckForObjectId } from './measure-deck-provider';
 
 type CostSlot = string[] | 'ANY';
 
@@ -829,19 +830,8 @@ export class EffectResolver {
         obj.playCount = (obj.playCount || 0) + 1;
         obj.owner = undefined;
 
-        // Determine Zones based on prefix
-        let recycleZone = 'MeasureRecyclePile';
-        let discardZone = 'MeasureFinalDiscard';
-
-        if (measureObjectId.startsWith('exp02_')) {
-            recycleZone = 'EXP02_MeasureRecyclePile';
-            discardZone = 'EXP02_MeasureFinalDiscard';
-        } else if (measureObjectId.startsWith('exp03_')) {
-            recycleZone = 'EXP03_MeasureRecyclePile';
-            discardZone = 'EXP03_MeasureFinalDiscard';
-        }
-
-        const targetZone = obj.playCount === 1 ? recycleZone : discardZone;
+        const deck = lookupMeasureDeckForObjectId(G, measureObjectId);
+        const targetZone = obj.playCount === 1 ? deck.recyclePileId : deck.finalDiscardId;
         if (G.zones[targetZone]) {
             G.zones[targetZone].items.push(measureObjectId);
         }
@@ -866,22 +856,9 @@ export class EffectResolver {
         const obj = G.objects[measureObjectId];
         if (!obj || obj.type !== 'Measure') return;
 
-        // Determine correct zones based on prefix
-        let openZoneId = 'OpenMeasures';
-        let drawPileId = 'MeasureDrawPile';
-        let recyclePileId = 'MeasureRecyclePile';
+        const deck = lookupMeasureDeckForObjectId(G, measureObjectId);
 
-        if (measureObjectId.startsWith('exp02_')) {
-            openZoneId = 'EXP02_OpenMeasures';
-            drawPileId = 'EXP02_MeasureDrawPile';
-            recyclePileId = 'EXP02_MeasureRecyclePile';
-        } else if (measureObjectId.startsWith('exp03_')) {
-            openZoneId = 'EXP03_OpenMeasures';
-            drawPileId = 'EXP03_MeasureDrawPile';
-            recyclePileId = 'EXP03_MeasureRecyclePile';
-        }
-
-        const openZone = G.zones[openZoneId];
+        const openZone = G.zones[deck.openZoneId];
         const hand = G.zones[`PlayerHand:${playerId}`];
         if (!openZone || !hand) return;
 
@@ -892,12 +869,12 @@ export class EffectResolver {
             obj.owner = playerId;
 
             // Refill logic
-            const drawPile = G.zones[drawPileId];
+            const drawPile = G.zones[deck.drawPileId];
             if (drawPile && drawPile.items.length > 0) {
                 openZone.items.push(drawPile.items.pop()!);
             } else {
                 // Trigger recycle
-                this.handleMeasureRecycle(G, ctx, { kind: 'measure.recycle', drawPileId, recyclePileId });
+                this.handleMeasureRecycle(G, ctx, { kind: 'measure.recycle', drawPileId: deck.drawPileId, recyclePileId: deck.recyclePileId });
                 if (drawPile && drawPile.items.length > 0) {
                     openZone.items.push(drawPile.items.pop()!);
                 }
