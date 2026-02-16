@@ -2,8 +2,8 @@
 
 # Codex Task 0056 - HexTile Visual Contract Freeze (747x864 canonical space)
 
-**Date:** 2026-02-16  
-**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)  
+**Date:** 2026-02-16
+**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)
 **Primary contract:** `AGENTS.md` (repo root)
 
 Key anchors (ASCII only):
@@ -41,8 +41,8 @@ Create:
 
 1) `docs/ui/hex-tile/UI-HEX-TILE-VISUAL.v0.2.yaml` (normative)
 2) `docs/ui/hex-tile/README.md` (short human-readable summary)
-3) `docs/ui/hex-tile/fixtures/base_tile.svg`
-4) `docs/ui/hex-tile/fixtures/tile-overlay.png`
+3) `docs/ui/hex-tile/fixtures/base_tile.svg` (should be already exsitent)
+4) `docs/ui/hex-tile/fixtures/tile-overlay.png` (should be already exsitent)
 
 The YAML MUST contain (copy exact values below; no recomputation):
 
