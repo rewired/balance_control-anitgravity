@@ -61,9 +61,8 @@ describe('Selection inspector', () => {
             />
         );
 
-        const tileCell = screen.getAllByTestId('hex-tile-0_0')[0];
-        const tileNode = tileCell.querySelector('.tile') as HTMLElement;
-        fireEvent.click(tileNode);
+        const tileCell = screen.getByTestId('hex-tile-0_0');
+        fireEvent.click(tileCell);
 
         const coordValue = screen.getByTestId('inspector-coord');
         expect(coordValue.textContent).toBe('0,0');
@@ -93,9 +92,8 @@ describe('Selection inspector', () => {
             />
         );
 
-        const tileCell = screen.getAllByTestId('hex-tile-0_0')[0];
-        const tileNode = tileCell.querySelector('.tile') as HTMLElement;
-        fireEvent.click(tileNode);
+        const tileCell = screen.getByTestId('hex-tile-0_0');
+        fireEvent.click(tileCell);
 
         fireEvent.keyDown(window, { key: 'Escape' });
         expect(screen.queryByTestId('inspector-empty')).not.toBeNull();
