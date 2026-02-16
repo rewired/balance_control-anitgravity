@@ -2,7 +2,7 @@ import { Game } from 'boardgame.io';
 import { GameState, CoreZoneNames } from '@balance-control/rules';
 import { SetupGame } from './setup';
 import { CoreMoves } from './moves';
-import { drawTileToStaging } from './mechanics-turn';
+import { drawTileToStaging } from './mechanics-draw';
 import { EffectResolver } from './engine/resolver';
 import { ExpansionRegistry } from './expansion-registry';
 import { enumerateLegalIntents } from './engine/legal-intents';

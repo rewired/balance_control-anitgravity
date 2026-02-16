@@ -4,7 +4,7 @@ import { CoreZoneNames, TileType } from '@balance-control/rules';
 import { enumerateLegalIntents } from '../src/engine/legal-intents';
 import { SetupGame } from '../src/setup';
 import { CoreMoves } from '../src/moves';
-import { drawTileToStaging } from '../src/mechanics-turn';
+import { drawTileToStaging } from '../src/mechanics-draw';
 
 function createCtx(stage: string) {
     return {

@@ -2,6 +2,7 @@ import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneNames, CoreResources, TileType, PlayerID } from '@balance-control/rules';
 import { stringToCoord, coordToString, getNeighbors, isSurrounded, positionKeyFromCoordString } from './topology';
 import { drawMeasure, allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap, runFinalRoundSettlement, returnMetaMarkerToSupply } from './mechanics-turn';
+import { drawTileToStaging, UNPLACEABLE_DRAW_CHOICE_SOURCE_ID } from './mechanics-draw';
 import { computeMajority } from './mechanics';
 import { EffectResolver } from './engine/resolver';
 import {
@@ -133,6 +134,10 @@ export const CoreMoves = {
         if (!G.engine.pendingChoice || G.engine.pendingChoice.choiceId !== choiceId) return INVALID_MOVE;
 
         const choice = G.engine.pendingChoice;
+
+        // Forced confirm gate for unplaceable draw loop.
+        if (choice.sourceId === UNPLACEABLE_DRAW_CHOICE_SOURCE_ID && selection !== 'OK') return INVALID_MOVE;
+
         G.engine.pendingChoice = undefined;
 
         // Push resolution atom to front of queue
@@ -144,6 +149,11 @@ export const CoreMoves = {
         } as any);
 
         EffectResolver.resolve(G, ctx);
+
+        // CORE-01-04-07: After unplaceable discard, draw again (confirm-gated via pendingChoice).
+        if (choice.sourceId === UNPLACEABLE_DRAW_CHOICE_SOURCE_ID) {
+            drawTileToStaging(G, ctx);
+        }
     },
 
     // CORE-01-04-10–12: PlaceInfluence via Lobbyist

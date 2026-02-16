@@ -5,6 +5,7 @@ import { Zone } from './Zone';
 import { ActionPanel } from './ActionPanel';
 import { BoardViewport } from './BoardViewport';
 import { PendingChoiceModal } from './PendingChoiceModal';
+import { PublicNoticeOverlay } from './PublicNoticeOverlay';
 
 interface GameLayoutProps {
     G: GameState;
@@ -116,6 +117,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
 
     return (
         <div className="game-layout">
+            <PublicNoticeOverlay G={G} />
             <PendingChoiceModal intents={intents} moves={moves} />
 
             {/* Left Panel: Bank & Supply */}
