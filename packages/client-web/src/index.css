@@ -298,18 +298,20 @@ body {
     flex: 1;
     min-height: 320px;
     border-radius: var(--radius-md);
-    overflow: hidden;
+    overflow: visible;
 }
 
-.board-viewport-wrapper,
 .board-viewport-wrapper {
     width: 100%;
     height: 100%;
+    overflow: visible !important;
 }
 
 .board-viewport-content {
     width: max-content;
     height: max-content;
+    will-change: transform;
+    transform-origin: 0 0;
 }
 
 .board-viewport-controls {
@@ -349,11 +351,18 @@ body {
     justify-content: center;
     transform: translate(-50%, -50%);
     overflow: visible;
+    --hex-hit-pad: 0px;
+    width: calc(var(--hex-cell-w) + (var(--hex-hit-pad) * 2));
+    height: calc(var(--hex-cell-h) + (var(--hex-hit-pad) * 2));
+}
+
+.hex-cell-hot {
+    --hex-hit-pad: 28px;
 }
 
 .hex-tile-visual {
-    width: 100%;
-    height: 100%;
+    width: var(--hex-cell-w);
+    height: var(--hex-cell-h);
     display: block;
     pointer-events: none;
 }

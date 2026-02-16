@@ -67,6 +67,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     const coord = parseCoordString(coordStr);
                     const { x, y } = axialToPixel(coord, HEX_SIZE);
                     const isSelected = selectedTileId === tileId || selectedCoord === coordStr;
+                    const isHot = isSelected || hoveredTileId === tileId;
                     const disabled = !isInteractive;
                     const testId = `hex-tile-${coordStr.replace(',', '_')}`;
 
@@ -89,12 +90,18 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     return (
                         <div
                             key={coordStr}
-                            className={isSelected ? 'hex-cell hex-cell-selected' : 'hex-cell'}
+                            className={[
+                                'hex-cell',
+                                isSelected ? 'hex-cell-selected' : null,
+                                isHot ? 'hex-cell-hot' : null
+                            ]
+                                .filter(Boolean)
+                                .join(' ')}
                             style={{
                                 left: x + offsetX,
                                 top: y + offsetY,
-                                width: cellWidth,
-                                height: cellHeight
+                                ['--hex-cell-w' as any]: `${cellWidth}px`,
+                                ['--hex-cell-h' as any]: `${cellHeight}px`
                             }}
                             data-testid={testId}
                             title={`coord ${coordStr}`}
@@ -138,8 +145,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             style={{
                                 left: x + offsetX,
                                 top: y + offsetY,
-                                width: cellWidth,
-                                height: cellHeight
+                                ['--hex-cell-w' as any]: `${cellWidth}px`,
+                                ['--hex-cell-h' as any]: `${cellHeight}px`
                             }}
                             title={`Place at ${coordStr}`}
                         />
