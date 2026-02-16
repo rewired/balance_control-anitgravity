@@ -1,11 +1,10 @@
-import overlayUrl from "../../assets/tiles/tile-overlay.png";
-
 import { OVERLAY_RENDER_RECT } from "./tileGeometry";
+import { tileOverlayUrl } from "./tileAssets";
 
 export function GlassOverlay() {
   return (
     <image
-      href={overlayUrl}
+      href={tileOverlayUrl}
       x={OVERLAY_RENDER_RECT.x}
       y={OVERLAY_RENDER_RECT.y}
       width={OVERLAY_RENDER_RECT.width}
