@@ -3,6 +3,7 @@ import { Client, LobbyClient } from 'boardgame.io/client';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { BalanceControl } from '@balance-control/game';
 import { Board } from './Board';
+import { StartScreen } from './components/StartScreen';
 import { LobbyScreen, type LobbyJoinPayload } from './components/LobbyScreen';
 import { clearLastSession, writeLastSession } from './lobby/session';
 
@@ -28,6 +29,15 @@ const HotseatShell = React.lazy(() =>
     import('./hotseat/HotseatShell').then((m) => ({ default: m.HotseatShell }))
 );
 
+type AppMode = 'start' | 'hotseat' | 'onlineLobby' | 'onlineMatch';
+
+function getInitialModeFromUrl(): AppMode {
+    const mode = new URLSearchParams(window.location.search).get('mode');
+    if (mode === 'hotseat') return 'hotseat';
+    if (mode === 'online') return 'onlineLobby';
+    return 'start';
+}
+
 function getStateID(state: any): number | null {
     if (!state) return null;
     return state.ctx?._stateID ?? state.ctx?.stateID ?? state._stateID ?? null;
@@ -44,26 +54,15 @@ function getReplaySeed(state: any): string | number | null {
 }
 
 const App: React.FC = () => {
+    const [mode, setMode] = useState<AppMode>(() => getInitialModeFromUrl());
     const [session, setSession] = useState<LobbyJoinPayload | null>(null);
     const [leaveError, setLeaveError] = useState<string | null>(null);
     const [isLeaving, setIsLeaving] = useState(false);
-
-    const mode = useMemo(() => {
-        return new URLSearchParams(window.location.search).get('mode');
-    }, []);
 
     const devScene = useMemo(() => {
         if (!import.meta.env.DEV) return null;
         return new URLSearchParams(window.location.search).get('dev');
     }, []);
-
-    if (mode === 'hotseat') {
-        return (
-            <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading hotseat…</div>}>
-                <HotseatShell />
-            </Suspense>
-        );
-    }
 
     if (devScene === 'hex-tile' && DevHexTilePlayground) {
         return (
@@ -72,6 +71,15 @@ const App: React.FC = () => {
             </Suspense>
         );
     }
+
+    useEffect(() => {
+        if (session && mode !== 'onlineMatch') {
+            setMode('onlineMatch');
+        }
+        if (!session && mode === 'onlineMatch') {
+            setMode('start');
+        }
+    }, [mode, session]);
 
     const lobbyClient = useMemo(() => {
         const serverUrl = session?.serverUrl ?? SERVER_URL;
@@ -177,6 +185,7 @@ const App: React.FC = () => {
         setLeaveError(null);
         writeLastSession(payload);
         setSession(payload);
+        setMode('onlineMatch');
     };
 
     const handleQuitGame = async () => {
@@ -193,6 +202,7 @@ const App: React.FC = () => {
             setMoveLog([]);
             wasConnectedRef.current = false;
             setSession(null);
+            setMode('start');
         } catch (err) {
             const message = err instanceof Error ? err.message : String(err);
             setLeaveError(`Failed to leave match: ${message}`);
@@ -201,9 +211,54 @@ const App: React.FC = () => {
         }
     };
 
-    if (!session) {
-        return <LobbyScreen onJoin={handleJoin} />;
+    if (mode === 'start' && !session) {
+        return (
+            <StartScreen
+                onSelectHotseat={() => setMode('hotseat')}
+                onSelectOnlineLobby={() => setMode('onlineLobby')}
+                onResumeOnlineSession={(stored) => {
+                    setLeaveError(null);
+                    pendingMovesRef.current = [];
+                    setMoveLog([]);
+                    wasConnectedRef.current = false;
+                    setSession(stored);
+                    setMode('onlineMatch');
+                }}
+            />
+        );
     }
+
+    if (mode === 'hotseat') {
+        return (
+            <>
+                <div className="game-topbar glass-panel" data-testid="startflow-topbar">
+                    <div className="game-topbar-text">Local hotseat</div>
+                    <button className="btn-secondary" onClick={() => setMode('start')} data-testid="back-to-start">
+                        Back to start
+                    </button>
+                </div>
+                <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading hotseat…</div>}>
+                    <HotseatShell />
+                </Suspense>
+            </>
+        );
+    }
+
+    if (mode === 'onlineLobby' && !session) {
+        return (
+            <>
+                <div className="game-topbar glass-panel" data-testid="startflow-topbar">
+                    <div className="game-topbar-text">Online lobby</div>
+                    <button className="btn-secondary" onClick={() => setMode('start')} data-testid="back-to-start">
+                        Back to start
+                    </button>
+                </div>
+                <LobbyScreen onJoin={handleJoin} />
+            </>
+        );
+    }
+
+    if (!session) return null;
 
     if (!state) return null;
 
@@ -261,4 +316,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Client: start flow now begins with a simple mode select (Local hotseat vs Online lobby); online lobby remains available but optional.
 - Fix: DrawPile privacy hardened in playerView (closed-bag masking + hidden tile defs filtered); UI shows Draw Bag count-only and renders Discard (Face Up).
 - Fix: Unplaceable drawn tiles are discarded face-up with a public notice and confirm-gated redraw loop (CORE-01-04-06/07).
 - Fix: client active-state now derived from `ctx` (no reliance on `state.isActive`); legal-intents fall back when `ctx.activePlayers` is missing and prohibitions are respected.

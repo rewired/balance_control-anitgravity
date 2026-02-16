@@ -116,6 +116,7 @@ describe('Lobby session persistence', () => {
 
     it('writes last session to localStorage on join', async () => {
         render(<App />);
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
 
         await screen.findByTestId('lobby-match-m1');
 
@@ -146,8 +147,8 @@ describe('Lobby session persistence', () => {
 
         render(<App />);
 
-        await screen.findByTestId('lobby-last-session');
-        fireEvent.click(screen.getByTestId('lobby-resume-last-match'));
+        await screen.findByTestId('start-resume-online');
+        fireEvent.click(screen.getByTestId('start-resume-online'));
 
         await screen.findByTestId('game-screen');
 
@@ -172,6 +173,8 @@ describe('Lobby session persistence', () => {
 
         render(<App />);
 
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
+
         await screen.findByTestId('lobby-last-session');
         fireEvent.click(screen.getByTestId('lobby-leave-last-match'));
 
@@ -192,6 +195,8 @@ describe('Lobby session persistence', () => {
         });
 
         render(<App />);
+
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
 
         await screen.findByTestId('lobby-last-session');
         fireEvent.click(screen.getByTestId('lobby-leave-last-match'));
