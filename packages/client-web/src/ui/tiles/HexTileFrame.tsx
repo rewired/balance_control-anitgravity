@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { GlassOverlay } from "./GlassOverlay";
 import { CENTER_ABS, INFLUENCE_MARKER_CENTERS_ABS, INNER_DISC_RADIUS, VIEWBOX } from "./tileGeometry";
 import type { SeatId } from "./types";
 
@@ -7,6 +8,7 @@ export type HexTileFrameProps = {
   majoritySeat: SeatId | null;
   seatColor: (seat: SeatId) => string;
   className?: string;
+  content?: ReactNode;
   children?: ReactNode;
 };
 
@@ -34,7 +36,7 @@ function hexPathFromVerticesAbs(vertices: Readonly<Record<SeatId, readonly [numb
   return `M ${x2} ${y2} L ${x3} ${y3} L ${x4} ${y4} L ${x5} ${y5} L ${x6} ${y6} L ${x1} ${y1} Z`;
 }
 
-export function HexTileFrame({ majoritySeat, seatColor, className, children }: HexTileFrameProps) {
+export function HexTileFrame({ majoritySeat, seatColor, className, content, children }: HexTileFrameProps) {
   const baseFill = majoritySeat === null ? NO_MAJORITY_FILL : seatColor(majoritySeat);
   const hexPath = hexPathFromVerticesAbs(INFLUENCE_MARKER_CENTERS_ABS);
   const [cx, cy] = CENTER_ABS;
@@ -62,7 +64,9 @@ export function HexTileFrame({ majoritySeat, seatColor, className, children }: H
         strokeWidth={INNER_DISC_OUTLINE_WIDTH}
         strokeLinejoin="round"
       />
-      <g>{children}</g>
+      {content ? <g>{content}</g> : null}
+      <GlassOverlay />
+      {children ? <g>{children}</g> : null}
     </svg>
   );
 }
