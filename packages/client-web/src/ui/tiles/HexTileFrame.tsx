@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, SVGProps } from "react";
 
 import { GlassOverlay } from "./GlassOverlay";
 import { CENTER_ABS, INFLUENCE_MARKER_CENTERS_ABS, INNER_DISC_RADIUS, VIEWBOX } from "./tileGeometry";
@@ -8,6 +8,7 @@ export type HexTileFrameProps = {
   majoritySeat: SeatId | null;
   seatColor: (seat: SeatId) => string;
   className?: string;
+  svgProps?: Omit<SVGProps<SVGSVGElement>, "children" | "viewBox" | "xmlns">;
   content?: ReactNode;
   children?: ReactNode;
 };
@@ -36,17 +37,21 @@ function hexPathFromVerticesAbs(vertices: Readonly<Record<SeatId, readonly [numb
   return `M ${x2} ${y2} L ${x3} ${y3} L ${x4} ${y4} L ${x5} ${y5} L ${x6} ${y6} L ${x1} ${y1} Z`;
 }
 
-export function HexTileFrame({ majoritySeat, seatColor, className, content, children }: HexTileFrameProps) {
+export function HexTileFrame({ majoritySeat, seatColor, className, svgProps, content, children }: HexTileFrameProps) {
   const baseFill = majoritySeat === null ? NO_MAJORITY_FILL : seatColor(majoritySeat);
   const hexPath = hexPathFromVerticesAbs(INFLUENCE_MARKER_CENTERS_ABS);
   const [cx, cy] = CENTER_ABS;
+  const svgClassName = [className, svgProps?.className].filter(Boolean).join(" ") || undefined;
+  const svgStyle = { ...(svgProps?.style ?? {}), overflow: "visible" as const };
+  const { className: _ignoredClassName, style: _ignoredStyle, ...restSvgProps } = svgProps ?? {};
 
   return (
     <svg
-      className={className}
+      {...restSvgProps}
+      className={svgClassName}
       viewBox={viewBoxToString(VIEWBOX)}
       xmlns="http://www.w3.org/2000/svg"
-      style={{ overflow: "visible" }}
+      style={svgStyle}
     >
       <path
         d={hexPath}
