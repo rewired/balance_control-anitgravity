@@ -38,7 +38,7 @@ export function BadgeSlots({ badges }: BadgeSlotsProps) {
   const iconScale = BADGE_ICON_SIZE / DEFAULT_ICON_VIEWBOX_SIZE;
 
   return (
-    <g>
+    <g pointerEvents="none">
       {slotDefs.slice(0, count).map((slot, idx) => {
         const badge = badges[idx] as TileBadge;
         const [cx, cy] = slot.center_abs;
@@ -72,4 +72,3 @@ export function BadgeSlots({ badges }: BadgeSlotsProps) {
     </g>
   );
 }
-
