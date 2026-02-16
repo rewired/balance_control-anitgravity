@@ -45,6 +45,10 @@ describe("HexTileVisual smoke", () => {
     expect(overlay?.getAttribute("height")).toBe(String(OVERLAY_RENDER_RECT.height));
     expect(overlay?.getAttribute("preserveAspectRatio")).toBe(OVERLAY_RENDER_RECT.preserveAspectRatio);
 
+    const overlayStyle = overlay?.getAttribute("style") ?? "";
+    expect(overlayStyle).toMatch(/mix-blend-mode:\s*luminosity/);
+    expect(overlayStyle).toMatch(/opacity:\s*0\.8/);
+
     expect(container.querySelector('g[pointer-events="none"]')).toBeNull();
   });
 
@@ -108,4 +112,3 @@ describe("HexTileVisual smoke", () => {
     expect(belt.querySelectorAll("rect")).toHaveLength(4);
   });
 });
-
