@@ -1,16 +1,13 @@
-import domIconUrl from "../../assets/tile-icons/dom.svg";
-import infIconUrl from "../../assets/tile-icons/inf.svg";
-import forIconUrl from "../../assets/tile-icons/for.svg";
+import { resortIconUrlByResort, type ResortKey } from "./tileAssets";
 
 export type ResortIconProps = {
-  resort?: string;
+  resort?: ResortKey;
 };
 
 const DEFAULT_ICON_VIEWBOX_SIZE = 24;
 
 export function ResortIcon({ resort }: ResortIconProps) {
-  const href =
-    resort === "DOM" ? domIconUrl : resort === "INF" ? infIconUrl : resort === "FOR" ? forIconUrl : null;
+  const href = resort ? resortIconUrlByResort[resort] : null;
 
   if (!href) return null;
 

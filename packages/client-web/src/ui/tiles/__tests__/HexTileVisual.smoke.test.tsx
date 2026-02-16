@@ -13,10 +13,7 @@ import {
   OVERLAY_RENDER_RECT,
 } from "../tileGeometry";
 import type { SeatId, TileBadge } from "../types";
-
-import domIconUrl from "../../../assets/tile-icons/dom.svg";
-import infIconUrl from "../../../assets/tile-icons/inf.svg";
-import forIconUrl from "../../../assets/tile-icons/for.svg";
+import { resortIconUrlByResort } from "../tileAssets";
 
 afterEach(() => cleanup());
 
@@ -131,9 +128,9 @@ describe("HexTileVisual smoke", () => {
   });
 
   it.each([
-    ["DOM", domIconUrl],
-    ["INF", infIconUrl],
-    ["FOR", forIconUrl],
+    ["DOM", resortIconUrlByResort.DOM],
+    ["INF", resortIconUrlByResort.INF],
+    ["FOR", resortIconUrlByResort.FOR],
   ] as const)("renders resort icon image when provided (%s)", (resort, expectedHref) => {
     const { container } = renderHexTileVisual({ resortIcon: <ResortIcon resort={resort} /> });
     const images = Array.from(container.querySelectorAll("image"));
