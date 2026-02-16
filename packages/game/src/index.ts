@@ -218,3 +218,4 @@ export * from './move-contracts';
 export * from './config';
 export * from './hash-state';
 export * from './engine/legal-intents';
+export { selectTileController } from './public-selectors';

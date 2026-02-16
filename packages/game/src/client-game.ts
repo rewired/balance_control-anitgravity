@@ -6,9 +6,11 @@ import { drawTileToStaging } from './mechanics-draw';
 import { EffectResolver } from './engine/resolver';
 import { ExpansionRegistry } from './expansion-registry';
 import { enumerateLegalIntents } from './engine/legal-intents';
+import { selectTileController } from './public-selectors';
 
 export { enumerateLegalIntents };
 export type { LegalIntent } from './engine/legal-intents';
+export { selectTileController };
 
 const expansionMoves = ExpansionRegistry.getMergedMoves();
 const politicalActionMoves = {
