@@ -172,6 +172,7 @@ describe('EffectResolver cost and production behavior', () => {
     it('should apply production modifiers (no PingPong production reduction)', () => {
         ExpansionRegistry.clear();
         ExpansionRegistry.register({
+            id: 'exp01',
             name: 'PingPongModExp',
             modifiers: {
                 production: (_tileId, _G, base) => base + 2
@@ -202,6 +203,9 @@ describe('EffectResolver cost and production behavior', () => {
             },
             adjacency: { tile_resort: [] },
             grid: {},
+            meta: {
+                cfg: { expansions: { ex01: true, ex02: false, ex03: false } }
+            },
             engine: {
                 idSeq: 0,
                 effectQueue: [

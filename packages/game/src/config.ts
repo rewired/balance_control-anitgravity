@@ -1,12 +1,5 @@
-export interface ExpansionFlags {
-    ex01: boolean;
-    ex02: boolean;
-    ex03: boolean;
-}
-
-export interface GameConfig {
-    expansions: ExpansionFlags;
-}
+import type { ExpansionFlags, GameConfig } from '@balance-control/rules';
+export type { ExpansionFlags, GameConfig } from '@balance-control/rules';
 
 export const DEFAULT_EXPANSION_FLAGS: ExpansionFlags = {
     ex01: false,

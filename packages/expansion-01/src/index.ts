@@ -21,6 +21,7 @@ const MEASURE_DETAILS: Record<string, { name: string, cost: Record<string, numbe
 };
 
 export const Expansion01: ExpansionDefinition = {
+    id: 'exp01',
     name: EXP_01_NAME,
     resources: ['ECO'],
     zones: [

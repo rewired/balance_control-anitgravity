@@ -120,6 +120,7 @@ describe('SetupGame', () => {
 
     it('should not apply ex01 setup when ex01 flag is disabled', () => {
         const mockEx01: ExpansionDefinition = {
+            id: 'exp01',
             name: 'EXP-01 Economy & Labor',
             onSetup: (G) => {
                 G.tiles.tile_ex01_mock = { id: 'tile_ex01_mock', type: TileType.Resort, resort: 'ECO', weight: 1 };
@@ -138,6 +139,7 @@ describe('SetupGame', () => {
 
     it('should apply ex01 setup when enabled and keep deterministic deck composition', () => {
         const mockEx01: ExpansionDefinition = {
+            id: 'exp01',
             name: 'EXP-01 Economy & Labor',
             onSetup: (G) => {
                 G.tiles.tile_ex01_mock = { id: 'tile_ex01_mock', type: TileType.Resort, resort: 'ECO', weight: 1 };
