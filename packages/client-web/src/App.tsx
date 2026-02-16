@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Client, LobbyClient } from 'boardgame.io/client';
 import { SocketIO } from 'boardgame.io/multiplayer';
 import { BalanceControl } from '@balance-control/game';
@@ -20,6 +20,10 @@ const REPLAY_RING_SIZE = 200;
 const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
 const GAME_NAME = BalanceControl.name;
 
+const DevHexTilePlayground = import.meta.env.DEV
+    ? React.lazy(() => import('./dev/HexTilePlayground'))
+    : null;
+
 function getStateID(state: any): number | null {
     if (!state) return null;
     return state.ctx?._stateID ?? state.ctx?.stateID ?? state._stateID ?? null;
@@ -39,6 +43,19 @@ const App: React.FC = () => {
     const [session, setSession] = useState<LobbyJoinPayload | null>(null);
     const [leaveError, setLeaveError] = useState<string | null>(null);
     const [isLeaving, setIsLeaving] = useState(false);
+
+    const devScene = useMemo(() => {
+        if (!import.meta.env.DEV) return null;
+        return new URLSearchParams(window.location.search).get('dev');
+    }, []);
+
+    if (devScene === 'hex-tile' && DevHexTilePlayground) {
+        return (
+            <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading playground…</div>}>
+                <DevHexTilePlayground />
+            </Suspense>
+        );
+    }
 
     const lobbyClient = useMemo(() => {
         const serverUrl = session?.serverUrl ?? SERVER_URL;
