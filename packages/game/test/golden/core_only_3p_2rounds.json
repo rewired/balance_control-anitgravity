@@ -9,6 +9,9 @@
       "ex03": false
     }
   },
+  "prelude": [
+    { "action": "stackDrawPileByType", "tileType": "Committee", "count": 1 }
+  ],
   "rulesetManifest": {
     "coreVersion": "v1.1.0",
     "expansions": {},
@@ -20,17 +23,17 @@
   },
   "moves": [
     { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "0,-1" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,1" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
-    { "move": "pass", "args": [{}] }
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] }
   ],
-  "expectedFinalHash": "4c8d673d0415164d6edac0c04f1ba0cded8da8c16a7985cad907070caaade0bd"
+  "expectedFinalHash": "5ab4fdd5920cb241253d9288629ee0d3c90a94a94371bbe4abae2974204ba7ef"
 }

@@ -102,7 +102,6 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         if (intent.moveType === 'resolveChoice') return false;
         if (intent.moveType === 'placeTile') return false;
         if (intent.moveType === 'placeInfluence') return false;
-        if (intent.moveType === 'pass') return false;
         if (intent.moveType === 'passTilePlacement') return false;
         return true;
     });
@@ -111,7 +110,6 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
     if (stage !== 'drawAndPlace') {
         trailing.push(...input.intents.filter((intent) => intent.moveType === 'passTilePlacement'));
     }
-    trailing.push(...input.intents.filter((intent) => intent.moveType === 'pass'));
 
     const ghostCoords = stableSortCoords(
         Array.from(

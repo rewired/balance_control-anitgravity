@@ -30,11 +30,11 @@
     { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,-1" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "0,-1" }] },
     { "move": "moveInfluence", "args": [{ "sourceCoord": "1,0", "targetCoord": "1,-1" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "0,1" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
     {
       "move": "moveInfluence",
@@ -58,7 +58,7 @@
       ]
     },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,1" }] },
-    { "move": "pass", "args": [{}] }
+    { "move": "placeInfluence", "args": [{ "targetCoord": "-1,1" }] }
   ],
-  "expectedFinalHash": "dfc14985518ed878e841944a9937541e04fa638dce97b25977afe1d122720493"
+  "expectedFinalHash": "4c00e1a64ebb5b5a818d0ff5bd72a15dc88bd15b0c0d7fb793ce1c93241e1a81"
 }

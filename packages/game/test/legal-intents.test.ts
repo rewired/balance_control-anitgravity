@@ -41,6 +41,7 @@ describe('enumerateLegalIntents', () => {
         const intentsA = enumerateLegalIntents(G as any, ctx, '0');
         const intentsB = enumerateLegalIntents(G as any, ctx, '0');
         expect(JSON.stringify(intentsA)).toEqual(JSON.stringify(intentsB));
+        expect(intentsA.some((intent) => intent.moveType === 'pass')).toBe(false);
 
         const events = { endTurn: () => {}, endStage: () => {}, setStage: () => {} };
         for (const intent of intentsA) {

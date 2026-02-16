@@ -23,9 +23,6 @@ const formatIntentLabel = (intent: LegalIntent) => {
     if (intent.moveType === 'convertResources') {
         return `Convert → ${intent.payload?.outputResort}`;
     }
-    if (intent.moveType === 'pass') {
-        return 'Pass';
-    }
     if (intent.moveType === 'passTilePlacement') {
         return 'Skip placement';
     }

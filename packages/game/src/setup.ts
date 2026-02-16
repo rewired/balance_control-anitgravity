@@ -4,7 +4,18 @@ import { Ctx } from 'boardgame.io';
 import { ExpansionRegistry } from './expansion-registry';
 import { normalizeGameConfig } from './config';
 
+function normalizeBoardgameCtx(ctx: any): Ctx {
+    if (ctx && typeof ctx === 'object' && (ctx as any).ctx && typeof (ctx as any).ctx === 'object') {
+        const inner = (ctx as any).ctx as Ctx;
+        const random = (ctx as any).random ?? (inner as any).random;
+        return { ...(inner as any), random } as any;
+    }
+    return ctx as Ctx;
+}
+
 export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown }): GameState => {
+    const normalizedCtx = normalizeBoardgameCtx(ctx);
+
     const gameConfig = normalizeGameConfig(setupData);
     const rulesetBase: RulesetManifest = RULESET_MANIFEST ?? {
         coreVersion: 'v1.1.0',
@@ -76,7 +87,7 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
     });
 
     // Personal Zones (Meta-Marker only; CORE-01-03-03B: Influence after Shuffle)
-    for (let i = 0; i < ctx.numPlayers; i++) {
+    for (let i = 0; i < normalizedCtx.numPlayers; i++) {
         const pid = i.toString();
         const zoneId = `${CoreZoneNames.PersonalSupply}:${pid}`;
         G.zones[zoneId] = { id: zoneId, name: zoneId, items: [] };
@@ -98,7 +109,7 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
     G.grid['0,0'] = startId;
 
     // 3. Initialize DrawPile (core + ADD56 when 5-6 players)
-    const coreTiles = generateCoreTiles(ctx.numPlayers);
+    const coreTiles = generateCoreTiles(normalizedCtx.numPlayers);
     coreTiles.forEach(t => {
         G.tiles[t.id] = t;
         G.zones[CoreZoneNames.DrawPile].items.push(t.id);
@@ -107,29 +118,29 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
     });
 
     // 4. Apply enabled expansions before the one final setup shuffle.
-    ExpansionRegistry.applySetup(G, ctx, gameConfig);
+    ExpansionRegistry.applySetup(G, normalizedCtx, gameConfig);
 
     // CORE-01-03-02B: Canonical Pre-Shuffle Ordering before shuffle
     G.zones[CoreZoneNames.DrawPile].items = sortDrawPileCanonical(G);
 
     // CORE-01-03-02 / CORE-01-03-02A.1: Canonical Fisher-Yates shuffle (i from n-1 down to 1, j = RNG.nextInt(i+1))
-    if (ctx && (ctx as any).random) {
+    if (normalizedCtx && (normalizedCtx as any).random) {
         G.zones[CoreZoneNames.DrawPile].items = shuffleFisherYates(
             G.zones[CoreZoneNames.DrawPile].items,
-            (ctx as any).random
+            (normalizedCtx as any).random
         );
     }
 
     // CORE-01-03-03B(5): Assign Starting Influence after Shuffle
-    for (let i = 0; i < ctx.numPlayers; i++) {
+    for (let i = 0; i < normalizedCtx.numPlayers; i++) {
         const pid = i.toString();
         const zoneId = `${CoreZoneNames.PersonalSupply}:${pid}`;
         let influenceCount = 0;
-        if (ctx.numPlayers === 2) influenceCount = 4;
-        else if (ctx.numPlayers === 3) influenceCount = 3;
-        else if (ctx.numPlayers === 4) influenceCount = 2;
+        if (normalizedCtx.numPlayers === 2) influenceCount = 4;
+        else if (normalizedCtx.numPlayers === 3) influenceCount = 3;
+        else if (normalizedCtx.numPlayers === 4) influenceCount = 2;
         // ADD56-01-02-01/02: 5-6 players get 2 Influence each
-        else if (ctx.numPlayers === 5 || ctx.numPlayers === 6) influenceCount = 2;
+        else if (normalizedCtx.numPlayers === 5 || normalizedCtx.numPlayers === 6) influenceCount = 2;
 
         for (let k = 0; k < influenceCount; k++) {
             const infId = `inf_${pid}_${k}`;

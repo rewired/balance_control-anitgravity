@@ -7,9 +7,7 @@ import { buildIntentViewModel } from '../src/ui/useIntentViewModel';
 describe('Controls - StartCommittee targeting', () => {
     it('disables PlaceInfluence when selected tile lacks a legal intent', () => {
         const moves = {
-            placeInfluence: vi.fn(),
-            pass: vi.fn(),
-            passTilePlacement: vi.fn()
+            placeInfluence: vi.fn()
         };
 
         const intents: any[] = [];

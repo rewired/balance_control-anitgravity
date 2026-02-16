@@ -96,7 +96,7 @@ function makeHotspotTestGame(): Game {
                     next: 'politicalAction',
                 },
                 politicalAction: {
-                    moves: { pass: CoreMoves.pass },
+                    moves: {},
                 },
             },
         },

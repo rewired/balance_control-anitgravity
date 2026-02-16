@@ -20,12 +20,12 @@ describe('Replay runner', () => {
             },
             moves: [
                 { move: 'placeTile', payload: { targetCoord: '1,0' } },
-                { move: 'pass', payload: {} }
+                { move: 'placeInfluence', payload: { targetCoord: '1,0' } }
             ]
         };
 
         const result = runReplay(replay);
-        expect(result.hash).toBe('582d2f0ae0c533287b7d130b21a1007423c8c71830fcbaa25c1345b30b23d027');
+        expect(result.hash).toBe('501bcf80eecf65454ea6c0e3880b941aa38c51768e7ac000cbca0c014c6a013b');
         expect(result.state.G.meta?.ruleset).toBeTruthy();
     });
 
@@ -49,7 +49,7 @@ describe('Replay runner', () => {
             },
             moves: [
                 { move: 'placeTile', payload: { targetCoord: '1,0' } },
-                { move: 'pass', payload: {} }
+                { move: 'placeInfluence', payload: { targetCoord: '1,0' } }
             ]
         };
 
@@ -72,7 +72,7 @@ describe('Replay runner', () => {
             },
             moves: [
                 { move: 'placeTile', payload: { targetCoord: '1,0' } },
-                { move: 'pass', payload: {} }
+                { move: 'placeInfluence', payload: { targetCoord: '1,0' } }
             ]
         };
 

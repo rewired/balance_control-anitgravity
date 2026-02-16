@@ -44,10 +44,9 @@ describe('ActionPanel', () => {
     });
 
     it('dispatches a secondary action exactly once', () => {
-        const moves = { moveInfluence: vi.fn(), pass: vi.fn() };
+        const moves = { moveInfluence: vi.fn() };
         const intents = [
             { moveType: 'moveInfluence', payload: { sourceId: 'inf-1', targetId: 'inf-2' } },
-            { moveType: 'pass', payload: {} }
         ] as any;
         const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: 'tile_alpha', stagedTileId: null }), intents } as any;
         render(

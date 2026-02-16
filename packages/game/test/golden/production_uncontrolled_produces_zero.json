@@ -9,19 +9,23 @@
       "ex03": false
     }
   },
+  "prelude": [
+    { "action": "stackDrawPileByType", "tileType": "Resort", "count": 3 },
+    { "action": "stackDrawPileByType", "tileType": "Committee", "count": 1 }
+  ],
   "notes": {
     "updatedFor": "CORE-01 v1.0.20 migration",
     "previousExpectedFinalHash": "609372d9b0bd8b8272ed1e87f77668f7c0f9d7957f4b9ddf923deeace8e29f1c"
   },
   "moves": [
     { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "0,-1" }] },
-    { "move": "pass", "args": [{}] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
-    { "move": "pass", "args": [{}] }
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] }
   ],
-  "expectedFinalHash": "f53ab04ae74ce8c741e040c645a52fac978d770f863ec62b57e1795758a4134d"
+  "expectedFinalHash": "fb83c76f74890d0fd3decdb62f9d07dbd13a70b3864b7030ddc6092f2aa929e2"
 }

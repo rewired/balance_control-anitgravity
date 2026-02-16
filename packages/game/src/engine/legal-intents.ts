@@ -92,7 +92,6 @@ export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string):
             intents.push(...enumerateMoveInfluence(G, playerID));
             intents.push(...enumerateFormalize(G, ctx, playerID));
             intents.push(...enumerateConvertResources(G, playerID));
-            intents.push({ moveType: 'pass', payload: {} });
         }
     }
 
