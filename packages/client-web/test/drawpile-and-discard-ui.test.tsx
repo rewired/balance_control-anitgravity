@@ -4,9 +4,13 @@ import { render, screen, cleanup } from '@testing-library/react';
 import { TileType } from '@balance-control/rules';
 import { GameLayout } from '../src/components/GameLayout';
 
-vi.mock('@balance-control/game', () => ({
-    enumerateLegalIntents: () => []
-}));
+vi.mock('@balance-control/game', async () => {
+    const actual = await vi.importActual<any>('@balance-control/game');
+    return {
+        ...actual,
+        enumerateLegalIntents: () => []
+    };
+});
 
 afterEach(() => {
     cleanup();
@@ -82,4 +86,3 @@ describe('DrawPile and DiscardFaceUp UI', () => {
         expect(screen.getByText(TileType.Committee)).not.toBeNull();
     });
 });
-

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
-import { computeMajority } from '../../../game/src/mechanics';
+import { selectTileController } from '@balance-control/game';
 import { axialToPixel, computeBoardLayout, parseCoordString, stableSortCoords } from '../ui/hexLayout';
 import { HexTileVisual } from '../ui/tiles/HexTileVisual';
 import { ResortIcon } from '../ui/tiles/ResortIcon';
@@ -79,7 +79,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     const testId = `hex-tile-${coordStr.replace(',', '_')}`;
 
                     const tile = G.tiles[tileId];
-                    const controller = computeMajority(tileId, G).controller;
+                    const controller = selectTileController(tileId, G);
                     const majoritySeat = controller ? playerIdToSeatId(controller) : null;
 
                     const zone = G.zones[tileId];

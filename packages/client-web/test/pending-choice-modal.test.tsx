@@ -6,9 +6,13 @@ import { GameLayout } from '../src/components/GameLayout';
 
 const mockEnumerateLegalIntents = vi.fn();
 
-vi.mock('@balance-control/game', () => ({
-    enumerateLegalIntents: (...args: any[]) => mockEnumerateLegalIntents(...args)
-}));
+vi.mock('@balance-control/game', async () => {
+    const actual = await vi.importActual<any>('@balance-control/game');
+    return {
+        ...actual,
+        enumerateLegalIntents: (...args: any[]) => mockEnumerateLegalIntents(...args)
+    };
+});
 
 afterEach(() => {
     cleanup();
