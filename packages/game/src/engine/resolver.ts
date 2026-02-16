@@ -4,6 +4,7 @@ import { evaluateTileSelector } from './selectors';
 import { computeMajority } from '../mechanics';
 import { countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
 import { ExpansionRegistry } from '../expansion-registry';
+import { EngineModuleRegistry, type AtomHandler } from './engine-module-registry';
 
 type CostSlot = string[] | 'ANY';
 
@@ -369,10 +370,11 @@ export class EffectResolver {
     public static resolve(G: GameState & { engine: EngineState }, ctx: any): boolean {
         const engine = G.engine;
         let ok = true;
+        const dispatch = this.buildAtomDispatch(G);
 
         while (engine.effectQueue.length > 0 && !engine.pendingChoice) {
             const atom = engine.effectQueue.shift()!;
-            ok = this.execute(G, ctx, atom);
+            ok = this.execute(G, ctx, atom, dispatch);
             if (!ok) {
                 engine.effectQueue = [];
                 break;
@@ -385,7 +387,12 @@ export class EffectResolver {
     /**
      * Execute a single atom, applying relevant modifiers before/after.
      */
-    private static execute(G: GameState & { engine: EngineState }, ctx: any, atom: EffectAtom): boolean {
+    private static execute(
+        G: GameState & { engine: EngineState },
+        ctx: any,
+        atom: EffectAtom,
+        dispatch: ReadonlyMap<string, AtomHandler>
+    ): boolean {
         const hook = this.getHookForAtom(atom);
 
         // 1. Apply "before" modifiers
@@ -394,82 +401,10 @@ export class EffectResolver {
         }
 
         // 2. Main Logic
-        switch (atom.kind) {
-            case 'resource.pay':
-                if (!this.handleResourcePay(G, atom)) return false;
-                break;
-            case 'resource.penaltyToNoise':
-                if (!this.handleResourcePenaltyToNoise(G, atom)) return false;
-                break;
-            case 'resource.grant':
-                this.handleResourceGrant(G, atom);
-                break;
-            case 'production.resolve':
-                this.handleProductionResolve(G, atom);
-                break;
-            case 'measure.play':
-                this.handleMeasurePlay(G, atom);
-                break;
-            case 'influence.place':
-                this.handleInfluencePlace(G, atom);
-                break;
-            case 'influence.formalize':
-                this.handleInfluenceFormalize(G, ctx, atom);
-                break;
-            case 'influence.move':
-                this.handleInfluenceMove(G, atom);
-                break;
-            case 'regulation.place':
-                this.handleRegulationPlace(G, atom);
-                break;
-            case 'regulation.move':
-                this.handleRegulationMove(G, atom);
-                break;
-            case 'regulation.remove':
-                this.handleRegulationRemove(G, atom);
-                break;
-            case 'countdown.place':
-                this.handleCountdownPlace(G, atom);
-                break;
-            case 'choice.request':
-                // Deterministic pending choice token for network/replay stability.
-                const choiceId = allocId(G, 'choice');
-                G.engine.pendingChoice = {
-                    ...atom.choice,
-                    choiceId,
-                    resumeToken: choiceId
-                };
-                break;
-
-            case 'choice.apply':
-                this.handleChoiceApply(G, ctx, atom);
-                break;
-
-            case 'modifier.add':
-                G.engine.activeModifiers.push(atom.modifier);
-                break;
-
-            case 'modifier.remove':
-                this.removeModifier(G, atom.sourceId);
-                break;
-            case 'measure.take':
-                this.handleMeasureTake(G, ctx, atom);
-                break;
-            case 'measure.recycle':
-                this.handleMeasureRecycle(G, ctx, atom);
-                break;
-            case 'rule.prohibit':
-                this.handleRuleProhibit(G, atom);
-                break;
-            case 'rule.attribute':
-                this.handleRuleAttribute(G, atom);
-                break;
-            case 'hook.trigger':
-                this.triggerHook(G, ctx, atom.hook, atom.payload);
-                break;
-            case 'hotspot.resolve':
-                this.handleHotspotResolve(G, ctx, atom);
-                break;
+        const handler = dispatch.get(atom.kind);
+        if (handler) {
+            const result = handler(G as any, ctx, atom as any);
+            if (result === false) return false;
         }
 
         // 3. Apply "after" modifiers
@@ -484,6 +419,116 @@ export class EffectResolver {
         });
 
         return true;
+    }
+
+    private static buildAtomDispatch(G: GameState & { engine: EngineState }): ReadonlyMap<string, AtomHandler> {
+        const registry = new EngineModuleRegistry();
+
+        registry.registerModule({
+            id: 'core',
+            isEnabled: () => true,
+            atoms: [
+                {
+                    kind: 'resource.pay',
+                    handler: (G2, _ctx, atom) => this.handleResourcePay(G2, atom)
+                },
+                {
+                    kind: 'resource.penaltyToNoise',
+                    handler: (G2, _ctx, atom) => this.handleResourcePenaltyToNoise(G2, atom)
+                },
+                {
+                    kind: 'resource.grant',
+                    handler: (G2, _ctx, atom) => this.handleResourceGrant(G2, atom)
+                },
+                {
+                    kind: 'production.resolve',
+                    handler: (G2, _ctx, atom) => this.handleProductionResolve(G2, atom)
+                },
+                {
+                    kind: 'measure.play',
+                    handler: (G2, _ctx, atom) => this.handleMeasurePlay(G2, atom)
+                },
+                {
+                    kind: 'influence.place',
+                    handler: (G2, _ctx, atom) => this.handleInfluencePlace(G2, atom)
+                },
+                {
+                    kind: 'influence.formalize',
+                    handler: (G2, ctx2, atom) => this.handleInfluenceFormalize(G2, ctx2, atom)
+                },
+                {
+                    kind: 'influence.move',
+                    handler: (G2, _ctx, atom) => this.handleInfluenceMove(G2, atom)
+                },
+                {
+                    kind: 'choice.request',
+                    handler: (G2, _ctx, atom) => {
+                        const choiceId = allocId(G2, 'choice');
+                        G2.engine.pendingChoice = {
+                            ...atom.choice,
+                            choiceId,
+                            resumeToken: choiceId
+                        };
+                    }
+                },
+                {
+                    kind: 'choice.apply',
+                    handler: (G2, ctx2, atom) => this.handleChoiceApply(G2, ctx2, atom)
+                },
+                {
+                    kind: 'modifier.add',
+                    handler: (G2, _ctx, atom) => {
+                        G2.engine.activeModifiers.push(atom.modifier);
+                    }
+                },
+                {
+                    kind: 'modifier.remove',
+                    handler: (G2, _ctx, atom) => this.removeModifier(G2, atom.sourceId)
+                },
+                {
+                    kind: 'measure.take',
+                    handler: (G2, ctx2, atom) => this.handleMeasureTake(G2, ctx2, atom)
+                },
+                {
+                    kind: 'measure.recycle',
+                    handler: (G2, ctx2, atom) => this.handleMeasureRecycle(G2, ctx2, atom)
+                },
+                {
+                    kind: 'rule.prohibit',
+                    handler: (G2, _ctx, atom) => this.handleRuleProhibit(G2, atom)
+                },
+                {
+                    kind: 'rule.attribute',
+                    handler: (G2, _ctx, atom) => this.handleRuleAttribute(G2, atom)
+                },
+                {
+                    kind: 'hook.trigger',
+                    handler: (G2, ctx2, atom) => this.triggerHook(G2, ctx2, atom.hook, atom.payload)
+                },
+                {
+                    kind: 'hotspot.resolve',
+                    handler: (G2, ctx2, atom) => this.handleHotspotResolve(G2, ctx2, atom)
+                }
+            ]
+        });
+
+        registry.registerModule({
+            id: 'exp02',
+            isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex02 === true,
+            atoms: [
+                { kind: 'regulation.place', handler: (G2, _ctx, atom) => this.handleRegulationPlace(G2, atom) },
+                { kind: 'regulation.move', handler: (G2, _ctx, atom) => this.handleRegulationMove(G2, atom) },
+                { kind: 'regulation.remove', handler: (G2, _ctx, atom) => this.handleRegulationRemove(G2, atom) }
+            ]
+        });
+
+        registry.registerModule({
+            id: 'exp03',
+            isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex03 === true,
+            atoms: [{ kind: 'countdown.place', handler: (G2, _ctx, atom) => this.handleCountdownPlace(G2, atom) }]
+        });
+
+        return registry.buildAtomDispatch(G);
     }
 
     /**

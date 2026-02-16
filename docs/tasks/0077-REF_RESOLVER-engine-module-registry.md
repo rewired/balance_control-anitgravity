@@ -82,12 +82,12 @@ Failure behavior requirements:
 
 ## 9) PR Checklist (frozen)
 
-- [ ] `EngineModuleRegistry` introduced with deterministic ordering
-- [ ] No override policy enforced (duplicate kind is an error)
-- [ ] Core module is mandatory and always enabled
-- [ ] EXP modules are gated by config flags (canonical source)
-- [ ] Tests added for no-override behavior
-- [ ] `affected_guardrails` and `spec_anchor_refs` present
+- [x] `EngineModuleRegistry` introduced with deterministic ordering
+- [x] No override policy enforced (duplicate kind is an error)
+- [x] Core module is mandatory and always enabled
+- [x] EXP modules are gated by config flags (canonical source)
+- [x] Tests added for no-override behavior
+- [x] `affected_guardrails` and `spec_anchor_refs` present
 
 ## 15) Execution Log (append-only)
 
@@ -95,6 +95,78 @@ Failure behavior requirements:
 
 TBD
 
+- Introduced `EngineModuleRegistry` to register `atom.kind -> handler` maps by module in canonical order.
+- Refactored `EffectResolver` dispatch to use the registry without changing the resolver pipeline ordering.
+- Added deterministic no-override error behavior and a unit test covering conflict ordering.
+- Gated EXP-02/EXP-03 atom handlers by `G.meta.cfg.expansions` flags (canonical config source).
+- Updated `CHANGELOG.md` entry for the new dispatch modularization.
+
 ### Commands Run
 
 TBD
+
+```bash
+git status
+```
+```
+On branch task/0077-engine-module-registry
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   CHANGELOG.md
+	modified:   packages/game/src/engine/resolver.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	packages/game/src/engine/engine-module-registry.ts
+	packages/game/test/engine-module-registry.test.ts
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+```bash
+git diff --stat
+```
+```
+ CHANGELOG.md                         |   1 +
+ packages/game/src/engine/resolver.ts | 201 +++++++++++++++++++++--------------
+ 2 files changed, 124 insertions(+), 78 deletions(-)
+```
+
+```bash
+pnpm test
+```
+```
+> balance-control-monorepo@0.0.0 test D:\__DEV\balance_control-anitgravity
+> pnpm -r --if-present test
+
+Scope: 9 of 10 workspace projects
+packages/game test$ vitest run
+packages/game test:  Test Files  24 passed (24)
+packages/game test:       Tests  93 passed (93)
+packages/game test: Done
+packages/client-web test$ vitest run
+packages/client-web test:  Test Files  16 passed (16)
+packages/client-web test:       Tests  48 passed (48)
+packages/client-web test: Done
+```
+
+```bash
+pnpm lint
+```
+```
+> balance-control-monorepo@0.0.0 lint D:\__DEV\balance_control-anitgravity
+> eslint "packages/**/*.{ts,tsx,js,cjs,mjs}" "scripts/**/*.{js,cjs,mjs}" "*.{js,cjs,mjs}"
+```
+
+```bash
+git show -1 --stat
+```
+```
+ CHANGELOG.md                                       |   1 +
+ .../0077-REF_RESOLVER-engine-module-registry.md    |  84 ++++++++-
+ packages/game/src/engine/engine-module-registry.ts |  90 +++++++++
+ packages/game/src/engine/resolver.ts               | 201 +++++++++++++--------
+ packages/game/test/engine-module-registry.test.ts  |  36 ++++
+ 5 files changed, 328 insertions(+), 84 deletions(-)
+```
