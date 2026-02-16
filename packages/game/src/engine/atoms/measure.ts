@@ -1,0 +1,85 @@
+import type { GameState } from '@balance-control/rules';
+import type { AtomRegistration } from '../engine-module-registry';
+import type { EngineState } from '../types';
+import { ExpansionRegistry } from '../../expansion-registry';
+import { lookupMeasureDeckForObjectId } from '../measure-deck-provider';
+
+function handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): void {
+    const { playerId, measureObjectId } = atom;
+    const obj = G.objects[measureObjectId];
+    if (!obj || obj.type !== 'Measure') return;
+
+    const mId = obj.measureId;
+    if (!mId) return;
+
+    const atoms = ExpansionRegistry.getMeasureAtoms(G, mId, atom);
+    if (atoms && atoms.length > 0) {
+        G.engine.effectQueue.unshift(...atoms);
+    }
+
+    // Standard Recycle and Hand Removal
+    const handId = `PlayerHand:${playerId}`;
+    const hand = G.zones[handId];
+    if (hand) {
+        const idx = hand.items.indexOf(measureObjectId);
+        if (idx >= 0) hand.items.splice(idx, 1);
+    }
+
+    obj.playCount = (obj.playCount || 0) + 1;
+    obj.owner = undefined;
+
+    const deck = lookupMeasureDeckForObjectId(G, measureObjectId);
+    const targetZone = obj.playCount === 1 ? deck.recyclePileId : deck.finalDiscardId;
+    if (G.zones[targetZone]) {
+        G.zones[targetZone].items.push(measureObjectId);
+    }
+}
+
+function handleMeasureRecycle(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
+    const { drawPileId, recyclePileId } = atom;
+    const drawPile = G.zones[drawPileId];
+    const recyclePile = G.zones[recyclePileId];
+
+    if (drawPile && recyclePile && recyclePile.items.length > 0) {
+        drawPile.items = ctx.random.Shuffle([...recyclePile.items]);
+        recyclePile.items = [];
+    }
+}
+
+function handleMeasureTake(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
+    const { playerId, measureObjectId } = atom;
+    const obj = G.objects[measureObjectId];
+    if (!obj || obj.type !== 'Measure') return;
+
+    const deck = lookupMeasureDeckForObjectId(G, measureObjectId);
+
+    const openZone = G.zones[deck.openZoneId];
+    const hand = G.zones[`PlayerHand:${playerId}`];
+    if (!openZone || !hand) return;
+
+    const idx = openZone.items.indexOf(measureObjectId);
+    if (idx >= 0) {
+        openZone.items.splice(idx, 1);
+        hand.items.push(measureObjectId);
+        obj.owner = playerId;
+
+        // Refill logic
+        const drawPile = G.zones[deck.drawPileId];
+        if (drawPile && drawPile.items.length > 0) {
+            openZone.items.push(drawPile.items.pop()!);
+        } else {
+            // Trigger recycle
+            handleMeasureRecycle(G, ctx, { kind: 'measure.recycle', drawPileId: deck.drawPileId, recyclePileId: deck.recyclePileId });
+            if (drawPile && drawPile.items.length > 0) {
+                openZone.items.push(drawPile.items.pop()!);
+            }
+        }
+    }
+}
+
+export const coreMeasureAtoms: AtomRegistration[] = [
+    { kind: 'measure.play', handler: (G, _ctx, atom) => handleMeasurePlay(G as any, atom) },
+    { kind: 'measure.take', handler: (G, ctx, atom) => handleMeasureTake(G as any, ctx, atom) },
+    { kind: 'measure.recycle', handler: (G, ctx, atom) => handleMeasureRecycle(G as any, ctx, atom) }
+];
+

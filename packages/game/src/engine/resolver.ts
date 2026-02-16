@@ -1,24 +1,27 @@
 import { GameState } from '@balance-control/rules';
-import { EffectAtom, ActiveModifier, HookPoint, EngineState } from './types';
-import { evaluateTileSelector } from './selectors';
-import { computeMajority } from '../mechanics';
-import { countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
-import { ExpansionRegistry } from '../expansion-registry';
+import { EffectAtom, HookPoint, EngineState } from './types';
 import { EngineModuleRegistry, type AtomHandler } from './engine-module-registry';
-import { lookupMeasureDeckForObjectId } from './measure-deck-provider';
-
-type CostSlot = string[] | 'ANY';
-
-interface CostSpec {
-    playerId: string;
-    slots: CostSlot[];
-    resourceIds?: string[];
-    allowSubstitutions?: boolean;
-}
-
-type CostValidationResult =
-    | { ok: true; resourceIds: string[] }
-    | { ok: false; error: string };
+import { coreResourceAtoms } from './atoms/resource';
+import { coreInfluenceAtoms } from './atoms/influence';
+import { coreProductionAtoms } from './atoms/production';
+import { exp03CountdownAtoms } from './atoms/countdown';
+import { coreMeasureAtoms } from './atoms/measure';
+import { coreChoiceAtoms } from './atoms/choice';
+import { createCoreRulesAtoms } from './atoms/rules';
+import { exp02RegulationAtoms } from './atoms/regulation';
+import { coreHotspotAtoms } from './atoms/hotspot';
+import { capitalize } from './resolver/ids';
+import { applyModifiers, getHookForAtom, removeModifier } from './resolver/modifiers';
+import { isProhibited as isProhibitedImpl } from './resolver/prohibitions';
+import {
+    checkAndPayCosts as checkAndPayCostsImpl,
+    commitCost as commitCostImpl,
+    getExtraCostSlots as getExtraCostSlotsImpl,
+    validateCost as validateCostImpl,
+    type CostSlot,
+    type CostSpec,
+    type CostValidationResult
+} from './resolver/costs';
 
 /**
  * The EffectResolver is the central "CPU" of the game.
@@ -47,25 +50,15 @@ export class EffectResolver {
             G.engine.effectQueue.unshift(mod.effect);
 
             if (mod.expiry === 'consumed' || mod.consumeRule === 'once') {
-                this.removeModifier(G, mod.id);
+                removeModifier(G, mod.id);
             }
         }
 
         this.resolve(G, ctx);
     }
+
     public static isProhibited(G: GameState & { engine: EngineState }, actionType: string, playerId: string, tileId?: string): boolean {
-        const prohibitions = G.engine.attributes.prohibitions || {};
-
-        // Global prohibition for this action
-        if (prohibitions[actionType] === true) return true;
-
-        // Player-specific prohibition
-        if (prohibitions[playerId]?.[actionType] === true) return true;
-
-        // Tile-specific prohibition (if applicable)
-        if (tileId && prohibitions[tileId]?.[actionType] === true) return true;
-
-        return false;
+        return isProhibitedImpl(G, actionType, playerId, tileId);
     }
 
     public static checkUsageLimit(G: GameState & { engine: EngineState }, actionType: string, playerId: string): boolean {
@@ -132,106 +125,7 @@ export class EffectResolver {
         _ctx: any,
         costSpec: CostSpec
     ): CostValidationResult {
-        const { playerId, slots, resourceIds, allowSubstitutions = false } = costSpec;
-        if (slots.length === 0) {
-            return { ok: true, resourceIds: [] };
-        }
-
-        const supplyId = `PersonalSupply:${playerId}`;
-        const supply = G.zones[supplyId];
-        const bank = G.zones['Bank'];
-        if (!supply || !bank) {
-            return { ok: false, error: 'missing supply or bank zone' };
-        }
-
-        if (resourceIds && resourceIds.length < slots.length) {
-            return { ok: false, error: 'not enough resource ids provided' };
-        }
-
-        const usedSubstitution = { eco: false, sec: false };
-        const selectedResourceIds: string[] = [];
-        const usedResourceIds = new Set<string>();
-
-        const canUseResource = (rid: string, slot: CostSlot): { ok: true; useEcoSubstitution: boolean; useSecSubstitution: boolean } | { ok: false } => {
-            if (usedResourceIds.has(rid)) return { ok: false };
-            if (!supply.items.includes(rid)) return { ok: false };
-
-            const obj = G.objects[rid];
-            if (!obj || obj.type !== 'Resource') return { ok: false };
-
-            const normalizedSlot: CostSlot = slot === 'ANY' || slot.includes('ANY') ? 'ANY' : slot;
-            if (normalizedSlot === 'ANY' || normalizedSlot.includes(obj.resort!)) {
-                return { ok: true, useEcoSubstitution: false, useSecSubstitution: false };
-            }
-
-            if (!allowSubstitutions) {
-                return { ok: false };
-            }
-
-            if (
-                normalizedSlot.includes('ECO')
-                && !usedSubstitution.eco
-                && G.engine.attributes[`ecoSubstitute:${playerId}`]
-            ) {
-                return { ok: true, useEcoSubstitution: true, useSecSubstitution: false };
-            }
-
-            if (
-                obj.resort === 'SEC'
-                && !usedSubstitution.sec
-                && G.engine.attributes[`secSubstitution:${playerId}`]
-            ) {
-                return { ok: true, useEcoSubstitution: false, useSecSubstitution: true };
-            }
-
-            return { ok: false };
-        };
-
-        for (let slotIdx = 0; slotIdx < slots.length; slotIdx++) {
-            const slot = slots[slotIdx];
-
-            if (resourceIds) {
-                const rid = resourceIds[slotIdx];
-                if (!rid) {
-                    return { ok: false, error: 'missing explicit resource id for cost slot' };
-                }
-
-                const check = canUseResource(rid, slot);
-                if (!check.ok) {
-                    return { ok: false, error: `invalid explicit payment resource "${rid}"` };
-                }
-
-                if (check.useEcoSubstitution) usedSubstitution.eco = true;
-                if (check.useSecSubstitution) usedSubstitution.sec = true;
-                usedResourceIds.add(rid);
-                selectedResourceIds.push(rid);
-                continue;
-            }
-
-            let selectedId: string | undefined;
-            let selectedCheck: { ok: true; useEcoSubstitution: boolean; useSecSubstitution: boolean } | undefined;
-
-            for (let i = supply.items.length - 1; i >= 0; i--) {
-                const rid = supply.items[i];
-                const check = canUseResource(rid, slot);
-                if (check.ok) {
-                    selectedId = rid;
-                    selectedCheck = check;
-                    break;
-                }
-            }
-
-            if (!selectedId || !selectedCheck) {
-                return { ok: false, error: 'insufficient resources for cost' };
-            }
-
-            if (selectedCheck.useEcoSubstitution) usedSubstitution.eco = true;
-            if (selectedCheck.useSecSubstitution) usedSubstitution.sec = true;
-            usedResourceIds.add(selectedId);
-            selectedResourceIds.push(selectedId);
-        }
-
-        return { ok: true, resourceIds: selectedResourceIds };
+        return validateCostImpl(G, _ctx, costSpec);
     }
 
     public static commitCost(
@@ -239,133 +133,15 @@ export class EffectResolver {
         _ctx: any,
         costSpec: CostSpec & { resourceIds: string[] }
     ): boolean {
-        const { playerId, resourceIds } = costSpec;
-        if (resourceIds.length === 0) return true;
-
-        const supplyId = `PersonalSupply:${playerId}`;
-        const supply = G.zones[supplyId];
-        const bank = G.zones['Bank'];
-        if (!supply || !bank) return false;
-
-        for (const rid of resourceIds) {
-            if (!supply.items.includes(rid)) return false;
-            const obj = G.objects[rid];
-            if (!obj || obj.type !== 'Resource') return false;
-        }
-
-        for (const rid of resourceIds) {
-            const idx = supply.items.indexOf(rid);
-            if (idx < 0) return false;
-            supply.items.splice(idx, 1);
-            bank.items.push(rid);
-            G.objects[rid].owner = undefined;
-        }
-
-        return true;
-    }
-
-    private static getPlayerMetaMarker(G: GameState & { engine: EngineState }, playerId: string): any | null {
-        const directId = `meta_${playerId}`;
-        const direct = (G.objects as any)?.[directId];
-        if (direct && direct.type === 'MetaMarker') return direct;
-        for (const obj of Object.values(G.objects || {})) {
-            if (obj && (obj as any).type === 'MetaMarker' && (obj as any).owner === playerId) return obj;
-        }
-        return null;
-    }
-
-    private static findObjectZoneId(G: GameState & { engine: EngineState }, objectId: string): string | null {
-        for (const zone of Object.values(G.zones || {})) {
-            if (zone.items.includes(objectId)) return zone.id;
-        }
-        return null;
+        return commitCostImpl(G, _ctx, costSpec);
     }
 
     public static getExtraCostSlots(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string): CostSlot[] {
-        const attr = G.engine.attributes;
-        const costSlots: CostSlot[] = [];
-
-        if (tileId && attr.tileExtraCosts?.[tileId]) {
-            for (let i = 0; i < attr.tileExtraCosts[tileId]; i++) costSlots.push('ANY');
-        }
-
-        if (attr.playerExtraCosts?.[pid]) {
-            for (let i = 0; i < attr.playerExtraCosts[pid]; i++) costSlots.push('ANY');
-        }
-
-        if (attr.climateCostRules) {
-            const isImmune = attr[`climateImmunity:${pid}`] || attr[`ignoreClimateCosts:${pid}`] || attr.ignoreClimateCostThisAction;
-            if (!isImmune) {
-                for (const rule of attr.climateCostRules) {
-                    let apply = false;
-                    if (rule.type === 'action' && rule.target === actionType) apply = true;
-                    if (rule.type === 'tile' && rule.target === tileId) apply = true;
-                    if (rule.type === 'resort' && tileId && G.tiles[tileId]?.resort === rule.target) apply = true;
-
-                    if (apply) {
-                        for (let i = 0; i < rule.amount; i++) costSlots.push(rule.resorts || 'ANY');
-                    }
-                }
-            }
-        }
-
-        if (actionType === 'convertResources') {
-            const marker = this.getPlayerMetaMarker(G, pid);
-            if (marker && marker.mode === 'Convert') {
-                const markerZoneId = this.findObjectZoneId(G, marker.id);
-                const supplyId = `PersonalSupply:${pid}`;
-                if (markerZoneId && markerZoneId !== supplyId && G.tiles[markerZoneId]) {
-                    costSlots.push('ANY');
-                }
-            }
-        }
-
-        // CORE-01-04-12B: Ping-Pong Penalty — N = min(10, floor(R/2)) resources to Noise
-        if (actionType === 'influence.move' && tileId) {
-            const marker = this.getPlayerMetaMarker(G, pid);
-            if (marker && marker.mode === 'PingPong') {
-                const markerZoneId = this.findObjectZoneId(G, marker.id);
-                if (markerZoneId === tileId) {
-                    const supplyId = `PersonalSupply:${pid}`;
-                    const supply = G.zones[supplyId];
-                    const R = supply?.items?.filter((id: string) => G.objects[id]?.type === 'Resource').length ?? 0;
-                    const N = Math.min(10, Math.floor(R / 2));
-                    for (let i = 0; i < N; i++) costSlots.push('ANY');
-                }
-            }
-        }
-
-        if (attr[`ignoreCostIncrease:${pid}`] && costSlots.length > 0) {
-            costSlots.shift();
-        }
-
-        return costSlots;
+        return getExtraCostSlotsImpl(G, pid, actionType, tileId);
     }
 
     public static checkAndPayCosts(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string, extraResourceIds?: string[]): boolean {
-        const attr = G.engine.attributes;
-        const costSlots = this.getExtraCostSlots(G, pid, actionType, tileId);
-
-        if (costSlots.length === 0) return true;
-
-        const validation = this.validateCost(G, null, {
-            playerId: pid,
-            slots: costSlots,
-            resourceIds: extraResourceIds
-        });
-        if (!validation.ok) return false;
-
-        const committed = this.commitCost(G, null, {
-            playerId: pid,
-            slots: costSlots,
-            resourceIds: validation.resourceIds
-        });
-        if (!committed) return false;
-
-        // Consume one-time costs if applicable
-        if (attr.playerExtraCosts?.[pid] > 0) attr.playerExtraCosts[pid]--;
-
-        return true;
+        return checkAndPayCostsImpl(G, pid, actionType, tileId, extraResourceIds);
     }
 
     public static resolve(G: GameState & { engine: EngineState }, ctx: any): boolean {
@@ -394,11 +170,11 @@ export class EffectResolver {
         atom: EffectAtom,
         dispatch: ReadonlyMap<string, AtomHandler>
     ): boolean {
-        const hook = this.getHookForAtom(atom);
+        const hook = getHookForAtom(atom);
 
         // 1. Apply "before" modifiers
         if (hook) {
-            this.applyModifiers(G, ctx, `before${capitalize(hook)}` as HookPoint, atom);
+            applyModifiers(G, ctx, `before${capitalize(hook)}` as HookPoint, atom);
         }
 
         // 2. Main Logic
@@ -410,7 +186,7 @@ export class EffectResolver {
 
         // 3. Apply "after" modifiers
         if (hook) {
-            this.applyModifiers(G, ctx, `after${capitalize(hook)}` as HookPoint, atom);
+            applyModifiers(G, ctx, `after${capitalize(hook)}` as HookPoint, atom);
         }
 
         // Log to history
@@ -429,578 +205,31 @@ export class EffectResolver {
             id: 'core',
             isEnabled: () => true,
             atoms: [
-                {
-                    kind: 'resource.pay',
-                    handler: (G2, _ctx, atom) => this.handleResourcePay(G2, atom)
-                },
-                {
-                    kind: 'resource.penaltyToNoise',
-                    handler: (G2, _ctx, atom) => this.handleResourcePenaltyToNoise(G2, atom)
-                },
-                {
-                    kind: 'resource.grant',
-                    handler: (G2, _ctx, atom) => this.handleResourceGrant(G2, atom)
-                },
-                {
-                    kind: 'production.resolve',
-                    handler: (G2, _ctx, atom) => this.handleProductionResolve(G2, atom)
-                },
-                {
-                    kind: 'measure.play',
-                    handler: (G2, _ctx, atom) => this.handleMeasurePlay(G2, atom)
-                },
-                {
-                    kind: 'influence.place',
-                    handler: (G2, _ctx, atom) => this.handleInfluencePlace(G2, atom)
-                },
-                {
-                    kind: 'influence.formalize',
-                    handler: (G2, ctx2, atom) => this.handleInfluenceFormalize(G2, ctx2, atom)
-                },
-                {
-                    kind: 'influence.move',
-                    handler: (G2, _ctx, atom) => this.handleInfluenceMove(G2, atom)
-                },
-                {
-                    kind: 'choice.request',
-                    handler: (G2, _ctx, atom) => {
-                        const choiceId = allocId(G2, 'choice');
-                        G2.engine.pendingChoice = {
-                            ...atom.choice,
-                            choiceId,
-                            resumeToken: choiceId
-                        };
-                    }
-                },
-                {
-                    kind: 'choice.apply',
-                    handler: (G2, ctx2, atom) => this.handleChoiceApply(G2, ctx2, atom)
-                },
-                {
-                    kind: 'modifier.add',
-                    handler: (G2, _ctx, atom) => {
-                        G2.engine.activeModifiers.push(atom.modifier);
-                    }
-                },
-                {
-                    kind: 'modifier.remove',
-                    handler: (G2, _ctx, atom) => this.removeModifier(G2, atom.sourceId)
-                },
-                {
-                    kind: 'measure.take',
-                    handler: (G2, ctx2, atom) => this.handleMeasureTake(G2, ctx2, atom)
-                },
-                {
-                    kind: 'measure.recycle',
-                    handler: (G2, ctx2, atom) => this.handleMeasureRecycle(G2, ctx2, atom)
-                },
-                {
-                    kind: 'rule.prohibit',
-                    handler: (G2, _ctx, atom) => this.handleRuleProhibit(G2, atom)
-                },
-                {
-                    kind: 'rule.attribute',
-                    handler: (G2, _ctx, atom) => this.handleRuleAttribute(G2, atom)
-                },
-                {
-                    kind: 'hook.trigger',
-                    handler: (G2, ctx2, atom) => this.triggerHook(G2, ctx2, atom.hook, atom.payload)
-                },
-                {
-                    kind: 'hotspot.resolve',
-                    handler: (G2, ctx2, atom) => this.handleHotspotResolve(G2, ctx2, atom)
-                }
+                ...coreResourceAtoms,
+                ...coreProductionAtoms,
+                ...coreMeasureAtoms,
+                ...coreInfluenceAtoms,
+                ...coreChoiceAtoms,
+                ...createCoreRulesAtoms({
+                    triggerHook: (G2, ctx2, hook, payload) => this.triggerHook(G2 as any, ctx2, hook, payload)
+                }),
+                ...coreHotspotAtoms
             ]
         });
 
         registry.registerModule({
             id: 'exp02',
             isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex02 === true,
-            atoms: [
-                { kind: 'regulation.place', handler: (G2, _ctx, atom) => this.handleRegulationPlace(G2, atom) },
-                { kind: 'regulation.move', handler: (G2, _ctx, atom) => this.handleRegulationMove(G2, atom) },
-                { kind: 'regulation.remove', handler: (G2, _ctx, atom) => this.handleRegulationRemove(G2, atom) }
-            ]
+            atoms: [...exp02RegulationAtoms]
         });
 
         registry.registerModule({
             id: 'exp03',
             isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex03 === true,
-            atoms: [{ kind: 'countdown.place', handler: (G2, _ctx, atom) => this.handleCountdownPlace(G2, atom) }]
+            atoms: [...exp03CountdownAtoms]
         });
 
         return registry.buildAtomDispatch(G);
     }
-
-    /**
-     * Find all modifiers matching the current hook and context, and trigger them.
-     */
-    private static applyModifiers(G: GameState & { engine: EngineState }, ctx: any, hook: HookPoint, currentAtom: EffectAtom): void {
-        const modifiers = G.engine.activeModifiers
-            .filter(m => m.hook === hook)
-            .sort((a, b) => (b.priority || 0) - (a.priority || 0));
-
-        for (const mod of modifiers) {
-            // Check context suitability (Player/Tile)
-            if (mod.playerId && mod.playerId !== (currentAtom as any).playerId) continue;
-            if (mod.targetTileId && mod.targetTileId !== (currentAtom as any).targetTileId) continue;
-
-            if (mod.selector) {
-                const targetId = (currentAtom as any).targetTileId || (currentAtom as any).tileId;
-                if (targetId && !evaluateTileSelector(mod.selector, targetId, G)) continue;
-            }
-
-            // Trigger the modifier's effect by prepending to the queue
-            // This allows recursive/cascading effects (e.g., "M02 adds cost to Action")
-            G.engine.effectQueue.unshift(mod.effect);
-
-            // Handle consumption
-            if (mod.expiry === 'consumed' || mod.consumeRule === 'once') {
-                this.removeModifier(G, mod.id);
-            }
-        }
-    }
-
-    private static getHookForAtom(atom: EffectAtom): string | null {
-        if (atom.kind === 'resource.pay') return 'PayCost';
-        if (atom.kind === 'resource.grant') return 'Grant';
-        if (atom.kind.startsWith('influence.')) return 'Action';
-        if (atom.kind.startsWith('tile.')) return 'Action';
-        return null;
-    }
-
-    private static handleResourcePenaltyToNoise(G: GameState & { engine: EngineState }, atom: any): boolean {
-        // CORE-01-04-12B: Move chosen resources from PersonalSupply to Noise
-        const { playerId, resourceIds } = atom;
-        const supplyId = `PersonalSupply:${playerId}`;
-        const supply = G.zones[supplyId];
-        const noise = G.zones['Noise'];
-        if (!supply || !noise) return false;
-
-        for (const rid of resourceIds) {
-            const idx = supply.items.indexOf(rid);
-            if (idx < 0) return false;
-            const obj = G.objects[rid];
-            if (!obj || obj.type !== 'Resource') return false;
-            supply.items.splice(idx, 1);
-            noise.items.push(rid);
-            obj.owner = undefined;
-        }
-        return true;
-    }
-
-    private static handleResourcePay(G: GameState & { engine: EngineState }, atom: any): boolean {
-        const { playerId, amount, resorts } = atom;
-        let resolvedPlayerId = playerId;
-
-        if (resolvedPlayerId === 'CONTROLLER') {
-            const contextTileId = atom.context?.tileId;
-            if (!contextTileId) return false;
-            const { controller } = computeMajority(contextTileId, G);
-            if (!controller) return false;
-            resolvedPlayerId = controller;
-        }
-
-        const slots: CostSlot[] = Array.from({ length: Math.max(0, amount) }, () => (
-            resorts === 'ANY' ? 'ANY' : [...resorts]
-        ));
-
-        const validation = this.validateCost(G, null, {
-            playerId: resolvedPlayerId,
-            slots,
-            resourceIds: atom.resourceIds,
-            allowSubstitutions: !atom.resourceIds
-        });
-
-        if (!validation.ok) {
-            console.error(`[resolver:resource.pay] ${validation.error}`);
-            return false;
-        }
-
-        return this.commitCost(G, null, {
-            playerId: resolvedPlayerId,
-            slots,
-            resourceIds: validation.resourceIds
-        });
-    }
-
-    private static handleResourceGrant(G: GameState, atom: any): void {
-        let { playerId, amount, resort, context, missingController } = atom;
-
-        if (amount === 'CONTEXT_BASE' && context?.baseAmount !== undefined) {
-            amount = context.baseAmount;
-        }
-        if (resort === 'CONTEXT_RESORT' && context?.resort) {
-            resort = context.resort;
-        }
-
-        if (playerId === 'CONTROLLER') {
-            const controller = context?.tileId ? computeMajority(context.tileId, G).controller : null;
-
-            if (controller) {
-                playerId = controller;
-            } else {
-                const policy = missingController ?? 'ERROR';
-                if (policy === 'NOISE') {
-                    playerId = 'NOISE';
-                } else if (policy === 'SKIP') {
-                    return;
-                } else {
-                    const sourceTag = context?.source || context?.tileId || atom.reason || 'unknown';
-                    throw new Error(`[resolver:resource.grant] missing controller for "${sourceTag}"`);
-                }
-            }
-        }
-
-        const supplyId = playerId === 'NOISE' ? 'Noise' : `PersonalSupply:${playerId}`;
-        const targetZone = G.zones[supplyId];
-        const bank = G.zones['Bank'];
-
-        if (!targetZone || !bank) return;
-
-        if (amount >= 0) {
-            for (let k = 0; k < amount; k++) {
-                const bankIdx = bank.items.findIndex(id => G.objects[id]?.resort === resort);
-                if (bankIdx >= 0) {
-                    const rid = bank.items.splice(bankIdx, 1)[0];
-                    targetZone.items.push(rid);
-                    if (G.objects[rid]) G.objects[rid].owner = playerId === 'NOISE' ? undefined : playerId;
-                } else {
-                    const rid = allocId(G, `res_${resort}`);
-                    G.objects[rid] = { id: rid, type: 'Resource', owner: playerId === 'NOISE' ? undefined : playerId, resort };
-                    targetZone.items.push(rid);
-                }
-            }
-        } else {
-            // Negative grant = Removal (Reduction)
-            const countToRemove = Math.abs(amount);
-            let removed = 0;
-            for (let i = targetZone.items.length - 1; i >= 0 && removed < countToRemove; i--) {
-                const rid = targetZone.items[i];
-                const obj = G.objects[rid];
-                if (obj && obj.type === 'Resource' && obj.resort === resort) {
-                    targetZone.items.splice(i, 1);
-                    bank.items.push(rid);
-                    obj.owner = undefined;
-                    removed++;
-                }
-            }
-        }
-    }
-
-    private static handleInfluencePlace(G: GameState & { engine: EngineState }, atom: any): void {
-        this.applyModifiers(G, null, 'beforeAction', atom);
-        const { playerId, targetTileId } = atom;
-        const supplyId = `PersonalSupply:${playerId}`;
-        const supply = G.zones[supplyId];
-        const targetZone = G.zones[targetTileId];
-
-        const idx = supply.items.findIndex(id => G.objects[id]?.type === 'Influence');
-        if (idx >= 0) {
-            const iid = supply.items.splice(idx, 1)[0];
-            targetZone.items.push(iid);
-        }
-    }
-
-    private static handleInfluenceFormalize(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
-        this.applyModifiers(G, null, 'beforeAction', atom);
-        const { playerId } = atom;
-        if (countPlayerInfluence(G, playerId) >= getInfluenceCap(ctx)) {
-            return;
-        }
-
-        const supplyId = `PersonalSupply:${playerId}`;
-        const supply = G.zones[supplyId];
-
-        // CORE-01-04-17: Create exactly one new Influence
-        const infId = allocId(G, `inf_${playerId}_form`);
-        G.objects[infId] = { id: infId, type: 'Influence', owner: playerId };
-        supply.items.push(infId);
-    }
-
-    private static handleInfluenceMove(G: GameState & { engine: EngineState }, atom: any): void {
-        this.applyModifiers(G, null, 'beforeAction', atom);
-        const { playerId, sourceTileId, targetTileId } = atom;
-        const srcZone = G.zones[sourceTileId];
-        const dstZone = G.zones[targetTileId];
-
-        const idx = srcZone.items.findIndex(id => G.objects[id]?.owner === playerId && G.objects[id].type === 'Influence');
-        if (idx >= 0) {
-            const iid = srcZone.items.splice(idx, 1)[0];
-            dstZone.items.push(iid);
-        }
-    }
-
-    private static handleProductionResolve(G: GameState & { engine: EngineState }, atom: any): void {
-        const { tileId } = atom;
-        const tile = G.tiles[tileId];
-        if (!tile || tile.type !== 'Resort' || !tile.resort) return;
-
-        // CORE-01-06-17
-        if (this.isProhibited(G, 'production.resolve', 'NONE', tileId)) return;
-
-        const printedAmount = tile.weight || 0;
-        const baseAmount = ExpansionRegistry.applyProductionModifiers(G, tileId, printedAmount);
-        atom.context = { ...atom.context, tileId, baseAmount, resort: tile.resort };
-
-        // 1. Trigger hooks that might add or subtract from this distribution
-        this.applyModifiers(G, null, 'onProduction', atom);
-
-        // CORE-01-06-16: Tie split is even; remainder goes to Noise.
-        const majority = computeMajority(tileId, G);
-        const grants: Array<{ playerId: string; amount: number }> = [];
-
-        if (majority.controller) {
-            const cap = G.engine.attributes[`productionCap:${majority.controller}`];
-            let finalAmount = baseAmount;
-            // CORE-01-06-16(a): Apply production cap if set
-            if (cap !== undefined) {
-                finalAmount = Math.min(finalAmount, cap);
-            }
-            if (finalAmount > 0) {
-                grants.push({ playerId: majority.controller, amount: finalAmount });
-            }
-        } else if (majority.winners.length > 0 && baseAmount > 0) {
-            const winners = [...majority.winners].sort();
-            const splitAmount = Math.floor(baseAmount / winners.length);
-            const remainder = baseAmount % winners.length;
-
-            if (splitAmount > 0) {
-                for (const winner of winners) {
-                    grants.push({ playerId: winner, amount: splitAmount });
-                }
-            }
-
-            if (remainder > 0) {
-                grants.push({ playerId: 'NOISE', amount: remainder });
-            }
-        }
-
-        for (let i = grants.length - 1; i >= 0; i--) {
-            const grant = grants[i];
-            G.engine.effectQueue.unshift({
-                kind: 'resource.grant',
-                playerId: grant.playerId as any,
-                amount: grant.amount,
-                resort: tile.resort,
-                context: { tileId, source: 'production', baseAmount }
-            });
-        }
-    }
-
-    private static handleCountdownPlace(G: GameState & { engine: EngineState }, atom: any): void {
-        const { targetTileId, amount = 3 } = atom;
-        const supply = G.zones.CountdownSupply;
-        if (!supply || supply.items.length === 0) return;
-
-        const cid = supply.items.pop()!;
-        const obj = G.objects[cid];
-        if (obj) {
-            obj.targetTileId = targetTileId;
-            (obj as any).amount = amount;
-        }
-
-        const targetZone = G.zones[targetTileId];
-        if (targetZone) {
-            targetZone.items.push(cid);
-        }
-    }
-
-    private static handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): void {
-        const { playerId, measureObjectId } = atom;
-        const obj = G.objects[measureObjectId];
-        if (!obj || obj.type !== 'Measure') return;
-
-        const mId = obj.measureId;
-        if (!mId) return;
-
-        const atoms = ExpansionRegistry.getMeasureAtoms(G, mId, atom);
-        if (atoms && atoms.length > 0) {
-            G.engine.effectQueue.unshift(...atoms);
-        }
-
-        // Standard Recycle and Hand Removal
-        const handId = `PlayerHand:${playerId}`;
-        const hand = G.zones[handId];
-        if (hand) {
-            const idx = hand.items.indexOf(measureObjectId);
-            if (idx >= 0) hand.items.splice(idx, 1);
-        }
-
-        obj.playCount = (obj.playCount || 0) + 1;
-        obj.owner = undefined;
-
-        const deck = lookupMeasureDeckForObjectId(G, measureObjectId);
-        const targetZone = obj.playCount === 1 ? deck.recyclePileId : deck.finalDiscardId;
-        if (G.zones[targetZone]) {
-            G.zones[targetZone].items.push(measureObjectId);
-        }
-    }
-    private static handleChoiceApply(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
-        const { selection, context } = atom;
-        if (context?.followUp) {
-            const followUpAtoms = context.followUp[selection];
-            if (followUpAtoms) {
-                // Add follow-up atoms to the FRONT of the queue to prioritize them
-                G.engine.effectQueue.unshift(...followUpAtoms);
-            }
-        }
-    }
-
-    private static removeModifier(G: GameState & { engine: EngineState }, id: string): void {
-        G.engine.activeModifiers = G.engine.activeModifiers.filter(m => m.id !== id);
-    }
-
-    private static handleMeasureTake(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
-        const { playerId, measureObjectId } = atom;
-        const obj = G.objects[measureObjectId];
-        if (!obj || obj.type !== 'Measure') return;
-
-        const deck = lookupMeasureDeckForObjectId(G, measureObjectId);
-
-        const openZone = G.zones[deck.openZoneId];
-        const hand = G.zones[`PlayerHand:${playerId}`];
-        if (!openZone || !hand) return;
-
-        const idx = openZone.items.indexOf(measureObjectId);
-        if (idx >= 0) {
-            openZone.items.splice(idx, 1);
-            hand.items.push(measureObjectId);
-            obj.owner = playerId;
-
-            // Refill logic
-            const drawPile = G.zones[deck.drawPileId];
-            if (drawPile && drawPile.items.length > 0) {
-                openZone.items.push(drawPile.items.pop()!);
-            } else {
-                // Trigger recycle
-                this.handleMeasureRecycle(G, ctx, { kind: 'measure.recycle', drawPileId: deck.drawPileId, recyclePileId: deck.recyclePileId });
-                if (drawPile && drawPile.items.length > 0) {
-                    openZone.items.push(drawPile.items.pop()!);
-                }
-            }
-        }
-    }
-
-    private static handleMeasureRecycle(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
-        const { drawPileId, recyclePileId } = atom;
-        const drawPile = G.zones[drawPileId];
-        const recyclePile = G.zones[recyclePileId];
-
-        if (drawPile && recyclePile && recyclePile.items.length > 0) {
-            drawPile.items = ctx.random.Shuffle([...recyclePile.items]);
-            recyclePile.items = [];
-        }
-    }
-
-    private static handleRuleAttribute(G: GameState & { engine: EngineState }, atom: any): void {
-        const { attribute, value, playerId, targetTileId, context } = atom;
-        const key = playerId ? `${attribute}:${playerId}` : (targetTileId ? `${attribute}:${targetTileId}` : attribute);
-
-        if (context?.append) {
-            if (!G.engine.attributes[key]) G.engine.attributes[key] = [];
-            if (Array.isArray(G.engine.attributes[key])) {
-                G.engine.attributes[key].push(value);
-            }
-        } else {
-            G.engine.attributes[key] = value;
-        }
-    }
-
-    private static handleRuleProhibit(G: GameState & { engine: EngineState }, atom: any): void {
-        G.engine.effectQueue = []; // Full stop
-    }
-
-    private static handleRegulationPlace(G: GameState & { engine: EngineState }, atom: any): void {
-        const { regType, targetTileId } = atom;
-        const supply = G.zones.RegulationSupply;
-        const attached = G.zones.BoardAttached;
-        if (!supply || !attached) return;
-
-        let regId = supply.items.find(id => G.objects[id].regType === regType);
-        if (!regId) {
-            regId = allocId(G, `reg_${regType}_gen`);
-            G.objects[regId] = { id: regId, type: 'Regulation', regType };
-        } else {
-            supply.items.splice(supply.items.indexOf(regId), 1);
-        }
-        attached.items.push(regId);
-        G.objects[regId].targetTileId = targetTileId;
-    }
-
-    private static handleRegulationMove(G: GameState & { engine: EngineState }, atom: any): void {
-        const { regulationId, targetTileId } = atom;
-        const obj = G.objects[regulationId];
-        if (!obj || obj.type !== 'Regulation') return;
-
-        // Check M13 protection
-        const protectedTiles = G.engine.attributes.protectedTiles || [];
-        if (protectedTiles.includes(obj.targetTileId)) return;
-
-        obj.targetTileId = targetTileId;
-    }
-
-    private static handleRegulationRemove(G: GameState & { engine: EngineState }, atom: any): void {
-        const { regulationId } = atom;
-        const obj = G.objects[regulationId];
-        if (!obj || obj.type !== 'Regulation') return;
-
-        // Check M13 protection
-        const protectedTiles = G.engine.attributes.protectedTiles || [];
-        if (protectedTiles.includes(obj.targetTileId)) return;
-
-        const attached = G.zones.BoardAttached;
-        const supply = G.zones.RegulationSupply;
-        if (!attached || !supply) return;
-
-        const idx = attached.items.indexOf(regulationId);
-        if (idx >= 0) {
-            attached.items.splice(idx, 1);
-        }
-    }
-
-    private static handleHotspotResolve(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
-        const { tileId } = atom;
-        const tile = G.tiles[tileId];
-        if (!tile) return;
-
-        // CORE-01-06-03B: Single-Resolution Invariant — skip if already resolved
-        const resolved = G.engine.attributes.resolvedHotspots ?? [];
-        if (resolved.includes(tileId)) return;
-
-        // 1. Prohibitions & Modifiers
-        if (this.isProhibited(G, 'hotspot.resolve', 'NONE', tileId)) return;
-        this.applyModifiers(G, ctx, 'beforeAction', atom);
-
-        // 2. Determine Majority
-        const { controller } = computeMajority(tileId, G);
-        if (controller) {
-            // Emit influence placement
-            G.engine.effectQueue.unshift({
-                kind: 'influence.place',
-                playerId: controller,
-                targetTileId: tileId,
-                context: { source: 'hotspot.resolve', tileId }
-            });
-        }
-
-        // CORE-01-06-03B: Mark Hotspot as resolved
-        if (!G.engine.attributes.resolvedHotspots) G.engine.attributes.resolvedHotspots = [];
-        G.engine.attributes.resolvedHotspots.push(tileId);
-
-        this.applyModifiers(G, ctx, 'afterAction', atom);
-    }
 }
 
-function capitalize(s: string): string {
-    return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-function allocId(G: GameState & { engine: EngineState }, prefix: string): string {
-    if (typeof G.engine.idSeq !== 'number' || !Number.isFinite(G.engine.idSeq) || G.engine.idSeq < 0) {
-        G.engine.idSeq = 0;
-    }
-
-    G.engine.idSeq += 1;
-    return `${prefix}_${G.engine.idSeq}`;
-}
