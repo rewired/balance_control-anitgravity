@@ -40,7 +40,12 @@ export function HexTileFrame({ majoritySeat, seatColor, className, children }: H
   const [cx, cy] = CENTER_ABS;
 
   return (
-    <svg className={className} viewBox={viewBoxToString(VIEWBOX)} xmlns="http://www.w3.org/2000/svg">
+    <svg
+      className={className}
+      viewBox={viewBoxToString(VIEWBOX)}
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ overflow: "visible" }}
+    >
       <path
         d={hexPath}
         fill={baseFill}
