@@ -37,6 +37,18 @@ export const Expansion03: ExpansionDefinition = {
         'EXP03_MeasureRecyclePile',
         'EXP03_MeasureFinalDiscard'
     ],
+    measureDecks: [
+        {
+            id: 'measures',
+            objectIdPrefix: 'exp03_measure_',
+            zones: {
+                drawPileId: 'EXP03_MeasureDrawPile',
+                openZoneId: 'EXP03_OpenMeasures',
+                recyclePileId: 'EXP03_MeasureRecyclePile',
+                finalDiscardId: 'EXP03_MeasureFinalDiscard'
+            }
+        }
+    ],
 
     onSetup: (GValue: GameState, ctxValue: any) => {
         const G = GValue as any;

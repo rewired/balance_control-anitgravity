@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Engine: add deterministic measure deck providers for EXP-02/EXP-03 and remove prefix-based measure zone routing from core resolver.
 - Engine: add deterministic `EngineModuleRegistry` for effect-atom dispatch; forbid module overrides and gate EXP-02/EXP-03 handlers by match config flags.
 - Engine: normalize ExpansionRegistry identity/order via canonical expansion ids; enablement now reads from match config snapshot at `G.meta.cfg` (deterministic; no state-slice inference).
 - Client: start flow now begins with a simple mode select (Local hotseat vs Online lobby); online lobby remains available but optional.

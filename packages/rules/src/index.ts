@@ -173,6 +173,13 @@ export interface ExpansionDefinition {
     name: string;
     resources?: ResourceType[];
     zones?: string[];
+    /**
+     * Optional measure deck descriptors contributed by this expansion.
+     *
+     * Engine uses these to route measure.take / measure.play / measure.recycle
+     * without hardcoding object id prefix switches in core logic.
+     */
+    measureDecks?: MeasureDeckDescriptor[];
 
     // Hooks
     onSetup?: (G: GameState, ctx: any) => void;
@@ -187,6 +194,19 @@ export interface ExpansionDefinition {
     effectHandlers?: Record<string, (G: GameState, ctx: any, effect: any, utils: any) => void>;
     getMeasureAtoms?: (G: GameState, measureId: string, payload: any) => any[] | null;
     moves?: Record<string, (arg0: any, arg1: any) => any>;
+}
+
+export interface MeasureDeckDescriptor {
+    /** Stable identifier within an expansion (e.g. "measures"). */
+    id: string;
+    /** Deterministic object-id routing key (e.g. "exp02_measure_"). */
+    objectIdPrefix: string;
+    zones: {
+        drawPileId: string;
+        openZoneId: string;
+        recyclePileId: string;
+        finalDiscardId: string;
+    };
 }
 
 export interface EffectContext {

@@ -39,6 +39,18 @@ export const Expansion02: ExpansionDefinition = {
         'EXP02_MeasureRecyclePile',
         'EXP02_MeasureFinalDiscard'
     ],
+    measureDecks: [
+        {
+            id: 'measures',
+            objectIdPrefix: 'exp02_measure_',
+            zones: {
+                drawPileId: 'EXP02_MeasureDrawPile',
+                openZoneId: 'EXP02_OpenMeasures',
+                recyclePileId: 'EXP02_MeasureRecyclePile',
+                finalDiscardId: 'EXP02_MeasureFinalDiscard'
+            }
+        }
+    ],
 
     onSetup: (G: GameState, ctx: any) => {
         // 1. Initialize Zones
