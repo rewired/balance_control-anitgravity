@@ -1,13 +1,13 @@
-# Codex Task 0003_REF_RESOLVER - Measure decks as provider modules (remove prefix switches)
+# Codex Task 0079 - REF_RESOLVER: Measure decks as provider modules (remove prefix switches)
 
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
-**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+**Recommended execution order:** `0076 → 0077 → 0078 → 0079 → 0080 → 0081 → 0082 → 0083 → 0084 → 0085`
 
 ## 0) Metadata (frozen)
 
-- **Task ID:** 0003
+- **Task ID:** 0079
 - **Area:** Resolver modularization (measures)
 - **Risk:** Medium (touches measure zone routing; must preserve zone invariants)
 

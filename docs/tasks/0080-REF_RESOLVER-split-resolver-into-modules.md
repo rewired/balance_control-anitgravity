@@ -1,13 +1,13 @@
-# Codex Task 0005_REF_RESOLVER - Split resolver.ts into modules (mechanical move, preserve anchors)
+# Codex Task 0080 - REF_RESOLVER: Split resolver.ts into modules (mechanical move, preserve anchors)
 
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
-**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+**Recommended execution order:** `0076 → 0077 → 0078 → 0079 → 0080 → 0081 → 0082 → 0083 → 0084 → 0085`
 
 ## 0) Metadata (frozen)
 
-- **Task ID:** 0005
+- **Task ID:** 0080
 - **Area:** Refactor for readability (mechanical split)
 - **Risk:** Medium-high (large file moves; must preserve behavior, determinism, and rule anchors)
 

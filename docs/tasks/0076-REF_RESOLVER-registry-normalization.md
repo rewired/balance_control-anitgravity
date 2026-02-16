@@ -1,13 +1,13 @@
-# Codex Task 0001_REF_RESOLVER - ExpansionRegistry normalization (ids, order, enablement)
+# Codex Task 0076 - REF_RESOLVER: ExpansionRegistry normalization (ids, order, enablement)
 
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
-**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+**Recommended execution order:** `0076 → 0077 → 0078 → 0079 → 0080 → 0081 → 0082 → 0083 → 0084 → 0085`
 
 ## 0) Metadata (frozen)
 
-- **Task ID:** 0001
+- **Task ID:** 0076
 - **Area:** Resolver refactor (prework)
 - **Risk:** Medium (touches expansion enablement + determinism)
 

@@ -1,13 +1,13 @@
-# Codex Task 0002_REF_RESOLVER - EngineModuleRegistry (no override, deterministic dispatch)
+# Codex Task 0077 - REF_RESOLVER: EngineModuleRegistry (no override, deterministic dispatch)
 
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
-**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+**Recommended execution order:** `0076 → 0077 → 0078 → 0079 → 0080 → 0081 → 0082 → 0083 → 0084 → 0085`
 
 ## 0) Metadata (frozen)
 
-- **Task ID:** 0002
+- **Task ID:** 0077
 - **Area:** Resolver modularization (module registry)
 - **Risk:** Medium-high (touches dispatch path; must preserve single canonical resolver)
 

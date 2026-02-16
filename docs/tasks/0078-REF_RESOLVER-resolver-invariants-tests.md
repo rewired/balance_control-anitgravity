@@ -1,13 +1,13 @@
-# Codex Task 0004_REF_RESOLVER - Resolver invariants tests (order, determinism, no-override)
+# Codex Task 0078 - REF_RESOLVER: Resolver invariants tests (order, determinism, no-override)
 
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)
 
-**Recommended execution order:** `0001 → 0002 → 0004 → 0003 → 0005`
+**Recommended execution order:** `0076 → 0077 → 0078 → 0079 → 0080 → 0081 → 0082 → 0083 → 0084 → 0085`
 
 ## 0) Metadata (frozen)
 
-- **Task ID:** 0004
+- **Task ID:** 0078
 - **Area:** Test hardening for upcoming refactors
 - **Risk:** Low-medium (tests only, but must be stable and non-flaky)
 
