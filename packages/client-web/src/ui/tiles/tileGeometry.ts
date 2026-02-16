@@ -22,6 +22,11 @@ export const MARKER_RADIUS = 98.277579;
 
 export const MARKER_STROKE_WIDTH = 37.084447;
 
+// Influence marker capsule sizing (UI-HEX-TILE-VISUAL v0.2)
+export const INFLUENCE_CAPSULE_LABEL_GAP = 40.0;
+export const INFLUENCE_META_ICON_SIZE = 86.0;
+export const INFLUENCE_META_ICON_GAP = 22.0;
+
 export const BADGE_SIZE = [173.73, 101.34] as const;
 
 export const BADGE_CORNER_RADIUS = 24.61;
@@ -51,4 +56,3 @@ export const OVERLAY_RENDER_RECT = {
   height: 864,
   preserveAspectRatio: "none",
 } as const;
-
