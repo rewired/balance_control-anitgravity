@@ -3,7 +3,9 @@ import React from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 
 import { HexTileVisual } from "../HexTileVisual";
+import { ResortIcon } from "../ResortIcon";
 import {
+  CENTER_ABS,
   INFLUENCE_CAPSULE_LABEL_GAP,
   INFLUENCE_META_ICON_GAP,
   INFLUENCE_META_ICON_SIZE,
@@ -11,6 +13,10 @@ import {
   OVERLAY_RENDER_RECT,
 } from "../tileGeometry";
 import type { SeatId, TileBadge } from "../types";
+
+import domIconUrl from "../../../assets/tile-icons/dom.svg";
+import infIconUrl from "../../../assets/tile-icons/inf.svg";
+import forIconUrl from "../../../assets/tile-icons/for.svg";
 
 afterEach(() => cleanup());
 
@@ -110,5 +116,33 @@ describe("HexTileVisual smoke", () => {
 
     const { container: belt } = renderHexTileVisual({ badges: badges4 });
     expect(belt.querySelectorAll("rect")).toHaveLength(4);
+  });
+
+  it("renders valueW centered and shifted up (y = center - 10) without 'W' prefix", () => {
+    const [cx, cy] = CENTER_ABS;
+    renderHexTileVisual({ valueW: 7 });
+
+    const valueText = screen.getByText("7");
+    expect(valueText.tagName.toLowerCase()).toBe("text");
+    expect(valueText.getAttribute("x")).toBe(String(cx));
+    expect(valueText.getAttribute("y")).toBe(String(cy - 10));
+    expect(valueText.textContent).toBe("7");
+    expect(screen.queryByText("W7")).toBeNull();
+  });
+
+  it.each([
+    ["DOM", domIconUrl],
+    ["INF", infIconUrl],
+    ["FOR", forIconUrl],
+  ] as const)("renders resort icon image when provided (%s)", (resort, expectedHref) => {
+    const { container } = renderHexTileVisual({ resortIcon: <ResortIcon resort={resort} /> });
+    const images = Array.from(container.querySelectorAll("image"));
+    expect(images.length).toBeGreaterThanOrEqual(2);
+
+    const hrefs = images
+      .map((img) => img.getAttribute("href") ?? img.getAttribute("xlink:href"))
+      .filter((v): v is string => typeof v === "string");
+
+    expect(hrefs).toContain(expectedHref);
   });
 });
