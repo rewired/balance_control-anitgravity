@@ -4,23 +4,28 @@ import { SetupGame } from './setup';
 import { CoreMoves } from './moves';
 import { drawTileToStaging } from './mechanics-draw';
 import { EffectResolver } from './engine/resolver';
-import { ExpansionRegistry } from './expansion-registry';
 import { enumerateLegalIntents } from './engine/legal-intents';
 import { selectTileController } from './public-selectors';
+import { DEFAULT_GAME_CONFIG } from './config';
+import { getEnabledMoveModules, mergeMoveModules } from './move-assembly';
 
 export { enumerateLegalIntents };
 export type { LegalIntent } from './engine/legal-intents';
 export { selectTileController };
 
-const expansionMoves = ExpansionRegistry.getMergedMoves();
-const politicalActionMoves = {
+const moveModules = getEnabledMoveModules(DEFAULT_GAME_CONFIG);
+const moves = mergeMoveModules(moveModules);
+const expansionModules = moveModules.filter((m) => m.moduleId !== 'core');
+const expansionMoves = mergeMoveModules(expansionModules);
+
+const politicalCoreMoves = {
     placeInfluence: CoreMoves.placeInfluence,
     moveInfluence: CoreMoves.moveInfluence,
     formalizeInfluence: CoreMoves.formalizeInfluence,
     convertResources: CoreMoves.convertResources,
     resolveChoice: CoreMoves.resolveChoice,
-    ...expansionMoves
 };
+const politicalActionMoves = mergeMoveModules([{ moduleId: 'core', moves: politicalCoreMoves as any }, ...expansionModules]);
 
 function isZoneVisible(zoneId: string, playerID: string): boolean {
     if (zoneId.startsWith('staging_')) return zoneId === `staging_${playerID}`;
@@ -98,10 +103,7 @@ function buildPlayerView(G: GameState, playerID?: string | null): GameState {
 export const BalanceControl: Game<GameState> = {
     name: 'balance-control',
     setup: (ctx: any, setupData: unknown) => SetupGame({ ctx, setupData }),
-    moves: {
-        ...CoreMoves,
-        ...expansionMoves
-    },
+    moves: moves as any,
     playerView: ({ G, playerID }: { G: GameState; playerID: string | null }) => {
         return buildPlayerView(G, playerID);
     },
