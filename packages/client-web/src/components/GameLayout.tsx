@@ -20,6 +20,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
         Bank: 'Bank',
         Board: 'Board',
         DrawPile: 'DrawPile',
+        DiscardFaceUp: 'DiscardFaceUp',
         Noise: 'Noise'
     } as const;
 
@@ -207,7 +208,13 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                         </div>
                     )}
                 </div>
-                <Zone zoneId={zoneNames.DrawPile} G={G} title="Draw Pile" />
+                <div className="zone draw-bag-widget" data-testid="draw-bag-widget">
+                    <h4 className="zone-title">Draw Bag</h4>
+                    <div className="draw-bag-count" data-testid="draw-bag-count">
+                        {G.zones[zoneNames.DrawPile]?.items.length ?? 0}
+                    </div>
+                </div>
+                <Zone zoneId={zoneNames.DiscardFaceUp} G={G} title="Discard (Face Up)" />
                 <Zone zoneId={zoneNames.Noise} G={G} title="Noise" />
             </aside>
 

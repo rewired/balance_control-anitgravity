@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: DrawPile privacy hardened in playerView (closed-bag masking + hidden tile defs filtered); UI shows Draw Bag count-only and renders Discard (Face Up).
 - Fix: client active-state now derived from `ctx` (no reliance on `state.isActive`); legal-intents fall back when `ctx.activePlayers` is missing and prohibitions are respected.
 - Client: added classic boardgame.io Lobby start screen (list/create/join) and in-game Quit that leaves via Lobby `leaveMatch`.
 - Client: persist last lobby session in `localStorage` with explicit Resume/Leave + Force forget on leave failure.
