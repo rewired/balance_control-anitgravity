@@ -1,6 +1,8 @@
 export type ResourceType = 'DOM' | 'FOR' | 'INF' | string;
 export type PlayerID = string;
 
+export type ExpansionId = 'exp01' | 'exp02' | 'exp03';
+
 export enum CoreResources {
     DOM = 'DOM',
     FOR = 'FOR',
@@ -113,8 +115,20 @@ export const RULESET_MANIFEST: RulesetManifest = {
     specAnchorHash: '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3',
 };
 
+export interface ExpansionFlags {
+    ex01: boolean;
+    ex02: boolean;
+    ex03: boolean;
+}
+
+export interface GameConfig {
+    expansions: ExpansionFlags;
+}
+
 export interface GameMeta {
     ruleset?: RulesetManifest;
+    /** Canonical match config snapshot (GR-012). */
+    cfg?: GameConfig;
 }
 
 export interface GameState {
@@ -154,6 +168,8 @@ export function allocId(G: GameState, prefix: string): string {
 }
 
 export interface ExpansionDefinition {
+    /** Canonical id (stable; used for enablement + deterministic registry ordering). */
+    id: ExpansionId;
     name: string;
     resources?: ResourceType[];
     zones?: string[];

@@ -50,6 +50,7 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         grid: {},
         meta: {
             ruleset: rulesetManifest,
+            cfg: gameConfig,
         },
         engine: {
             idSeq: 0,

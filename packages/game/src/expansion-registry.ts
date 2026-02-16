@@ -1,85 +1,98 @@
-import { ExpansionDefinition, GameState } from '@balance-control/rules';
-import { ExpansionFlags, DEFAULT_EXPANSION_FLAGS, GameConfig } from './config';
+import type { ExpansionDefinition, ExpansionFlags, ExpansionId, GameConfig, GameState } from '@balance-control/rules';
+import { DEFAULT_EXPANSION_FLAGS } from './config';
 
-const EXPANSION_NAME_TO_FLAG: Record<string, keyof ExpansionFlags> = {
-    'EXP-01 Economy & Labor': 'ex01',
-    'EXP-02 Security & Order': 'ex02',
-    'EXP-03 Climate & Future': 'ex03',
+/**
+ * Canonical ordering for all engine modules.
+ * Single source of truth: do not derive from Map insertion order, object keys, or registration side-effects.
+ */
+export const CANONICAL_ENGINE_MODULE_ORDER = ['core', 'exp01', 'exp02', 'exp03'] as const;
+export type EngineModuleId = (typeof CANONICAL_ENGINE_MODULE_ORDER)[number];
+
+export const CANONICAL_EXPANSION_ORDER: readonly ExpansionId[] = ['exp01', 'exp02', 'exp03'] as const;
+
+const CANONICAL_EXPANSION_IDS = new Set<ExpansionId>(CANONICAL_EXPANSION_ORDER);
+
+const EXPANSION_ID_TO_FLAG_KEY: Record<ExpansionId, keyof ExpansionFlags> = {
+    exp01: 'ex01',
+    exp02: 'ex02',
+    exp03: 'ex03',
 };
 
 class Registry {
-    private expansions: Map<string, ExpansionDefinition> = new Map();
+    private expansions: Partial<Record<ExpansionId, ExpansionDefinition>> = {};
 
     private resolveFlags(G?: GameState, config?: GameConfig): ExpansionFlags {
-        if (config?.expansions) {
-            return {
-                ex01: config.expansions.ex01 === true,
-                ex02: config.expansions.ex02 === true,
-                ex03: config.expansions.ex03 === true,
-            };
-        }
+        const candidate = config?.expansions ?? G?.meta?.cfg?.expansions;
+        if (!candidate) return { ...DEFAULT_EXPANSION_FLAGS };
 
-        const stored = (G as any)?.engine?.attributes?.enabledExpansions;
-        if (stored && typeof stored === 'object') {
-            const candidate = stored as Record<string, unknown>;
-            return {
-                ex01: candidate.ex01 === true,
-                ex02: candidate.ex02 === true,
-                ex03: candidate.ex03 === true,
-            };
-        }
-
-        return { ...DEFAULT_EXPANSION_FLAGS };
+        return {
+            ex01: candidate.ex01 === true,
+            ex02: candidate.ex02 === true,
+            ex03: candidate.ex03 === true,
+        };
     }
 
-    private isEnabled(exp: ExpansionDefinition, flags: ExpansionFlags): boolean {
-        const mappedFlag = EXPANSION_NAME_TO_FLAG[exp.name];
-        if (!mappedFlag) return true;
-        return flags[mappedFlag] === true;
+    private isEnabled(expId: ExpansionId, flags: ExpansionFlags): boolean {
+        const flagKey = EXPANSION_ID_TO_FLAG_KEY[expId];
+        return flags[flagKey] === true;
     }
 
     register(def: ExpansionDefinition) {
-        if (this.expansions.has(def.name)) {
-            console.warn(`Expansion ${def.name} already registered.`);
+        if (!CANONICAL_EXPANSION_IDS.has(def.id)) {
+            throw new Error(`Expansion id "${def.id}" is not in CANONICAL_EXPANSION_ORDER.`);
+        }
+
+        if (this.expansions[def.id]) {
+            console.warn(`Expansion ${def.id} already registered.`);
             return;
         }
-        this.expansions.set(def.name, def);
-        console.log(`Expansion registered: ${def.name}`);
+        this.expansions[def.id] = def;
+        console.log(`Expansion registered: ${def.id}`);
     }
 
     getAll() {
-        return Array.from(this.expansions.values());
+        const all: ExpansionDefinition[] = [];
+        for (const expId of CANONICAL_EXPANSION_ORDER) {
+            const exp = this.expansions[expId];
+            if (exp) all.push(exp);
+        }
+        return all;
     }
 
     clear() {
-        this.expansions.clear();
+        this.expansions = {};
     }
 
     getMergedMoves(config?: GameConfig) {
-        const flags = config ? this.resolveFlags(undefined, config) : undefined;
+        const flags = config ? this.resolveFlags(undefined, config) : null;
         let allMoves: Record<string, (arg0: any, arg1: any) => any> = {};
-        this.expansions.forEach(exp => {
-            if (flags && !this.isEnabled(exp, flags)) return;
-            if (exp.moves) {
-                allMoves = { ...allMoves, ...exp.moves };
-            }
-        });
+        for (const expId of CANONICAL_EXPANSION_ORDER) {
+            const exp = this.expansions[expId];
+            if (!exp) continue;
+            if (flags && !this.isEnabled(expId, flags)) continue;
+            if (!exp.moves) continue;
+            allMoves = { ...allMoves, ...exp.moves };
+        }
         return allMoves;
     }
 
     // Hook Executors
     applySetup(G: GameState, ctx: any, config?: GameConfig) {
         const flags = this.resolveFlags(G, config);
-        this.expansions.forEach(exp => {
-            if (!this.isEnabled(exp, flags)) return;
+        for (const expId of CANONICAL_EXPANSION_ORDER) {
+            const exp = this.expansions[expId];
+            if (!exp) continue;
+            if (!this.isEnabled(expId, flags)) continue;
             if (exp.onSetup) exp.onSetup(G, ctx);
-        });
+        }
     }
 
     getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
         const flags = this.resolveFlags(G);
-        for (const exp of this.expansions.values()) {
-            if (!this.isEnabled(exp, flags)) continue;
+        for (const expId of CANONICAL_EXPANSION_ORDER) {
+            const exp = this.expansions[expId];
+            if (!exp) continue;
+            if (!this.isEnabled(expId, flags)) continue;
             if (exp.getMeasureAtoms) {
                 const atoms = exp.getMeasureAtoms(G, measureId, payload);
                 if (atoms) return atoms;
@@ -90,28 +103,32 @@ class Registry {
 
     applyEffect(G: GameState, ctx: any, effect: any, contextTileId?: string, utils?: any, config?: GameConfig) {
         const flags = this.resolveFlags(G, config);
-        this.expansions.forEach(exp => {
-            if (!this.isEnabled(exp, flags)) return;
+        for (const expId of CANONICAL_EXPANSION_ORDER) {
+            const exp = this.expansions[expId];
+            if (!exp) continue;
+            if (!this.isEnabled(expId, flags)) continue;
             if (exp.effectHandlers && exp.effectHandlers[effect.type]) {
                 exp.effectHandlers[effect.type](G, ctx, effect, utils);
             }
-        });
+        }
     }
 
     applyProductionModifiers(G: GameState, tileId: string, baseAmount: number, config?: GameConfig): number {
         const flags = this.resolveFlags(G, config);
         let amount = baseAmount;
 
-        this.expansions.forEach(exp => {
-            if (!this.isEnabled(exp, flags)) return;
+        for (const expId of CANONICAL_EXPANSION_ORDER) {
+            const exp = this.expansions[expId];
+            if (!exp) continue;
+            if (!this.isEnabled(expId, flags)) continue;
             const productionModifier = exp.modifiers?.production;
-            if (!productionModifier) return;
+            if (!productionModifier) continue;
 
             const nextAmount = productionModifier(tileId, G, amount);
             if (typeof nextAmount === 'number' && Number.isFinite(nextAmount)) {
                 amount = nextAmount;
             }
-        });
+        }
 
         return amount;
     }

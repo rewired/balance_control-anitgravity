@@ -10,10 +10,18 @@ describe('Expansion System', () => {
     });
 
     it('should register an expansion', () => {
-        const mockExp: ExpansionDefinition = { name: 'TestExp' };
+        const mockExp: ExpansionDefinition = { id: 'exp01', name: 'TestExp' };
         ExpansionRegistry.register(mockExp);
         const all = ExpansionRegistry.getAll();
         expect(all).toContain(mockExp);
+    });
+
+    it('should return expansions in deterministic canonical order', () => {
+        ExpansionRegistry.register({ id: 'exp03', name: 'E3' });
+        ExpansionRegistry.register({ id: 'exp01', name: 'E1' });
+        ExpansionRegistry.register({ id: 'exp02', name: 'E2' });
+
+        expect(ExpansionRegistry.getAll().map(e => e.id)).toEqual(['exp01', 'exp02', 'exp03']);
     });
 
     it('should apply production modifiers', () => {
@@ -31,6 +39,9 @@ describe('Expansion System', () => {
             },
             adjacency: {},
             grid: {},
+            meta: {
+                cfg: { expansions: { ex01: true, ex02: false, ex03: false } }
+            },
             engine: {
                 effectQueue: [],
                 activeModifiers: [],
@@ -43,6 +54,7 @@ describe('Expansion System', () => {
 
         // Register Modifier
         const modExp: ExpansionDefinition = {
+            id: 'exp01',
             name: 'ModExp',
             modifiers: {
                 production: (tileId, G, base) => base + 10
