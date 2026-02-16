@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 
+import HexTilePackedSimulator from "./HexTilePackedSimulator";
 import { HexTileVisual } from "../ui/tiles/HexTileVisual";
 import { seatColor } from "../ui/tiles/seatColor";
 import type { SeatId, TileBadge } from "../ui/tiles/types";
@@ -65,6 +66,7 @@ type TileCase = {
 };
 
 export default function HexTilePlayground() {
+  const [viewMode, setViewMode] = useState<"grid" | "packed">("grid");
   const [zoom, setZoom] = useState(1.0);
   const [controlIndex, setControlIndex] = useState(0);
   const [forceHovered, setForceHovered] = useState(true);
@@ -148,6 +150,15 @@ export default function HexTilePlayground() {
         <div style={{ fontWeight: 800, marginBottom: 8 }}>Dev Preview: HexTile playground</div>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
           <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <span style={{ opacity: 0.85 }}>View</span>
+            <select value={viewMode} onChange={(e) => setViewMode(e.target.value as any)}>
+              <option value="grid">Grid</option>
+              <option value="packed">Packed (radius=3)</option>
+            </select>
+          </label>
+
+          {viewMode === "grid" && (
+          <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <span style={{ opacity: 0.85 }}>Zoom</span>
             <input
               type="range"
@@ -159,7 +170,9 @@ export default function HexTilePlayground() {
             />
             <span style={{ width: 48, textAlign: "right" }}>{zoom.toFixed(2)}x</span>
           </label>
+          )}
 
+          {viewMode === "grid" && (
           <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <span style={{ opacity: 0.85 }}>Control tile</span>
             <select value={clampedControlIndex} onChange={(e) => setControlIndex(Number(e.target.value))}>
@@ -170,32 +183,43 @@ export default function HexTilePlayground() {
               ))}
             </select>
           </label>
+          )}
 
+          {viewMode === "grid" && (
           <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input type="checkbox" checked={forceHovered} onChange={(e) => setForceHovered(e.target.checked)} />
             <span>Force hover</span>
           </label>
+          )}
 
+          {viewMode === "grid" && (
           <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input type="checkbox" checked={forceSelected} onChange={(e) => setForceSelected(e.target.checked)} />
             <span>Force selected</span>
           </label>
+          )}
 
-          <button
-            className="btn-secondary"
-            onClick={() => {
-              setMouseHoverIndex(null);
-              setClickedIndex(null);
-            }}
-          >
-            Reset click/hover
-          </button>
+          {viewMode === "grid" && (
+            <button
+              className="btn-secondary"
+              onClick={() => {
+                setMouseHoverIndex(null);
+                setClickedIndex(null);
+              }}
+            >
+              Reset click/hover
+            </button>
+          )}
         </div>
         <div style={{ opacity: 0.75, marginTop: 8, fontSize: 12 }}>
-          Tip: open via <code>?dev=hex-tile</code> (dev mode only). Click tiles to toggle selection; hover to preview.
+          Tip: open via <code>?dev=hex-tile</code> (dev mode only).{" "}
+          {viewMode === "grid" ? "Click tiles to toggle selection; hover to preview." : "Use viewport pan/zoom controls; click tiles to toggle selection."}
         </div>
       </div>
 
+      {viewMode === "packed" ? (
+        <HexTilePackedSimulator />
+      ) : (
       <div
         style={{
           display: "grid",
@@ -253,6 +277,7 @@ export default function HexTilePlayground() {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

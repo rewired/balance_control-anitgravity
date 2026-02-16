@@ -3,10 +3,12 @@ import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { HexBoard, HEX_SIZE } from './HexBoard';
+import type { BoardLayout } from '../ui/hexLayout';
 import { computeBoardLayout, stableSortCoords } from '../ui/hexLayout';
 import { computeFitTransform } from '../ui/fitToBounds';
 
-interface BoardViewportProps {
+type BoardViewportGameProps = {
+    mode?: undefined | 'game';
     G: GameState;
     moves: any;
     intents: LegalIntent[];
@@ -14,23 +16,29 @@ interface BoardViewportProps {
     selectedTileId?: string | null;
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
-}
+};
+
+type BoardViewportDevProps = {
+    mode: 'dev';
+    coordStrings: string[];
+    hexSize: number;
+    renderContent: (layout: BoardLayout) => React.ReactNode;
+};
+
+type BoardViewportProps = BoardViewportGameProps | BoardViewportDevProps;
 
 const FIT_PADDING = 48;
 
-export const BoardViewport: React.FC<BoardViewportProps> = ({
-    G,
-    moves,
-    intents,
-    isInteractive,
-    selectedTileId,
-    selectedCoord,
-    onSelectTile
-}) => {
+export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
     const viewportRef = useRef<HTMLDivElement | null>(null);
     const setTransformRef = useRef<((x: number, y: number, scale: number) => void) | null>(null);
     const baselineTransformRef = useRef<{ x: number; y: number; scale: number } | null>(null);
     const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
+
+    const devProps = props.mode === 'dev' ? (props as BoardViewportDevProps) : null;
+    const gameProps = props.mode === 'dev' ? null : (props as BoardViewportGameProps);
+    const isDevViewport = Boolean(devProps);
+    const hexSize = devProps ? devProps.hexSize : HEX_SIZE;
 
     useEffect(() => {
         const node = viewportRef.current;
@@ -49,24 +57,28 @@ export const BoardViewport: React.FC<BoardViewportProps> = ({
     }, []);
 
     const occupiedCoords = useMemo(() => {
-        return stableSortCoords(Object.keys(G.grid || {}));
-    }, [G.grid]);
+        if (devProps) {
+            return stableSortCoords(devProps.coordStrings);
+        }
+        return stableSortCoords(Object.keys(gameProps?.G.grid || {}));
+    }, [devProps?.coordStrings, gameProps?.G.grid, props.mode]);
 
     const ghostCoords = useMemo(() => {
-        const coords = intents
+        if (devProps) return [];
+        const coords = (gameProps?.intents ?? [])
             .filter((intent) => intent.moveType === 'placeTile' && intent.payload?.targetCoord)
             .map((intent) => intent.payload.targetCoord);
         const unique = Array.from(new Set(coords));
         return stableSortCoords(unique);
-    }, [intents]);
+    }, [gameProps?.intents, props.mode]);
 
     const allCoords = useMemo(() => {
         return stableSortCoords([...occupiedCoords, ...ghostCoords]);
     }, [occupiedCoords, ghostCoords]);
 
     const layout = useMemo(() => {
-        return computeBoardLayout(allCoords, HEX_SIZE);
-    }, [allCoords]);
+        return computeBoardLayout(allCoords, hexSize);
+    }, [allCoords, hexSize]);
 
     const applyFit = useCallback(() => {
         if (!setTransformRef.current) return;
@@ -126,15 +138,19 @@ export const BoardViewport: React.FC<BoardViewportProps> = ({
                                 wrapperClass="board-viewport-wrapper"
                                 contentClass="board-viewport-content"
                             >
-                                <HexBoard
-                                    G={G}
-                                    moves={moves}
-                                    intents={intents}
-                                    isInteractive={isInteractive}
-                                    selectedTileId={selectedTileId}
-                                    selectedCoord={selectedCoord}
-                                    onSelectTile={onSelectTile}
-                                />
+                                {devProps
+                                    ? devProps.renderContent(layout)
+                                    : (
+                                        <HexBoard
+                                            G={gameProps!.G}
+                                            moves={gameProps!.moves}
+                                            intents={gameProps!.intents}
+                                            isInteractive={gameProps!.isInteractive}
+                                            selectedTileId={gameProps!.selectedTileId}
+                                            selectedCoord={gameProps!.selectedCoord}
+                                            onSelectTile={gameProps!.onSelectTile}
+                                        />
+                                    )}
                             </TransformComponent>
                         </>
                     );
