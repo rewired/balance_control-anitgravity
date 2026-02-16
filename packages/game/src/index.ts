@@ -29,17 +29,52 @@ function isZoneVisible(zoneId: string, playerID: string): boolean {
     return true;
 }
 
+function makeDrawPilePlaceholders(count: number, forbiddenIds: Set<string>): string[] {
+    const placeholders: string[] = [];
+    for (let i = 0; i < count; i++) {
+        let attempt = 0;
+        let id = `__drawpile_${i}`;
+        while (forbiddenIds.has(id)) {
+            attempt += 1;
+            id = `__drawpile_${i}_${attempt}`;
+        }
+        placeholders.push(id);
+        forbiddenIds.add(id);
+    }
+    return placeholders;
+}
+
 function buildPlayerView(G: GameState, playerID?: string | null): GameState {
     if (!playerID) return G;
     const zones: GameState['zones'] = {};
     const objectIds = new Set<string>();
+    const visibleTileIds = new Set<string>();
+
+    const forbiddenPlaceholderIds = new Set<string>([...Object.keys(G.tiles), ...Object.keys(G.objects)]);
+    const drawPile = G.zones[CoreZoneNames.DrawPile];
+    const maskedDrawPileItems = drawPile ? makeDrawPilePlaceholders(drawPile.items.length, forbiddenPlaceholderIds) : [];
 
     for (const [zoneId, zone] of Object.entries(G.zones)) {
         if (!isZoneVisible(zoneId, playerID)) continue;
+
+        if (zoneId === CoreZoneNames.DrawPile) {
+            zones[zoneId] = { ...zone, items: maskedDrawPileItems };
+            for (const itemId of maskedDrawPileItems) {
+                objectIds.add(itemId);
+            }
+            continue;
+        }
+
         zones[zoneId] = zone;
         for (const itemId of zone.items) {
             objectIds.add(itemId);
+            if (G.tiles[itemId]) visibleTileIds.add(itemId);
         }
+    }
+
+    const tiles: GameState['tiles'] = {};
+    for (const tileId of visibleTileIds) {
+        tiles[tileId] = G.tiles[tileId];
     }
 
     const objects: GameState['objects'] = {};
@@ -53,7 +88,7 @@ function buildPlayerView(G: GameState, playerID?: string | null): GameState {
         engine.pendingChoice = undefined;
     }
 
-    return { ...G, zones, objects, engine };
+    return { ...G, zones, objects, tiles, engine };
 }
 
 export const BalanceControl: Game<GameState> = {

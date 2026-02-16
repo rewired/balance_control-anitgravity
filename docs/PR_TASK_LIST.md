@@ -50,3 +50,4 @@
 - [x] Task 0047 - PendingChoice Modal: Block Until Resolved (No UX Dead Ends)
 - [x] Task 0048 - Production Resolve: Restore Tie-Split Guard (No stray block)
 - [x] Task 0049 - Client-Web: Fix Active State + Legal Intents Fallback
+- [x] Task 0054 - DrawPile Privacy (Closed Bag) + UI: Draw Count Widget + DiscardFaceUp

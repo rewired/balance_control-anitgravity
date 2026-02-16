@@ -31,4 +31,29 @@ describe('playerView', () => {
         expect(view.engine.pendingChoice).toBeUndefined();
         expect(ownerView.engine.pendingChoice).toEqual(G.engine.pendingChoice);
     });
+
+    it('masks DrawPile items and filters hidden tile defs', () => {
+        const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
+        const G = SetupGame({ ctx });
+
+        const originalDrawPileItems = G.zones[CoreZoneNames.DrawPile].items.slice();
+        expect(originalDrawPileItems.length).toBeGreaterThan(0);
+
+        const view = BalanceControl.playerView?.({ G, ctx, playerID: '0' }) as any;
+        const viewDrawPile = view.zones[CoreZoneNames.DrawPile];
+
+        expect(viewDrawPile).toBeDefined();
+        expect(viewDrawPile.items.length).toBe(originalDrawPileItems.length);
+
+        for (const placeholderId of viewDrawPile.items) {
+            expect(originalDrawPileItems).not.toContain(placeholderId);
+            expect(G.tiles[placeholderId]).toBeUndefined();
+            expect(G.objects[placeholderId]).toBeUndefined();
+        }
+
+        const hiddenTileId = originalDrawPileItems[0];
+        expect(view.tiles[hiddenTileId]).toBeUndefined();
+
+        expect(view.tiles['tile_start_committee']).toBeDefined();
+    });
 });
