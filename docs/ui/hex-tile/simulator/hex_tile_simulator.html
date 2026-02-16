@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HexTile Simulator</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(255,255,255,0.10);
+      --txt: rgba(255,255,255,0.86);
+      --muted: rgba(255,255,255,0.55);
+
+      /* player colors (example) */
+      --p1: #ff3b3b;
+      --p2: #ffcc00;
+      --p3: #34e7e4;
+      --p4: #28a745;
+      --p5: #4c6fff;
+      --p6: #ff4ffb;
+
+      --noMajority: #0B0B0D;
+      --innerDisc: #060607;
+
+      --strokeBase: rgba(0,0,0,0.85);
+      --strokeSel: rgba(255,255,255,0.55);
+      --strokeHover: rgba(255,255,255,0.25);
+
+      --badgeFill: rgba(0,0,0,0.55);
+      --badgeStroke: rgba(255,255,255,0.22);
+
+      --shadow: 0 12px 40px rgba(0,0,0,0.55);
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--txt);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .app {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-wrap: wrap;
+    }
+
+    header .title {
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    header .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-left: auto;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: var(--txt);
+      font-size: 12px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .chip b { font-weight: 800; }
+
+    input[type="range"] { width: 160px; }
+
+    select {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.9);
+      border-radius: 10px;
+      padding: 4px 6px;
+      font-size: 12px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      height: 100%;
+      min-height: 0;
+    }
+
+    aside {
+      padding: 14px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      overflow: auto;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .legend .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.7);
+    }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .viewport {
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .viewport.dragging { cursor: grabbing; }
+
+    .camera {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+
+    .grid {
+      position: relative;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+    }
+
+    .tile {
+      position: absolute;
+      width: 210px;
+      height: 242px; /* 747:864 aspect */
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,0.55));
+      z-index: 0;
+      isolation: isolate; /* important for blend modes */
+    }
+
+    .tile:hover { z-index: 10; }
+    .tile[data-selected="1"] { z-index: 12; }
+
+    .tile[data-selected="1"] {
+      filter: drop-shadow(0 10px 30px rgba(255,255,255,0.10));
+    }
+
+    /* Click surface (so markers never steal hover/click) */
+    .tile .hit {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      background: transparent;
+      z-index: 5;
+    }
+
+    .tile svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible; /* crucial: markers can protrude */
+      display: block;
+    }
+
+    .markers {
+      opacity: 0;
+      transition: opacity 120ms linear;
+      pointer-events: none;
+    }
+
+    .tile:hover .markers,
+    .tile[data-selected="1"] .markers {
+      opacity: 1;
+    }
+
+    .hoverOutline { opacity: 0; transition: opacity 120ms linear; }
+    .tile:hover .hoverOutline { opacity: 1; }
+
+    .selOutline { opacity: 0; }
+    .tile[data-selected="1"] .selOutline { opacity: 1; }
+
+    .label {
+      font-weight: 900;
+      font-size: 64px;
+      fill: rgba(255,255,255,0.86);
+      letter-spacing: 0.02em;
+    }
+
+    .wval {
+      font-weight: 900;
+      font-size: 130px;
+      fill: rgba(255,255,255,0.84);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .badgeRect {
+      fill: var(--badgeFill);
+      stroke: var(--badgeStroke);
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .badgeText {
+      fill: rgba(255,255,255,0.86);
+      font-weight: 800;
+      font-size: 46px;
+    }
+
+    .markerText {
+      fill: rgba(0,0,0,0.92);
+      font-weight: 900;
+      font-size: 176px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metaIcon {
+      fill: rgba(255,255,255,0.92);
+      stroke: rgba(0,0,0,0.35);
+      stroke-width: 6;
+      stroke-linejoin: round;
+    }
+
+    .toast {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.82);
+      font-size: 12px;
+      max-width: 720px;
+      backdrop-filter: blur(8px);
+    }
+
+    .toast code { color: rgba(255,255,255,0.9); }
+
+    .testFail {
+      color: #ff6b6b;
+      font-weight: 800;
+    }
+
+    .testPass {
+      color: #7CFC9A;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">HexTile Simulator</div>
+      <div class="controls">
+        <div class="chip"><b>Pan</b> drag background</div>
+        <div class="chip"><b>Select</b> click tile</div>
+
+        <div class="chip"><b>Overlay</b>
+          <label style="display:inline-flex; gap:6px; align-items:center;">
+            <input id="ovEnabled" type="checkbox" checked />
+            on
+          </label>
+          <span style="opacity:0.7;">|</span>
+          <span style="opacity:0.85;">mix-blend-mode: luminosity</span>
+          <span style="opacity:0.7;">|</span>
+          <span style="opacity:0.85;">strength 0.80</span>
+        </div>
+
+        <div class="chip"><b>Zoom</b>
+          <input id="zoom" type="range" min="0.55" max="1.8" value="1.0" step="0.01" />
+          <span id="zoomLabel">1.00x</span>
+        </div>
+
+        <button id="reset" class="chip" style="cursor:pointer;">Reset view</button>
+      </div>
+    </header>
+
+    <main>
+      <aside>
+        <div style="font-weight:800; margin-bottom:10px;">Players (seat colors)</div>
+        <div class="legend" id="legend"></div>
+        <div class="hint">
+          Rules simulated:
+          <ul>
+            <li>Tile background = influence majority color (unique max), else very dark gray.</li>
+            <li>Influence markers are centered exactly on the hex vertices and protrude outside.</li>
+            <li>Markers show only on hover/selected: number + ALL meta icons. Capsule expands if metaCount &gt; 0.</li>
+            <li>Badges use compact slots (&lt;=2) or belt slots (&gt;2) with fixed centers + rotations.</li>
+            <li>Overlay: <code>mix-blend-mode: luminosity</code> at strength 0.8 (opacity).</li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="viewport" id="viewport">
+        <div class="camera" id="camera">
+          <div class="grid" id="grid"></div>
+        </div>
+        <div class="toast" id="toast">
+          Tile-space: <code>viewBox="0 0 747 864"</code>. Overlay: <code>tile-overlay.png</code> rendered into <code>747x864</code> with <code>preserveAspectRatio="none"</code>.
+          <div style="margin-top:6px; color: rgba(255,255,255,0.72);">
+            Overlay is fixed by contract: <code>mix-blend-mode: luminosity</code>, strength <code>0.8</code>.
+          </div>
+          <div id="tests" style="margin-top:8px;"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // --- Canonical geometry (UI-HEX-TILE-VISUAL v0.2) ---
+    const TILE = {
+      viewBox: [0, 0, 747, 864],
+      center: { x: 373.28624396, y: 431.625874112 },
+      innerR: 249.99996,
+      vertices: {
+        1: { x: 0.000030165,   y: 215.812893301 }, // TL
+        2: { x: 373.285429344, y: -0.000480986 },  // T
+        3: { x: 746.572091316, y: 215.812893301 }, // TR
+        4: { x: 746.572091316, y: 647.438467016 }, // BR
+        5: { x: 373.285429344, y: 863.250666444 }, // B
+        6: { x: 0.000030165,   y: 647.438467016 }, // BL
+      },
+      badge: {
+        size: { w: 173.73, h: 101.34 },
+        r: 24.61,
+        compactOrder: ["TL_T", "T_TR"],
+        beltOrder: ["TL_T", "T_TR", "TR_BR", "BR_B", "B_BL", "BL_TL"],
+        slots: {
+          TL_T:  { cx: 220.108281301, cy: 165.949783405, rot: -30.034172325 },
+          T_TR:  { cx: 526.463343061, cy: 165.949860824, rot:  30.034088338 },
+          TR_BR: { cx: 679.572091316, cy: 431.625714971, rot:  90.0 },
+          BR_B:  { cx: 526.463267388, cy: 697.300955694, rot: 149.966046816 },
+          B_BL:  { cx: 220.108356974, cy: 697.301033113, rot: -149.965962829 },
+          BL_TL: { cx: 67.000030165,  cy: 431.625714971, rot: -90.0 },
+        }
+      },
+      marker: {
+        r: 98.277579,
+        stroke: 37.084447,
+        capsule: {
+          labelGap: 40.0,
+          iconSize: 86.0,
+          iconGap: 22.0
+        }
+      }
+    };
+
+    // Overlay rendering config (fixed by contract)
+    const OVERLAY = {
+      enabled: true,
+      strength: 0.8,
+    };
+
+    // --- Theming (example) ---
+    const seatCssVar = {
+      1: "--p1",
+      2: "--p2",
+      3: "--p3",
+      4: "--p4",
+      5: "--p5",
+      6: "--p6",
+    };
+
+    function seatColor(seat) {
+      return getComputedStyle(document.documentElement).getPropertyValue(seatCssVar[seat]).trim();
+    }
+
+    // --- Demo tiles (hex-packed board, 6 players) ---
+    function mulberry32(seed) {
+      let a = seed >>> 0;
+      return function() {
+        a |= 0;
+        a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    const rand = mulberry32(0xBADC0DE);
+    const rint = (min, max) => Math.floor(rand() * (max - min + 1)) + min;
+    const pick = (arr) => arr[rint(0, arr.length - 1)];
+
+    const LABELS = ["DOM", "INF", "FOR"];
+    const BADGE_POOL = ["A","B","C","H1","H2","R","S","!","?","M","X","Y","++"];
+
+    const BOARD = {
+      radius: 3,              // 3 => 37 tiles
+      tileW: 210,
+      tileH: 242,
+      margin: 180
+    };
+
+    function axialCoordsInRadius(R) {
+      const out = [];
+      for (let q = -R; q <= R; q++) {
+        const r1 = Math.max(-R, -q - R);
+        const r2 = Math.min(R, -q + R);
+        for (let r = r1; r <= r2; r++) out.push({ q, r });
+      }
+      return out;
+    }
+
+    function axialToPixel(q, r) {
+      // pointy-top axial -> pixel (edge-to-edge packing)
+      const size = BOARD.tileH / 2;
+      const x = Math.sqrt(3) * size * (q + r / 2);
+      const y = 1.5 * size * r;
+      return { x, y };
+    }
+
+    function makeInfluencePattern() {
+      const modeRoll = rand();
+      const infl = {};
+
+      if (modeRoll < 0.10) return infl; // none
+
+      if (modeRoll < 0.28) {
+        // tie between two seats
+        const a = rint(1,6);
+        let b = rint(1,6);
+        while (b === a) b = rint(1,6);
+        const v = rint(2,5);
+        infl[a] = v;
+        infl[b] = v;
+        for (let s = 1; s <= 6; s++) {
+          if (s === a || s === b) continue;
+          if (rand() < 0.45) infl[s] = rint(0, v - 1);
+        }
+        return infl;
+      }
+
+      // majority
+      const m = rint(1,6);
+      const mv = rint(3,6);
+      infl[m] = mv;
+      for (let s = 1; s <= 6; s++) {
+        if (s === m) continue;
+        if (rand() < 0.70) infl[s] = rint(0, Math.max(0, mv - 1));
+      }
+      return infl;
+    }
+
+    function makeMeta(infl) {
+      const meta = {};
+      for (let s = 1; s <= 6; s++) {
+        const hasAny = (infl[s] || 0) > 0;
+        const p = hasAny ? 0.45 : 0.18;
+        if (rand() < p) meta[s] = rint(1,4);
+      }
+      return meta;
+    }
+
+    function makeBadges() {
+      const n = (rand() < 0.25) ? 0 : rint(1,5);
+      const out = [];
+      for (let i = 0; i < n; i++) out.push({ key: `b${i}`, text: pick(BADGE_POOL) });
+      return out;
+    }
+
+    const coords = axialCoordsInRadius(BOARD.radius);
+    const tiles = coords.map((c) => {
+      const influence = makeInfluencePattern();
+      const meta = makeMeta(influence);
+      return {
+        id: `Q${c.q}_R${c.r}`,
+        axial: c,
+        pos: { x: 0, y: 0 },
+        label: pick(LABELS),
+        valueW: rint(1,5),
+        influence,
+        meta,
+        badges: makeBadges(),
+      };
+    });
+
+    function majoritySeatFromInfluence(influence) {
+      // unique max only; ties => null
+      const entries = Object.entries(influence).map(([k,v]) => [Number(k), Number(v || 0)]);
+      let bestSeat = null;
+      let best = -1;
+      let tie = false;
+      for (const [seat, val] of entries) {
+        if (val > best) { best = val; bestSeat = seat; tie = false; }
+        else if (val === best && val !== -1) { tie = true; }
+      }
+      if (best <= 0) return null;
+      return tie ? null : bestSeat;
+    }
+
+    // --- SVG helpers ---
+    const HEX_POINTS = [
+      [TILE.vertices[1].x, TILE.vertices[1].y],
+      [TILE.vertices[2].x, TILE.vertices[2].y],
+      [TILE.vertices[3].x, TILE.vertices[3].y],
+      [TILE.vertices[4].x, TILE.vertices[4].y],
+      [TILE.vertices[5].x, TILE.vertices[5].y],
+      [TILE.vertices[6].x, TILE.vertices[6].y],
+    ].map(p => p.join(",")).join(" ");
+
+    function svgEl(tag, attrs = {}, children = []) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) {
+        if (v === undefined || v === null) continue;
+        el.setAttribute(k, String(v));
+      }
+      for (const ch of children) el.appendChild(ch);
+      return el;
+    }
+
+    function degrees(rad) { return rad * (180 / Math.PI); }
+
+    function outwardAngleDeg(vertex) {
+      const vx = vertex.x - TILE.center.x;
+      const vy = vertex.y - TILE.center.y;
+      return degrees(Math.atan2(vy, vx));
+    }
+
+    function metaDiamondPath(size) {
+      const s = size;
+      return `M 0 ${-s} L ${s} 0 L 0 ${s} L ${-s} 0 Z`;
+    }
+
+    function buildOverlayLuminosity() {
+      // Contract: ONLY mix-blend-mode: luminosity, strength fixed at 0.8.
+      const layer = svgEl("g", { class: "overlay" }, [
+        svgEl("image", {
+          href: "assets/tile-overlay.png",
+          x: 0,
+          y: 0,
+          width: 747,
+          height: 864,
+          preserveAspectRatio: "none",
+          opacity: String(OVERLAY.strength),
+          style: "mix-blend-mode: luminosity;",
+        }),
+      ]);
+      return { defs: null, layer };
+    }
+
+    function buildOverlayLayer() {
+      if (!OVERLAY.enabled) return null;
+      return buildOverlayLuminosity();
+    }
+
+    function buildBadges(tile) {
+      const badges = tile.badges || [];
+      if (badges.length === 0) return svgEl("g");
+
+      const useBelt = badges.length > 2;
+      const order = useBelt ? TILE.badge.beltOrder : TILE.badge.compactOrder;
+
+      const g = svgEl("g", { class: "badges" });
+
+      const max = Math.min(badges.length, order.length);
+      for (let i = 0; i < max; i++) {
+        const slotKey = order[i];
+        const slot = TILE.badge.slots[slotKey];
+        const b = badges[i];
+
+        const rect = svgEl("rect", {
+          x: -TILE.badge.size.w / 2,
+          y: -TILE.badge.size.h / 2,
+          width: TILE.badge.size.w,
+          height: TILE.badge.size.h,
+          rx: TILE.badge.r,
+          ry: TILE.badge.r,
+          class: "badgeRect"
+        });
+
+        const text = svgEl("text", {
+          x: 0,
+          y: 16,
+          "text-anchor": "middle",
+          "dominant-baseline": "middle",
+          class: "badgeText"
+        });
+        text.textContent = b.text;
+
+        const gg = svgEl("g", {
+          transform: `translate(${slot.cx} ${slot.cy}) rotate(${slot.rot})`
+        }, [rect, text]);
+
+        g.appendChild(gg);
+      }
+
+      return g;
+    }
+
+    function buildMarkers(tile) {
+      const markers = svgEl("g", { class: "markers" });
+
+      for (let seat = 1; seat <= 6; seat++) {
+        const v = TILE.vertices[seat];
+        const influence = Number(tile.influence?.[seat] || 0);
+        const metaCount = Number(tile.meta?.[seat] || 0);
+
+        const fill = seatColor(seat);
+
+        const ang = outwardAngleDeg(v);
+        const r = TILE.marker.r;
+        const h = 2 * r;
+
+        let gg;
+
+        if (metaCount > 0) {
+          const { labelGap, iconSize, iconGap } = TILE.marker.capsule;
+          const w = (2 * r) + labelGap + metaCount * (iconSize + iconGap);
+
+          const rect = svgEl("rect", {
+            x: -r,
+            y: -r,
+            width: w,
+            height: h,
+            rx: r,
+            ry: r,
+            fill,
+            stroke: "#000",
+            "stroke-width": TILE.marker.stroke,
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          });
+
+          const number = svgEl("text", {
+            x: 0,
+            y: 12,
+            "text-anchor": "middle",
+            "dominant-baseline": "middle",
+            class: "markerText"
+          });
+          number.textContent = String(influence);
+
+          const numberUpright = svgEl("g", { transform: `rotate(${-ang})` }, [number]);
+
+          const icons = svgEl("g");
+          const startX = r + labelGap + (iconSize / 2);
+          const step = iconSize + iconGap;
+
+          for (let i = 0; i < metaCount; i++) {
+            const ix = startX + i * step;
+            const path = svgEl("path", { d: metaDiamondPath(24), class: "metaIcon" });
+            const icon = svgEl("g", { transform: `translate(${ix} 0) rotate(${-ang})` }, [path]);
+            icons.appendChild(icon);
+          }
+
+          gg = svgEl("g", {
+            transform: `translate(${v.x} ${v.y}) rotate(${ang})`
+          }, [rect, numberUpright, icons]);
+        } else {
+          const circle = svgEl("circle", {
+            cx: v.x,
+            cy: v.y,
+            r,
+            fill,
+            stroke: "#000",
+            "stroke-width": TILE.marker.stroke,
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round"
+          });
+
+          const number = svgEl("text", {
+            x: v.x,
+            y: v.y + 12,
+            "text-anchor": "middle",
+            "dominant-baseline": "middle",
+            class: "markerText"
+          });
+          number.textContent = String(influence);
+
+          gg = svgEl("g", {}, [circle, number]);
+        }
+
+        markers.appendChild(gg);
+      }
+
+      return markers;
+    }
+
+    function buildTileSvg(tile) {
+      const majoritySeat = majoritySeatFromInfluence(tile.influence || {});
+      const majorityFill = majoritySeat
+        ? seatColor(majoritySeat)
+        : getComputedStyle(document.documentElement).getPropertyValue("--noMajority").trim();
+
+      const svg = svgEl("svg", {
+        viewBox: "0 0 747 864",
+        role: "img",
+        "aria-label": `Hex tile ${tile.id}`
+      });
+
+      svg.appendChild(svgEl("polygon", {
+        points: HEX_POINTS,
+        fill: majorityFill,
+        stroke: getComputedStyle(document.documentElement).getPropertyValue("--strokeBase").trim(),
+        "stroke-width": 22,
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round"
+      }));
+
+      svg.appendChild(svgEl("circle", {
+        cx: TILE.center.x,
+        cy: TILE.center.y,
+        r: TILE.innerR,
+        fill: getComputedStyle(document.documentElement).getPropertyValue("--innerDisc").trim(),
+        stroke: getComputedStyle(document.documentElement).getPropertyValue("--strokeBase").trim(),
+        "stroke-width": 18,
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round"
+      }));
+
+      const label = svgEl("text", {
+        x: TILE.center.x,
+        y: TILE.center.y - 40,  // 40px up from center (contract)
+        "text-anchor": "middle",
+        "dominant-baseline": "middle",
+        class: "label"
+      });
+      label.textContent = tile.label;
+      svg.appendChild(label);
+
+      if (tile.valueW !== undefined && tile.valueW !== null && String(tile.valueW) !== "") {
+        const w = svgEl("text", {
+          x: TILE.center.x,
+          y: TILE.center.y + 60,  // 60px down from center (contract)
+          "text-anchor": "middle",
+          "dominant-baseline": "middle",
+          class: "wval"
+        });
+        w.textContent = String(tile.valueW);
+        svg.appendChild(w);
+      }
+
+      const ov = buildOverlayLayer();
+      if (ov) {
+        if (ov.defs) svg.appendChild(ov.defs);
+        svg.appendChild(ov.layer);
+      }
+
+      svg.appendChild(buildMarkers(tile));
+      svg.appendChild(buildBadges(tile));
+
+      svg.appendChild(svgEl("polygon", {
+        points: HEX_POINTS,
+        fill: "none",
+        stroke: getComputedStyle(document.documentElement).getPropertyValue("--strokeHover").trim(),
+        "stroke-width": 14,
+        class: "hoverOutline"
+      }));
+
+      svg.appendChild(svgEl("polygon", {
+        points: HEX_POINTS,
+        fill: "none",
+        stroke: getComputedStyle(document.documentElement).getPropertyValue("--strokeSel").trim(),
+        "stroke-width": 18,
+        class: "selOutline"
+      }));
+
+      return svg;
+    }
+
+    // --- Render grid ---
+    const grid = document.getElementById("grid");
+
+    const legend = document.getElementById("legend");
+    for (let i = 1; i <= 6; i++) {
+      const row = document.createElement("div");
+      row.className = "row";
+      const sw = document.createElement("div");
+      sw.className = "swatch";
+      sw.style.background = seatColor(i);
+      const txt = document.createElement("div");
+      txt.innerHTML = `<b>Seat ${i}</b> <span style="color:var(--muted)">(${seatCssVar[i]})</span>`;
+      row.appendChild(sw);
+      row.appendChild(txt);
+      legend.appendChild(row);
+    }
+
+    const pts = tiles.map((t) => ({ t, p: axialToPixel(t.axial.q, t.axial.r) }));
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const it of pts) {
+      minX = Math.min(minX, it.p.x);
+      minY = Math.min(minY, it.p.y);
+      maxX = Math.max(maxX, it.p.x);
+      maxY = Math.max(maxY, it.p.y);
+    }
+
+    // NOTE: do not name these variables 'top' or 'bottom' (conflicts with non-configurable window.top/window.bottom in some runtimes)
+    const boundsLeft = minX - BOARD.tileW / 2;
+    const boundsRight = maxX + BOARD.tileW / 2;
+    const boundsTopY = minY - BOARD.tileH / 2;
+    const boundsBottomY = maxY + BOARD.tileH / 2;
+
+    const gridW = (boundsRight - boundsLeft) + BOARD.margin * 2;
+    const gridH = (boundsBottomY - boundsTopY) + BOARD.margin * 2;
+
+    grid.style.width = `${Math.ceil(gridW)}px`;
+    grid.style.height = `${Math.ceil(gridH)}px`;
+
+    const offsetX = -boundsLeft + BOARD.margin;
+    const offsetY = -boundsTopY + BOARD.margin;
+
+    for (const it of pts) {
+      it.t.pos.x = it.p.x + offsetX;
+      it.t.pos.y = it.p.y + offsetY;
+    }
+
+    const titleEl = document.querySelector("header .title");
+    if (titleEl) titleEl.textContent = `HexTile Simulator (${tiles.length} tiles, 6 players)`;
+
+    const selected = new Set();
+    const tileDom = new Map(); // tileId -> div
+
+    function mountTiles() {
+      grid.innerHTML = "";
+      tileDom.clear();
+
+      for (const t of tiles) {
+        const el = document.createElement("div");
+        el.className = "tile";
+        el.style.left = `${t.pos.x}px`;
+        el.style.top = `${t.pos.y}px`;
+        el.dataset.tileId = t.id;
+        el.dataset.selected = selected.has(t.id) ? "1" : "0";
+
+        const svg = buildTileSvg(t);
+        el.appendChild(svg);
+
+        const hit = document.createElement("div");
+        hit.className = "hit";
+        hit.title = `Click to toggle selected: ${t.id}`;
+        hit.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          if (selected.has(t.id)) selected.delete(t.id);
+          else selected.add(t.id);
+          el.dataset.selected = selected.has(t.id) ? "1" : "0";
+        });
+        el.appendChild(hit);
+
+        grid.appendChild(el);
+        tileDom.set(t.id, el);
+      }
+    }
+
+    function rerenderTiles() {
+      for (const t of tiles) {
+        const el = tileDom.get(t.id);
+        if (!el) continue;
+        const oldSvg = el.querySelector("svg");
+        if (oldSvg) oldSvg.remove();
+        el.insertBefore(buildTileSvg(t), el.firstChild);
+      }
+    }
+
+    mountTiles();
+
+    // --- Overlay UI wiring (contract: ONLY luminosity @ 0.8) ---
+    const ovEnabled = document.getElementById("ovEnabled");
+
+    function applyOverlayControls() {
+      OVERLAY.enabled = !!ovEnabled.checked;
+      OVERLAY.strength = 0.8;
+      rerenderTiles();
+      document.getElementById("tests").innerHTML = runTests().join("<br>");
+    }
+
+    ovEnabled.addEventListener("change", applyOverlayControls);
+
+    // --- Minimal pan/zoom camera ---
+    const viewport = document.getElementById("viewport");
+    const camera = document.getElementById("camera");
+
+    const zoom = document.getElementById("zoom");
+    const zoomLabel = document.getElementById("zoomLabel");
+
+    const vpW = viewport.clientWidth || 1200;
+    const vpH = viewport.clientHeight || 800;
+
+    let cam = {
+      x: Math.floor((vpW - gridW) / 2),
+      y: Math.floor((vpH - gridH) / 2),
+      s: Number(zoom.value || 1.0)
+    };
+
+    function applyCam() {
+      camera.style.transform = `translate(${cam.x}px, ${cam.y}px) scale(${cam.s})`;
+      zoomLabel.textContent = `${cam.s.toFixed(2)}x`;
+    }
+
+    let dragging = false;
+    let dragStart = { x: 0, y: 0, camX: 0, camY: 0 };
+
+    viewport.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      viewport.classList.add("dragging");
+      dragStart = { x: e.clientX, y: e.clientY, camX: cam.x, camY: cam.y };
+      viewport.setPointerCapture(e.pointerId);
+    });
+
+    viewport.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - dragStart.x;
+      const dy = e.clientY - dragStart.y;
+      cam.x = dragStart.camX + dx;
+      cam.y = dragStart.camY + dy;
+      applyCam();
+    });
+
+    viewport.addEventListener("pointerup", (e) => {
+      dragging = false;
+      viewport.classList.remove("dragging");
+      try { viewport.releasePointerCapture(e.pointerId); } catch (_) {}
+    });
+
+    viewport.addEventListener("pointercancel", () => {
+      dragging = false;
+      viewport.classList.remove("dragging");
+    });
+
+    viewport.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const delta = -Math.sign(e.deltaY) * 0.05;
+      const next = Math.max(0.55, Math.min(1.8, cam.s + delta));
+      cam.s = next;
+      zoom.value = String(next);
+      applyCam();
+    }, { passive: false });
+
+    zoom.addEventListener("input", () => {
+      cam.s = Number(zoom.value);
+      applyCam();
+    });
+
+    document.getElementById("reset").addEventListener("click", () => {
+      cam = {
+        x: Math.floor((vpW - gridW) / 2),
+        y: Math.floor((vpH - gridH) / 2),
+        s: 1.0
+      };
+      zoom.value = "1.0";
+      applyCam();
+    });
+
+    // --- Tiny self-tests (no framework) ---
+    function runTests() {
+      const out = [];
+      const ok = (name) => out.push(`<div class="testPass">PASS</div> ${name}`);
+      const bad = (name, msg) => out.push(`<div class="testFail">FAIL</div> ${name}: ${msg}`);
+
+      // 1) Canonical viewBox
+      const vb = TILE.viewBox.join(",");
+      if (vb === "0,0,747,864") ok("tile viewBox is 0,0,747,864");
+      else bad("tile viewBox", `got ${vb}`);
+
+      // 2) Vertex count
+      const vCount = Object.keys(TILE.vertices).length;
+      if (vCount === 6) ok("tile has 6 vertex centers");
+      else bad("vertex centers", `got ${vCount}`);
+
+      // 3) Hex packing non-empty
+      if (tiles.length > 5) ok("generated more than 5 tiles");
+      else bad("tile generation", `got ${tiles.length}`);
+
+      // 4) Majority tie behavior
+      const tie = majoritySeatFromInfluence({ 1: 3, 3: 3 });
+      if (tie === null) ok("majority: tie => null");
+      else bad("majority tie", `got ${tie}`);
+
+      // 5) Majority unique max
+      const maj = majoritySeatFromInfluence({ 2: 4, 5: 3 });
+      if (maj === 2) ok("majority: unique max => seat");
+      else bad("majority unique", `got ${maj}`);
+
+      // 6) Grid bounds are sane
+      if (Number.isFinite(gridW) && gridW > 0 && Number.isFinite(gridH) && gridH > 0) ok("grid bounds are positive");
+      else bad("grid bounds", `gridW=${gridW}, gridH=${gridH}`);
+
+      // 7) Overlay plumbing (contract: luminosity only)
+      if (OVERLAY.enabled) {
+        const firstSvg = document.querySelector(".tile svg");
+        if (!firstSvg) {
+          bad("overlay", "no svg found");
+        } else {
+          const img = firstSvg.querySelector("image[style*='mix-blend-mode: luminosity']");
+          if (img) ok("overlay: mix-blend-mode image present");
+          else bad("overlay", "missing image with mix-blend-mode: luminosity");
+        }
+      } else {
+        ok("overlay disabled");
+      }
+
+      // 8) Overlay contract is enforced
+      if (Math.abs(OVERLAY.strength - 0.8) < 1e-9) ok("overlay strength is 0.8 (fixed)");
+      else bad("overlay strength", `got ${OVERLAY.strength}`);
+
+      // 9) Strength clamps
+      if (OVERLAY.strength >= 0 && OVERLAY.strength <= 1) ok("overlay strength in [0..1]");
+      else bad("overlay strength range", `got ${OVERLAY.strength}`);
+
+      return out;
+    }
+
+    // init tests + camera
+    document.getElementById("tests").innerHTML = runTests().join("<br>");
+    applyCam();
+
+    // prime UI labels
+    applyOverlayControls();
+  </script>
+</body>
+</html>
