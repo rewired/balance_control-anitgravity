@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import React from 'react';
 import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import { ActionPanel } from '../src/components/ActionPanel';
+import { buildIntentViewModel } from '../src/ui/useIntentViewModel';
 
 afterEach(() => {
     cleanup();
@@ -10,13 +11,13 @@ afterEach(() => {
 describe('ActionPanel', () => {
     it('enables primary place influence when selection matches intent', () => {
         const moves = { placeInfluence: vi.fn() };
+        const intents = [{ moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } } as any];
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: 'tile_alpha', stagedTileId: null }), intents } as any;
         render(
             <ActionPanel
                 moves={moves}
                 isActive={true}
-                stage={'politicalAction'}
-                intents={[{ moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } } as any]}
-                selectedTileId={'tile_alpha'}
+                vm={vm}
             />
         );
 
@@ -26,13 +27,13 @@ describe('ActionPanel', () => {
 
     it('disables primary place influence without selection and does not dispatch', () => {
         const moves = { placeInfluence: vi.fn() };
+        const intents = [{ moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } } as any];
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
         render(
             <ActionPanel
                 moves={moves}
                 isActive={true}
-                stage={'politicalAction'}
-                intents={[{ moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } } as any]}
-                selectedTileId={null}
+                vm={vm}
             />
         );
 
@@ -44,16 +45,16 @@ describe('ActionPanel', () => {
 
     it('dispatches a secondary action exactly once', () => {
         const moves = { moveInfluence: vi.fn(), pass: vi.fn() };
+        const intents = [
+            { moveType: 'moveInfluence', payload: { sourceId: 'inf-1', targetId: 'inf-2' } },
+            { moveType: 'pass', payload: {} }
+        ] as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: 'tile_alpha', stagedTileId: null }), intents } as any;
         render(
             <ActionPanel
                 moves={moves}
                 isActive={true}
-                stage={'politicalAction'}
-                intents={[
-                    { moveType: 'moveInfluence', payload: { sourceId: 'inf-1', targetId: 'inf-2' } },
-                    { moveType: 'pass', payload: {} }
-                ] as any}
-                selectedTileId={'tile_alpha'}
+                vm={vm}
             />
         );
 

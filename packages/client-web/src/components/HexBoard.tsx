@@ -11,7 +11,8 @@ import type { SeatId } from '../ui/tiles/types';
 interface HexBoardProps {
     G: GameState;
     moves: any;
-    intents: LegalIntent[];
+    placeTileIntents: LegalIntent[];
+    ghostCoords: string[];
     isInteractive: boolean;
     selectedTileId?: string | null;
     selectedCoord?: string | null;
@@ -23,7 +24,8 @@ export const HEX_SIZE = 110;
 export const HexBoard: React.FC<HexBoardProps> = ({
     G,
     moves,
-    intents,
+    placeTileIntents,
+    ghostCoords,
     isInteractive,
     selectedTileId,
     selectedCoord,
@@ -35,13 +37,17 @@ export const HexBoard: React.FC<HexBoardProps> = ({
         return stableSortCoords(Object.keys(G.grid || {}));
     }, [G.grid]);
 
-    const ghostCoords = useMemo(() => {
-        const coords = intents
-            .filter((intent) => intent.moveType === 'placeTile' && intent.payload?.targetCoord)
-            .map((intent) => intent.payload.targetCoord);
-        const unique = Array.from(new Set(coords));
-        return stableSortCoords(unique);
-    }, [intents]);
+    const placeTileByCoord = useMemo(() => {
+        const map = new Map<string, LegalIntent>();
+        for (const intent of placeTileIntents) {
+            const coord = intent.payload?.targetCoord;
+            if (typeof coord !== 'string' || coord.length === 0) continue;
+            if (!map.has(coord)) {
+                map.set(coord, intent);
+            }
+        }
+        return map;
+    }, [placeTileIntents]);
 
     const allCoords = useMemo(() => {
         return stableSortCoords([...occupiedCoords, ...ghostCoords]);
@@ -130,9 +136,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
             </div>
             <div className="hex-layer hex-layer-ghosts">
                 {ghostCoords.map((coordStr) => {
-                    const intent = intents.find(
-                        (candidate) => candidate.moveType === 'placeTile' && candidate.payload?.targetCoord === coordStr
-                    );
+                    const intent = placeTileByCoord.get(coordStr);
                     if (!intent) return null;
                     const coord = parseCoordString(coordStr);
                     const { x, y } = axialToPixel(coord, HEX_SIZE);

@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { GameState } from '@balance-control/rules';
-import { enumerateLegalIntents, type LegalIntent } from '@balance-control/game';
 import { Zone } from './Zone';
 import { ActionPanel } from './ActionPanel';
 import { BoardViewport } from './BoardViewport';
 import { PendingChoiceModal } from './PendingChoiceModal';
 import { PublicNoticeOverlay } from './PublicNoticeOverlay';
+import { useIntentViewModel } from '../ui/useIntentViewModel';
 
 interface GameLayoutProps {
     G: GameState;
@@ -28,19 +28,12 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     // Determine player's personal supply
     const myPid = playerID ?? ctx.currentPlayer ?? '0';
     const mySupplyId = `${zoneNames.PersonalSupply}:${myPid}`;
-    const stage = useMemo(() => {
-        const pid = playerID ?? ctx.currentPlayer;
-        const ap = ctx.activePlayers || {};
-        return ap[pid] || null;
-    }, [ctx, playerID]);
 
     const [selectedCoord, setSelectedCoord] = useState<string | null>(null);
     const [selectedTileId, setSelectedTileId] = useState<string | null>(null);
     const stagingZoneId = `staging_${myPid}`;
     const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
-    const intents: LegalIntent[] = useMemo(() => {
-        return enumerateLegalIntents(G, ctx, myPid);
-    }, [G, ctx, myPid]);
+    const vm = useIntentViewModel({ G, ctx, playerID: myPid, selectedTileId, stagedTileId });
 
     const handleSelectTile = useCallback((tileId: string | null, coordStr: string | null) => {
         setSelectedTileId(tileId);
@@ -109,16 +102,12 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
         return { tile, coord, influenceByOwner, resourceByResort };
     }, [G, selectedCoord, selectedTileId]);
 
-    const hasPendingChoice = useMemo(() => {
-        return intents.some((intent) => intent.moveType === 'resolveChoice');
-    }, [intents]);
-
-    const isInteractive = isActive && !hasPendingChoice;
+    const isInteractive = isActive && !vm.hasPendingChoice;
 
     return (
         <div className="game-layout">
             <PublicNoticeOverlay G={G} />
-            <PendingChoiceModal intents={intents} moves={moves} />
+            <PendingChoiceModal resolveChoiceIntents={vm.pendingChoice.resolveChoice} moves={moves} />
 
             {/* Left Panel: Bank & Supply */}
             <aside className="left-panel glass-panel">
@@ -140,7 +129,8 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                 <BoardViewport
                     G={G}
                     moves={moves}
-                    intents={intents}
+                    placeTileIntents={vm.drawAndPlace.placeTile}
+                    ghostCoords={vm.ghostCoords}
                     isInteractive={isInteractive}
                     selectedTileId={selectedTileId}
                     selectedCoord={selectedCoord}
@@ -221,15 +211,12 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
             </aside>
 
             {/* Bottom Controls */}
-            {!hasPendingChoice && (
+            {!vm.hasPendingChoice && (
                 <div className="controls-container glass-panel">
                     <ActionPanel
                         moves={moves}
                         isActive={isActive}
-                        stage={stage}
-                        intents={intents}
-                        selectedTileId={selectedTileId}
-                        stagedTileId={stagedTileId}
+                        vm={vm}
                     />
                 </div>
             )}

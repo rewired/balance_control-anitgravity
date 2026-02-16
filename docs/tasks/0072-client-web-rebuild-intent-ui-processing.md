@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** COMMIT_READY
 
 ## Task State Machine (Loop-Breaker)
 
@@ -43,9 +43,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -191,31 +191,96 @@ Changelog / DD / ERRATA:
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] VM introduced and consumed by UI
-* [ ] No duplicated intent filtering remains
-* [ ] No engine changes
-* [ ] `pnpm -w lint` passes
-* [ ] `$env:NO_COLOR=1; pnpm -w test` passes
-* [ ] No temporary files
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] VM introduced and consumed by UI
+* [x] No duplicated intent filtering remains
+* [x] No engine changes
+* [x] `pnpm -w lint` passes
+* [x] `$env:NO_COLOR=1; pnpm -w test` passes
+* [x] No temporary files
 
 ---
 
 ## 11) Work Summary (3-7 bullets)
 
-* TODO
+* Added `useIntentViewModel` + pure builder to centralize intent grouping for UI.
+* Refactored `GameLayout`, `ActionPanel`, `BoardViewport`, `HexBoard`, and `PendingChoiceModal` to consume the VM (no ad-hoc intent filters).
+* Removed unused legacy `Controls.tsx`.
+* Added deterministic unit tests for VM grouping + updated affected client-web tests.
 
 ---
 
 ## 12) Commands Run (exact)
 
-* TODO
+* `pnpm -w lint` (ok)
+* `$env:NO_COLOR=1; pnpm -w test` (ok)
+* `git status` (ok)
+* `git diff --stat` (ok)
 
 ---
 
 ## 13) Proof (screenshots / logs)
 
-* TODO
+### git status
+
+```
+On branch task/0072-client-web-intent-ui-processing
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   docs/tasks/0072-client-web-rebuild-intent-ui-processing.md
+	modified:   packages/client-web/src/components/ActionPanel.tsx
+	modified:   packages/client-web/src/components/BoardViewport.tsx
+	deleted:    packages/client-web/src/components/Controls.tsx
+	modified:   packages/client-web/src/components/GameLayout.tsx
+	modified:   packages/client-web/src/components/HexBoard.tsx
+	modified:   packages/client-web/src/components/PendingChoiceModal.tsx
+	modified:   packages/client-web/test/Board.test.tsx
+	modified:   packages/client-web/test/action-panel.test.tsx
+	modified:   packages/client-web/test/controls-start-committee.test.tsx
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	packages/client-web/src/ui/__tests__/
+	packages/client-web/src/ui/useIntentViewModel.ts
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+### git diff --stat
+
+```
+ ...0072-client-web-rebuild-intent-ui-processing.md |  8 +-
+ packages/client-web/src/components/ActionPanel.tsx | 90 ++++----------------
+ .../client-web/src/components/BoardViewport.tsx    | 20 ++---
+ packages/client-web/src/components/Controls.tsx    | 95 ----------------------
+ packages/client-web/src/components/GameLayout.tsx  | 29 ++-----
+ packages/client-web/src/components/HexBoard.tsx    | 28 ++++---
+ .../src/components/PendingChoiceModal.tsx          | 19 ++---
+ packages/client-web/test/Board.test.tsx            |  5 +-
+ packages/client-web/test/action-panel.test.tsx     | 25 +++---
+ .../test/controls-start-committee.test.tsx         |  8 +-
+ 10 files changed, 78 insertions(+), 249 deletions(-)
+```
+
+### $env:NO_COLOR=1; pnpm -w test
+
+```
+> balance-control-monorepo@0.0.0 test D:\__DEV\balance_control-anitgravity
+> pnpm -r --if-present test
+
+Scope: 9 of 10 workspace projects
+packages/game test$ vitest run
+packages/game test:  RUN  v0.30.1 D:/__DEV/balance_control-anitgravity/packages/game
+packages/game test:  Test Files  23 passed (23)
+packages/game test:       Tests  91 passed (91)
+packages/game test: Done
+packages/client-web test$ vitest run
+packages/client-web test:  RUN  v0.30.1 D:/__DEV/balance_control-anitgravity/packages/client-web
+packages/client-web test:  Test Files  13 passed (13)
+packages/client-web test:       Tests  45 passed (45)
+packages/client-web test: Done
+```
 
 ---
 
@@ -228,6 +293,14 @@ Required format:
 
   - `- ...`
   - `- ...`
+
+Subject: `task(0072): rebuild intent UI processing via view-model`
+
+Body:
+
+- Centralize client intent grouping in `useIntentViewModel`/`buildIntentViewModel`.
+- Refactor intent-consuming components to render from the VM (no ad-hoc filtering).
+- Add unit tests for deterministic grouping and update client-web tests for new props.
 
 ---
 

@@ -11,7 +11,8 @@ type BoardViewportGameProps = {
     mode?: undefined | 'game';
     G: GameState;
     moves: any;
-    intents: LegalIntent[];
+    placeTileIntents: LegalIntent[];
+    ghostCoords: string[];
     isInteractive: boolean;
     selectedTileId?: string | null;
     selectedCoord?: string | null;
@@ -63,18 +64,10 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
         return stableSortCoords(Object.keys(gameProps?.G.grid || {}));
     }, [devProps?.coordStrings, gameProps?.G.grid, props.mode]);
 
-    const ghostCoords = useMemo(() => {
-        if (devProps) return [];
-        const coords = (gameProps?.intents ?? [])
-            .filter((intent) => intent.moveType === 'placeTile' && intent.payload?.targetCoord)
-            .map((intent) => intent.payload.targetCoord);
-        const unique = Array.from(new Set(coords));
-        return stableSortCoords(unique);
-    }, [gameProps?.intents, props.mode]);
-
     const allCoords = useMemo(() => {
-        return stableSortCoords([...occupiedCoords, ...ghostCoords]);
-    }, [occupiedCoords, ghostCoords]);
+        const ghosts = devProps ? [] : (gameProps?.ghostCoords ?? []);
+        return stableSortCoords([...occupiedCoords, ...ghosts]);
+    }, [occupiedCoords, devProps, gameProps?.ghostCoords]);
 
     const layout = useMemo(() => {
         return computeBoardLayout(allCoords, hexSize);
@@ -144,7 +137,8 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                         <HexBoard
                                             G={gameProps!.G}
                                             moves={gameProps!.moves}
-                                            intents={gameProps!.intents}
+                                            placeTileIntents={gameProps!.placeTileIntents}
+                                            ghostCoords={gameProps!.ghostCoords}
                                             isInteractive={gameProps!.isInteractive}
                                             selectedTileId={gameProps!.selectedTileId}
                                             selectedCoord={gameProps!.selectedCoord}

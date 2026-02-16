@@ -1,13 +1,11 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { LegalIntent } from '@balance-control/game';
+import type { IntentViewModel } from '../ui/useIntentViewModel';
 
 interface ActionPanelProps {
     moves: any;
     isActive: boolean;
-    stage?: string | null;
-    intents: LegalIntent[];
-    selectedTileId?: string | null;
-    stagedTileId?: string | null;
+    vm: IntentViewModel;
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -42,70 +40,16 @@ const intentSortKey = (intent: LegalIntent) => {
 export const ActionPanel: React.FC<ActionPanelProps> = ({
     moves,
     isActive,
-    stage,
-    intents,
-    selectedTileId,
-    stagedTileId
+    vm
 }) => {
     if (!isActive) return null;
 
-    const stageLabel = stage ? (STAGE_LABELS[stage] ?? stage) : 'Waiting';
-    const isDrawAndPlace = stage === 'drawAndPlace';
-    const isPoliticalAction = stage === 'politicalAction';
+    const stageLabel = vm.stage ? (STAGE_LABELS[vm.stage] ?? vm.stage) : 'Waiting';
+    const isDrawAndPlace = vm.stage === 'drawAndPlace';
+    const isPoliticalAction = vm.stage === 'politicalAction';
 
-    const placeInfluenceIntent = useMemo(() => {
-        if (!selectedTileId) return null;
-        return intents.find(intent => intent.moveType === 'placeInfluence' && intent.payload?.targetTileId === selectedTileId) || null;
-    }, [intents, selectedTileId]);
-
-    const passTilePlacementIntent = useMemo(() => {
-        return intents.find(intent => intent.moveType === 'passTilePlacement') || null;
-    }, [intents]);
-
-    const secondaryIntents = useMemo(() => {
-        const normalIntents = intents.filter(intent => {
-            if (intent.moveType === 'resolveChoice') return false;
-            if (intent.moveType === 'placeTile') return false;
-            if (intent.moveType === 'placeInfluence') return false;
-            if (intent.moveType === 'pass') return false;
-            if (intent.moveType === 'passTilePlacement') return false;
-            return true;
-        });
-
-        const grouped: Record<string, LegalIntent[]> = {};
-        for (const intent of normalIntents) {
-            if (!grouped[intent.moveType]) {
-                grouped[intent.moveType] = [];
-            }
-            grouped[intent.moveType].push(intent);
-        }
-
-        const ordered: LegalIntent[] = [];
-        const moveTypes = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
-        for (const moveType of moveTypes) {
-            const group = grouped[moveType].slice().sort((a, b) => intentSortKey(a).localeCompare(intentSortKey(b)));
-            ordered.push(...group);
-        }
-
-        const trailing: LegalIntent[] = [];
-        if (!isDrawAndPlace) {
-            const skipIntents = intents
-                .filter(intent => intent.moveType === 'passTilePlacement')
-                .slice()
-                .sort((a, b) => intentSortKey(a).localeCompare(intentSortKey(b)));
-            trailing.push(...skipIntents);
-        }
-        const passIntents = intents
-            .filter(intent => intent.moveType === 'pass')
-            .slice()
-            .sort((a, b) => intentSortKey(a).localeCompare(intentSortKey(b)));
-        trailing.push(...passIntents);
-
-        return [...ordered, ...trailing];
-    }, [intents, isDrawAndPlace]);
-
-    const primaryPlaceInfluenceDisabled = !placeInfluenceIntent;
-    const showMoreActions = secondaryIntents.length > 0;
+    const primaryPlaceInfluenceDisabled = !vm.political.placeInfluenceForSelected;
+    const showMoreActions = vm.political.others.length > 0;
 
     return (
         <div className="action-panel">
@@ -117,11 +61,11 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
             <div className="action-panel-primary">
                 {isDrawAndPlace && (
                     <>
-                        <div className="action-panel-meta">Staged: {stagedTileId || 'None'}</div>
-                        {passTilePlacementIntent && (
+                        <div className="action-panel-meta">Staged: {vm.stagedTileId || 'None'}</div>
+                        {vm.drawAndPlace.passTilePlacement && (
                             <button
                                 className="btn-primary"
-                                onClick={() => moves[passTilePlacementIntent.moveType](passTilePlacementIntent.payload)}
+                                onClick={() => moves[vm.drawAndPlace.passTilePlacement!.moveType](vm.drawAndPlace.passTilePlacement!.payload)}
                                 data-testid="btn-skip-placement"
                             >
                                 Skip placement
@@ -135,18 +79,18 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                             className="btn-primary"
                             disabled={primaryPlaceInfluenceDisabled}
                             onClick={
-                                placeInfluenceIntent
-                                    ? () => moves[placeInfluenceIntent.moveType](placeInfluenceIntent.payload)
+                                vm.political.placeInfluenceForSelected
+                                    ? () => moves[vm.political.placeInfluenceForSelected.moveType](vm.political.placeInfluenceForSelected.payload)
                                     : undefined
                             }
                             data-testid="btn-place-influence"
                         >
                             Place influence
                         </button>
-                        {!selectedTileId && (
+                        {!vm.selectedTileId && (
                             <div className="action-panel-hint">Select a tile to place influence.</div>
                         )}
-                        {selectedTileId && primaryPlaceInfluenceDisabled && (
+                        {vm.selectedTileId && primaryPlaceInfluenceDisabled && (
                             <div className="action-panel-hint">Selected tile is not a legal target.</div>
                         )}
                     </>
@@ -157,7 +101,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                 <details className="action-panel-more">
                     <summary>More actions</summary>
                     <div className="action-panel-secondary">
-                        {secondaryIntents.map(intent => (
+                        {vm.political.others.map(intent => (
                             <button
                                 key={intentSortKey(intent)}
                                 className="btn-secondary"
