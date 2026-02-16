@@ -1,14 +1,10 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { LegalIntent } from '@balance-control/game';
 
 interface PendingChoiceModalProps {
-    intents: LegalIntent[];
+    resolveChoiceIntents: LegalIntent[];
     moves: any;
 }
-
-const intentSortKey = (intent: LegalIntent) => {
-    return JSON.stringify(intent.payload ?? {});
-};
 
 const formatChoiceLabel = (intent: LegalIntent) => {
     const selection = intent.payload && (intent.payload as any).selection;
@@ -20,14 +16,9 @@ const formatChoiceLabel = (intent: LegalIntent) => {
     return JSON.stringify(selection);
 };
 
-export const PendingChoiceModal: React.FC<PendingChoiceModalProps> = ({ intents, moves }) => {
-    const resolveChoiceIntents = useMemo(() => {
-        return intents
-            .filter((intent) => intent.moveType === 'resolveChoice')
-            .slice()
-            .sort((a, b) => intentSortKey(a).localeCompare(intentSortKey(b)));
-    }, [intents]);
+const intentKey = (intent: LegalIntent) => JSON.stringify(intent.payload ?? {});
 
+export const PendingChoiceModal: React.FC<PendingChoiceModalProps> = ({ resolveChoiceIntents, moves }) => {
     if (resolveChoiceIntents.length === 0) return null;
 
     return (
@@ -37,7 +28,7 @@ export const PendingChoiceModal: React.FC<PendingChoiceModalProps> = ({ intents,
                 <div className="pending-choice-options">
                     {resolveChoiceIntents.map((intent, index) => (
                         <button
-                            key={`${intentSortKey(intent)}:${index}`}
+                            key={`${intentKey(intent)}:${index}`}
                             className="pending-choice-option"
                             type="button"
                             onClick={() => moves.resolveChoice(intent.payload)}

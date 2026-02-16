@@ -76,7 +76,7 @@ describe('Token', () => {
 describe('HexBoard', () => {
     it('dispatches placeTile when a ghost is clicked', () => {
         const moves = { placeTile: vi.fn() };
-        const intents = [
+        const placeTileIntents = [
             { moveType: 'placeTile', payload: { targetCoord: '0,1' } }
         ];
         const G = {
@@ -91,7 +91,8 @@ describe('HexBoard', () => {
             <HexBoard
                 G={G}
                 moves={moves}
-                intents={intents as any}
+                placeTileIntents={placeTileIntents as any}
+                ghostCoords={['0,1']}
                 isInteractive={true}
             />
         );
