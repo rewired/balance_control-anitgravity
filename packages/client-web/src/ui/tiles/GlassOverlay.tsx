@@ -11,7 +11,7 @@ export function GlassOverlay() {
       width={OVERLAY_RENDER_RECT.width}
       height={OVERLAY_RENDER_RECT.height}
       preserveAspectRatio={OVERLAY_RENDER_RECT.preserveAspectRatio}
+      style={{ mixBlendMode: "luminosity", opacity: 0.8, pointerEvents: "none" }}
     />
   );
 }
-
