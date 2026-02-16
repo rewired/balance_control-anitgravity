@@ -54,15 +54,15 @@ export function HexTileVisual({
         {valueW !== undefined ? (
           <text
             x={cx}
-            y={cy + 160}
+            y={cy - 10}
             textAnchor="middle"
             dominantBaseline="middle"
             fill={CONTENT_COLOR}
-            fontSize={120}
+            fontSize={130}
             fontWeight={800}
             style={{ fontVariantNumeric: "tabular-nums" }}
           >
-            W{valueW}
+            {valueW}
           </text>
         ) : null}
       </g>
@@ -91,4 +91,3 @@ export function HexTileVisual({
     </HexTileFrame>
   );
 }
-
