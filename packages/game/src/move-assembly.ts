@@ -1,24 +1,9 @@
 import type { GameConfig } from '@balance-control/rules';
 import { CoreMoves } from './moves';
 import { CANONICAL_ENGINE_MODULE_ORDER, type EngineModuleId, ExpansionRegistry } from './expansion-registry';
+import { MoveModuleRegistry, type MoveFn, type MoveMap, type MoveModule } from './move-module-registry';
 
-export type MoveFn = (...args: any[]) => any;
-export type MoveMap = Record<string, MoveFn>;
-
-export type MoveModule = Readonly<{
-    moduleId: EngineModuleId;
-    moves: MoveMap;
-}>;
-
-function mergeMoveMapsDeterministic(into: MoveMap, from: MoveMap, moduleId: string) {
-    const keys = Object.keys(from).sort((a, b) => a.localeCompare(b));
-    for (const key of keys) {
-        if (Object.prototype.hasOwnProperty.call(into, key)) {
-            throw new Error(`[moves] duplicate move id "${key}" while merging module "${moduleId}".`);
-        }
-        into[key] = from[key];
-    }
-}
+export type { MoveFn, MoveMap, MoveModule };
 
 export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
     const expansionModules = ExpansionRegistry.getEnabledMoveModules(config);
@@ -43,11 +28,11 @@ export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
 }
 
 export function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
-    const merged: MoveMap = {};
+    const reg = new MoveModuleRegistry(CANONICAL_ENGINE_MODULE_ORDER);
     for (const module of modules) {
-        mergeMoveMapsDeterministic(merged, module.moves, module.moduleId);
+        reg.registerModule(module);
     }
-    return merged;
+    return reg.buildMoveMap();
 }
 
 export function buildMovesForConfig(config: GameConfig): MoveMap {
@@ -58,4 +43,3 @@ export function buildExpansionMovesForConfig(config: GameConfig): MoveMap {
     const modules = getEnabledMoveModules(config).filter((m) => m.moduleId !== 'core');
     return mergeMoveModules(modules);
 }
-
