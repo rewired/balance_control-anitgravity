@@ -1,4 +1,4 @@
-# Codex Task 0097 - Documentation Contract (TSDoc + Rule Binding) + AGENTS Policy Hook
+# Codex Task 0102 - Documentation Contract (TSDoc + Rule Binding) + AGENTS Policy Hook
 
 **Date:** 2026-02-17
 **Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)

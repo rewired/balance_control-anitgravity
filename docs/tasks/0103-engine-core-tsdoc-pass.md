@@ -1,4 +1,4 @@
-# Codex Task 0098 - Engine Core TSDoc Annotation Pass (Rule-Linked)
+# Codex Task 0103 - Engine Core TSDoc Annotation Pass (Rule-Linked)
 
 **Date:** 2026-02-17
 **Style:** Codex task contract
@@ -34,7 +34,7 @@ No behavior changes.
 
 ## Inputs
 
-- /docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md (from Task 0097)
+- /docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md (from Task 0102)
 - /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
 - /docs/architecture/ARCH-03-MEASURE-CPU.md
 - packages/game source tree

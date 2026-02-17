@@ -1,4 +1,4 @@
-# Codex Task 0099 - Expansion Documentation Pass (Isolation + Stacking References)
+# Codex Task 0104 - Expansion Documentation Pass (Isolation + Stacking References)
 
 **Date:** 2026-02-17
 **Style:** Codex task contract

@@ -1,7 +1,7 @@
 # Codex Task 0096 - Insert Pack-System Tasks: Renumber Existing 0097-0101
 
-**Date:** 2026-02-17  
-**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)  
+**Date:** 2026-02-17
+**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)
 **Primary contract:** `AGENTS.md` (repo root)
 
 ---
@@ -79,8 +79,40 @@ Create/append a short entry in a central place that future humans will actually 
 
 ## PR Checklist
 
-- [ ] Renames done via `git mv`
-- [ ] References updated repo-wide
-- [ ] No duplicate task IDs in `/docs/tasks/`
-- [ ] Files are UTF-8 (no BOM) and lint-clean
-- [ ] Meaningful commit message, e.g. `tasks: renumber 0097-0101 to 0102-0106 to insert pack-system series`
+- [x] Renames done via `git mv`
+- [x] References updated repo-wide
+- [x] No duplicate task IDs in `/docs/tasks/`
+- [x] Files are UTF-8 (no BOM) and lint-clean
+- [x] Meaningful commit message, e.g. `tasks: renumber 0097-0101 to 0102-0106 to insert pack-system series`
+
+---
+
+## 15) Execution Log (append-only)
+
+### affected_guardrails
+
+- NONE
+
+### spec_anchor_refs
+
+- docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json
+
+### Work Summary
+
+- Renamed tasks 0097-0101 to 0102-0106 and updated self-references.
+- Updated the changelog with a renumbering audit note.
+- pnpm -r build failed in packages/bot-llm with TS2742 (pre-existing).
+
+### Commands Run
+
+- `git mv -v "docs/tasks/0097-documentation-contract.md" "docs/tasks/0102-documentation-contract.md"`
+- `git mv -v "docs/tasks/0098-engine-core-tsdoc-pass.md" "docs/tasks/0103-engine-core-tsdoc-pass.md"`
+- `git mv -v "docs/tasks/0099-expansion-annotation-pass.md" "docs/tasks/0104-expansion-annotation-pass.md"`
+- `git mv -v "docs/tasks/0100-client-boundary-documentation.md" "docs/tasks/0105-client-boundary-documentation.md"`
+- `git mv -v "docs/tasks/0101-determinism-annotation-guard.md" "docs/tasks/0106-determinism-annotation-guard.md"`
+- `$env:NO_COLOR=1; pnpm lint` (pass, TS version warning only)
+- `$env:NO_COLOR=1; pnpm -r build` (fail: bot-llm TS2742 createBotGame inferred type)
+- `$env:NO_COLOR=1; pnpm test` (pass)
+- `git status -sb`
+- `git diff --stat`
+- `git diff --stat docs/changelog.md`

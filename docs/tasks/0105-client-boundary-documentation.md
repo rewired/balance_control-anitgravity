@@ -1,4 +1,4 @@
-# Codex Task 0100 - Client Boundary Documentation (ARCH-01 Presentation-Only)
+# Codex Task 0105 - Client Boundary Documentation (ARCH-01 Presentation-Only)
 
 **Date:** 2026-02-17
 **Style:** Codex task contract
