@@ -4,6 +4,7 @@ import { computeMajority } from '../mechanics';
 import { coordToString, getNeighbors, stringToCoord } from '../topology';
 import { EffectResolver } from './resolver';
 import { evaluateTileSelector } from './selectors';
+import { EnginePackRegistry } from '../expansion-registry';
 
 type CostSlot = string[] | 'ANY';
 type JsonLike =
@@ -92,6 +93,7 @@ export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string):
             intents.push(...enumerateMoveInfluence(G, playerID));
             intents.push(...enumerateFormalize(G, ctx, playerID));
             intents.push(...enumerateConvertResources(G, playerID));
+            intents.push(...enumerateTakeMeasure(G, playerID));
         }
     }
 
@@ -284,6 +286,27 @@ function enumerateConvertResources(G: GameState, playerID: string): LegalIntent[
                     });
                 }
             }
+        }
+    }
+
+    return intents;
+}
+
+function enumerateTakeMeasure(G: GameState, playerID: string): LegalIntent[] {
+    const intents: LegalIntent[] = [];
+    if (EffectResolver.isProhibited(G as any, 'measure.take', playerID)) return intents;
+    if (!EffectResolver.checkUsageLimit(G as any, 'measure.hold', playerID)) return intents;
+
+    const decks = EnginePackRegistry.getMeasureDeckDescriptors(G);
+    for (const entry of decks) {
+        const openZoneId = entry.deck.zones.openZoneId;
+        const openZone = G.zones[openZoneId];
+        if (!openZone || openZone.items.length === 0) continue;
+        for (const measureObjectId of openZone.items) {
+            intents.push({
+                moveType: `${entry.expansionId}.takeMeasure`,
+                payload: measureObjectId
+            });
         }
     }
 

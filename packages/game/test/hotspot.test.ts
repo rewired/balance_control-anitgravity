@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect } from 'vitest';
 import { Client } from 'boardgame.io/client';
 import { Game } from 'boardgame.io';
 import { CoreMoves } from '../src/moves';
 import { TileType, CoreZoneNames, GameState } from '@balance-control/rules';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 /**
  * Self-contained game definition for hotspot testing.
@@ -104,6 +105,9 @@ function makeHotspotTestGame(): Game {
 }
 
 describe('Hotspot Mechanics', () => {
+    beforeEach(() => {
+        registerTestPacks();
+    });
     it('should detect hotspot when a tile becomes fully surrounded', () => {
         const game = makeHotspotTestGame();
         const client = Client({ game, numPlayers: 2 });

@@ -1,14 +1,21 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { CANONICAL_ENGINE_MODULE_ORDER } from '../src/expansion-registry';
 import { EngineModuleRegistry } from '../src/engine/engine-module-registry';
 import { EffectResolver } from '../src/engine/resolver';
 import { TileType } from '@balance-control/rules';
+import { registerTestPacks } from './_helpers/registerPacks';
+import { Exp02Pack } from '../src/packs/exp02';
+import { Exp03Pack } from '../src/packs/exp03';
 
 function cloneJson<T>(value: T): T {
     return JSON.parse(JSON.stringify(value)) as T;
 }
 
 describe('REF_RESOLVER invariants (tripwires)', () => {
+    beforeEach(() => {
+        registerTestPacks([Exp02Pack, Exp03Pack]);
+    });
+
     it('uses the canonical engine module order list exactly', () => {
         expect([...CANONICAL_ENGINE_MODULE_ORDER]).toEqual(['core', 'exp01', 'exp02', 'exp03']);
     });
@@ -193,4 +200,3 @@ describe('REF_RESOLVER invariants (tripwires)', () => {
         expect(a.objects).toEqual(b.objects);
     });
 });
-

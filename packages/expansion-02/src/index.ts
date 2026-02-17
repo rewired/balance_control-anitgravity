@@ -61,6 +61,15 @@ export const Expansion02: ExpansionDefinition = {
         G.zones.EXP02_MeasureFinalDiscard = { id: 'EXP02_MeasureFinalDiscard', name: 'EXP-02 Measure Final Discard', items: [] };
         G.zones.EXP02_OpenMeasures = { id: 'EXP02_OpenMeasures', name: 'EXP-02 Open Measures', items: [] };
 
+        const playerIds = Object.keys(G.zones)
+            .filter(z => z.startsWith(CoreZoneNames.PersonalSupply))
+            .map(z => z.split(':')[1]);
+
+        playerIds.forEach(pid => {
+            const handId = `PlayerHand:${pid}`;
+            G.zones[handId] = { id: handId, name: 'Hand', items: [] };
+        });
+
         // 2. Add SEC ResortTiles (Assuming similar scaling to ECO for now as per usual patterns)
         const addSecResort = (weight: number, count: number) => {
             for (let i = 0; i < count; i++) {

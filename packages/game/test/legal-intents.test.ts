@@ -6,24 +6,48 @@ import { SetupGame } from '../src/setup';
 import { CoreMoves } from '../src/moves';
 import { drawTileToStaging } from '../src/mechanics-draw';
 import { registerTestPacks } from './_helpers/registerPacks';
+import { buildMovesForConfig } from '../src/move-assembly';
+import { Exp01Pack } from '../src/packs/exp01';
+import { Exp02Pack } from '../src/packs/exp02';
+import { Exp03Pack } from '../src/packs/exp03';
 
 function createCtx(stage: string) {
     return {
         numPlayers: 2,
         currentPlayer: '0',
-        activePlayers: { '0': stage }
+        activePlayers: { '0': stage },
+        random: { Shuffle: (items: string[]) => items }
     } as any;
 }
 
 function createCtxNoActivePlayers() {
     return {
         numPlayers: 2,
-        currentPlayer: '0'
+        currentPlayer: '0',
+        random: { Shuffle: (items: string[]) => items }
     } as any;
 }
 
 function cloneGameState(G: any) {
     return JSON.parse(JSON.stringify(G));
+}
+
+function assertTakeMeasureIntent(expansionId: string, packs: any[], setupData: any) {
+    registerTestPacks(packs);
+    const ctx = createCtx('politicalAction');
+    const G = SetupGame({ ctx, setupData });
+    const intents = enumerateLegalIntents(G as any, ctx, '0');
+    const intent = intents.find((entry) => entry.moveType === `${expansionId}.takeMeasure`);
+    expect(intent).toBeTruthy();
+
+    const moves = buildMovesForConfig(setupData as any);
+    const move = (moves as any)[intent!.moveType];
+    expect(typeof move).toBe('function');
+
+    const cloned = cloneGameState(G);
+    const events = { endTurn: () => {}, endStage: () => {}, setStage: () => {} };
+    const result = move({ G: cloned, ctx, events }, intent!.payload);
+    expect(result).not.toBe(INVALID_MOVE);
 }
 
 describe('enumerateLegalIntents', () => {
@@ -181,5 +205,29 @@ describe('enumerateLegalIntents', () => {
 
         const intents = enumerateLegalIntents(G as any, ctx, '0');
         expect(intents).toHaveLength(0);
+    });
+
+    it('enumerates exp01 takeMeasure intents when exp01 is enabled', () => {
+        assertTakeMeasureIntent(
+            'exp01',
+            [Exp01Pack],
+            { expansions: { ex01: true, ex02: false, ex03: false } }
+        );
+    });
+
+    it('enumerates exp02 takeMeasure intents when exp02 is enabled', () => {
+        assertTakeMeasureIntent(
+            'exp02',
+            [Exp02Pack],
+            { expansions: { ex01: false, ex02: true, ex03: false } }
+        );
+    });
+
+    it('enumerates exp03 takeMeasure intents when exp03 is enabled', () => {
+        assertTakeMeasureIntent(
+            'exp03',
+            [Exp03Pack],
+            { expansions: { ex01: false, ex02: false, ex03: true } }
+        );
     });
 });

@@ -1,7 +1,4 @@
-import { CorePack, createBalanceControlGame, EnginePackRegistry, packFromExpansionDefinition } from '@balance-control/game';
-import { Expansion01 } from '@balance-control/expansion-01';
-import { Expansion02 } from '@balance-control/expansion-02';
-import { Expansion03 } from '@balance-control/expansion-03';
+import { CorePack, createBalanceControlGame, EnginePackRegistry, Exp01Pack, Exp02Pack, Exp03Pack } from '@balance-control/game';
 
 export function registerBotPacks(): void {
     const registeredPackIds = new Set(EnginePackRegistry.getRegisteredPacks().map((pack) => pack.id));
@@ -9,17 +6,17 @@ export function registerBotPacks(): void {
         EnginePackRegistry.registerPack(CorePack);
     }
     if (!registeredPackIds.has('exp01')) {
-        EnginePackRegistry.registerPack(packFromExpansionDefinition(Expansion01));
+        EnginePackRegistry.registerPack(Exp01Pack);
     }
     if (!registeredPackIds.has('exp02')) {
-        EnginePackRegistry.registerPack(packFromExpansionDefinition(Expansion02));
+        EnginePackRegistry.registerPack(Exp02Pack);
     }
     if (!registeredPackIds.has('exp03')) {
-        EnginePackRegistry.registerPack(packFromExpansionDefinition(Expansion03));
+        EnginePackRegistry.registerPack(Exp03Pack);
     }
 }
 
-export function createBotGame() {
+export function createBotGame(): ReturnType<typeof createBalanceControlGame> {
     registerBotPacks();
     return createBalanceControlGame();
 }

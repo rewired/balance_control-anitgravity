@@ -1,0 +1,12 @@
+import path from 'node:path';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+    resolve: {
+        alias: {
+            '@balance-control/expansion-01': path.resolve(__dirname, '../expansion-01/src/index.ts'),
+            '@balance-control/expansion-02': path.resolve(__dirname, '../expansion-02/src/index.ts'),
+            '@balance-control/expansion-03': path.resolve(__dirname, '../expansion-03/src/index.ts'),
+        },
+    },
+});

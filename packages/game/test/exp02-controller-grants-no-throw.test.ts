@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreZoneNames, TileType } from '@balance-control/rules';
 import { Expansion02 } from '../../expansion-02/src/index';
+import { Exp02Pack } from '../src';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
@@ -38,7 +39,7 @@ function collectControllerGrants(value: unknown, out: any[] = []): any[] {
 
 describe('EXP-02 controller grants with no controller', () => {
     beforeEach(() => {
-        registerTestPacks([Expansion02 as any]);
+        registerTestPacks([Exp02Pack]);
     });
 
     afterEach(() => {

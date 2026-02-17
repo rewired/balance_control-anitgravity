@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { TileType } from '@balance-control/rules';
 import { EffectResolver } from '../src/engine/resolver';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 function createGrantState(atomOverrides?: Record<string, unknown>) {
     const bankIds = ['res_dom_1'];
@@ -42,6 +43,9 @@ function createGrantState(atomOverrides?: Record<string, unknown>) {
 }
 
 describe('Controller fallback hardening', () => {
+    beforeEach(() => {
+        registerTestPacks();
+    });
     it('should throw when CONTROLLER grant has no controller and no explicit missingController policy', () => {
         const G = createGrantState({
             context: {

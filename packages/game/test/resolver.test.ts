@@ -1,10 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { TileType } from '@balance-control/rules';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { EffectResolver } from '../src/engine/resolver';
 import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('EffectResolver cost and production behavior', () => {
+    beforeEach(() => {
+        registerTestPacks();
+    });
+
     it('should not mutate state when resource.pay cannot be fully paid', () => {
         const G: any = {
             zones: {
@@ -220,7 +224,6 @@ describe('EffectResolver cost and production behavior', () => {
         };
 
         const ok = EffectResolver.resolve(G, {});
-        EnginePackRegistry.clear();
 
         expect(ok).toBe(true);
         expect(G.zones['PersonalSupply:p1'].items).toHaveLength(7);

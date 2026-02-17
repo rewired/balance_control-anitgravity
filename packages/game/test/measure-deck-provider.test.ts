@@ -2,13 +2,12 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { EnginePackRegistry, packFromExpansionDefinition } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { lookupMeasureDeckForObjectId } from '../src/engine/measure-deck-provider';
-import { Expansion02 } from '../../expansion-02/src/index';
-import { Expansion03 } from '../../expansion-03/src/index';
+import { Exp02Pack, Exp03Pack } from '../src';
 import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('Measure deck provider lookup', () => {
     beforeEach(() => {
-        registerTestPacks([Expansion02 as any, Expansion03 as any]);
+        registerTestPacks([Exp02Pack, Exp03Pack]);
     });
 
     afterEach(() => {

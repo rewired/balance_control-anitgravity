@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreResources, CoreZoneNames, TileType } from '@balance-control/rules';
 import { Expansion01 } from '../../expansion-01/src/index';
+import { Exp01Pack } from '../src';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { EffectResolver } from '../src/engine/resolver';
@@ -8,7 +9,7 @@ import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('EXP-01 controller grants with no controller', () => {
     beforeEach(() => {
-        registerTestPacks([Expansion01 as any]);
+        registerTestPacks([Exp01Pack]);
     });
 
     afterEach(() => {

@@ -1,8 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { TileType } from '@balance-control/rules';
 import { EffectResolver } from '../src/engine/resolver';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('Production resolve (uncontrolled resort)', () => {
+    beforeEach(() => {
+        registerTestPacks();
+    });
+
     it('should produce 0 when a resort tile has no controller and no tie winners', () => {
         const bankIds = ['res_dom_1', 'res_dom_2', 'res_dom_3', 'res_dom_4'];
         const G: any = {

@@ -7,9 +7,9 @@ const rootDir = path.resolve(__dirname, '../../..');
 function assertBootWiring(filePath: string) {
     const content = readFileSync(filePath, 'utf8');
     const coreIndex = content.indexOf('registerPack(CorePack)');
-    const exp01Index = content.indexOf('register(Expansion01)');
-    const exp02Index = content.indexOf('register(Expansion02)');
-    const exp03Index = content.indexOf('register(Expansion03)');
+    const exp01Index = content.indexOf('registerPack(Exp01Pack)');
+    const exp02Index = content.indexOf('registerPack(Exp02Pack)');
+    const exp03Index = content.indexOf('registerPack(Exp03Pack)');
 
     expect(coreIndex).toBeGreaterThan(-1);
     expect(exp01Index).toBeGreaterThan(-1);

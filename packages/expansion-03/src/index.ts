@@ -61,6 +61,15 @@ export const Expansion03: ExpansionDefinition = {
         G.zones.EXP03_MeasureFinalDiscard = { id: 'EXP03_MeasureFinalDiscard', name: 'EXP-03 Measure Final Discard', items: [] };
         G.zones.EXP03_OpenMeasures = { id: 'EXP03_OpenMeasures', name: 'EXP-03 Open Measures', items: [] };
 
+        const playerIds = Object.keys(G.zones)
+            .filter(z => z.startsWith(CoreZoneNames.PersonalSupply))
+            .map(z => z.split(':')[1]);
+
+        playerIds.forEach(pid => {
+            const handId = `PlayerHand:${pid}`;
+            G.zones[handId] = { id: handId, name: 'Hand', items: [] };
+        });
+
         // 2. Add CLM ResortTiles
         const addClmResort = (weight: number, count: number) => {
             for (let i = 0; i < count; i++) {

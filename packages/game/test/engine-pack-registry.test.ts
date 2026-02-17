@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { GameConfig, ExpansionFlags } from '@balance-control/rules';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { buildMovesForConfig } from '../src/move-assembly';
+import { CorePack } from '../src/packs/core';
 
 function cfg(expansions: Partial<ExpansionFlags>): GameConfig {
     return {
@@ -36,6 +37,7 @@ describe('EnginePackRegistry', () => {
     });
 
     it('rejects duplicate move ids across packs deterministically (no silent overwrite)', () => {
+        EnginePackRegistry.registerPack(CorePack);
         EnginePackRegistry.registerPack({
             id: 'exp01',
             name: 'E1',

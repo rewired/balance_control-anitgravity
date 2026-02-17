@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { CoreMoves } from '../src/moves';
 import { GameState, TileType, CoreZoneNames } from '@balance-control/rules';
 import { INVALID_MOVE } from 'boardgame.io/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('Moves', () => {
     let G: GameState;
@@ -32,6 +33,7 @@ describe('Moves', () => {
     };
 
     beforeEach(() => {
+        registerTestPacks();
         events = { endTurn: () => { }, endStage: () => { } };
         G = {
             zones: {

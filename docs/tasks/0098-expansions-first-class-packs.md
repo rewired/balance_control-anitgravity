@@ -1,97 +1,210 @@
-# Codex Task 0098 - Convert EXP-01/02/03 to First-Class Engine Packs
+# Task 0098 — Convert EXP-01/02/03 to First-Class Engine Packs
 
-**Date:** 2026-02-17  
-**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)  
-**Primary contract:** `AGENTS.md` (repo root)
-
-Normative specs to treat as anchors:
-- `/docs/rules/001-expansion01.md` (EXP-01 v1.3)
-- `/docs/rules/002-expansion02.md` (EXP-02 v1.0)
-- `/docs/rules/003-expansion03.md` (EXP-03 v1.0)
+**Date:** 2026-02-17
+**Owner:** Codex
+**Branch:** `task/0098-expansions-first-class-packs`
 
 ---
 
-## Goal
+**Task State:** FROZEN
 
-Make all expansions fully comply with the same **Pack Contract** as Core.
+## Task State Machine (Loop-Breaker)
 
-**Target outcome:** EXP-01, EXP-02, EXP-03 are implemented as:
-- `Exp01Pack`, `Exp02Pack`, `Exp03Pack`
-- registered via `EnginePackRegistry.registerPack(pack)`
-- providing their setup hooks, moves, and atoms/resolvers through the *same* mechanism as Core
-- with **zero** legacy special-casing or alternate “old” attachment paths
+States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → DONE**
 
----
+Rules (non-negotiable):
 
-## Inputs
+* **Before touching code:** set **Task State = FROZEN** and complete **Sections 0–9**.
+* **After FROZEN:** **Sections 0–9 are read-only.** If anything must change, append an entry to **Section 15 (Amendments, append-only)**. Do **not** rewrite earlier sections.
+* During **IMPLEMENTING/VERIFYING:** you may only:
 
-- Pack registry exists and is now the only assembly path (Task 0097).
-- CorePack exists and can be used as the reference implementation of the contract.
+  * check boxes in **Section 10**
+  * fill **Sections 11–14** (Work Summary / Commands / Proof)
+* If scope changes beyond small amendments: **STOP** and create a **new task file**.
 
----
+Iteration budget (hard stop):
 
-## Outputs
-
-### A) Pack modules for each expansion
-
-Create (or refactor into) one module per expansion pack, example layout (adapt to repo conventions):
-- `packages/game/src/packs/exp01/Exp01Pack.ts`
-- `packages/game/src/packs/exp02/Exp02Pack.ts`
-- `packages/game/src/packs/exp03/Exp03Pack.ts`
-
-Each pack must export:
-- `manifest` (id + version + ruleset anchor; details in Task 0099)
-- `register(registry)` (or whatever the contract is) that registers:
-  - expansion zones (if explicit zone registration exists)
-  - setup modifications (adding tiles/measures/regulations/countdowns to initial state)
-  - moves (e.g., TakeMeasure/PlayMeasure if expansion enables them)
-  - atoms/resolvers/effect modifiers (e.g., regulations / climate stacking hooks)
-
-### B) Expansion isolation invariants
-
-Ensure that expansion-specific objects/zones remain isolated per state-shape contract:
-- expansion measure decks must not mix with other expansions’ measure decks
-- regulations/countdowns must exist only when their expansion is enabled
-- cross-expansion interactions must be explicit and deterministic
-
-### C) One enablement mechanism
-
-There must be one enablement switch:
-- Match config (or game setup) specifies enabled expansion pack IDs.
-- Engine assembly decides which packs are active.
-- Client does not assume expansions; it reads enabled packs from state (to be added in Task 0100).
+* **Max 2 fix cycles** after the **first full test run**. If still failing: **STOP and report blockers** (no infinite “try again”).
 
 ---
 
-## Constraints
+## 0) Masterplan Guardrails (MUST)
 
-- Do not change the normative rules; implement/encode only what is in the specs.
-- Deterministic state only (JSON serializable).
-- No object mixing across expansions unless explicitly defined.
-- Avoid touching unrelated UI except where required to keep build green.
+**Guardrails file:** `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`
+
+### affected_guardrails
+
+* GR-004
+* GR-005
+* GR-009
+* GR-012
+
+### compliance_notes
+
+* GR-004: Legal actions remain enumerated exclusively by `enumerateLegalIntents`, expanded to include enabled expansion measure takes.
+* GR-005: No new “pass” or undefined moves; only expansion-defined TakeMeasure is enumerated.
+* GR-009: Measure deck descriptors are expansion-scoped and remain isolated per expansion zones.
+* GR-012: Expansion enablement continues to read from match config (`G.meta.cfg.expansions`).
+
+### guardrail_gate
+
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
-## Invariants
+## 1) Primary Spec Anchors (MUST)
 
-- If an expansion pack is disabled, its zones/resources/components do not exist in state and its moves are not legal.
-- If enabled, all its zones exist and are wired into effect resolution deterministically.
-
----
-
-## Acceptance Criteria
-
-- A core-only match starts and runs without expansion state artifacts.
-- Enabling exactly one expansion adds only that expansion’s zones and legal moves.
-- At least one minimal integration test per expansion exists (can be tiny):
-  - enable pack -> ensure expected zones exist and at least one expansion move is enumerated/legal where applicable.
+* EXP-01: EXP-01-02-E-01, EXP-01-06-01, EXP-01-06-03, EXP-01-06-04, EXP-01-06-01A
+* EXP-02: EXP-02-03-01, EXP-02-03-02, EXP-02-07-00-01
+* EXP-03: EXP-03-03-01, EXP-03-03-02, EXP-03-07-00-01
+* ARCH: ARCH-01:LEGALITY_ENUMERATION
 
 ---
 
-## PR Checklist
+## 2) Goal
 
-- [ ] Exp01Pack/Exp02Pack/Exp03Pack created and registered via pack registry
-- [ ] No legacy expansion attachment paths remain
-- [ ] Expansion zones are isolated and only exist when enabled
-- [ ] Tests added (smoke/integration) for core-only and each single-expansion enablement
-- [ ] Meaningful commit message, e.g. `engine: implement EXP packs via pack registry`
+* Ensure expansion measure decks are discoverable by the pack registry for intent enumeration.
+* Enumerate expansion TakeMeasure intents only when the corresponding expansion is enabled.
+* Keep expansion moves legal and isolated in core-only and single-expansion matches.
+
+---
+
+## 3) Non-Goals
+
+* Implement expansion PlayMeasure targeting or countdown placement intent enumeration.
+* Alter measure definitions, costs, or effect resolution behavior.
+* Modify client UI behavior beyond consuming legal intents.
+
+---
+
+## 4) Inputs
+
+* Repo areas:
+  * `packages/game/src/engine/legal-intents.ts`
+  * `packages/expansion-01/src/index.ts`
+  * `packages/game/test/legal-intents.test.ts`
+  * `packages/game/src/expansion-registry.ts`
+* Existing behavior summary (current):
+  * Legal intents enumerate core actions only; expansion TakeMeasure is omitted.
+  * EXP-01 measure deck lacks descriptors for registry-based lookup.
+
+---
+
+## 5) Outputs
+
+### 5.1 Code
+
+* `packages/game/src/engine/legal-intents.ts`
+* `packages/expansion-01/src/index.ts`
+
+### 5.2 Tests
+
+* `packages/game/test/legal-intents.test.ts`
+
+### 5.3 Docs
+
+* [ ] `/docs/changelog.md` updated (required if logic/state/resolver changes)
+* [ ] `/docs/design-decisions/DD-XXXX-<topic>.md` created (only if ambiguity/conflict)
+* [ ] `/docs/rules/ERRATA-XXXX.md` created (only if rule clarification)
+
+---
+
+## 6) Constraints (Hard)
+
+* Determinism: no time, no Math.random, no non-seeded sources.
+* Engine authority: rules/legality/costs computed only in `packages/game`.
+* No phantom moves: do not invent actions (e.g. pass) unless explicitly defined.
+* No implicit rules: if spec does not state it, it does not exist.
+* Expansion isolation: disabled expansions must not leak state, hooks, counters.
+* Canonical services only:
+  * `computeMajority(...)` is single source of truth.
+  * `resolveEffect(...)` is the only mutation path for effects.
+
+---
+
+## 7) Invariants (Must remain true)
+
+* Identical move sequence → identical state hash.
+* State is JSON-serializable; no functions; no derived caches.
+* Every object exists in exactly one zone.
+* UI remains presentation-only; no rules logic in client.
+
+---
+
+## 8) Implementation Plan
+
+* [ ] Add EXP-01 measure deck descriptors to the expansion definition.
+* [ ] Enumerate enabled expansion TakeMeasure intents in legal intent listing.
+* [ ] Add integration tests asserting TakeMeasure intent legality per expansion.
+
+---
+
+## 9) Acceptance Criteria
+
+* [ ] Core-only matches enumerate no expansion intents.
+* [ ] Enabling exactly one expansion enumerates TakeMeasure intents for that expansion only.
+* [ ] Each expansion has at least one TakeMeasure intent that executes without INVALID_MOVE.
+* [ ] Golden replay unchanged or updated intentionally with explanation.
+
+---
+
+## 10) PR Checklist (Repo Artifact)
+
+* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [ ] Normative anchors cited for all changes
+* [ ] No implicit rules introduced
+* [ ] No phantom moves introduced
+* [ ] Expansion isolation preserved (if touched)
+* [ ] `pnpm lint` passes
+* [ ] `pnpm test` (or `pnpm vitest run`) passes
+* [ ] Determinism verified (golden replay/state hash)
+* [ ] No temporary files committed
+* [ ] `/docs/changelog.md` updated if required
+
+---
+
+## 11) Work Summary (3–7 bullets)
+
+* N/A
+
+---
+
+## 12) Commands Run (with outcomes)
+
+* N/A
+
+---
+
+## 13) Postflight Proof (recorded in commit message)
+
+Do NOT paste command outputs into this task file (it would dirty the tree after committing and cause an amend loop). Instead, capture postflight proof AFTER the final commit and append it to the latest commit message under a `Postflight:` section via ONE amend that edits the commit message only (no file changes).
+
+Required commands:
+
+* `git status -sb`
+* `git diff --stat`
+* tests (e.g. `pnpm test` or `pnpm vitest run`)
+
+Rule:
+
+* After the postflight amend, do not modify any tracked files. The working tree must remain clean.
+
+### 13.1 Recorded
+
+Recorded in final commit message (Postflight: block).
+
+---
+
+## 14) Commit Proof (recorded in commit message)
+
+After creating exactly ONE commit, include `git show -1 --stat` output inside the same `Postflight:` block in the commit message (amend message only, no file changes).
+
+### 14.1 Recorded
+
+Recorded in final commit message (Postflight: block).
+
+---
+
+## 15) Amendments (append-only)

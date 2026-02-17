@@ -22,7 +22,7 @@ describe('Expansion System', () => {
         EnginePackRegistry.registerPack(packFromExpansionDefinition({ id: 'exp01', name: 'E1' } as ExpansionDefinition));
         EnginePackRegistry.registerPack(packFromExpansionDefinition({ id: 'exp02', name: 'E2' } as ExpansionDefinition));
 
-        expect(EnginePackRegistry.getRegisteredPacks().map((e) => e.id)).toEqual(['exp01', 'exp02', 'exp03']);
+        expect(EnginePackRegistry.getRegisteredPacks().map((e) => e.id)).toEqual(['core', 'exp01', 'exp02', 'exp03']);
     });
 
     it('should apply production modifiers', () => {

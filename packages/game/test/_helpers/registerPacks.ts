@@ -1,14 +1,15 @@
-import type { ExpansionDefinition } from '@balance-control/rules';
-import { EnginePackRegistry, packFromExpansionDefinition } from '../../src/expansion-registry';
+import type { EnginePackDefinition } from '../../src/packs/types';
+import { EnginePackRegistry } from '../../src/expansion-registry';
 import { CorePack } from '../../src/packs/core';
+import { CoreMoves } from '../../src/moves';
 
-export function registerTestPacks(expansions: ExpansionDefinition[] = []): void {
+export function registerTestPacks(packs: EnginePackDefinition[] = []): void {
     EnginePackRegistry.clear();
     const coreAlreadyRegistered = EnginePackRegistry.getRegisteredPacks().some((pack) => pack.id === 'core');
     if (!coreAlreadyRegistered) {
-        EnginePackRegistry.registerPack(CorePack);
+        EnginePackRegistry.registerPack({ ...CorePack, moves: CoreMoves });
     }
-    for (const expansion of expansions) {
-        EnginePackRegistry.registerPack(packFromExpansionDefinition(expansion));
+    for (const pack of packs) {
+        EnginePackRegistry.registerPack(pack);
     }
 }

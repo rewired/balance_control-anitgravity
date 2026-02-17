@@ -30,6 +30,18 @@ export const Expansion01: ExpansionDefinition = {
         'MeasureRecyclePile',
         'MeasureFinalDiscard'
     ],
+    measureDecks: [
+        {
+            id: 'measures',
+            objectIdPrefix: 'measure_',
+            zones: {
+                drawPileId: 'MeasureDrawPile',
+                openZoneId: 'OpenMeasures',
+                recyclePileId: 'MeasureRecyclePile',
+                finalDiscardId: 'MeasureFinalDiscard'
+            }
+        }
+    ],
 
     onSetup: (G: GameState, ctx: any) => {
         if (G.secret) G.secret.playedMeasureThisRound = {};

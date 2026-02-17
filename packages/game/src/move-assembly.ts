@@ -3,8 +3,6 @@ import { DEFAULT_EXPANSION_FLAGS } from './config';
 import { CANONICAL_ENGINE_MODULE_ORDER, EnginePackRegistry } from './expansion-registry';
 import type { AtomHandler } from './engine/engine-module-registry';
 import { EngineModuleRegistry } from './engine/engine-module-registry';
-import { exp03CountdownAtoms } from './engine/atoms/countdown';
-import { exp02RegulationAtoms } from './engine/atoms/regulation';
 import type { EngineState, HookPoint } from './engine/types';
 import { MoveModuleRegistry, type MoveFn, type MoveMap, type MoveModule } from './move-module-registry';
 import type { EnginePackDefinition } from './packs/types';
@@ -100,28 +98,21 @@ export function assemblePacks(options: { config?: GameConfig; mode?: PackAssembl
         triggerHook: (G2: GameState & { engine: EngineState }, ctx2: any, hook: HookPoint, payload?: any) => void
     ) => {
         const registry = new EngineModuleRegistry();
-        const coreAtoms =
-            CorePack.engine?.atoms?.({
-                triggerHook: (G2, ctx2, hook, payload) => triggerHook(G2 as any, ctx2, hook, payload),
-            }) ?? [];
+        const enabledPackIds = new Set(EnginePackRegistry.getEnabledPacks(undefined, config).map((pack) => pack.id));
+        const registeredPacks = EnginePackRegistry.getRegisteredPacks();
 
-        registry.registerModule({
-            id: 'core',
-            isEnabled: () => true,
-            atoms: coreAtoms,
-        });
-
-        registry.registerModule({
-            id: 'exp02',
-            isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex02 === true,
-            atoms: [...exp02RegulationAtoms],
-        });
-
-        registry.registerModule({
-            id: 'exp03',
-            isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex03 === true,
-            atoms: [...exp03CountdownAtoms],
-        });
+        for (const pack of registeredPacks) {
+            const atoms =
+                pack.engine?.atoms?.({
+                    triggerHook: (G2, ctx2, hook, payload) => triggerHook(G2 as any, ctx2, hook, payload),
+                }) ?? [];
+            if (pack.id !== 'core' && atoms.length === 0) continue;
+            registry.registerModule({
+                id: pack.id,
+                isEnabled: () => (pack.id === 'core' ? true : enabledPackIds.has(pack.id)),
+                atoms,
+            });
+        }
 
         return registry.buildAtomDispatch(G);
     };
