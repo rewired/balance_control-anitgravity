@@ -201,37 +201,33 @@ Paste exact commands and short outcomes.
 
 ---
 
-## 13) Postflight Proof (copy/paste output)
+## 13) Postflight Proof (recorded in commit message)
 
-### 13.1 git status
+Do NOT paste command outputs into this task file (it would dirty the tree after committing and cause an amend loop). Instead, capture postflight proof AFTER the final commit and append it to the latest commit message under a `Postflight:` section via ONE amend that edits the commit message only (no file changes).
 
-```
-<paste output>
-```
+Required commands:
 
-### 13.2 git diff --stat
+* `git status -sb`
+* `git diff --stat`
+* tests (e.g. `pnpm test` or `pnpm vitest run`)
 
-```
-<paste output>
-```
+Rule:
 
-### 13.3 Tests
+* After the postflight amend, do not modify any tracked files. The working tree must remain clean.
 
-```
-<paste output>
-```
+### 13.1 Recorded
+
+Recorded in final commit message (Postflight: block).
 
 ---
 
-## 14) Commit Proof (copy/paste output)
+## 14) Commit Proof (recorded in commit message)
 
-After creating exactly ONE commit, paste:
+After creating exactly ONE commit, include `git show -1 --stat` output inside the same `Postflight:` block in the commit message (amend message only, no file changes).
 
-### 14.1 git show -1 --stat
+### 14.1 Recorded
 
-```
-<paste output>
-```
+Recorded in final commit message (Postflight: block).
 
 ---
 

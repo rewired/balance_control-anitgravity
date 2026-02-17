@@ -117,6 +117,34 @@ function verifyChecklist(md) {
   ok(`PR Checklist complete (${checked.length} checked item(s)).`);
 }
 
+function verifyPostflightInCommit(commitMsg) {
+  if (!/^\s*Postflight:\s*$/im.test(commitMsg)) {
+    fail('Latest commit message must include a "Postflight:" section with proof (captured after the final commit).');
+  }
+
+  const lower = commitMsg.toLowerCase();
+  const requiredLabels = ["git status", "git diff --stat", "git show -1 --stat"];
+  const missing = requiredLabels.filter((s) => !lower.includes(s));
+  if (missing.length > 0) {
+    fail(`Postflight section missing required command label(s): ${missing.join(", ")}`);
+  }
+
+  const hasTests = /(pnpm\s+(test|vitest)\b|^\s*tests?\b)/im.test(commitMsg);
+  if (!hasTests) {
+    fail('Postflight section must include tests proof (e.g. "pnpm test" or "pnpm vitest run").');
+  }
+
+  ok("Latest commit includes Postflight proof section.");
+}
+
+function verifyCleanWorkingTree() {
+  const porcelain = git("git status --porcelain");
+  if (porcelain.trim().length > 0) {
+    fail(`Working tree is not clean. Resolve before declaring DONE.\n${porcelain}`);
+  }
+  ok("Working tree clean.");
+}
+
 function verifyCommit(taskId, taskFilePath) {
   let commitMsg = "";
   try {
@@ -142,6 +170,8 @@ function verifyCommit(taskId, taskFilePath) {
   if (bulletLines.length < 2) {
     fail(`Latest commit body must contain at least 2 bullet lines ('- ...'). Found ${bulletLines.length}.`);
   }
+
+  verifyPostflightInCommit(commitMsg);
 
   let names = "";
   try {
@@ -169,6 +199,7 @@ function main() {
   ensureNonEmptySection(md, "Work Summary");
   ensureNonEmptySection(md, "Commands Run");
   verifyCommit(resolvedId, taskFile);
+  verifyCleanWorkingTree();
 
   console.log("\n[verify-task] PASS ✅\n");
   process.exit(0);

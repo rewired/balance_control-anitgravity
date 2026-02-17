@@ -53,23 +53,29 @@ You must execute this task end-to-end. You are NOT DONE until every item below i
 
 ### 3) Postflight Proof (must be produced)
 
-Run and record outputs (copy/paste into the task file in `docs/tasks/`):
+Run and capture outputs AFTER the final commit. Do NOT paste them into the task file (it would dirty the tree and create an amend loop). Instead, append them to the latest commit message under a `Postflight:` section via ONE amend that edits the commit message only (no file changes).
 
-* `git status`
+Required commands:
+
+* `git status -sb`
 * `git diff --stat`
 * project tests (e.g. `pnpm test` or `pnpm vitest run`)
+
+Rule:
+
+* After the postflight amend, do not modify any tracked files. The working tree must remain clean.
 
 ### 4) Single Meaningful Commit (required)
 
 * Create exactly ONE commit on a dedicated branch.
+
 * Commit message MUST follow:
 
   * Subject: `task(XXXX): <imperative summary>`
   * Body: 2-6 bullet points describing what changed and why.
-* Commit must include the updated task file in `docs/tasks/`.
-* After commit, include proof:
+  * Then a `Postflight:` block containing the captured outputs (including `git show -1 --stat`).
 
-  * `git show -1 --stat`
+* Commit must include the updated task file in `docs/tasks/`.
 
 ### 5) Failure Mode
 
