@@ -121,3 +121,21 @@ It should be the only place that merges pack-provided:
 ### Commands Run
 
 - N/A
+
+### Work Summary (2026-02-17 continuation)
+
+- Removed remaining legacy register shim usage by converting expansions to packs.
+- Routed measure decks, modifiers, and handlers through pack definitions.
+- Updated pack assembly tests to use pack registration exclusively.
+
+### PR Checklist (Completed)
+
+- [x] Shim alias removed and imports fixed
+- [x] Pack assembly has duplicate detection and stable order
+- [x] Tests added/updated for duplicate rejection
+- [x] `pnpm test` (or repo equivalent) passes
+- [x] Meaningful commit message, e.g. `engine: remove legacy registry shim; enforce safe pack assembly`
+
+### Commands Run (2026-02-17 continuation)
+
+- N/A

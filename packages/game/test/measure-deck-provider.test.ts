@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { EnginePackRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry, packFromExpansionDefinition } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { lookupMeasureDeckForObjectId } from '../src/engine/measure-deck-provider';
 import { Expansion02 } from '../../expansion-02/src/index';
@@ -66,22 +66,24 @@ describe('Measure deck provider lookup', () => {
     });
 
     it('fails deterministically when multiple enabled decks match the same object id', () => {
-        EnginePackRegistry.register({
-            id: 'exp01',
-            name: 'Mock EXP-01',
-            measureDecks: [
-                {
-                    id: 'conflict',
-                    objectIdPrefix: 'exp02_measure_',
-                    zones: {
-                        drawPileId: 'X',
-                        openZoneId: 'Y',
-                        recyclePileId: 'Z',
-                        finalDiscardId: 'W'
+        EnginePackRegistry.registerPack(
+            packFromExpansionDefinition({
+                id: 'exp01',
+                name: 'Mock EXP-01',
+                measureDecks: [
+                    {
+                        id: 'conflict',
+                        objectIdPrefix: 'exp02_measure_',
+                        zones: {
+                            drawPileId: 'X',
+                            openZoneId: 'Y',
+                            recyclePileId: 'Z',
+                            finalDiscardId: 'W'
+                        }
                     }
-                }
-            ]
-        } as any);
+                ]
+            } as any)
+        );
 
         const G = SetupGame({
             ctx: { numPlayers: 2, random: { Shuffle: (items: string[]) => items } } as any,

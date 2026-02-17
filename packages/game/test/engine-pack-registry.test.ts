@@ -56,8 +56,4 @@ describe('EnginePackRegistry', () => {
         );
     });
 
-    it('legacy expansion definition registration is still supported for exp01..03 only', () => {
-        EnginePackRegistry.register({ id: 'exp01', name: 'LegacyExp01', moves: { 'legacy.move': () => null } } as any);
-        expect(EnginePackRegistry.getRegisteredMoveModules().some((m) => m.moduleId === 'exp01')).toBe(true);
-    });
 });

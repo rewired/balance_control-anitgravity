@@ -1,5 +1,5 @@
 import type { ExpansionDefinition } from '@balance-control/rules';
-import { EnginePackRegistry } from '../../src/expansion-registry';
+import { EnginePackRegistry, packFromExpansionDefinition } from '../../src/expansion-registry';
 import { CorePack } from '../../src/packs/core';
 
 export function registerTestPacks(expansions: ExpansionDefinition[] = []): void {
@@ -9,6 +9,6 @@ export function registerTestPacks(expansions: ExpansionDefinition[] = []): void 
         EnginePackRegistry.registerPack(CorePack);
     }
     for (const expansion of expansions) {
-        EnginePackRegistry.register(expansion);
+        EnginePackRegistry.registerPack(packFromExpansionDefinition(expansion));
     }
 }

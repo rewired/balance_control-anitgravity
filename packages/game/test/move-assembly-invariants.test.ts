@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ExpansionDefinition, GameConfig, ExpansionFlags } from '@balance-control/rules';
-import { EnginePackRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry, packFromExpansionDefinition } from '../src/expansion-registry';
 import { createBalanceControlGame } from '../src/index';
 import { buildExpansionMovesForConfig, getEnabledMoveModules } from '../src/move-assembly';
 import { registerTestPacks } from './_helpers/registerPacks';
@@ -29,41 +29,49 @@ describe('Move assembly invariants', () => {
             },
         };
 
-        EnginePackRegistry.register(mockEx01);
+        EnginePackRegistry.registerPack(packFromExpansionDefinition(mockEx01));
 
         const modules = getEnabledMoveModules(cfg({ ex01: false, ex02: false, ex03: false }));
         expect(modules.map((m) => m.moduleId)).toEqual(['core']);
     });
 
     it('module ordering equals canonical order filtered by enablement (independent of registration order)', () => {
-        EnginePackRegistry.register({
-            id: 'exp03',
-            name: 'Mock EX03',
-            moves: { 'tripwire.ex03.only': () => null },
-        });
+        EnginePackRegistry.registerPack(
+            packFromExpansionDefinition({
+                id: 'exp03',
+                name: 'Mock EX03',
+                moves: { 'tripwire.ex03.only': () => null },
+            } as ExpansionDefinition)
+        );
 
-        EnginePackRegistry.register({
-            id: 'exp01',
-            name: 'Mock EX01',
-            moves: { 'tripwire.ex01.only': () => null },
-        });
+        EnginePackRegistry.registerPack(
+            packFromExpansionDefinition({
+                id: 'exp01',
+                name: 'Mock EX01',
+                moves: { 'tripwire.ex01.only': () => null },
+            } as ExpansionDefinition)
+        );
 
         const modules = getEnabledMoveModules(cfg({ ex01: true, ex02: false, ex03: true }));
         expect(modules.map((m) => m.moduleId)).toEqual(['core', 'exp01', 'exp03']);
     });
 
     it('duplicate move keys fail deterministically', () => {
-        EnginePackRegistry.register({
-            id: 'exp02',
-            name: 'Mock EX02',
-            moves: { 'tripwire.dupe': () => null },
-        });
+        EnginePackRegistry.registerPack(
+            packFromExpansionDefinition({
+                id: 'exp02',
+                name: 'Mock EX02',
+                moves: { 'tripwire.dupe': () => null },
+            } as ExpansionDefinition)
+        );
 
-        EnginePackRegistry.register({
-            id: 'exp01',
-            name: 'Mock EX01',
-            moves: { 'tripwire.dupe': () => null },
-        });
+        EnginePackRegistry.registerPack(
+            packFromExpansionDefinition({
+                id: 'exp01',
+                name: 'Mock EX01',
+                moves: { 'tripwire.dupe': () => null },
+            } as ExpansionDefinition)
+        );
 
         expect(() => buildExpansionMovesForConfig(cfg({ ex01: true, ex02: true, ex03: false }))).toThrowError(
             ['MoveModuleRegistry: duplicate move registrations are forbidden.', 'Conflicts:', '- exp02 registers "tripwire.dupe" but it is already registered by exp01'].join(
@@ -73,11 +81,13 @@ describe('Move assembly invariants', () => {
     });
 
     it('factory-built Game includes registered expansion moves (superset, no import-time assembly)', () => {
-        EnginePackRegistry.register({
-            id: 'exp01',
-            name: 'Mock EX01',
-            moves: { 'tripwire.ex01.only': () => null },
-        });
+        EnginePackRegistry.registerPack(
+            packFromExpansionDefinition({
+                id: 'exp01',
+                name: 'Mock EX01',
+                moves: { 'tripwire.ex01.only': () => null },
+            } as ExpansionDefinition)
+        );
 
         const game = createBalanceControlGame() as any;
         expect(typeof game.moves?.['tripwire.ex01.only']).toBe('function');
@@ -85,16 +95,20 @@ describe('Move assembly invariants', () => {
     });
 
     it('factory-built Game throws deterministically on duplicate move ids (superset)', () => {
-        EnginePackRegistry.register({
-            id: 'exp02',
-            name: 'Mock EX02',
-            moves: { 'tripwire.dupe.factory': () => null },
-        });
-        EnginePackRegistry.register({
-            id: 'exp01',
-            name: 'Mock EX01',
-            moves: { 'tripwire.dupe.factory': () => null },
-        });
+        EnginePackRegistry.registerPack(
+            packFromExpansionDefinition({
+                id: 'exp02',
+                name: 'Mock EX02',
+                moves: { 'tripwire.dupe.factory': () => null },
+            } as ExpansionDefinition)
+        );
+        EnginePackRegistry.registerPack(
+            packFromExpansionDefinition({
+                id: 'exp01',
+                name: 'Mock EX01',
+                moves: { 'tripwire.dupe.factory': () => null },
+            } as ExpansionDefinition)
+        );
 
         expect(() => createBalanceControlGame()).toThrowError(
             [

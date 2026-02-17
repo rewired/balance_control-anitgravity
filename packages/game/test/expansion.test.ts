@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { EnginePackRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry, packFromExpansionDefinition } from '../src/expansion-registry';
 import { EffectResolver } from '../src/engine/resolver';
 import { ExpansionDefinition, GameState, TileType } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';
@@ -12,17 +12,17 @@ describe('Expansion System', () => {
 
     it('should register an expansion', () => {
         const mockExp: ExpansionDefinition = { id: 'exp01', name: 'TestExp' };
-        EnginePackRegistry.register(mockExp);
-        const all = EnginePackRegistry.getAll();
-        expect(all).toContain(mockExp);
+        EnginePackRegistry.registerPack(packFromExpansionDefinition(mockExp));
+        const all = EnginePackRegistry.getRegisteredPacks().map((pack) => pack.id);
+        expect(all).toContain('exp01');
     });
 
     it('should return expansions in deterministic canonical order', () => {
-        EnginePackRegistry.register({ id: 'exp03', name: 'E3' });
-        EnginePackRegistry.register({ id: 'exp01', name: 'E1' });
-        EnginePackRegistry.register({ id: 'exp02', name: 'E2' });
+        EnginePackRegistry.registerPack(packFromExpansionDefinition({ id: 'exp03', name: 'E3' } as ExpansionDefinition));
+        EnginePackRegistry.registerPack(packFromExpansionDefinition({ id: 'exp01', name: 'E1' } as ExpansionDefinition));
+        EnginePackRegistry.registerPack(packFromExpansionDefinition({ id: 'exp02', name: 'E2' } as ExpansionDefinition));
 
-        expect(EnginePackRegistry.getAll().map(e => e.id)).toEqual(['exp01', 'exp02', 'exp03']);
+        expect(EnginePackRegistry.getRegisteredPacks().map((e) => e.id)).toEqual(['exp01', 'exp02', 'exp03']);
     });
 
     it('should apply production modifiers', () => {
@@ -61,7 +61,7 @@ describe('Expansion System', () => {
                 production: (tileId, G, base) => base + 10
             }
         };
-        EnginePackRegistry.register(modExp);
+        EnginePackRegistry.registerPack(packFromExpansionDefinition(modExp));
 
         // Resolve
         G.engine.effectQueue.push({ kind: 'production.resolve', tileId: 'r1' });

@@ -1,4 +1,4 @@
-import { CorePack, createBalanceControlGame, EnginePackRegistry } from '@balance-control/game';
+import { CorePack, createBalanceControlGame, EnginePackRegistry, packFromExpansionDefinition } from '@balance-control/game';
 import { Expansion01 } from '@balance-control/expansion-01';
 import { Expansion02 } from '@balance-control/expansion-02';
 import { Expansion03 } from '@balance-control/expansion-03';
@@ -9,13 +9,13 @@ export function registerServerPacks(): void {
         EnginePackRegistry.registerPack(CorePack);
     }
     if (!registeredPackIds.has('exp01')) {
-        EnginePackRegistry.register(Expansion01);
+        EnginePackRegistry.registerPack(packFromExpansionDefinition(Expansion01));
     }
     if (!registeredPackIds.has('exp02')) {
-        EnginePackRegistry.register(Expansion02);
+        EnginePackRegistry.registerPack(packFromExpansionDefinition(Expansion02));
     }
     if (!registeredPackIds.has('exp03')) {
-        EnginePackRegistry.register(Expansion03);
+        EnginePackRegistry.registerPack(packFromExpansionDefinition(Expansion03));
     }
 }
 

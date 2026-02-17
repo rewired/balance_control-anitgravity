@@ -8,7 +8,6 @@ export type EngineModuleId = (typeof CANONICAL_ENGINE_MODULE_ORDER)[number];
 
 export const CANONICAL_EXPANSION_ORDER: readonly ExpansionId[] = ['exp01', 'exp02', 'exp03'] as const;
 
-const CANONICAL_EXPANSION_IDS = new Set<ExpansionId>(CANONICAL_EXPANSION_ORDER);
 const CANONICAL_PACK_IDS = new Set<EnginePackId>(CANONICAL_ENGINE_MODULE_ORDER as unknown as EnginePackId[]);
 
 const EXPANSION_ID_TO_FLAG_KEY: Record<ExpansionId, keyof ExpansionFlags> = {
@@ -17,9 +16,29 @@ const EXPANSION_ID_TO_FLAG_KEY: Record<ExpansionId, keyof ExpansionFlags> = {
     exp03: 'ex03',
 };
 
+export function packFromExpansionDefinition(def: ExpansionDefinition): EnginePackDefinition {
+    const setup = def.onSetup
+        ? {
+              preShuffle: (G: GameState, ctx: any, _cfg: GameConfig) => def.onSetup?.(G, ctx),
+          }
+        : undefined;
+
+    return {
+        id: def.id as EnginePackId,
+        name: def.name,
+        moves: def.moves,
+        resources: def.resources,
+        zones: def.zones,
+        measureDecks: def.measureDecks,
+        modifiers: def.modifiers,
+        effectHandlers: def.effectHandlers,
+        getMeasureAtoms: def.getMeasureAtoms,
+        setup,
+    };
+}
+
 class EnginePackRegistryImpl {
     private packs: Partial<Record<EnginePackId, EnginePackDefinition>> = {};
-    private legacyExpansions: Partial<Record<ExpansionId, ExpansionDefinition>> = {};
 
     private resolveFlags(G?: GameState, config?: GameConfig): ExpansionFlags {
         const candidate = config?.expansions ?? G?.meta?.cfg?.expansions;
@@ -127,57 +146,18 @@ class EnginePackRegistryImpl {
         }
     }
 
-    public register(def: ExpansionDefinition): void {
-        if (!CANONICAL_EXPANSION_IDS.has(def.id)) {
-            throw new Error(`Expansion id "${def.id}" is not in CANONICAL_EXPANSION_ORDER.`);
-        }
-
-        if (this.legacyExpansions[def.id] || this.packs[def.id]) {
-            throw new Error(`EnginePackRegistry: pack "${def.id}" already registered.`);
-        }
-
-        this.legacyExpansions[def.id] = def;
-
-        const setup = def.onSetup
-            ? {
-                  preShuffle: (G: GameState, ctx: any, _cfg: GameConfig) => def.onSetup?.(G, ctx),
-              }
-            : undefined;
-
-        this.registerPack({
-            id: def.id as unknown as EnginePackId,
-            name: def.name,
-            moves: def.moves,
-            setup,
-        });
-    }
-
-    public getAll() {
-        const all: ExpansionDefinition[] = [];
-        for (const expId of CANONICAL_EXPANSION_ORDER) {
-            const exp = this.legacyExpansions[expId];
-            if (exp) all.push(exp);
-        }
-        return all;
-    }
-
-    public getById(expId: ExpansionId): ExpansionDefinition | undefined {
-        return this.legacyExpansions[expId];
-    }
-
     public clear() {
         this.packs = {};
-        this.legacyExpansions = {};
     }
 
     public getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
         const flags = this.resolveFlags(G);
         for (const expId of CANONICAL_EXPANSION_ORDER) {
-            const exp = this.legacyExpansions[expId];
-            if (!exp) continue;
+            const pack = this.packs[expId];
+            if (!pack) continue;
             if (!this.isEnabled(expId, flags)) continue;
-            if (exp.getMeasureAtoms) {
-                const atoms = exp.getMeasureAtoms(G, measureId, payload);
+            if (pack.getMeasureAtoms) {
+                const atoms = pack.getMeasureAtoms(G, measureId, payload);
                 if (atoms) return atoms;
             }
         }
@@ -189,12 +169,12 @@ class EnginePackRegistryImpl {
         const out: Array<{ expansionId: ExpansionId; deck: MeasureDeckDescriptor }> = [];
 
         for (const expId of CANONICAL_EXPANSION_ORDER) {
-            const exp = this.legacyExpansions[expId];
-            if (!exp) continue;
+            const pack = this.packs[expId];
+            if (!pack) continue;
             if (!this.isEnabled(expId, flags)) continue;
-            if (!exp.measureDecks || exp.measureDecks.length === 0) continue;
+            if (!pack.measureDecks || pack.measureDecks.length === 0) continue;
 
-            const decksSorted = [...exp.measureDecks].sort((a, b) => a.id.localeCompare(b.id));
+            const decksSorted = [...pack.measureDecks].sort((a, b) => a.id.localeCompare(b.id));
             for (const deck of decksSorted) {
                 out.push({ expansionId: expId, deck });
             }
@@ -206,11 +186,11 @@ class EnginePackRegistryImpl {
     public applyEffect(G: GameState, ctx: any, effect: any, contextTileId?: string, utils?: any, config?: GameConfig) {
         const flags = this.resolveFlags(G, config);
         for (const expId of CANONICAL_EXPANSION_ORDER) {
-            const exp = this.legacyExpansions[expId];
-            if (!exp) continue;
+            const pack = this.packs[expId];
+            if (!pack) continue;
             if (!this.isEnabled(expId, flags)) continue;
-            if (exp.effectHandlers && exp.effectHandlers[effect.type]) {
-                exp.effectHandlers[effect.type](G, ctx, effect, utils);
+            if (pack.effectHandlers && pack.effectHandlers[effect.type]) {
+                pack.effectHandlers[effect.type](G, ctx, effect, utils);
             }
         }
     }
@@ -220,10 +200,10 @@ class EnginePackRegistryImpl {
         let amount = baseAmount;
 
         for (const expId of CANONICAL_EXPANSION_ORDER) {
-            const exp = this.legacyExpansions[expId];
-            if (!exp) continue;
+            const pack = this.packs[expId];
+            if (!pack) continue;
             if (!this.isEnabled(expId, flags)) continue;
-            const productionModifier = exp.modifiers?.production;
+            const productionModifier = pack.modifiers?.production;
             if (!productionModifier) continue;
 
             const nextAmount = productionModifier(tileId, G, amount);
