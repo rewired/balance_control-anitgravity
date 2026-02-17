@@ -1,13 +1,17 @@
 import { resortIconUrlByResort, type ResortKey } from "./tileAssets";
 
 export type ResortIconProps = {
-  resort?: ResortKey;
+  resort?: string;
 };
 
 const DEFAULT_ICON_VIEWBOX_SIZE = 24;
 
+function isResortKey(value: string): value is ResortKey {
+  return value in resortIconUrlByResort;
+}
+
 export function ResortIcon({ resort }: ResortIconProps) {
-  const href = resort ? resortIconUrlByResort[resort] : null;
+  const href = resort && isResortKey(resort) ? resortIconUrlByResort[resort] : null;
 
   if (!href) return null;
 

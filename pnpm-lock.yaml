@@ -145,6 +145,9 @@ importers:
       '@balance-control/shared':
         specifier: workspace:*
         version: link:../shared
+      '@noble/hashes':
+        specifier: ^1.8.0
+        version: 1.8.0
       boardgame.io:
         specifier: ^0.50.0
         version: 0.50.2

@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite",
+    "prebuild": "pnpm -C ../rules build && pnpm -C ../game build && pnpm -C ../expansion-01 build && pnpm -C ../expansion-02 build && pnpm -C ../expansion-03 build",
     "build": "tsc && vite build",
     "test": "vitest run",
     "preview": "vite preview"
