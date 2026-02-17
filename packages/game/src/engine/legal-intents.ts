@@ -234,7 +234,7 @@ function enumerateFormalize(G: GameState, ctx: any, playerID: string): LegalInte
                 intents.push({
                     moveType: 'formalizeInfluence',
                     payload: {
-                        tileId,
+                        committeeTileId: tileId,
                         paymentResourceIds,
                         extraResourceIds: extraResourceIds.length > 0 ? extraResourceIds : undefined
                     },
