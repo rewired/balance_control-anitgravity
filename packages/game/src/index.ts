@@ -2,20 +2,28 @@ import { Game } from 'boardgame.io';
 import { GameState, CoreZoneNames, TileType } from '@balance-control/rules';
 import { SetupGame } from './setup';
 import { positionKeyFromCoordString } from './topology';
-import { CoreMoves } from './moves';
 import { returnMetaMarkersAtRoundStart } from './mechanics-turn';
 import { drawTileToStaging } from './mechanics-draw';
 import { EffectResolver } from './engine/resolver';
-import { getMoveModulesSuperset, mergeMoveModules } from './move-assembly';
+import { getMoveModulesSuperset, mergeMoveModules, type MoveMap } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
 
-const politicalCoreMoves = {
-    placeInfluence: CoreMoves.placeInfluence,
-    moveInfluence: CoreMoves.moveInfluence,
-    formalizeInfluence: CoreMoves.formalizeInfluence,
-    convertResources: CoreMoves.convertResources,
-    resolveChoice: CoreMoves.resolveChoice,
-};
+const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources', 'resolveChoice'] as const;
+const DRAW_AND_PLACE_MOVE_IDS = ['placeTile', 'passTilePlacement'] as const;
+
+function selectMoves(mergedMoves: MoveMap, moveIds: readonly string[], stageName: string): MoveMap {
+    const out: MoveMap = {};
+    for (const moveId of moveIds) {
+        const move = mergedMoves[moveId];
+        if (typeof move !== 'function') {
+            throw new Error(
+                `Core pack not registered or missing required move "${moveId}" for ${stageName}. Register CorePack before calling createBalanceControlGame().`
+            );
+        }
+        out[moveId] = move;
+    }
+    return out;
+}
 
 function isZoneVisible(zoneId: string, playerID: string): boolean {
     if (zoneId.startsWith('staging_')) return zoneId === `staging_${playerID}`;
@@ -93,14 +101,16 @@ function buildPlayerView(G: GameState, playerID?: string | null): GameState {
 export function createBalanceControlGame(): Game<GameState> {
     ensureCorePackRegistered();
     const moveModules = getMoveModulesSuperset();
-    const moves = mergeMoveModules(moveModules);
+    const mergedMoves = mergeMoveModules(moveModules);
     const expansionModules = moveModules.filter((m) => m.moduleId !== 'core');
+    const politicalCoreMoves = selectMoves(mergedMoves, CORE_POLITICAL_MOVE_IDS, 'politicalAction');
+    const drawAndPlaceMoves = selectMoves(mergedMoves, DRAW_AND_PLACE_MOVE_IDS, 'drawAndPlace');
     const politicalActionMoves = mergeMoveModules([{ moduleId: 'core', moves: politicalCoreMoves as any }, ...expansionModules]);
 
     return {
         name: 'balance-control',
         setup: (ctx: any, setupData: unknown) => SetupGame({ ctx, setupData }),
-        moves: moves as any,
+        moves: mergedMoves as any,
         playerView: ({ G, playerID }: { G: GameState; playerID: string | null }) => {
             return buildPlayerView(G, playerID);
         },
@@ -143,10 +153,7 @@ export function createBalanceControlGame(): Game<GameState> {
             },
             stages: {
                 drawAndPlace: {
-                    moves: {
-                        placeTile: CoreMoves.placeTile,
-                        passTilePlacement: CoreMoves.passTilePlacement,
-                    },
+                    moves: drawAndPlaceMoves,
                     next: 'politicalAction',
                 },
                 politicalAction: {
@@ -218,6 +225,7 @@ export function createBalanceControlGame(): Game<GameState> {
 
 export { EnginePackRegistry, ExpansionRegistry } from './expansion-registry';
 export type { EnginePackDefinition, EnginePackId } from './packs/types';
+export { CorePack } from './packs/core';
 export * from './move-contracts';
 export * from './config';
 export * from './hash-state';

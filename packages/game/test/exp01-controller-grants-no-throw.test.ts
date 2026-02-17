@@ -1,13 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreResources, CoreZoneNames, TileType } from '@balance-control/rules';
 import { Expansion01 } from '../../expansion-01/src/index';
-import { ExpansionRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { EffectResolver } from '../src/engine/resolver';
+import { CorePack } from '../src/packs/core';
 
 describe('EXP-01 controller grants with no controller', () => {
     beforeEach(() => {
         ExpansionRegistry.clear();
+        EnginePackRegistry.registerPack(CorePack);
         ExpansionRegistry.register(Expansion01 as any);
     });
 

@@ -1,8 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneNames, CoreResources, TileType } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
 import { CoreMoves } from '../src/moves';
+import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
+import { CorePack } from '../src/packs/core';
 
 function createCtx() {
     return {
@@ -43,6 +45,11 @@ function addPlayerResource(G: any, playerId: string, resourceId: string, resort:
 }
 
 describe('ConvertResources with real setup-generated Grassroots tiles', () => {
+    beforeEach(() => {
+        ExpansionRegistry.clear();
+        EnginePackRegistry.registerPack(CorePack);
+    });
+
     it('should succeed on a SetupGame Grassroots tile with valid input and output', () => {
         const { G, ctx, grassrootsTileId } = prepareGameWithBoardGrassroots();
         const events = { endTurn: () => { } };

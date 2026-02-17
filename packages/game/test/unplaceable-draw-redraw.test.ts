@@ -1,10 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneNames } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
 import { enumerateLegalIntents } from '../src/engine/legal-intents';
 import { CoreMoves } from '../src/moves';
 import { drawTileToStaging, UNPLACEABLE_DRAW_CHOICE_SOURCE_ID } from '../src/mechanics-draw';
+import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
+import { CorePack } from '../src/packs/core';
 
 function createCtx() {
     return {
@@ -15,6 +17,11 @@ function createCtx() {
 }
 
 describe('Unplaceable draw handling', () => {
+    beforeEach(() => {
+        ExpansionRegistry.clear();
+        EnginePackRegistry.registerPack(CorePack);
+    });
+
     it('discards unplaceable drawn tile, logs notice, forces confirm, then redraws on confirm', () => {
         const ctx = createCtx();
         const G = SetupGame({ ctx });
@@ -80,4 +87,3 @@ describe('Unplaceable draw handling', () => {
         expect(G.engine.attributes.drawPileEmptyAtTurnStart).toBe(true);
     });
 });
-
