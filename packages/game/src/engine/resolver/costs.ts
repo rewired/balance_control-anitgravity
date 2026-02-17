@@ -201,7 +201,7 @@ export function getExtraCostSlots(
         }
     }
 
-    // CORE-01-04-12B: Ping-Pong Penalty â€” N = min(10, floor(R/2)) resources to Noise
+    // CORE-01-04-12B: Ping-Pong Penalty — N = min(10, floor(R/2)) resources to Noise
     if (actionType === 'influence.move' && tileId) {
         const marker = getPlayerMetaMarker(G, pid);
         if (marker && marker.mode === 'PingPong') {

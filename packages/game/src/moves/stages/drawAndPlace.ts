@@ -7,7 +7,7 @@ import { passTilePlacementPayloadSchema, placeTilePayloadSchema, validateMovePay
 import { DRAW_AND_PLACE_STAGE, POLITICAL_ACTION_STAGE, requireStage } from '../shared';
 
 export const DrawAndPlaceMoves = {
-    // CORE-01-04-02: DrawAndPlaceTile â€” place drawn tile at coord
+    // CORE-01-04-02: DrawAndPlaceTile — place drawn tile at coord
     placeTile: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('placeTile', placeTilePayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
@@ -62,7 +62,7 @@ export const DrawAndPlaceMoves = {
             }
         });
 
-        // CORE-01-06-02/03/03A: Hotspot check â€” skip StartCommittee; resolve in ascending PositionKey order
+        // CORE-01-06-02/03/03A: Hotspot check — skip StartCommittee; resolve in ascending PositionKey order
         const resolved = G.engine.attributes.resolvedHotspots ?? [];
         const candidatePairs: { coordStr: string; tileId: string }[] = [];
         [coord, ...neighbors].forEach(c => {

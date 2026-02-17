@@ -204,8 +204,8 @@ This section MUST be completed in this task file before declaring done.
 ## Work Summary (3–7 bullets)
 
 * Added a small `localStorage` persistence helper for the last joined lobby session (defensive shape validation).
-* Lobby now renders an explicit â€œResume last matchâ€ panel when a saved session exists.
-* Lobby â€œLeaveâ€ calls Lobby `leaveMatch`; on failure shows error and enables â€œForce forgetâ€ local cleanup.
+* Lobby now renders an explicit “Resume last match” panel when a saved session exists.
+* Lobby “Leave” calls Lobby `leaveMatch`; on failure shows error and enables “Force forget” local cleanup.
 * Join writes the session immediately; successful in-game quit clears the saved session.
 * Added RTL coverage for write/resume/leave/force-forget session flows.
 * Updated `CHANGELOG.md` (Unreleased).
