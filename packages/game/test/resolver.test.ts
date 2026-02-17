@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { TileType } from '@balance-control/rules';
 import { ExpansionRegistry } from '../src/expansion-registry';
 import { EffectResolver } from '../src/engine/resolver';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('EffectResolver cost and production behavior', () => {
     it('should not mutate state when resource.pay cannot be fully paid', () => {
@@ -170,14 +171,15 @@ describe('EffectResolver cost and production behavior', () => {
     });
 
     it('should apply production modifiers (no PingPong production reduction)', () => {
-        ExpansionRegistry.clear();
-        ExpansionRegistry.register({
-            id: 'exp01',
-            name: 'PingPongModExp',
-            modifiers: {
-                production: (_tileId, _G, base) => base + 2
-            }
-        });
+        registerTestPacks([
+            {
+                id: 'exp01',
+                name: 'PingPongModExp',
+                modifiers: {
+                    production: (_tileId, _G, base) => base + 2
+                }
+            } as any
+        ]);
 
         const bankIds = ['res_dom_1', 'res_dom_2', 'res_dom_3', 'res_dom_4', 'res_dom_5', 'res_dom_6', 'res_dom_7'];
         const G: any = {

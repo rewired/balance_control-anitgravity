@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { SetupGame } from '../src/setup';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
-import { CorePack } from '../src/packs/core';
+import { ExpansionRegistry } from '../src/expansion-registry';
+import { registerTestPacks } from './_helpers/registerPacks';
 import { CoreZoneNames, ExpansionDefinition, TileType } from '@balance-control/rules';
 
 function createSeededRandom(seed: number) {
@@ -29,8 +29,7 @@ const EXPECTED_SPEC_ANCHOR_HASH = '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3
 
 describe('SetupGame', () => {
     beforeEach(() => {
-        ExpansionRegistry.clear();
-        EnginePackRegistry.registerPack(CorePack);
+        registerTestPacks();
     });
 
     it('should generate correct number of core tiles', () => {

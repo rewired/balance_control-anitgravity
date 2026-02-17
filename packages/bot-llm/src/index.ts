@@ -1,12 +1,5 @@
-import { createBalanceControlGame, ExpansionRegistry } from '@balance-control/game';
-import { Expansion01 } from '@balance-control/expansion-01';
-import { Expansion02 } from '@balance-control/expansion-02';
-import { Expansion03 } from '@balance-control/expansion-03';
+import { createBotGame } from './boot';
 
-ExpansionRegistry.register(Expansion01);
-ExpansionRegistry.register(Expansion02);
-ExpansionRegistry.register(Expansion03);
-
-const BalanceControl = createBalanceControlGame();
+const BalanceControl = createBotGame();
 console.log('Bot adapter loaded for', BalanceControl.name);
 // TODO: Implement LLM adapter contracts

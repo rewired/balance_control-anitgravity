@@ -38,3 +38,6 @@ Client renders only from G, ctx, selectors, and enumerateLegalIntents.
 ## DETERMINISM
 Identical move sequence must produce identical state hash.
 No hidden state permitted.
+
+## BOOT CONTRACT
+CorePack must be registered before createBalanceControlGame().

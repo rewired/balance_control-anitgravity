@@ -1,16 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreZoneNames } from '@balance-control/rules';
 import { Expansion02, EXP02_TILE_INNER_ORDER_ID } from '../../expansion-02/src/index';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
+import { ExpansionRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('EXP-02 Inner Order hotspot id consistency', () => {
     beforeEach(() => {
-        ExpansionRegistry.clear();
-        EnginePackRegistry.registerPack(CorePack);
-        ExpansionRegistry.register(Expansion02 as any);
+        registerTestPacks([Expansion02 as any]);
     });
 
     afterEach(() => {

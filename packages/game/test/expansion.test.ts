@@ -2,11 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ExpansionRegistry } from '../src/expansion-registry';
 import { EffectResolver } from '../src/engine/resolver';
 import { ExpansionDefinition, GameState, TileType } from '@balance-control/rules';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('Expansion System', () => {
 
     beforeEach(() => {
-        ExpansionRegistry.clear();
+        registerTestPacks();
     });
 
     it('should register an expansion', () => {

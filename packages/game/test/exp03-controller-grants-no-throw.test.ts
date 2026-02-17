@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreResources, CoreZoneNames, TileType } from '@balance-control/rules';
 import { Expansion03 } from '../../expansion-03/src/index';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
+import { ExpansionRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
 import { EffectResolver } from '../src/engine/resolver';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 const EXP03_MEASURE_IDS = [
     'M01', 'M02', 'M03', 'M04', 'M05',
@@ -39,9 +39,7 @@ function collectControllerGrants(value: unknown, out: any[] = []): any[] {
 
 describe('EXP-03 controller grants with no controller', () => {
     beforeEach(() => {
-        ExpansionRegistry.clear();
-        EnginePackRegistry.registerPack(CorePack);
-        ExpansionRegistry.register(Expansion03 as any);
+        registerTestPacks([Expansion03 as any]);
     });
 
     afterEach(() => {
