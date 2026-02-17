@@ -53,6 +53,40 @@ describe('enumerateLegalIntents', () => {
         }
     });
 
+    it('emits a move-valid formalizeInfluence intent payload (committeeTileId)', () => {
+        const ctx = createCtx('politicalAction');
+        const G = SetupGame({ ctx });
+
+        const committeeId = Object.values(G.tiles).find(tile => tile.type === TileType.Committee)?.id as string;
+        G.zones[CoreZoneNames.Board].items.push(committeeId);
+        G.zones[CoreZoneNames.DrawPile].items = G.zones[CoreZoneNames.DrawPile].items.filter(id => id !== committeeId);
+        G.grid['1,0'] = committeeId;
+
+        // Satisfy CORE-01-08-02/03 gate: remove all starting influence from all players' PersonalSupply.
+        for (const pid of ['0', '1']) {
+            const supply = G.zones[`${CoreZoneNames.PersonalSupply}:${pid}`];
+            const startingInfluenceIds = supply.items.filter(itemId => G.objects[itemId]?.type === 'Influence' && G.objects[itemId]?.isStarting);
+            supply.items = supply.items.filter(itemId => !startingInfluenceIds.includes(itemId));
+            G.zones[committeeId].items.push(...startingInfluenceIds);
+        }
+
+        // Provide exactly two payment resources of different resorts in PersonalSupply:0.
+        const resourceA = 'res_dom_0';
+        const resourceB = 'res_for_0';
+        G.objects[resourceA] = { id: resourceA, type: 'Resource', owner: '0', resort: 'DOM' } as any;
+        G.objects[resourceB] = { id: resourceB, type: 'Resource', owner: '0', resort: 'FOR' } as any;
+        G.zones[`${CoreZoneNames.PersonalSupply}:0`].items.push(resourceA, resourceB);
+
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        const formalize = intents.find(intent => intent.moveType === 'formalizeInfluence');
+        expect(formalize).toBeTruthy();
+
+        const events = { endTurn: () => {}, endStage: () => {}, setStage: () => {} };
+        const cloned = cloneGameState(G);
+        const result = CoreMoves.formalizeInfluence({ G: cloned, ctx, events } as any, formalize!.payload);
+        expect(result).not.toBe(INVALID_MOVE);
+    });
+
     it('does not emit moveInfluence intents involving Start Committee', () => {
         const ctx = createCtx('politicalAction');
         const G = SetupGame({ ctx });
