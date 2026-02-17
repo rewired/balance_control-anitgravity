@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ExpansionDefinition, GameConfig, ExpansionFlags } from '@balance-control/rules';
-import { ExpansionRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
 import { createBalanceControlGame } from '../src/index';
 import { buildExpansionMovesForConfig, getEnabledMoveModules } from '../src/move-assembly';
+import { CorePack } from '../src/packs/core';
 
 function cfg(expansions: Partial<ExpansionFlags>): GameConfig {
     return {
@@ -17,6 +18,7 @@ function cfg(expansions: Partial<ExpansionFlags>): GameConfig {
 describe('Move assembly invariants', () => {
     beforeEach(() => {
         ExpansionRegistry.clear();
+        EnginePackRegistry.registerPack(CorePack);
     });
 
     it('disabled expansion contributes no move modules', () => {
@@ -101,6 +103,13 @@ describe('Move assembly invariants', () => {
                 'Conflicts:',
                 '- exp02 registers "tripwire.dupe.factory" but it is already registered by exp01',
             ].join('\n')
+        );
+    });
+
+    it('factory-built Game throws when core pack is missing', () => {
+        ExpansionRegistry.clear();
+        expect(() => createBalanceControlGame()).toThrowError(
+            'Core pack not registered. Register CorePack before calling createBalanceControlGame().'
         );
     });
 });

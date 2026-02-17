@@ -1,14 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect } from 'vitest';
 import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from '../src/index';
 import { CoreZoneNames } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
+import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
+import { CorePack } from '../src/packs/core';
 
-const BalanceControl = createBalanceControlGame();
-const BalanceControlNoPlayerView = {
-    ...BalanceControl,
-    playerView: ({ G }: any) => G
-};
+let BalanceControlNoPlayerView: ReturnType<typeof createBalanceControlGame>;
 
 const HEX_DIRECTIONS: Array<[number, number]> = [
     [1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]
@@ -73,6 +71,16 @@ function getTileIdAtCoord(G: any, coord: string): string {
 }
 
 describe('Turn Structure (Stages)', () => {
+    beforeEach(() => {
+        ExpansionRegistry.clear();
+        EnginePackRegistry.registerPack(CorePack);
+        const balanceControl = createBalanceControlGame();
+        BalanceControlNoPlayerView = {
+            ...balanceControl,
+            playerView: ({ G }: any) => G
+        };
+    });
+
     it('should start in drawAndPlace stage', () => {
         const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
         client.start();

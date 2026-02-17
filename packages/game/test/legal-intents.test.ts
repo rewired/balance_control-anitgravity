@@ -1,10 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneNames, TileType } from '@balance-control/rules';
 import { enumerateLegalIntents } from '../src/engine/legal-intents';
 import { SetupGame } from '../src/setup';
 import { CoreMoves } from '../src/moves';
 import { drawTileToStaging } from '../src/mechanics-draw';
+import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
+import { CorePack } from '../src/packs/core';
 
 function createCtx(stage: string) {
     return {
@@ -26,6 +28,11 @@ function cloneGameState(G: any) {
 }
 
 describe('enumerateLegalIntents', () => {
+    beforeEach(() => {
+        ExpansionRegistry.clear();
+        EnginePackRegistry.registerPack(CorePack);
+    });
+
     it('produces deterministic ordering and move-valid payloads', () => {
         const ctx = createCtx('politicalAction');
         const G = SetupGame({ ctx });

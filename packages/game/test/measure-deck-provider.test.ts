@@ -1,13 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { ExpansionRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { lookupMeasureDeckForObjectId } from '../src/engine/measure-deck-provider';
 import { Expansion02 } from '../../expansion-02/src/index';
 import { Expansion03 } from '../../expansion-03/src/index';
+import { CorePack } from '../src/packs/core';
 
 describe('Measure deck provider lookup', () => {
     beforeEach(() => {
         ExpansionRegistry.clear();
+        EnginePackRegistry.registerPack(CorePack);
         ExpansionRegistry.register(Expansion02 as any);
         ExpansionRegistry.register(Expansion03 as any);
     });
@@ -99,4 +101,3 @@ describe('Measure deck provider lookup', () => {
         );
     });
 });
-

@@ -1,9 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect } from 'vitest';
 import { createBalanceControlGame } from '../src/index';
 import { SetupGame } from '../src/setup';
 import { CoreZoneNames } from '@balance-control/rules';
+import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
+import { CorePack } from '../src/packs/core';
 
 describe('playerView', () => {
+    beforeEach(() => {
+        ExpansionRegistry.clear();
+        EnginePackRegistry.registerPack(CorePack);
+    });
+
     it('hides other players private zones and objects', () => {
         const game = createBalanceControlGame();
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
