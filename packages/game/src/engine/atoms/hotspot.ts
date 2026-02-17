@@ -10,7 +10,7 @@ function handleHotspotResolve(G: GameState & { engine: EngineState }, ctx: any, 
     const tile = G.tiles[tileId];
     if (!tile) return;
 
-    // CORE-01-06-03B: Single-Resolution Invariant â€” skip if already resolved
+    // CORE-01-06-03B: Single-Resolution Invariant — skip if already resolved
     const resolved = G.engine.attributes.resolvedHotspots ?? [];
     if (resolved.includes(tileId)) return;
 

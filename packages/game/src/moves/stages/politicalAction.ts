@@ -29,7 +29,7 @@ import {
 } from '../shared';
 
 export const PoliticalActionMoves = {
-    // CORE-01-04-10â€“12: PlaceInfluence via Lobbyist
+    // CORE-01-04-10–12: PlaceInfluence via Lobbyist
     placeInfluence: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('placeInfluence', placeInfluencePayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
@@ -104,7 +104,7 @@ export const PoliticalActionMoves = {
 
         const penaltySlots = EffectResolver.getExtraCostSlots(G, pid, 'influence.move', targetId);
         if (penaltySlots.length > 0) {
-            // CORE-01-04-12B: Ping-Pong penalty â€” validate and queue move to Noise
+            // CORE-01-04-12B: Ping-Pong penalty — validate and queue move to Noise
             if (!extraResourceIds || extraResourceIds.length !== penaltySlots.length) return INVALID_MOVE;
             const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
             const supply = G.zones[supplyId];
@@ -144,7 +144,7 @@ export const PoliticalActionMoves = {
         events.endTurn();
     },
 
-    // CORE-01-04-13â€“19: FormalizeInfluence via Committee
+    // CORE-01-04-13–19: FormalizeInfluence via Committee
     formalizeInfluence: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('formalizeInfluence', formalizeInfluencePayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
@@ -241,7 +241,7 @@ export const PoliticalActionMoves = {
         events.endTurn();
     },
 
-    // CORE-01-04-20â€“22: ConvertResources via Grassroots tile
+    // CORE-01-04-20–22: ConvertResources via Grassroots tile
     convertResources: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('convertResources', convertResourcesPayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;

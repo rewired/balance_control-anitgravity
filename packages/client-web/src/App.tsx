@@ -65,7 +65,7 @@ const App: React.FC = () => {
 
     if (devScene === 'hex-tile' && DevHexTilePlayground) {
         return (
-            <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading playgroundâ€¦</div>}>
+            <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading playground…</div>}>
                 <DevHexTilePlayground />
             </Suspense>
         );
