@@ -1,15 +1,9 @@
 import { GameState } from '@balance-control/rules';
 import { EffectAtom, HookPoint, EngineState } from './types';
 import { EngineModuleRegistry, type AtomHandler } from './engine-module-registry';
-import { coreResourceAtoms } from './atoms/resource';
-import { coreInfluenceAtoms } from './atoms/influence';
-import { coreProductionAtoms } from './atoms/production';
 import { exp03CountdownAtoms } from './atoms/countdown';
-import { coreMeasureAtoms } from './atoms/measure';
-import { coreChoiceAtoms } from './atoms/choice';
-import { createCoreRulesAtoms } from './atoms/rules';
 import { exp02RegulationAtoms } from './atoms/regulation';
-import { coreHotspotAtoms } from './atoms/hotspot';
+import { CorePack } from '../packs/core';
 import { capitalize } from './resolver/ids';
 import { applyModifiers, getHookForAtom, removeModifier } from './resolver/modifiers';
 import { isProhibited as isProhibitedImpl } from './resolver/prohibitions';
@@ -200,21 +194,14 @@ export class EffectResolver {
 
     private static buildAtomDispatch(G: GameState & { engine: EngineState }): ReadonlyMap<string, AtomHandler> {
         const registry = new EngineModuleRegistry();
+        const coreAtoms = CorePack.engine?.atoms?.({
+            triggerHook: (G2, ctx2, hook, payload) => this.triggerHook(G2 as any, ctx2, hook, payload)
+        }) ?? [];
 
         registry.registerModule({
             id: 'core',
             isEnabled: () => true,
-            atoms: [
-                ...coreResourceAtoms,
-                ...coreProductionAtoms,
-                ...coreMeasureAtoms,
-                ...coreInfluenceAtoms,
-                ...coreChoiceAtoms,
-                ...createCoreRulesAtoms({
-                    triggerHook: (G2, ctx2, hook, payload) => this.triggerHook(G2 as any, ctx2, hook, payload)
-                }),
-                ...coreHotspotAtoms
-            ]
+            atoms: coreAtoms
         });
 
         registry.registerModule({
@@ -232,4 +219,3 @@ export class EffectResolver {
         return registry.buildAtomDispatch(G);
     }
 }
-
