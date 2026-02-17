@@ -131,10 +131,18 @@ export interface GameConfig {
     packs?: PackSelection;
 }
 
+export type PackManifestRecord = Readonly<{
+    id: string;
+    packVersion: string;
+    rulesetAnchor: string;
+}>;
+
 export interface GameMeta {
     ruleset?: RulesetManifest;
     /** Canonical match config snapshot (GR-012). */
     cfg?: GameConfig;
+    enabledPacks?: PackManifestRecord[];
+    publicSurfaceHash?: string;
 }
 
 export interface GameState {

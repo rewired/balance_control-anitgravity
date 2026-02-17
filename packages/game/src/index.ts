@@ -7,6 +7,7 @@ import { drawTileToStaging } from './mechanics-draw';
 import { EffectResolver } from './engine/resolver';
 import { assemblePacks, buildStageMoveMap, type MoveMap } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
+import { validateSurfaceHash } from './surface';
 
 const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources', 'resolveChoice'] as const;
 const DRAW_AND_PLACE_MOVE_IDS = ['placeTile', 'passTilePlacement'] as const;
@@ -162,6 +163,7 @@ export function createBalanceControlGame(): Game<GameState> {
                 },
             },
             onBegin: ({ G, ctx }: any) => {
+                validateSurfaceHash(G);
                 if (ctx.currentPlayer === '0') {
                     returnMetaMarkersAtRoundStart(G as any);
                 }
@@ -233,5 +235,6 @@ export { Exp03Pack } from './packs/exp03';
 export * from './move-contracts';
 export * from './config';
 export * from './hash-state';
+export * from './surface';
 export * from './engine/legal-intents';
 export { selectTileController } from './public-selectors';

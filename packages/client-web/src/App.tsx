@@ -159,6 +159,7 @@ const App: React.FC = () => {
             numPlayers: state?.ctx?.numPlayers ?? 2,
             config: getReplayConfig(state),
             rulesetManifest: state?.G?.meta?.ruleset,
+            publicSurfaceHash: state?.G?.meta?.publicSurfaceHash,
             moves: moveLog.map((entry) => ({
                 timestamp: entry.timestamp,
                 playerID: entry.playerID,

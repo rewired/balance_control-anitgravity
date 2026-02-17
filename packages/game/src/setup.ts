@@ -1,8 +1,10 @@
 import { GameState, CoreZoneNames, TileType, CoreResources, RULESET_MANIFEST, RulesetManifest } from '@balance-control/rules';
 import { Ctx } from 'boardgame.io';
 import { normalizeGameConfig } from './config';
+import { hashState } from './hash-state';
 import { assemblePacks } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
+import { getPublicSurface } from './surface';
 
 function normalizeBoardgameCtx(ctx: any): Ctx {
     if (ctx && typeof ctx === 'object' && (ctx as any).ctx && typeof (ctx as any).ctx === 'object') {
@@ -75,6 +77,11 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
     };
 
     ensureCorePackRegistered();
+
+    const publicSurface = getPublicSurface(gameConfig);
+    const publicSurfaceHash = hashState(publicSurface);
+    G.meta.enabledPacks = publicSurface.packs;
+    G.meta.publicSurfaceHash = publicSurfaceHash;
 
     const packAssembly = assemblePacks({ config: gameConfig, mode: 'enabled' });
     packAssembly.applySetupPreShuffle(G, normalizedCtx);

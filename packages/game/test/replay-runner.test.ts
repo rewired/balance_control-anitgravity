@@ -30,7 +30,7 @@ describe('Replay runner', () => {
         };
 
         const result = runReplay(replay);
-        expect(result.hash).toBe('75f7c1941a40913ecf898d587ad37b0ea822196836fda6235d921c485f2e8493');
+        expect(result.hash).toBe('d3e3a6db288339c2fa4391f91fc9d0c6ce2042534d337b46b089b532a0224189');
         expect(result.state.G.meta?.ruleset).toBeTruthy();
     });
 
@@ -87,5 +87,28 @@ describe('Replay runner', () => {
             rulesetManifest: result.state.G.meta?.ruleset
         };
         expect(exportedReplay.rulesetManifest).toBeTruthy();
+    });
+
+    it('rejects replays when the public surface hash mismatches', () => {
+        const replay: ReplaySpec = {
+            gameName: 'BalanceControl',
+            gameVersion: 'dev',
+            seed: 'replay-test-core-2p',
+            numPlayers: 2,
+            config: {
+                expansions: {
+                    ex01: false,
+                    ex02: false,
+                    ex03: false
+                }
+            },
+            publicSurfaceHash: 'invalid-hash',
+            moves: [
+                { move: 'placeTile', payload: { targetCoord: '1,0' } },
+                { move: 'placeInfluence', payload: { targetCoord: '1,0' } }
+            ]
+        };
+
+        expect(() => runReplay(replay)).toThrow(/Replay surface hash mismatch/);
     });
 });

@@ -1,7 +1,9 @@
 import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from './index';
 import { SetupGame } from './setup';
+import { normalizeGameConfig } from './config';
 import { hashState } from './hash-state';
+import { getPublicSurfaceHash } from './surface';
 import type { RulesetManifest } from '@balance-control/rules';
 
 export type ReplayMove = {
@@ -18,6 +20,7 @@ export type ReplaySpec = {
     numPlayers: number;
     config?: unknown;
     rulesetManifest?: RulesetManifest;
+    publicSurfaceHash?: string;
     moves: ReplayMove[];
 };
 
@@ -51,6 +54,15 @@ function resolveMoveArgs(G: any, move: string, args: any[]): any[] {
 }
 
 export function runReplay(replay: ReplaySpec): { hash: string; state: any } {
+    if (replay.publicSurfaceHash) {
+        const config = normalizeGameConfig(replay.config);
+        const currentHash = getPublicSurfaceHash(config);
+        if (currentHash !== replay.publicSurfaceHash) {
+            throw new Error(
+                `Replay surface hash mismatch. The replay was created with '${replay.publicSurfaceHash}', but the current engine surface hash is '${currentHash}'.`
+            );
+        }
+    }
     const baseGame = createBalanceControlGame();
     const game = {
         ...baseGame,
