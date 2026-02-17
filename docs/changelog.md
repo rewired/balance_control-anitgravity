@@ -6,3 +6,4 @@
 - 2026-02-16: task(0081) Normalize expansion move assembly: canonical module order + config-only enablement + duplicate-move detection (mechanical; no semantic changes).
 - 2026-02-17: task(0085) Split core moves into stage/system modules under `packages/game/src/moves/` (mechanical; no semantic changes).
 - 2026-02-17: task(0090) Unblock `packages/client-web` build (TypeScript strict fixes; browser-safe `hashState` hashing; Vite aliases for expansions).
+- 2026-02-17: task(0092) Introduce core-capable EnginePackRegistry + pack contract types; keep ExpansionRegistry as deprecated compatibility shim (mechanical; no semantic changes).

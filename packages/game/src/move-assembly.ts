@@ -1,52 +1,44 @@
 import type { GameConfig } from '@balance-control/rules';
 import { CoreMoves } from './moves';
-import { CANONICAL_ENGINE_MODULE_ORDER, type EngineModuleId, ExpansionRegistry } from './expansion-registry';
+import { CANONICAL_ENGINE_MODULE_ORDER, EnginePackRegistry } from './expansion-registry';
 import { MoveModuleRegistry, type MoveFn, type MoveMap, type MoveModule } from './move-module-registry';
 
 export type { MoveFn, MoveMap, MoveModule };
 
 export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
-    const expansionModules = ExpansionRegistry.getEnabledMoveModules(config);
-    const byModuleId = new Map<EngineModuleId, MoveMap>();
+    const modules = EnginePackRegistry.getEnabledMoveModules(config);
+    const out: MoveModule[] = [];
 
-    for (const mod of expansionModules) {
-        byModuleId.set(mod.moduleId, mod.moves);
-    }
-
-    const modules: MoveModule[] = [];
     for (const moduleId of CANONICAL_ENGINE_MODULE_ORDER) {
+        const mod = modules.find((m) => m.moduleId === moduleId);
+        if (!mod && moduleId !== 'core') continue;
         if (moduleId === 'core') {
-            modules.push({ moduleId, moves: CoreMoves as unknown as MoveMap });
+            const moves = mod?.moves && Object.keys(mod.moves).length > 0 ? mod.moves : (CoreMoves as unknown as MoveMap);
+            out.push({ moduleId, moves });
             continue;
         }
-        const moves = byModuleId.get(moduleId);
-        if (moves) {
-            modules.push({ moduleId, moves });
-        }
+        if (mod) out.push(mod);
     }
-    return modules;
+
+    return out;
 }
 
 export function getMoveModulesSuperset(): MoveModule[] {
-    const expansionModules = ExpansionRegistry.getRegisteredMoveModules();
-    const byModuleId = new Map<EngineModuleId, MoveMap>();
+    const modules = EnginePackRegistry.getRegisteredMoveModules();
+    const out: MoveModule[] = [];
 
-    for (const mod of expansionModules) {
-        byModuleId.set(mod.moduleId, mod.moves);
-    }
-
-    const modules: MoveModule[] = [];
     for (const moduleId of CANONICAL_ENGINE_MODULE_ORDER) {
+        const mod = modules.find((m) => m.moduleId === moduleId);
+        if (!mod && moduleId !== 'core') continue;
         if (moduleId === 'core') {
-            modules.push({ moduleId, moves: CoreMoves as unknown as MoveMap });
+            const moves = mod?.moves && Object.keys(mod.moves).length > 0 ? mod.moves : (CoreMoves as unknown as MoveMap);
+            out.push({ moduleId, moves });
             continue;
         }
-        const moves = byModuleId.get(moduleId);
-        if (moves) {
-            modules.push({ moduleId, moves });
-        }
+        if (mod) out.push(mod);
     }
-    return modules;
+
+    return out;
 }
 
 export function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
