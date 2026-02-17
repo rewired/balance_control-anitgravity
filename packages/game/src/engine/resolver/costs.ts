@@ -1,5 +1,6 @@
 import type { GameState } from '@balance-control/rules';
 import type { EngineState } from '../types';
+import { findObjectZoneId, getPlayerMetaMarker } from '../../state-lookup';
 
 export type CostSlot = string[] | 'ANY';
 
@@ -156,23 +157,6 @@ export function commitCost(
     return true;
 }
 
-function getPlayerMetaMarker(G: GameState & { engine: EngineState }, playerId: string): any | null {
-    const directId = `meta_${playerId}`;
-    const direct = (G.objects as any)?.[directId];
-    if (direct && direct.type === 'MetaMarker') return direct;
-    for (const obj of Object.values(G.objects || {})) {
-        if (obj && (obj as any).type === 'MetaMarker' && (obj as any).owner === playerId) return obj;
-    }
-    return null;
-}
-
-function findObjectZoneId(G: GameState & { engine: EngineState }, objectId: string): string | null {
-    for (const zone of Object.values(G.zones || {})) {
-        if (zone.items.includes(objectId)) return zone.id;
-    }
-    return null;
-}
-
 export function getExtraCostSlots(
     G: GameState & { engine: EngineState },
     pid: string,
@@ -270,4 +254,3 @@ export function checkAndPayCosts(
 
     return true;
 }
-
