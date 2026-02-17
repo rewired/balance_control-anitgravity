@@ -4,8 +4,7 @@ import path from 'node:path';
 import { SetupGame } from '../src/setup';
 import { EffectResolver } from '../src/engine/resolver';
 import { CoreZoneNames } from '@balance-control/rules';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 function createSeededRandom(seed: number) {
     let state = seed >>> 0;
@@ -47,8 +46,7 @@ function collectTsFiles(dirPath: string): string[] {
 }
 
 function runDeterministicScenario(seed: number): { snapshot: string; pendingChoiceId?: string } {
-    ExpansionRegistry.clear();
-    EnginePackRegistry.registerPack(CorePack);
+    registerTestPacks();
     const ctx: any = {
         numPlayers: 2,
         currentPlayer: '0',

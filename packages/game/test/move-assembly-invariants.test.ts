@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ExpansionDefinition, GameConfig, ExpansionFlags } from '@balance-control/rules';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
+import { ExpansionRegistry } from '../src/expansion-registry';
 import { createBalanceControlGame } from '../src/index';
 import { buildExpansionMovesForConfig, getEnabledMoveModules } from '../src/move-assembly';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 function cfg(expansions: Partial<ExpansionFlags>): GameConfig {
     return {
@@ -17,8 +17,7 @@ function cfg(expansions: Partial<ExpansionFlags>): GameConfig {
 
 describe('Move assembly invariants', () => {
     beforeEach(() => {
-        ExpansionRegistry.clear();
-        EnginePackRegistry.registerPack(CorePack);
+        registerTestPacks();
     });
 
     it('disabled expansion contributes no move modules', () => {

@@ -5,8 +5,7 @@ import { enumerateLegalIntents } from '../src/engine/legal-intents';
 import { SetupGame } from '../src/setup';
 import { CoreMoves } from '../src/moves';
 import { drawTileToStaging } from '../src/mechanics-draw';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 function createCtx(stage: string) {
     return {
@@ -29,8 +28,7 @@ function cloneGameState(G: any) {
 
 describe('enumerateLegalIntents', () => {
     beforeEach(() => {
-        ExpansionRegistry.clear();
-        EnginePackRegistry.registerPack(CorePack);
+        registerTestPacks();
     });
 
     it('produces deterministic ordering and move-valid payloads', () => {

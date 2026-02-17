@@ -1,13 +1,11 @@
 import { beforeEach, describe, it, expect } from 'vitest';
 import { Server, Origins } from 'boardgame.io/server';
 import { createBalanceControlGame } from '../src/index';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('server smoke', () => {
     beforeEach(() => {
-        ExpansionRegistry.clear();
-        EnginePackRegistry.registerPack(CorePack);
+        registerTestPacks();
     });
 
     it('creates a server with BalanceControl', () => {

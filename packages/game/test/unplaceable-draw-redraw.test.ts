@@ -5,8 +5,7 @@ import { SetupGame } from '../src/setup';
 import { enumerateLegalIntents } from '../src/engine/legal-intents';
 import { CoreMoves } from '../src/moves';
 import { drawTileToStaging, UNPLACEABLE_DRAW_CHOICE_SOURCE_ID } from '../src/mechanics-draw';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 function createCtx() {
     return {
@@ -18,8 +17,7 @@ function createCtx() {
 
 describe('Unplaceable draw handling', () => {
     beforeEach(() => {
-        ExpansionRegistry.clear();
-        EnginePackRegistry.registerPack(CorePack);
+        registerTestPacks();
     });
 
     it('discards unplaceable drawn tile, logs notice, forces confirm, then redraws on confirm', () => {

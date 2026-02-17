@@ -5,10 +5,10 @@ import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from '../src/index';
 import { SetupGame } from '../src/setup';
 import { hashState } from '../src/hash-state';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
+import { ExpansionRegistry } from '../src/expansion-registry';
 import { Expansion01 } from '../../expansion-01/src/index';
 import { CoreZoneNames, TileType } from '@balance-control/rules';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 interface GoldenMove {
     move: string;
@@ -60,15 +60,11 @@ function loadGoldenFixtures(): GoldenFixture[] {
 }
 
 function registerFixtureExpansions(names?: string[]): void {
-    ExpansionRegistry.clear();
-    EnginePackRegistry.registerPack(CorePack);
-    if (!names) return;
-
-    for (const name of names) {
-        if (name === 'ex01') {
-            ExpansionRegistry.register(Expansion01 as any);
-        }
+    const expansions: any[] = [];
+    if (names?.includes('ex01')) {
+        expansions.push(Expansion01 as any);
     }
+    registerTestPacks(expansions);
 }
 
 function applyPrelude(G: any, prelude?: PreludeAction[]): void {

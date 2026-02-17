@@ -3,8 +3,7 @@ import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from '../src/index';
 import { CoreZoneNames } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 let BalanceControlNoPlayerView: ReturnType<typeof createBalanceControlGame>;
 
@@ -72,8 +71,7 @@ function getTileIdAtCoord(G: any, coord: string): string {
 
 describe('Turn Structure (Stages)', () => {
     beforeEach(() => {
-        ExpansionRegistry.clear();
-        EnginePackRegistry.registerPack(CorePack);
+        registerTestPacks();
         const balanceControl = createBalanceControlGame();
         BalanceControlNoPlayerView = {
             ...balanceControl,

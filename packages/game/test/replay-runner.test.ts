@@ -1,15 +1,13 @@
 import { beforeEach, describe, it, expect } from 'vitest';
 import { runReplay, type ReplaySpec } from '../src/replay';
-import { EnginePackRegistry, ExpansionRegistry } from '../src/expansion-registry';
-import { CorePack } from '../src/packs/core';
+import { registerTestPacks } from './_helpers/registerPacks';
 
 const EXPECTED_CORE_VERSION = 'v1.1.0';
 const EXPECTED_SPEC_ANCHOR_HASH = '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3';
 
 describe('Replay runner', () => {
     beforeEach(() => {
-        ExpansionRegistry.clear();
-        EnginePackRegistry.registerPack(CorePack);
+        registerTestPacks();
     });
 
     it('replays a small sequence and matches the expected hash', () => {
