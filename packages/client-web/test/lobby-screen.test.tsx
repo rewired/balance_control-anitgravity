@@ -69,7 +69,7 @@ describe('LobbyScreen flow', () => {
                 matchID: 'm1',
                 gameName,
                 players: [{ id: 0, name: 'Alice' }, { id: 1 }],
-                setupData: { expansions: { ex01: false, ex02: false, ex03: false } },
+                setupData: { packs: { enabledPacks: [] } },
             },
         ];
 

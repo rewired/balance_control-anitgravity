@@ -38,12 +38,23 @@ type ExpansionFlags = {
 function getExpansionsLabel(setupData: unknown): string {
     if (!setupData || typeof setupData !== 'object') return 'None';
     const source = setupData as Record<string, unknown>;
-    const expansions = (source.expansions ?? (source.config as any)?.expansions ?? null) as Record<string, unknown> | null;
-    if (!expansions || typeof expansions !== 'object') return 'None';
     const enabled: string[] = [];
-    if (expansions.ex01 === true) enabled.push('EXP-01');
-    if (expansions.ex02 === true) enabled.push('EXP-02');
-    if (expansions.ex03 === true) enabled.push('EXP-03');
+    const packs = (source.packs ?? (source.config as any)?.packs ?? null) as Record<string, unknown> | null;
+    const enabledPacks = (packs?.enabledPacks ?? (source as any).enabledPacks ?? (source.config as any)?.enabledPacks ?? null) as
+        | string[]
+        | null;
+    if (Array.isArray(enabledPacks) && enabledPacks.length > 0) {
+        if (enabledPacks.includes('exp01')) enabled.push('EXP-01');
+        if (enabledPacks.includes('exp02')) enabled.push('EXP-02');
+        if (enabledPacks.includes('exp03')) enabled.push('EXP-03');
+    } else {
+        const expansions = (source.expansions ?? (source.config as any)?.expansions ?? null) as Record<string, unknown> | null;
+        if (expansions && typeof expansions === 'object') {
+            if (expansions.ex01 === true) enabled.push('EXP-01');
+            if (expansions.ex02 === true) enabled.push('EXP-02');
+            if (expansions.ex03 === true) enabled.push('EXP-03');
+        }
+    }
     return enabled.length ? enabled.join(', ') : 'None';
 }
 
@@ -85,10 +96,14 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
     const handleCreateMatch = async () => {
         setIsCreating(true);
         setError(null);
+        const enabledPacks: Array<'exp01' | 'exp02' | 'exp03'> = [];
+        if (expansions.ex01) enabledPacks.push('exp01');
+        if (expansions.ex02) enabledPacks.push('exp02');
+        if (expansions.ex03) enabledPacks.push('exp03');
         try {
             await lobbyClient.createMatch(GAME_NAME, {
                 numPlayers,
-                setupData: { expansions }
+                setupData: { packs: { enabledPacks } }
             });
             await loadMatches();
         } catch (err) {

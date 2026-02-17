@@ -121,8 +121,14 @@ export interface ExpansionFlags {
     ex03: boolean;
 }
 
+export interface PackSelection {
+    enabledPacks: ExpansionId[];
+    pinnedVersions?: Partial<Record<ExpansionId, string>>;
+}
+
 export interface GameConfig {
     expansions: ExpansionFlags;
+    packs?: PackSelection;
 }
 
 export interface GameMeta {

@@ -1,5 +1,5 @@
-import { CoreResources, CoreZoneNames, TileType, type GameConfig, type GameObject, type GameState, type Tile } from '@balance-control/rules';
-import type { EnginePackDefinition } from '../types';
+import { CoreResources, CoreZoneNames, RULESET_MANIFEST, TileType, type GameConfig, type GameObject, type GameState, type Tile } from '@balance-control/rules';
+import type { EnginePackDefinition, PackManifest } from '../types';
 import { CoreMoves } from '../../moves';
 import { coreResourceAtoms } from '../../engine/atoms/resource';
 import { coreInfluenceAtoms } from '../../engine/atoms/influence';
@@ -10,10 +10,18 @@ import { coreHotspotAtoms } from '../../engine/atoms/hotspot';
 import { createCoreRulesAtoms } from '../../engine/atoms/rules';
 
 const START_COMMITTEE_TILE_ID = 'tile_start_committee';
+const CORE_PACK_VERSION = RULESET_MANIFEST.coreVersion.replace(/^v/i, '');
+const CORE_PACK_MANIFEST: PackManifest = {
+    id: 'core',
+    packVersion: CORE_PACK_VERSION,
+    rulesetAnchor: `CORE-01 ${RULESET_MANIFEST.coreVersion}`,
+    required: true,
+};
 
 export const CorePack: EnginePackDefinition = {
     id: 'core',
     name: 'CORE-01 (v1.1.0)',
+    manifest: CORE_PACK_MANIFEST,
     moves: CoreMoves,
     setup: {
         preShuffle: (G: GameState, ctx: any, _cfg: GameConfig) => {

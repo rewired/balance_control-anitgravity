@@ -3,9 +3,19 @@ import type { AtomRegistration } from '../engine/engine-module-registry';
 
 export type EnginePackId = 'core' | 'exp01' | 'exp02' | 'exp03';
 
+export type PackManifest = Readonly<{
+    id: EnginePackId;
+    packVersion: string;
+    rulesetAnchor: string;
+    required: boolean;
+    requires?: { core: string };
+    compatibleWith?: string[];
+}>;
+
 export type EnginePackDefinition = Readonly<{
     id: EnginePackId;
     name: string;
+    manifest: PackManifest;
     moves?: Record<string, (...args: any[]) => any>;
     resources?: ResourceType[];
     zones?: string[];

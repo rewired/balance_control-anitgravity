@@ -30,7 +30,7 @@ describe('Replay runner', () => {
         };
 
         const result = runReplay(replay);
-        expect(result.hash).toBe('f2223a723d6d0ab75c7188955735ec9ccabf1d2fb185f59f8f0923b966d58c92');
+        expect(result.hash).toBe('75f7c1941a40913ecf898d587ad37b0ea822196836fda6235d921c485f2e8493');
         expect(result.state.G.meta?.ruleset).toBeTruthy();
     });
 

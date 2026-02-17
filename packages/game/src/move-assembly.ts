@@ -1,5 +1,5 @@
 import type { GameConfig, GameState } from '@balance-control/rules';
-import { DEFAULT_EXPANSION_FLAGS } from './config';
+import { DEFAULT_GAME_CONFIG } from './config';
 import { CANONICAL_ENGINE_MODULE_ORDER, EnginePackRegistry } from './expansion-registry';
 import type { AtomHandler } from './engine/engine-module-registry';
 import { EngineModuleRegistry } from './engine/engine-module-registry';
@@ -68,11 +68,7 @@ function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
 export function assemblePacks(options: { config?: GameConfig; mode?: PackAssemblyMode }): PackAssembly {
     ensureCorePackRegistered();
     const mode = options.mode ?? 'enabled';
-    const config: GameConfig =
-        options.config ??
-        ({
-            expansions: { ...DEFAULT_EXPANSION_FLAGS },
-        } as GameConfig);
+    const config: GameConfig = options.config ?? DEFAULT_GAME_CONFIG;
 
     const packs =
         mode === 'registered' ? EnginePackRegistry.getRegisteredPacks() : EnginePackRegistry.getEnabledPacks(undefined, config);

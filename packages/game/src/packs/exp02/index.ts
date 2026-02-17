@@ -1,11 +1,21 @@
 import { Expansion02 } from '@balance-control/expansion-02';
-import type { EnginePackDefinition } from '../types';
+import { RULESET_MANIFEST } from '@balance-control/rules';
+import type { EnginePackDefinition, PackManifest } from '../types';
 import { playMeasure, takeMeasure } from '../../expansion-moves';
 import { exp02RegulationAtoms } from '../../engine/atoms/regulation';
+
+const EXP02_PACK_VERSION = (RULESET_MANIFEST.expansions.exp02Version ?? '0.0.0').replace(/^v/i, '');
+const EXP02_PACK_MANIFEST: PackManifest = {
+    id: 'exp02',
+    packVersion: EXP02_PACK_VERSION,
+    rulesetAnchor: `EXP-02 ${RULESET_MANIFEST.expansions.exp02Version ?? 'v0.0.0'}`,
+    required: false,
+};
 
 export const Exp02Pack: EnginePackDefinition = {
     id: 'exp02',
     name: Expansion02.name,
+    manifest: EXP02_PACK_MANIFEST,
     moves: {
         'exp02.takeMeasure': takeMeasure,
         'exp02.playMeasure': playMeasure,
