@@ -45,7 +45,8 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
     const isDrawAndPlace = vm.stage === 'drawAndPlace';
     const isPoliticalAction = vm.stage === 'politicalAction';
 
-    const primaryPlaceInfluenceDisabled = !vm.political.placeInfluenceForSelected;
+    const placeInfluenceForSelected = vm.political.placeInfluenceForSelected;
+    const primaryPlaceInfluenceDisabled = !placeInfluenceForSelected;
     const showMoreActions = vm.political.others.length > 0;
 
     return (
@@ -76,8 +77,8 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                             className="btn-primary"
                             disabled={primaryPlaceInfluenceDisabled}
                             onClick={
-                                vm.political.placeInfluenceForSelected
-                                    ? () => moves[vm.political.placeInfluenceForSelected.moveType](vm.political.placeInfluenceForSelected.payload)
+                                placeInfluenceForSelected
+                                    ? () => moves[placeInfluenceForSelected.moveType](placeInfluenceForSelected.payload)
                                     : undefined
                             }
                             data-testid="btn-place-influence"

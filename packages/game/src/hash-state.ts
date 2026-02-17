@@ -1,4 +1,5 @@
-import { createHash } from 'node:crypto';
+import { sha256 } from '@noble/hashes/sha256';
+import { bytesToHex } from '@noble/hashes/utils';
 
 type JsonLike =
     | null
@@ -36,7 +37,6 @@ export function canonicalJsonStringify(value: JsonLike): string {
 }
 
 export function hashState(G: JsonLike): string {
-    return createHash('sha256')
-        .update(canonicalJsonStringify(G), 'utf8')
-        .digest('hex');
+    const utf8 = new TextEncoder().encode(canonicalJsonStringify(G));
+    return bytesToHex(sha256(utf8));
 }

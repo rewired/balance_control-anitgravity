@@ -4,11 +4,17 @@ import { GlassOverlay } from "./GlassOverlay";
 import { CENTER_ABS, INFLUENCE_MARKER_CENTERS_ABS, INNER_DISC_RADIUS, VIEWBOX } from "./tileGeometry";
 import type { SeatId } from "./types";
 
+type SvgDataAttributes = {
+  [K in `data-${string}`]?: string | undefined;
+};
+
+type HexTileSvgProps = Omit<SVGProps<SVGSVGElement>, "children" | "viewBox" | "xmlns"> & SvgDataAttributes;
+
 export type HexTileFrameProps = {
   majoritySeat: SeatId | null;
   seatColor: (seat: SeatId) => string;
   className?: string;
-  svgProps?: Omit<SVGProps<SVGSVGElement>, "children" | "viewBox" | "xmlns">;
+  svgProps?: HexTileSvgProps;
   content?: ReactNode;
   children?: ReactNode;
 };
