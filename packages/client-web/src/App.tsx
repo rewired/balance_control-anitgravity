@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Client, LobbyClient } from 'boardgame.io/client';
 import { SocketIO } from 'boardgame.io/multiplayer';
-import { BalanceControl } from '@balance-control/game';
+import { BalanceControlGame, GAME_NAME } from './game';
 import { Board } from './Board';
 import { StartScreen } from './components/StartScreen';
 import { LobbyScreen, type LobbyJoinPayload } from './components/LobbyScreen';
@@ -19,7 +19,6 @@ type MoveLogEntry = {
 const DEBUG_REPLAY = import.meta.env.VITE_DEBUG_REPLAY === '1';
 const REPLAY_RING_SIZE = 200;
 const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
-const GAME_NAME = BalanceControl.name;
 
 const DevHexTilePlayground = import.meta.env.DEV
     ? React.lazy(() => import('./dev/HexTilePlayground'))
@@ -89,7 +88,7 @@ const App: React.FC = () => {
     const client = useMemo(() => {
         if (!session) return null;
         return Client({
-            game: BalanceControl,
+            game: BalanceControlGame,
             multiplayer: SocketIO({ server: session.serverUrl }),
             matchID: session.matchID,
             playerID: session.playerID,
@@ -154,7 +153,7 @@ const App: React.FC = () => {
 
     const replayPayload = useMemo(() => {
         return {
-            gameName: BalanceControl.name,
+            gameName: GAME_NAME,
             gameVersion: 'dev',
             seed: getReplaySeed(state),
             numPlayers: state?.ctx?.numPlayers ?? 2,

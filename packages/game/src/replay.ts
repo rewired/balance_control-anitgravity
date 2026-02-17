@@ -1,5 +1,5 @@
 import { Client } from 'boardgame.io/client';
-import { BalanceControl } from './index';
+import { createBalanceControlGame } from './index';
 import { SetupGame } from './setup';
 import { hashState } from './hash-state';
 import type { RulesetManifest } from '@balance-control/rules';
@@ -51,8 +51,9 @@ function resolveMoveArgs(G: any, move: string, args: any[]): any[] {
 }
 
 export function runReplay(replay: ReplaySpec): { hash: string; state: any } {
+    const baseGame = createBalanceControlGame();
     const game = {
-        ...BalanceControl,
+        ...baseGame,
         seed: replay.seed ?? undefined,
         playerView: ({ G }: any) => G,
         setup: (ctx: any) => SetupGame({ ctx, setupData: replay.config })

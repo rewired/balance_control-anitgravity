@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Client } from 'boardgame.io/client';
 import { Local } from 'boardgame.io/multiplayer';
-import { BalanceControl } from '@balance-control/game';
+import { BalanceControlGame } from '../game';
 import { Board } from '../Board';
 
 type SeatID = '0' | '1';
@@ -16,14 +16,14 @@ export const HotseatShell: React.FC = () => {
     const clients = useMemo(() => {
         return {
             '0': Client({
-                game: BalanceControl,
+                game: BalanceControlGame,
                 numPlayers: 2,
                 matchID: MATCH_ID,
                 playerID: '0',
                 multiplayer: localMultiplayer,
             }),
             '1': Client({
-                game: BalanceControl,
+                game: BalanceControlGame,
                 numPlayers: 2,
                 matchID: MATCH_ID,
                 playerID: '1',
@@ -108,4 +108,3 @@ export const HotseatShell: React.FC = () => {
         </>
     );
 };
-

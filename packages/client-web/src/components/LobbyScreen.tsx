@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { LobbyClient } from 'boardgame.io/client';
-import { BalanceControl } from '@balance-control/game';
+import { GAME_NAME } from '../game';
 import { clearLastSession, readLastSession, type LastSession } from '../lobby/session';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
-const GAME_NAME = BalanceControl.name;
 
 export type LobbyJoinPayload = {
     matchID: string;

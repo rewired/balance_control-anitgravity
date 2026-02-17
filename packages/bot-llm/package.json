@@ -6,7 +6,11 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@balance-control/game": "workspace:*"  },
+    "@balance-control/expansion-01": "workspace:*",
+    "@balance-control/expansion-02": "workspace:*",
+    "@balance-control/expansion-03": "workspace:*",
+    "@balance-control/game": "workspace:*"
+  },
   "devDependencies": {
      "typescript": "^5.0.0"
   }

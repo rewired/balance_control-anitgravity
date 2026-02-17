@@ -82,6 +82,19 @@ class Registry {
         return modules;
     }
 
+    getRegisteredMoveModules(): Array<{ moduleId: EngineModuleId; expansionId: ExpansionId; moves: Record<string, (...args: any[]) => any> }> {
+        const modules: Array<{ moduleId: EngineModuleId; expansionId: ExpansionId; moves: Record<string, (...args: any[]) => any> }> = [];
+
+        for (const expId of CANONICAL_EXPANSION_ORDER) {
+            const exp = this.expansions[expId];
+            if (!exp) continue;
+            const moves = exp.moves ?? {};
+            modules.push({ moduleId: expId as EngineModuleId, expansionId: expId, moves });
+        }
+
+        return modules;
+    }
+
     getMergedMoves(config?: GameConfig) {
         const modules = this.getEnabledMoveModules(config);
         const merged: Record<string, (...args: any[]) => any> = {};
