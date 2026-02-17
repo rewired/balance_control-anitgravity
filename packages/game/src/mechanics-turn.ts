@@ -1,6 +1,7 @@
 import { GameState, CoreZoneNames, TileType } from '@balance-control/rules';
 import { positionKeyFromCoordString } from './topology';
 import { EffectResolver } from './engine/resolver';
+import { findObjectZoneId } from './state-lookup';
 
 /** CORE-01-08-01: Max influence cap */
 export function getInfluenceCap(ctx: any): number {
@@ -65,13 +66,6 @@ export function returnMetaMarkersAtRoundStart(G: GameState) {
     }
 }
 
-function findObjectZoneId(G: GameState, objectId: string): string | null {
-    for (const zone of Object.values(G.zones)) {
-        if (zone.items.includes(objectId)) return zone.id;
-    }
-    return null;
-}
-
 /** CORE-01-04-09A: Return Meta-Marker to PersonalSupply and set mode = None when Political Action did not place/update it. */
 export function returnMetaMarkerToSupply(G: GameState, playerId: string): void {
     const supplyId = `${CoreZoneNames.PersonalSupply}:${playerId}`;
@@ -124,4 +118,3 @@ export function runFinalRoundSettlement(G: GameState & { engine: any; grid?: Rec
     }
     EffectResolver.resolve(G, ctx);
 }
-
