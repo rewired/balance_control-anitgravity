@@ -1,5 +1,4 @@
 import { GameState, TileType, GameObject, CoreZoneNames, ResourceType } from '@balance-control/rules';
-import { ExpansionRegistry } from './expansion-registry';
 
 export interface MajorityResult {
     controller: string | null;

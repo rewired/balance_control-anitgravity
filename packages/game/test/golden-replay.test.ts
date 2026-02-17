@@ -5,7 +5,6 @@ import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from '../src/index';
 import { SetupGame } from '../src/setup';
 import { hashState } from '../src/hash-state';
-import { ExpansionRegistry } from '../src/expansion-registry';
 import { Expansion01 } from '../../expansion-01/src/index';
 import { CoreZoneNames, TileType } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';

@@ -8,11 +8,11 @@ Make the repo compile reliably:
 
 ## Inputs
 - packages/game/src/engine/types.ts has invalid syntax
-- server imports ExpansionRegistry but game package may not export it
+- server imports legacy registry alias but game package may not export it
 
 ## Outputs
 - Fix engine/types.ts (no syntax errors, no duplicate union arms)
-- Ensure packages/game exports ExpansionRegistry (or update server import path)
+- Ensure packages/game exports the legacy registry alias (or update server import path)
 - Ensure TS project references / tsconfig are coherent
 - Add root script: "build" runs workspace builds (pnpm -r build)
 

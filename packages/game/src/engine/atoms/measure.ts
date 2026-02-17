@@ -1,7 +1,7 @@
 import type { GameState } from '@balance-control/rules';
 import type { AtomRegistration } from '../engine-module-registry';
 import type { EngineState } from '../types';
-import { ExpansionRegistry } from '../../expansion-registry';
+import { EnginePackRegistry } from '../../expansion-registry';
 import { lookupMeasureDeckForObjectId } from '../measure-deck-provider';
 
 function handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): void {
@@ -12,7 +12,7 @@ function handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): v
     const mId = obj.measureId;
     if (!mId) return;
 
-    const atoms = ExpansionRegistry.getMeasureAtoms(G, mId, atom);
+    const atoms = EnginePackRegistry.getMeasureAtoms(G, mId, atom);
     if (atoms && atoms.length > 0) {
         G.engine.effectQueue.unshift(...atoms);
     }
@@ -82,4 +82,3 @@ export const coreMeasureAtoms: AtomRegistration[] = [
     { kind: 'measure.take', handler: (G, ctx, atom) => handleMeasureTake(G as any, ctx, atom) },
     { kind: 'measure.recycle', handler: (G, ctx, atom) => handleMeasureRecycle(G as any, ctx, atom) }
 ];
-

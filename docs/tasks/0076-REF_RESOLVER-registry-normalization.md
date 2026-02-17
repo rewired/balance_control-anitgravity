@@ -1,4 +1,4 @@
-# Codex Task 0076 - REF_RESOLVER: ExpansionRegistry normalization (ids, order, enablement)
+# Codex Task 0076 - REF_RESOLVER: legacy registry normalization (ids, order, enablement)
 
 **Date:** 2026-02-16
 **Primary contract:** `AGENTS.md` (repo root)

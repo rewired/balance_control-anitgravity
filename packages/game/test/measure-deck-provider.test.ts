@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { ExpansionRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { lookupMeasureDeckForObjectId } from '../src/engine/measure-deck-provider';
 import { Expansion02 } from '../../expansion-02/src/index';
@@ -12,7 +12,7 @@ describe('Measure deck provider lookup', () => {
     });
 
     afterEach(() => {
-        ExpansionRegistry.clear();
+        EnginePackRegistry.clear();
     });
 
     it('routes EXP-02 measure object ids to the EXP-02 measure zones', () => {
@@ -66,7 +66,7 @@ describe('Measure deck provider lookup', () => {
     });
 
     it('fails deterministically when multiple enabled decks match the same object id', () => {
-        ExpansionRegistry.register({
+        EnginePackRegistry.register({
             id: 'exp01',
             name: 'Mock EXP-01',
             measureDecks: [

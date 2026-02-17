@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ExpansionRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry } from '../src/expansion-registry';
 import { EffectResolver } from '../src/engine/resolver';
 import { ExpansionDefinition, GameState, TileType } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';
@@ -12,17 +12,17 @@ describe('Expansion System', () => {
 
     it('should register an expansion', () => {
         const mockExp: ExpansionDefinition = { id: 'exp01', name: 'TestExp' };
-        ExpansionRegistry.register(mockExp);
-        const all = ExpansionRegistry.getAll();
+        EnginePackRegistry.register(mockExp);
+        const all = EnginePackRegistry.getAll();
         expect(all).toContain(mockExp);
     });
 
     it('should return expansions in deterministic canonical order', () => {
-        ExpansionRegistry.register({ id: 'exp03', name: 'E3' });
-        ExpansionRegistry.register({ id: 'exp01', name: 'E1' });
-        ExpansionRegistry.register({ id: 'exp02', name: 'E2' });
+        EnginePackRegistry.register({ id: 'exp03', name: 'E3' });
+        EnginePackRegistry.register({ id: 'exp01', name: 'E1' });
+        EnginePackRegistry.register({ id: 'exp02', name: 'E2' });
 
-        expect(ExpansionRegistry.getAll().map(e => e.id)).toEqual(['exp01', 'exp02', 'exp03']);
+        expect(EnginePackRegistry.getAll().map(e => e.id)).toEqual(['exp01', 'exp02', 'exp03']);
     });
 
     it('should apply production modifiers', () => {
@@ -61,7 +61,7 @@ describe('Expansion System', () => {
                 production: (tileId, G, base) => base + 10
             }
         };
-        ExpansionRegistry.register(modExp);
+        EnginePackRegistry.register(modExp);
 
         // Resolve
         G.engine.effectQueue.push({ kind: 'production.resolve', tileId: 'r1' });

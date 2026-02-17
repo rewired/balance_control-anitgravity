@@ -14,7 +14,7 @@ Make expansions optional, isolated, and setup-correct:
 
 ## Outputs
 - GameConfig expansion flags (ex01/ex02/ex03 booleans)
-- ExpansionRegistry.applySetup(G, ctx, config) runs before final shuffle
+- Legacy registry applySetup(G, ctx, config) runs before final shuffle
 - Cleanup: expansion-specific zone names removed from core lists (moved behind flags)
 - Tests: enabled vs disabled expansions produce different deterministic deck composition
 

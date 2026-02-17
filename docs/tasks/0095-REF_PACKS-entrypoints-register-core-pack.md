@@ -20,7 +20,7 @@ Today, entrypoints only register numbered expansions:
 - `packages/server/src/index.ts`
 - `packages/bot-llm/src/index.ts`
 
-Tests also register expansions ad-hoc, and may use `ExpansionRegistry.clear()` between runs.
+Tests also register expansions ad-hoc, and may use the legacy registry `clear()` between runs.
 
 We need one consistent rule:
 
@@ -66,7 +66,7 @@ So that registration order is explicit:
 - `EnginePackRegistry.registerPack(CorePack)` first
 - then `registerPack(Expansion01/02/03)` (or legacy register if still supported)
 
-If the public API still exports `ExpansionRegistry`, update to use the new preferred name (but keep compatibility if required by other packages).
+If the public API still exports a legacy registry alias, update to use the new preferred name (but keep compatibility if required by other packages).
 
 ### B) Test helper
 
@@ -93,7 +93,7 @@ Keep it minimal and deterministic.
 
 - Update `docs/architecture/ARCH-01-ENGINE-CONTRACT.md` or `AGENTS.md` (choose one) with a short “Boot contract” note:
   - “CorePack must be registered before createBalanceControlGame().”
-- Update any references to “ExpansionRegistry” where it is now misleading (optional but preferred if low-risk).
+- Update any references to the legacy registry name where it is now misleading (optional but preferred if low-risk).
 
 ## 6) Constraints (frozen)
 

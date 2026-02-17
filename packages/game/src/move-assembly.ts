@@ -1,9 +1,35 @@
-import type { GameConfig } from '@balance-control/rules';
+import type { GameConfig, GameState } from '@balance-control/rules';
+import { DEFAULT_EXPANSION_FLAGS } from './config';
 import { CANONICAL_ENGINE_MODULE_ORDER, EnginePackRegistry } from './expansion-registry';
+import type { AtomHandler } from './engine/engine-module-registry';
+import { EngineModuleRegistry } from './engine/engine-module-registry';
+import { exp03CountdownAtoms } from './engine/atoms/countdown';
+import { exp02RegulationAtoms } from './engine/atoms/regulation';
+import type { EngineState, HookPoint } from './engine/types';
 import { MoveModuleRegistry, type MoveFn, type MoveMap, type MoveModule } from './move-module-registry';
+import type { EnginePackDefinition } from './packs/types';
+import { CorePack } from './packs/core';
 import { ensureCorePackRegistered } from './packs/register-core';
 
 export type { MoveFn, MoveMap, MoveModule };
+
+export type PackAssemblyMode = 'enabled' | 'registered';
+
+export type PackAssembly = Readonly<{
+    mode: PackAssemblyMode;
+    config: GameConfig;
+    packs: EnginePackDefinition[];
+    moveModules: MoveModule[];
+    moves: MoveMap;
+    expansionMoveModules: MoveModule[];
+    expansionMoves: MoveMap;
+    applySetupPreShuffle: (G: GameState, ctx: any) => void;
+    applySetupPostShuffle: (G: GameState, ctx: any) => void;
+    buildAtomDispatch: (
+        G: GameState & { engine: EngineState },
+        triggerHook: (G2: GameState & { engine: EngineState }, ctx2: any, hook: HookPoint, payload?: any) => void
+    ) => ReadonlyMap<string, AtomHandler>;
+}>;
 
 export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
     ensureCorePackRegistered();
@@ -33,7 +59,7 @@ export function getMoveModulesSuperset(): MoveModule[] {
     return out;
 }
 
-export function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
+function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
     const reg = new MoveModuleRegistry(CANONICAL_ENGINE_MODULE_ORDER);
     for (const module of modules) {
         reg.registerModule(module);
@@ -41,20 +67,95 @@ export function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
     return reg.buildMoveMap();
 }
 
+export function assemblePacks(options: { config?: GameConfig; mode?: PackAssemblyMode }): PackAssembly {
+    ensureCorePackRegistered();
+    const mode = options.mode ?? 'enabled';
+    const config: GameConfig =
+        options.config ??
+        ({
+            expansions: { ...DEFAULT_EXPANSION_FLAGS },
+        } as GameConfig);
+
+    const packs =
+        mode === 'registered' ? EnginePackRegistry.getRegisteredPacks() : EnginePackRegistry.getEnabledPacks(undefined, config);
+
+    const moveModules = mode === 'registered' ? getMoveModulesSuperset() : getEnabledMoveModules(config);
+    const moves = mergeMoveModules(moveModules);
+    const expansionMoveModules = moveModules.filter((m) => m.moduleId !== 'core');
+    const expansionMoves = mergeMoveModules(expansionMoveModules);
+
+    const applySetupPreShuffle = (G: GameState, ctx: any) => {
+        CorePack.setup?.preShuffle?.(G, ctx, config);
+        EnginePackRegistry.applySetupPreShuffle(G, ctx, config);
+    };
+
+    const applySetupPostShuffle = (G: GameState, ctx: any) => {
+        for (const pack of packs) {
+            pack.setup?.postShuffle?.(G, ctx, config);
+        }
+    };
+
+    const buildAtomDispatch = (
+        G: GameState & { engine: EngineState },
+        triggerHook: (G2: GameState & { engine: EngineState }, ctx2: any, hook: HookPoint, payload?: any) => void
+    ) => {
+        const registry = new EngineModuleRegistry();
+        const coreAtoms =
+            CorePack.engine?.atoms?.({
+                triggerHook: (G2, ctx2, hook, payload) => triggerHook(G2 as any, ctx2, hook, payload),
+            }) ?? [];
+
+        registry.registerModule({
+            id: 'core',
+            isEnabled: () => true,
+            atoms: coreAtoms,
+        });
+
+        registry.registerModule({
+            id: 'exp02',
+            isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex02 === true,
+            atoms: [...exp02RegulationAtoms],
+        });
+
+        registry.registerModule({
+            id: 'exp03',
+            isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex03 === true,
+            atoms: [...exp03CountdownAtoms],
+        });
+
+        return registry.buildAtomDispatch(G);
+    };
+
+    return {
+        mode,
+        config,
+        packs,
+        moveModules,
+        moves,
+        expansionMoveModules,
+        expansionMoves,
+        applySetupPreShuffle,
+        applySetupPostShuffle,
+        buildAtomDispatch,
+    };
+}
+
 export function buildMovesForConfig(config: GameConfig): MoveMap {
-    return mergeMoveModules(getEnabledMoveModules(config));
+    return assemblePacks({ config, mode: 'enabled' }).moves;
 }
 
 export function buildExpansionMovesForConfig(config: GameConfig): MoveMap {
-    const modules = getEnabledMoveModules(config).filter((m) => m.moduleId !== 'core');
-    return mergeMoveModules(modules);
+    return assemblePacks({ config, mode: 'enabled' }).expansionMoves;
 }
 
 export function buildMovesSuperset(): MoveMap {
-    return mergeMoveModules(getMoveModulesSuperset());
+    return assemblePacks({ mode: 'registered' }).moves;
 }
 
 export function buildExpansionMovesSuperset(): MoveMap {
-    const modules = getMoveModulesSuperset().filter((m) => m.moduleId !== 'core');
-    return mergeMoveModules(modules);
+    return assemblePacks({ mode: 'registered' }).expansionMoves;
+}
+
+export function buildStageMoveMap(coreStageMoves: MoveMap, expansionModules: MoveModule[]): MoveMap {
+    return mergeMoveModules([{ moduleId: 'core', moves: coreStageMoves }, ...expansionModules]);
 }

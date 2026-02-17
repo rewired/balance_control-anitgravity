@@ -1,5 +1,5 @@
 import type { ExpansionId, GameState } from '@balance-control/rules';
-import { ExpansionRegistry } from '../expansion-registry';
+import { EnginePackRegistry } from '../expansion-registry';
 
 export type MeasureDeckLookup = Readonly<{
     expansionId: ExpansionId;
@@ -12,7 +12,7 @@ export type MeasureDeckLookup = Readonly<{
 }>;
 
 export function lookupMeasureDeckForObjectId(G: GameState, measureObjectId: string): MeasureDeckLookup {
-    const candidates = ExpansionRegistry.getMeasureDeckDescriptors(G);
+    const candidates = EnginePackRegistry.getMeasureDeckDescriptors(G);
     const matches = candidates.filter(c => measureObjectId.startsWith(c.deck.objectIdPrefix));
 
     if (matches.length === 0) {
@@ -39,4 +39,3 @@ export function lookupMeasureDeckForObjectId(G: GameState, measureObjectId: stri
         finalDiscardId: match.deck.zones.finalDiscardId
     };
 }
-

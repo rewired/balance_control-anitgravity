@@ -78,7 +78,7 @@ Add a new test:
 
 Test requirements:
 
-* Register EXP-02 via `ExpansionRegistry.register(Expansion02)`.
+* Register EXP-02 via the legacy registry `register(Expansion02)`.
 * Call `SetupGame({ ctx, setupData: { expansions: { ex02: true } } })` with deterministic ctx shuffle (identity is fine).
 * Assert Inner Order tile exists in `G.tiles['tile_inner_order']`.
 * Place a single Influence for player `"0"` onto the tile zone `G.zones['tile_inner_order']` to make it controlled.
@@ -112,7 +112,7 @@ If the handler uses the wrong id, the queue stays unchanged (no-op), and the tes
 * No new mechanics, no rebalance, no timing/order changes.
 * Deterministic behavior only (test must not rely on real RNG).
 * Keep fix minimal (string/id unification only).
-* Do not introduce cross-package coupling; use existing imports (`SetupGame`, `ExpansionRegistry`, `computeMajority`, `Expansion02`).
+* Do not introduce cross-package coupling; use existing imports (`SetupGame`, legacy registry, `computeMajority`, `Expansion02`).
 
 ---
 

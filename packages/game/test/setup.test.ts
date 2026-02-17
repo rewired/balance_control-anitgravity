@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { SetupGame } from '../src/setup';
-import { ExpansionRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry } from '../src/expansion-registry';
 import { registerTestPacks } from './_helpers/registerPacks';
 import { CoreZoneNames, ExpansionDefinition, TileType } from '@balance-control/rules';
 
@@ -129,7 +129,7 @@ describe('SetupGame', () => {
                 G.zones.tile_ex01_mock = { id: 'tile_ex01_mock', name: 'EX01 Mock', items: [] };
             }
         };
-        ExpansionRegistry.register(mockEx01);
+        EnginePackRegistry.register(mockEx01);
 
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx, setupData: { expansions: { ex01: false } } });
@@ -148,7 +148,7 @@ describe('SetupGame', () => {
                 G.zones.tile_ex01_mock = { id: 'tile_ex01_mock', name: 'EX01 Mock', items: [] };
             }
         };
-        ExpansionRegistry.register(mockEx01);
+        EnginePackRegistry.register(mockEx01);
 
         const enabledA = SetupGame({
             ctx: { numPlayers: 2, random: createSeededRandom(2028) } as any,

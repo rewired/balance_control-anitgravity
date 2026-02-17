@@ -2,7 +2,7 @@ import type { GameState } from '@balance-control/rules';
 import type { AtomRegistration } from '../engine-module-registry';
 import type { EngineState } from '../types';
 import { computeMajority } from '../../mechanics';
-import { ExpansionRegistry } from '../../expansion-registry';
+import { EnginePackRegistry } from '../../expansion-registry';
 import { applyModifiers } from '../resolver/modifiers';
 import { isProhibited } from '../resolver/prohibitions';
 
@@ -15,7 +15,7 @@ function handleProductionResolve(G: GameState & { engine: EngineState }, atom: a
     if (isProhibited(G, 'production.resolve', 'NONE', tileId)) return;
 
     const printedAmount = tile.weight || 0;
-    const baseAmount = ExpansionRegistry.applyProductionModifiers(G, tileId, printedAmount);
+    const baseAmount = EnginePackRegistry.applyProductionModifiers(G, tileId, printedAmount);
     atom.context = { ...atom.context, tileId, baseAmount, resort: tile.resort };
 
     // 1. Trigger hooks that might add or subtract from this distribution
@@ -66,4 +66,3 @@ function handleProductionResolve(G: GameState & { engine: EngineState }, atom: a
 export const coreProductionAtoms: AtomRegistration[] = [
     { kind: 'production.resolve', handler: (G, _ctx, atom) => handleProductionResolve(G as any, atom) }
 ];
-

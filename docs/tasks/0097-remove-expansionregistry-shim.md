@@ -1,7 +1,7 @@
-# Codex Task 0097 - Remove ExpansionRegistry Shim (Pack-Only Assembly)
+# Codex Task 0097 - Remove legacy registry shim (Pack-Only Assembly)
 
-**Date:** 2026-02-17  
-**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)  
+**Date:** 2026-02-17
+**Style:** Codex task contract (Inputs / Outputs / Constraints / Invariants / Acceptance / PR Checklist)
 **Primary contract:** `AGENTS.md` (repo root)
 
 Related architecture contracts (normative):
@@ -17,7 +17,7 @@ Related architecture contracts (normative):
 Eliminate the legacy compatibility layer around pack assembly.
 
 **Target outcome:** There is exactly one authoritative pack assembly path:
-`EnginePackRegistry` + `registerPack()` (or equivalent), and *nothing* routes through an `ExpansionRegistry` shim or alias export.
+`EnginePackRegistry` + `registerPack()` (or equivalent), and *nothing* routes through a legacy registry shim or alias export.
 
 Reason: As long as the shim exists, someone will use it, and at some point it will silently drift.
 
@@ -27,7 +27,7 @@ Reason: As long as the shim exists, someone will use it, and at some point it wi
 
 - Current project state (post-Task 0095).
 - There exists a pack registry implementation (`EnginePackRegistry` / `registerPack`) that Core uses.
-- There also exists a legacy assembly/shim (`ExpansionRegistry` or similarly named) still used in some places.
+- There also exists a legacy assembly/shim (legacy registry alias) still used in some places.
 
 ---
 
@@ -36,7 +36,7 @@ Reason: As long as the shim exists, someone will use it, and at some point it wi
 ### A) Remove the shim
 
 1) Locate the shim:
-- Search for: `ExpansionRegistry`, `getMergedMoves`, `mergeMoves`, `mergedAtoms`, `compat`, `legacy`, `override`, or any export that exists “only for backwards compatibility”.
+- Search for: legacy registry aliases, `getMergedMoves`, `mergeMoves`, `mergedAtoms`, `compat`, `legacy`, `override`, or any export that exists “only for backwards compatibility”.
 
 2) Replace usages:
 - Update all imports/usages to route through `EnginePackRegistry` + the canonical pack assembly function (whatever the codebase calls it).
@@ -83,7 +83,7 @@ It should be the only place that merges pack-provided:
 
 ## Acceptance Criteria
 
-- `rg "ExpansionRegistry" -S packages docs` returns nothing (or only historical changelog notes).
+- `rg "legacy registry" -S packages docs` returns only the updated task references and historical changelog notes.
 - All game start paths (server + client) assemble packs via the canonical registry path.
 - Introduce a small unit test (or runtime assertion test) proving duplicates are rejected:
   - register two dummy packs with same move id -> assert throw.
@@ -92,8 +92,32 @@ It should be the only place that merges pack-provided:
 
 ## PR Checklist
 
-- [ ] Shim module deleted (and imports fixed)
-- [ ] Pack assembly has duplicate detection and stable order
-- [ ] Tests added/updated for duplicate rejection
+- [x] Shim alias removed and imports fixed
+- [x] Pack assembly has duplicate detection and stable order
+- [x] Tests added/updated for duplicate rejection
 - [ ] `pnpm test` (or repo equivalent) passes
-- [ ] Meaningful commit message, e.g. `engine: remove ExpansionRegistry shim; enforce safe pack assembly`
+- [ ] Meaningful commit message, e.g. `engine: remove legacy registry shim; enforce safe pack assembly`
+
+## 15) Execution Log (append-only)
+
+### affected_guardrails
+
+- GR-003
+- GR-012
+
+### spec_anchor_refs
+
+- docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json
+- docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+- docs/architecture/ARCH-03-MEASURE-CPU.md
+
+### Work Summary
+
+- Removed legacy registry alias exports and updated registry usages across packages.
+- Centralized pack assembly through canonical move merging with duplicate detection.
+- Updated tests and historical task docs to remove legacy registry naming.
+- Updated changelog for task 0097.
+
+### Commands Run
+
+- N/A

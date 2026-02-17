@@ -1,9 +1,6 @@
 import { GameState } from '@balance-control/rules';
 import { EffectAtom, HookPoint, EngineState } from './types';
-import { EngineModuleRegistry, type AtomHandler } from './engine-module-registry';
-import { exp03CountdownAtoms } from './atoms/countdown';
-import { exp02RegulationAtoms } from './atoms/regulation';
-import { CorePack } from '../packs/core';
+import type { AtomHandler } from './engine-module-registry';
 import { capitalize } from './resolver/ids';
 import { applyModifiers, getHookForAtom, removeModifier } from './resolver/modifiers';
 import { isProhibited as isProhibitedImpl } from './resolver/prohibitions';
@@ -16,6 +13,7 @@ import {
     type CostSpec,
     type CostValidationResult
 } from './resolver/costs';
+import { assemblePacks } from '../move-assembly';
 
 /**
  * The EffectResolver is the central "CPU" of the game.
@@ -193,29 +191,7 @@ export class EffectResolver {
     }
 
     private static buildAtomDispatch(G: GameState & { engine: EngineState }): ReadonlyMap<string, AtomHandler> {
-        const registry = new EngineModuleRegistry();
-        const coreAtoms = CorePack.engine?.atoms?.({
-            triggerHook: (G2, ctx2, hook, payload) => this.triggerHook(G2 as any, ctx2, hook, payload)
-        }) ?? [];
-
-        registry.registerModule({
-            id: 'core',
-            isEnabled: () => true,
-            atoms: coreAtoms
-        });
-
-        registry.registerModule({
-            id: 'exp02',
-            isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex02 === true,
-            atoms: [...exp02RegulationAtoms]
-        });
-
-        registry.registerModule({
-            id: 'exp03',
-            isEnabled: (G2) => G2?.meta?.cfg?.expansions?.ex03 === true,
-            atoms: [...exp03CountdownAtoms]
-        });
-
-        return registry.buildAtomDispatch(G);
+        const assembly = assemblePacks({ config: G.meta?.cfg as any, mode: 'enabled' });
+        return assembly.buildAtomDispatch(G, (G2, ctx2, hook, payload) => this.triggerHook(G2 as any, ctx2, hook, payload));
     }
 }

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreZoneNames } from '@balance-control/rules';
 import { Expansion02, EXP02_TILE_INNER_ORDER_ID } from '../../expansion-02/src/index';
-import { ExpansionRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
 import { registerTestPacks } from './_helpers/registerPacks';
@@ -12,7 +12,7 @@ describe('EXP-02 Inner Order hotspot id consistency', () => {
     });
 
     afterEach(() => {
-        ExpansionRegistry.clear();
+        EnginePackRegistry.clear();
     });
 
     it('should resolve HOTSPOT_RESOLUTION for the setup Inner Order tile id', () => {

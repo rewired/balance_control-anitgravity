@@ -1,8 +1,7 @@
 import { GameState, CoreZoneNames, TileType, CoreResources, RULESET_MANIFEST, RulesetManifest } from '@balance-control/rules';
 import { Ctx } from 'boardgame.io';
-import { EnginePackRegistry } from './expansion-registry';
 import { normalizeGameConfig } from './config';
-import { CorePack } from './packs/core';
+import { assemblePacks } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
 
 function normalizeBoardgameCtx(ctx: any): Ctx {
@@ -77,10 +76,8 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
 
     ensureCorePackRegistered();
 
-    CorePack.setup?.preShuffle?.(G, normalizedCtx, gameConfig);
-
-    // 4. Apply enabled expansions before the one final setup shuffle.
-    EnginePackRegistry.applySetupPreShuffle(G, normalizedCtx, gameConfig);
+    const packAssembly = assemblePacks({ config: gameConfig, mode: 'enabled' });
+    packAssembly.applySetupPreShuffle(G, normalizedCtx);
 
     // CORE-01-03-02B: Canonical Pre-Shuffle Ordering before shuffle
     G.zones[CoreZoneNames.DrawPile].items = sortDrawPileCanonical(G);
@@ -93,7 +90,7 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         );
     }
 
-    EnginePackRegistry.applySetupPostShuffle(G, normalizedCtx, gameConfig);
+    packAssembly.applySetupPostShuffle(G, normalizedCtx);
 
     return G;
 };

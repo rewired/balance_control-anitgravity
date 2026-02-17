@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreResources, CoreZoneNames, TileType } from '@balance-control/rules';
 import { Expansion03 } from '../../expansion-03/src/index';
-import { ExpansionRegistry } from '../src/expansion-registry';
+import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
 import { EffectResolver } from '../src/engine/resolver';
@@ -43,7 +43,7 @@ describe('EXP-03 controller grants with no controller', () => {
     });
 
     afterEach(() => {
-        ExpansionRegistry.clear();
+        EnginePackRegistry.clear();
     });
 
     it('should require explicit SKIP policy on all EXP-03 CONTROLLER grants', () => {

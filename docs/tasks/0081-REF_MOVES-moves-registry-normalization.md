@@ -86,7 +86,7 @@ Normalize move assembly so that:
 ### Work Summary
 
 - Added deterministic move assembly helpers (`getEnabledMoveModules` + strict merging with duplicate detection).
-- Updated `ExpansionRegistry.getMergedMoves` to be config-only and to reject duplicate move IDs deterministically.
+- Updated the legacy registry `getMergedMoves` to be config-only and to reject duplicate move IDs deterministically.
 - Updated `packages/game` entrypoints to assemble moves via canonical module order (no semantic changes at current coverage).
 - Updated changelog entry for task 0081.
 

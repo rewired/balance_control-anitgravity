@@ -3,10 +3,6 @@ import { DEFAULT_EXPANSION_FLAGS } from './config';
 import type { EnginePackDefinition, EnginePackId } from './packs/types';
 import type { MoveModule } from './move-module-registry';
 
-/**
- * Canonical ordering for all engine modules.
- * Single source of truth: do not derive from Map insertion order, object keys, or registration side-effects.
- */
 export const CANONICAL_ENGINE_MODULE_ORDER = ['core', 'exp01', 'exp02', 'exp03'] as const;
 export type EngineModuleId = (typeof CANONICAL_ENGINE_MODULE_ORDER)[number];
 
@@ -21,13 +17,6 @@ const EXPANSION_ID_TO_FLAG_KEY: Record<ExpansionId, keyof ExpansionFlags> = {
     exp03: 'ex03',
 };
 
-/**
- * EnginePackRegistry (core-capable) is the preferred registry API.
- *
- * Backward compatibility:
- * - ExpansionRegistry is deprecated; use EnginePackRegistry / registerPack.
- * - Legacy register(def: ExpansionDefinition) remains supported for exp01..exp03 only.
- */
 class EnginePackRegistryImpl {
     private packs: Partial<Record<EnginePackId, EnginePackDefinition>> = {};
     private legacyExpansions: Partial<Record<ExpansionId, ExpansionDefinition>> = {};
@@ -181,28 +170,6 @@ class EnginePackRegistryImpl {
         this.legacyExpansions = {};
     }
 
-    public getMergedMoves(config?: GameConfig) {
-        const modules = this.getEnabledMoveModules(config);
-        const merged: Record<string, (...args: any[]) => any> = {};
-
-        for (const mod of modules) {
-            const keys = Object.keys(mod.moves).sort((a, b) => a.localeCompare(b));
-            for (const key of keys) {
-                if (Object.prototype.hasOwnProperty.call(merged, key)) {
-                    throw new Error(`[moves] duplicate move id "${key}" while merging pack "${mod.moduleId}".`);
-                }
-                merged[key] = mod.moves[key];
-            }
-        }
-
-        return merged;
-    }
-
-    // Hook Executors
-    public applySetup(G: GameState, ctx: any, config?: GameConfig) {
-        this.applySetupPreShuffle(G, ctx, config);
-    }
-
     public getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
         const flags = this.resolveFlags(G);
         for (const expId of CANONICAL_EXPANSION_ORDER) {
@@ -271,6 +238,3 @@ class EnginePackRegistryImpl {
 }
 
 export const EnginePackRegistry = new EnginePackRegistryImpl();
-
-/** @deprecated Use EnginePackRegistry / registerPack. */
-export const ExpansionRegistry = EnginePackRegistry;

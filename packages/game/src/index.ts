@@ -5,7 +5,7 @@ import { positionKeyFromCoordString } from './topology';
 import { returnMetaMarkersAtRoundStart } from './mechanics-turn';
 import { drawTileToStaging } from './mechanics-draw';
 import { EffectResolver } from './engine/resolver';
-import { getMoveModulesSuperset, mergeMoveModules, type MoveMap } from './move-assembly';
+import { assemblePacks, buildStageMoveMap, type MoveMap } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
 
 const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources', 'resolveChoice'] as const;
@@ -100,12 +100,13 @@ function buildPlayerView(G: GameState, playerID?: string | null): GameState {
 
 export function createBalanceControlGame(): Game<GameState> {
     ensureCorePackRegistered();
-    const moveModules = getMoveModulesSuperset();
-    const mergedMoves = mergeMoveModules(moveModules);
-    const expansionModules = moveModules.filter((m) => m.moduleId !== 'core');
+    const packAssembly = assemblePacks({ mode: 'registered' });
+    const moveModules = packAssembly.moveModules;
+    const mergedMoves = packAssembly.moves;
+    const expansionModules = packAssembly.expansionMoveModules;
     const politicalCoreMoves = selectMoves(mergedMoves, CORE_POLITICAL_MOVE_IDS, 'politicalAction');
     const drawAndPlaceMoves = selectMoves(mergedMoves, DRAW_AND_PLACE_MOVE_IDS, 'drawAndPlace');
-    const politicalActionMoves = mergeMoveModules([{ moduleId: 'core', moves: politicalCoreMoves as any }, ...expansionModules]);
+    const politicalActionMoves = buildStageMoveMap(politicalCoreMoves, expansionModules);
 
     return {
         name: 'balance-control',
@@ -223,7 +224,7 @@ export function createBalanceControlGame(): Game<GameState> {
     };
 }
 
-export { EnginePackRegistry, ExpansionRegistry } from './expansion-registry';
+export { EnginePackRegistry } from './expansion-registry';
 export type { EnginePackDefinition, EnginePackId } from './packs/types';
 export { CorePack } from './packs/core';
 export * from './move-contracts';

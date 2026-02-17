@@ -1,4 +1,4 @@
-# Codex Task 0092 - REF_PACKS: Promote ExpansionRegistry to EnginePackRegistry (Core-capable)
+# Codex Task 0092 - REF_PACKS: Promote legacy registry to EnginePackRegistry (Core-capable)
 
 **Date:** 2026-02-17  
 **Primary contract:** `AGENTS.md` (repo root)
@@ -19,7 +19,7 @@ We already have deterministic, canonical ordering concepts in place:
   - moves (`move-module-registry.ts`)
   - atoms (`engine/engine-module-registry.ts`)
 - But **core is still not a first-class “pack”**:
-  - `ExpansionRegistry` only accepts `ExpansionId` (`exp01..03`)
+  - the legacy registry only accepts `ExpansionId` (`exp01..03`)
   - core wiring is still special-cased (setup/moves/resolver)
 
 Goal direction:
@@ -50,7 +50,7 @@ Introduce a **single pack registry contract** that can register:
 - `packages/game/src/move-assembly.ts`
 - `packages/game/src/engine/engine-module-registry.ts`
 - `packages/game/src/engine/resolver.ts`
-- Consumers importing `ExpansionRegistry`:
+- Consumers importing the legacy registry alias:
   - `packages/client-web/src/game.ts`
   - `packages/server/src/index.ts`
   - `packages/bot-llm/src/index.ts`
@@ -96,11 +96,11 @@ API expectations (minimum):
 
 To avoid a flag day across packages, keep a compatibility export:
 
-- Keep `export const ExpansionRegistry = EnginePackRegistry` (or re-export alias)
+- Keep `export const LegacyRegistry = EnginePackRegistry` (or re-export alias)
 - Keep existing `register(...)` working for expansions (wrap to `registerPack(...)`), but **do not** allow registering core through the old method.
 
 Document in code comments:
-- “ExpansionRegistry is deprecated; use EnginePackRegistry / registerPack.”
+- “Legacy registry is deprecated; use EnginePackRegistry / registerPack.”
 
 ### D) Tests
 
@@ -156,7 +156,7 @@ Keep all existing tests passing.
 
 - ...
 - Added `EnginePackId`/`EnginePackDefinition` contract (`packages/game/src/packs/types.ts`).
-- Refactored registry to `EnginePackRegistry` (core-capable) with backward-compatible `ExpansionRegistry` alias and legacy `register()` adapter.
+- Refactored registry to `EnginePackRegistry` (core-capable) with backward-compatible legacy alias and legacy `register()` adapter.
 - Updated move assembly to consume enabled/registered pack move modules deterministically (core fallback to existing `CoreMoves`).
 - Added pack registry tests covering canonical ordering, core enablement, duplicate pack ids, and duplicate move id rejection.
 - Updated `docs/changelog.md` with task(0092) entry.

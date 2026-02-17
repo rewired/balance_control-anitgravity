@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { GameConfig, ExpansionFlags } from '@balance-control/rules';
 import { EnginePackRegistry } from '../src/expansion-registry';
-import { mergeMoveModules } from '../src/move-assembly';
+import { buildMovesForConfig } from '../src/move-assembly';
 
 function cfg(expansions: Partial<ExpansionFlags>): GameConfig {
     return {
@@ -47,7 +47,7 @@ describe('EnginePackRegistry', () => {
             moves: { 'tripwire.dupe.pack': () => null },
         });
 
-        expect(() => mergeMoveModules(EnginePackRegistry.getEnabledMoveModules(cfg({ ex01: true, ex02: true })))).toThrowError(
+        expect(() => buildMovesForConfig(cfg({ ex01: true, ex02: true }))).toThrowError(
             [
                 'MoveModuleRegistry: duplicate move registrations are forbidden.',
                 'Conflicts:',
@@ -56,9 +56,8 @@ describe('EnginePackRegistry', () => {
         );
     });
 
-    it('legacy ExpansionRegistry-style registration is still supported for exp01..03 only', () => {
+    it('legacy expansion definition registration is still supported for exp01..03 only', () => {
         EnginePackRegistry.register({ id: 'exp01', name: 'LegacyExp01', moves: { 'legacy.move': () => null } } as any);
         expect(EnginePackRegistry.getRegisteredMoveModules().some((m) => m.moduleId === 'exp01')).toBe(true);
     });
 });
-
