@@ -214,10 +214,10 @@ export function createBalanceControlGame(): Game<GameState> {
     };
 }
 
-export { ExpansionRegistry } from './expansion-registry';
+export { EnginePackRegistry, ExpansionRegistry } from './expansion-registry';
+export type { EnginePackDefinition, EnginePackId } from './packs/types';
 export * from './move-contracts';
 export * from './config';
 export * from './hash-state';
 export * from './engine/legal-intents';
 export { selectTileController } from './public-selectors';
-
