@@ -1,0 +1,24 @@
+{
+  "id": "core_plus_ex02_small",
+  "seed": "golden-core-ex02-small",
+  "numPlayers": 2,
+  "registerExpansions": ["ex02"],
+  "config": {
+    "expansions": {
+      "ex01": false,
+      "ex02": true,
+      "ex03": false
+    }
+  },
+  "prelude": [
+    { "action": "stackDrawPileByType", "tileType": "Committee", "count": 1 }
+  ],
+  "moves": [
+    { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
+    { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] }
+  ],
+  "expectedFinalHash": "6a3683e334f882168fb87824ed8184eff7d7a55e2b9c225c1eb9def821c863fe",
+  "expectedPublicSurfaceHash": "cb30ba6ebd580dc25b6ae94fe56aa404f224d84708544795afc594a76e44b439"
+}

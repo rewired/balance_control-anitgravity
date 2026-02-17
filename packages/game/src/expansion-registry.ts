@@ -119,7 +119,7 @@ class EnginePackRegistryImpl {
         return out;
     }
 
-    public validateEnabledPacks(enabledPackIds: EnginePackId[], pinnedVersions?: Record<ExpansionId, string>): void {
+    public validateEnabledPacks(enabledPackIds: EnginePackId[], pinnedVersions?: Partial<Record<ExpansionId, string>>): void {
         const registered = new Map<EnginePackId, EnginePackDefinition>();
         for (const pack of this.getRegisteredPacks()) {
             registered.set(pack.id, pack);

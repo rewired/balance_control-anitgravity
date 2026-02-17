@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { Client } from 'boardgame.io/client';
@@ -6,6 +6,8 @@ import { createBalanceControlGame } from '../src/index';
 import { SetupGame } from '../src/setup';
 import { hashState } from '../src/hash-state';
 import { Expansion01 } from '../../expansion-01/src/index';
+import { Expansion02 } from '../../expansion-02/src/index';
+import { Expansion03 } from '../../expansion-03/src/index';
 import { CoreZoneNames, TileType } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';
 
@@ -23,6 +25,7 @@ interface GoldenFixture {
     prelude?: PreludeAction[];
     moves: GoldenMove[];
     expectedFinalHash: string;
+    expectedPublicSurfaceHash: string;
 }
 
 type PreludeAction =
@@ -62,6 +65,12 @@ function registerFixtureExpansions(names?: string[]): void {
     const expansions: any[] = [];
     if (names?.includes('ex01')) {
         expansions.push(Expansion01 as any);
+    }
+    if (names?.includes('ex02')) {
+        expansions.push(Expansion02 as any);
+    }
+    if (names?.includes('ex03')) {
+        expansions.push(Expansion03 as any);
     }
     registerTestPacks(expansions);
 }
@@ -170,27 +179,38 @@ describe('Golden replays', () => {
 
     for (const fixture of fixtures) {
         it(`should match golden hash for ${fixture.id}`, () => {
-            registerFixtureExpansions(fixture.registerExpansions);
+            const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+            const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-            const game = buildReplayGame(fixture.seed, fixture.numPlayers, fixture.config, fixture.prelude);
-            const client = Client({
-                game,
-                numPlayers: fixture.numPlayers,
-            });
-            client.start();
+            try {
+                registerFixtureExpansions(fixture.registerExpansions);
 
-            for (const step of fixture.moves) {
+                const game = buildReplayGame(fixture.seed, fixture.numPlayers, fixture.config, fixture.prelude);
+                const client = Client({
+                    game,
+                    numPlayers: fixture.numPlayers,
+                });
+                client.start();
+
+                for (const step of fixture.moves) {
+                    const state = client.getState();
+                    const resolvedArgs = resolveMoveArgs(state!.G, step.move, step.args);
+                    const moveFn = (client.moves as any)[step.move];
+                    expect(typeof moveFn).toBe('function');
+                    moveFn(...resolvedArgs);
+                }
+
                 const state = client.getState();
-                const resolvedArgs = resolveMoveArgs(state!.G, step.move, step.args);
-                const moveFn = (client.moves as any)[step.move];
-                expect(typeof moveFn).toBe('function');
-                moveFn(...resolvedArgs);
+                expect(state).toBeTruthy();
+                const actualHash = hashState(state!.G as any);
+                expect(actualHash).toBe(fixture.expectedFinalHash);
+                expect(state!.G.meta?.publicSurfaceHash).toBe(fixture.expectedPublicSurfaceHash);
+                expect(warnSpy).not.toHaveBeenCalled();
+                expect(errorSpy).not.toHaveBeenCalled();
+            } finally {
+                warnSpy.mockRestore();
+                errorSpy.mockRestore();
             }
-
-            const state = client.getState();
-            expect(state).toBeTruthy();
-            const actualHash = hashState(state!.G as any);
-            expect(actualHash).toBe(fixture.expectedFinalHash);
         });
     }
 });

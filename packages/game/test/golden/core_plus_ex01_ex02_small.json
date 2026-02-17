@@ -1,28 +1,24 @@
 {
-  "id": "core_plus_ex01_small",
-  "seed": "golden-core-ex01-small",
+  "id": "core_plus_ex01_ex02_small",
+  "seed": "golden-core-ex01-ex02-small",
   "numPlayers": 2,
-  "registerExpansions": ["ex01"],
+  "registerExpansions": ["ex01", "ex02"],
   "config": {
     "expansions": {
       "ex01": true,
-      "ex02": false,
+      "ex02": true,
       "ex03": false
     }
   },
   "prelude": [
     { "action": "stackDrawPileByType", "tileType": "Committee", "count": 1 }
   ],
-  "notes": {
-    "updatedFor": "CORE-01 v1.0.20 migration",
-    "previousExpectedFinalHash": "0b62eeecba4e93815caccf77f64c6479f2b116070189aed5ba2be373762437db"
-  },
   "moves": [
     { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
     { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] }
   ],
-  "expectedFinalHash": "40487b27125cdc1ed2f033a112720ba0180ccd063c06a52a57f950327e7ab280",
-  "expectedPublicSurfaceHash": "2c5576861f3e7b80937be84d4e42650483dbb01e3a10329da51dfd7043d8bdad"
+  "expectedFinalHash": "854b47db9f6e5c2fedcfbe43aa61d0f0a16fad5fded406a2c9860137b48bcd8c",
+  "expectedPublicSurfaceHash": "87b6705d71050befcf9079ee99ee9e59409d0ae22c317b8de2c945d4df7104a9"
 }

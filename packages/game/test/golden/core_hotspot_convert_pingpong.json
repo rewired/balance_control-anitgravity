@@ -25,7 +25,6 @@
     { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "0,0" }] },
     { "move": "placeInfluence", "args": [{ "targetCoord": "1,-1" }] },
     { "move": "placeTile", "args": [{ "targetCoord": "2,-1" }] },
     {
@@ -54,5 +53,6 @@
     { "move": "placeTile", "args": [{ "targetCoord": "-2,0" }] },
     { "move": "moveInfluence", "args": [{ "sourceCoord": "-1,1", "targetCoord": "-2,0" }] }
   ],
-  "expectedFinalHash": "3eb9531923b69825b1363ef9f85975c8cb25eb764bf6a3613134a8cb969adb2a"
+  "expectedFinalHash": "3eb9531923b69825b1363ef9f85975c8cb25eb764bf6a3613134a8cb969adb2a",
+  "expectedPublicSurfaceHash": "ac11f9da4045a3512d4a62e99eb0ec23a1b2e386fc388bd8a14171620a9befd4"
 }

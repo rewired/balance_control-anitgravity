@@ -89,4 +89,21 @@ describe('EnginePackRegistry', () => {
             })
         ).toThrowError('EnginePackRegistry: unknown pack id "exp99".');
     });
+
+    it('validates pinned pack versions deterministically', () => {
+        EnginePackRegistry.registerPack(CorePack);
+        EnginePackRegistry.registerPack(pack('exp01', 'E1'));
+
+        expect(() =>
+            EnginePackRegistry.validateEnabledPacks(['core', 'exp01'], {
+                exp01: '0.0.0' as any,
+            })
+        ).not.toThrow();
+
+        expect(() =>
+            EnginePackRegistry.validateEnabledPacks(['core', 'exp01'], {
+                exp01: '9.9.9' as any,
+            })
+        ).toThrowError('EnginePackRegistry: pack "exp01" version "0.0.0" does not match pinned "9.9.9".');
+    });
 });

@@ -1,4 +1,4 @@
-import { GameState, CoreZoneNames, TileType, CoreResources, RULESET_MANIFEST, RulesetManifest } from '@balance-control/rules';
+import { GameState, CoreZoneNames, TileType, CoreResources, RULESET_MANIFEST, RulesetManifest, GameMeta } from '@balance-control/rules';
 import { Ctx } from 'boardgame.io';
 import { normalizeGameConfig } from './config';
 import { hashState } from './hash-state';
@@ -44,7 +44,7 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         specAnchorHash: rulesetBase.specAnchorHash,
     };
 
-    const G: GameState = {
+    const G: GameState & { meta: GameMeta } = {
         zones: {},
         tiles: {},
         objects: {},
