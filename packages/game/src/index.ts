@@ -7,6 +7,7 @@ import { returnMetaMarkersAtRoundStart } from './mechanics-turn';
 import { drawTileToStaging } from './mechanics-draw';
 import { EffectResolver } from './engine/resolver';
 import { getMoveModulesSuperset, mergeMoveModules } from './move-assembly';
+import { ensureCorePackRegistered } from './packs/register-core';
 
 const politicalCoreMoves = {
     placeInfluence: CoreMoves.placeInfluence,
@@ -90,6 +91,7 @@ function buildPlayerView(G: GameState, playerID?: string | null): GameState {
 }
 
 export function createBalanceControlGame(): Game<GameState> {
+    ensureCorePackRegistered();
     const moveModules = getMoveModulesSuperset();
     const moves = mergeMoveModules(moveModules);
     const expansionModules = moveModules.filter((m) => m.moduleId !== 'core');

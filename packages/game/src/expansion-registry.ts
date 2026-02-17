@@ -120,6 +120,7 @@ class EnginePackRegistryImpl {
             } as GameConfig);
 
         for (const pack of this.getEnabledPacks(G, resolvedCfg)) {
+            if (pack.id === 'core') continue;
             pack.setup?.preShuffle?.(G, ctx, resolvedCfg);
         }
     }

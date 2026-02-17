@@ -160,13 +160,161 @@ Update / add tests:
 
 ### Work Summary
 
-- ...
+- Added `CorePack` (setup hooks, core moves, core engine atoms).
+- Updated `SetupGame` to delegate core setup to `CorePack` and run expansion setup via `EnginePackRegistry` hooks (pre/post shuffle).
+- Updated `EffectResolver` to source core atom registrations via `CorePack` (triggerHook injection preserved).
+- Added a focused unit test for `CorePack.setup.preShuffle`.
+- Updated `docs/changelog.md`.
+
+### Guardrails
+
+- affected_guardrails: GR-003, GR-002
+
+### PR Checklist (Completed)
+
+- [x] CorePack added (`packages/game/src/packs/core/index.ts`)
+- [x] SetupGame delegates to CorePack hooks (pre/post shuffle)
+- [x] Resolver uses CorePack atoms (triggerHook injection preserved)
+- [x] CorePack registration handled deterministically (tests updated accordingly)
+- [x] Tests pass (`pnpm -r test`)
+- [x] Task file updated with execution log
 
 ### Commands Run
 
-- ...
+- `pnpm -r test` (pass)
+- `git status`
+- `git diff --stat`
 
 ### Postflight Proof
 
 - `git status`
+```text
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   docs/changelog.md
+	modified:   packages/game/src/engine/resolver.ts
+	modified:   packages/game/src/expansion-registry.ts
+	modified:   packages/game/src/index.ts
+	modified:   packages/game/src/setup.ts
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	packages/game/src/packs/core/
+	packages/game/src/packs/register-core.ts
+	packages/game/test/core-pack-setup.test.ts
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+- `git diff --stat`
+```text
+ docs/changelog.md                       |   1 +
+ packages/game/src/engine/resolver.ts    |  24 ++----
+ packages/game/src/expansion-registry.ts |   1 +
+ packages/game/src/index.ts              |   2 +
+ packages/game/src/setup.ts              | 146 ++------------------------------
+ 5 files changed, 17 insertions(+), 157 deletions(-)
+```
+
 - `pnpm -r test`
+```text
+PASS (pnpm -r test)
+```
+
+### Commands Run (Additional)
+
+- `pnpm -r test` (pass)
+- `pnpm -r test -- --reporter dot` (pass)
+- `pnpm -r test -- --silent` (pass)
+
+### Postflight Proof (Additional)
+
+- `pnpm -r test`
+```text
+Scope: 9 of 10 workspace projects
+packages/game test$ vitest run
+packages/game test: [7m[1m[36m RUN [39m[22m[27m [36mv0.30.1[39m [90mD:/__DEV/balance_control-anitgravity/packages/game[39m
+packages/game test:  [32m✓[39m test/spec-anchor-tripwire.test.ts [2m ([22m[2m1 test[22m[2m)[22m[90m 108[2mms[22m[39m
+packages/game test: [90mstdout[2m | test/exp01-controller-grants-no-throw.test.ts[2m > [22m[2mEXP-01 controller grants with no controller[2m > [22m[2mshould not throw and should SKIP grant when controller is missing[22m[39m
+packages/game test: EXP-01 Setup Complete.
+packages/game test:  [32m✓[39m test/exp01-controller-grants-no-throw.test.ts [2m ([22m[2m1 test[22m[2m)[22m[90m 12[2mms[22m[39m
+packages/game test: [90mstderr[2m | test/resolver.test.ts[2m > [22m[2mEffectResolver cost and production behavior[2m > [22m[2mshould not mutate state when resource.pay cannot be fully paid[22m[39m
+packages/game test: [resolver:resource.pay] insufficient resources for cost
+packages/game test:  [32m✓[39m test/unplaceable-draw-redraw.test.ts [2m ([22m[2m2 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+packages/game test:  [32m✓[39m test/resolver.test.ts [2m ([22m[2m6 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+packages/game test:  [32m✓[39m test/determinism-policy.test.ts [2m ([22m[2m2 tests[22m[2m)[22m[90m 24[2mms[22m[39m
+packages/game test:  [32m✓[39m test/legal-intents.test.ts [2m ([22m[2m7 tests[22m[2m)[22m[90m 35[2mms[22m[39m
+packages/game test:  [32m✓[39m test/hotspot.test.ts [2m ([22m[2m3 tests[22m[2m)[22m[90m 32[2mms[22m[39m
+packages/game test:  [32m✓[39m test/moves.test.ts [2m ([22m[2m22 tests[22m[2m)[22m[90m 41[2mms[22m[39m
+packages/game test: [90mstderr[2m | test/moves.test.ts[2m > [22m[2mMoves[2m > [22m[2mplaceInfluence should reject malformed payload without mutation[22m[39m
+packages/game test: [move:placeInfluence] invalid payload: <root>: Expected object, received string
+packages/game test:  [32m✓[39m test/measure-deck-provider.test.ts [2m ([22m[2m4 tests[22m[2m)[22m[90m 34[2mms[22m[39m
+packages/game test: [90mstdout[2m | test/measure-deck-provider.test.ts[2m > [22m[2mMeasure deck provider lookup[2m > [22m[2mroutes EXP-02 measure object ids to the EXP-02 measure zones[22m[39m
+packages/game test: EXP-02 Setup Complete.
+packages/game test: [90mstdout[2m | test/measure-deck-provider.test.ts[2m > [22m[2mMeasure deck provider lookup[2m > [22m[2mfails deterministically when multiple enabled decks match the same object id[22m[39m
+packages/game test: EXP-02 Setup Complete.
+packages/game test:  [32m✓[39m test/player-view.test.ts [2m ([22m[2m3 tests[22m[2m)[22m[90m 32[2mms[22m[39m
+packages/game test:  [32m✓[39m test/server-smoke.test.ts [2m ([22m[2m1 test[22m[2m)[22m[90m 61[2mms[22m[39m
+packages/game test:  [32m✓[39m test/replay-runner.test.ts [2m ([22m[2m3 tests[22m[2m)[22m[90m 84[2mms[22m[39m
+packages/game test: [90mstderr[2m | test/turn.test.ts[2m > [22m[2mTurn Structure (Stages)[2m > [22m[2mshould reject placeTile during politicalAction stage without mutation[22m[39m
+packages/game test: ERROR: disallowed move: placeTile
+packages/game test:  [32m✓[39m test/turn.test.ts [2m ([22m[2m9 tests[22m[2m)[22m[90m 232[2mms[22m[39m
+packages/game test: [90mstderr[2m | test/turn.test.ts[2m > [22m[2mTurn Structure (Stages)[2m > [22m[2mshould reject passTilePlacement when a staging tile exists[22m[39m
+packages/game test: ERROR: invalid move: passTilePlacement args: [object Object]
+packages/game test: [90mstdout[2m | test/exp02-controller-grants-no-throw.test.ts[2m > [22m[2mEXP-02 controller grants with no controller[2m > [22m[2mshould require explicit SKIP policy on all EXP-02 CONTROLLER grants[22m[39m
+packages/game test: EXP-02 Setup Complete.
+packages/game test: [90mstdout[2m | test/exp02-controller-grants-no-throw.test.ts[2m > [22m[2mEXP-02 controller grants with no controller[2m > [22m[2mshould not throw and should not grant to Noise for uncontrolled EXP-02 effect path[22m[39m
+packages/game test: EXP-02 Setup Complete.
+packages/game test:  [32m✓[39m test/exp02-controller-grants-no-throw.test.ts [2m ([22m[2m2 tests[22m[2m)[22m[90m 49[2mms[22m[39m
+packages/game test: [90mstderr[2m | test/golden-replay.test.ts[2m > [22m[2mGolden replays[2m > [22m[2mshould match golden hash for core_hotspot_convert_pingpong[22m[39m
+packages/game test: ERROR: invalid move: placeInfluence args: [object Object]
+packages/game test: [90mstdout[2m | test/golden-replay.test.ts[2m > [22m[2mGolden replays[2m > [22m[2mshould match golden hash for core_plus_ex01_small[22m[39m
+packages/game test: EXP-01 Setup Complete.
+packages/game test:  [32m✓[39m test/golden-replay.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[33m 452[2mms[22m[39m
+packages/game test: [2m Test Files [22m [1m[32m30 passed[39m[22m[90m (30)[39m
+packages/game test: [2m      Tests [22m [1m[32m115 passed[39m[22m[90m (115)[39m
+packages/game test: Done
+packages/client-web test$ vitest run
+packages/client-web test: [7m[1m[36m RUN [39m[22m[27m [36mv0.30.1[39m [90mD:/__DEV/balance_control-anitgravity/packages/client-web[39m
+packages/client-web test: [2m Test Files [22m [1m[32m16 passed[39m[22m[90m (16)[39m
+packages/client-web test: [2m      Tests [22m [1m[32m48 passed[39m[22m[90m (48)[39m
+packages/client-web test: Done
+```
+
+### Commit Proof
+
+- Branch: `task/0093-core-pack`
+
+- `git show -1 --stat`
+```text
+Author: Björn Ahlers <rewired.de@gmail.com>
+Date:   Tue Feb 17 08:54:22 2026 +0100
+
+    task(0093): extract core into CorePack
+
+- Add CorePack (setup hooks, moves, engine atoms)
+- Delegate SetupGame pre/post-shuffle via pack hooks
+- Wire EffectResolver core atoms through CorePack factory
+- Add CorePack preShuffle unit test + changelog entry
+
+ docs/changelog.md                                  |   1 +
+ ...EF_PACKS-core-pack-extract-setup-moves-atoms.md | 118 ++++++++++++++-
+ packages/game/src/engine/resolver.ts               |  24 +--
+ packages/game/src/expansion-registry.ts            |   1 +
+ packages/game/src/index.ts                         |   2 +
+ packages/game/src/packs/core/index.ts              | 164 +++++++++++++++++++++
+ packages/game/src/packs/register-core.ts           |   9 ++
+ packages/game/src/setup.ts                         | 146 +-----------------
+ packages/game/test/core-pack-setup.test.ts         |  82 +++++++++++
+ 9 files changed, 388 insertions(+), 159 deletions(-)
+```
+
+- `git status`
+```text
+On branch task/0093-core-pack
+nothing to commit, working tree clean
+```
