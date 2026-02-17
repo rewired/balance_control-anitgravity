@@ -27,6 +27,28 @@ export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
     return modules;
 }
 
+export function getMoveModulesSuperset(): MoveModule[] {
+    const expansionModules = ExpansionRegistry.getRegisteredMoveModules();
+    const byModuleId = new Map<EngineModuleId, MoveMap>();
+
+    for (const mod of expansionModules) {
+        byModuleId.set(mod.moduleId, mod.moves);
+    }
+
+    const modules: MoveModule[] = [];
+    for (const moduleId of CANONICAL_ENGINE_MODULE_ORDER) {
+        if (moduleId === 'core') {
+            modules.push({ moduleId, moves: CoreMoves as unknown as MoveMap });
+            continue;
+        }
+        const moves = byModuleId.get(moduleId);
+        if (moves) {
+            modules.push({ moduleId, moves });
+        }
+    }
+    return modules;
+}
+
 export function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
     const reg = new MoveModuleRegistry(CANONICAL_ENGINE_MODULE_ORDER);
     for (const module of modules) {
@@ -41,5 +63,14 @@ export function buildMovesForConfig(config: GameConfig): MoveMap {
 
 export function buildExpansionMovesForConfig(config: GameConfig): MoveMap {
     const modules = getEnabledMoveModules(config).filter((m) => m.moduleId !== 'core');
+    return mergeMoveModules(modules);
+}
+
+export function buildMovesSuperset(): MoveMap {
+    return mergeMoveModules(getMoveModulesSuperset());
+}
+
+export function buildExpansionMovesSuperset(): MoveMap {
+    const modules = getMoveModulesSuperset().filter((m) => m.moduleId !== 'core');
     return mergeMoveModules(modules);
 }

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { Client } from 'boardgame.io/client';
-import { BalanceControl } from '../src/index';
+import { createBalanceControlGame } from '../src/index';
 import { SetupGame } from '../src/setup';
 import { hashState } from '../src/hash-state';
 import { ExpansionRegistry } from '../src/expansion-registry';
@@ -152,8 +152,9 @@ function resolveMoveArgs(G: any, move: string, args: any[]): any[] {
 }
 
 function buildReplayGame(seed: string | number, numPlayers: number, config?: unknown, prelude?: PreludeAction[]): any {
+    const baseGame = createBalanceControlGame();
     return {
-        ...BalanceControl,
+        ...baseGame,
         seed,
         playerView: ({ G }: any) => G,
         setup: (ctx: any) => {

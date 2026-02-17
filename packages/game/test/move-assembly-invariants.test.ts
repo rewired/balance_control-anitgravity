@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ExpansionDefinition, GameConfig, ExpansionFlags } from '@balance-control/rules';
 import { ExpansionRegistry } from '../src/expansion-registry';
+import { createBalanceControlGame } from '../src/index';
 import { buildExpansionMovesForConfig, getEnabledMoveModules } from '../src/move-assembly';
 
 function cfg(expansions: Partial<ExpansionFlags>): GameConfig {
@@ -69,5 +70,37 @@ describe('Move assembly invariants', () => {
             )
         );
     });
-});
 
+    it('factory-built Game includes registered expansion moves (superset, no import-time assembly)', () => {
+        ExpansionRegistry.register({
+            id: 'exp01',
+            name: 'Mock EX01',
+            moves: { 'tripwire.ex01.only': () => null },
+        });
+
+        const game = createBalanceControlGame() as any;
+        expect(typeof game.moves?.['tripwire.ex01.only']).toBe('function');
+        expect(typeof game.turn?.stages?.politicalAction?.moves?.['tripwire.ex01.only']).toBe('function');
+    });
+
+    it('factory-built Game throws deterministically on duplicate move ids (superset)', () => {
+        ExpansionRegistry.register({
+            id: 'exp02',
+            name: 'Mock EX02',
+            moves: { 'tripwire.dupe.factory': () => null },
+        });
+        ExpansionRegistry.register({
+            id: 'exp01',
+            name: 'Mock EX01',
+            moves: { 'tripwire.dupe.factory': () => null },
+        });
+
+        expect(() => createBalanceControlGame()).toThrowError(
+            [
+                'MoveModuleRegistry: duplicate move registrations are forbidden.',
+                'Conflicts:',
+                '- exp02 registers "tripwire.dupe.factory" but it is already registered by exp01',
+            ].join('\n')
+        );
+    });
+});

@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { Client } from 'boardgame.io/client';
-import { BalanceControl } from '../src/index';
+import { createBalanceControlGame } from '../src/index';
 import { CoreZoneNames } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
 
+const BalanceControl = createBalanceControlGame();
 const BalanceControlNoPlayerView = {
     ...BalanceControl,
     playerView: ({ G }: any) => G

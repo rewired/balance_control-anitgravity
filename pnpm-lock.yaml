@@ -35,6 +35,15 @@ importers:
 
   packages/bot-llm:
     dependencies:
+      '@balance-control/expansion-01':
+        specifier: workspace:*
+        version: link:../expansion-01
+      '@balance-control/expansion-02':
+        specifier: workspace:*
+        version: link:../expansion-02
+      '@balance-control/expansion-03':
+        specifier: workspace:*
+        version: link:../expansion-03
       '@balance-control/game':
         specifier: workspace:*
         version: link:../game
@@ -45,6 +54,15 @@ importers:
 
   packages/client-web:
     dependencies:
+      '@balance-control/expansion-01':
+        specifier: workspace:*
+        version: link:../expansion-01
+      '@balance-control/expansion-02':
+        specifier: workspace:*
+        version: link:../expansion-02
+      '@balance-control/expansion-03':
+        specifier: workspace:*
+        version: link:../expansion-03
       '@balance-control/game':
         specifier: workspace:*
         version: link:../game

@@ -7,6 +7,6 @@ ExpansionRegistry.register(Expansion01);
 ExpansionRegistry.register(Expansion02);
 ExpansionRegistry.register(Expansion03);
 
-const BalanceControl = createBalanceControlGame();
-console.log('Bot adapter loaded for', BalanceControl.name);
-// TODO: Implement LLM adapter contracts
+export const BalanceControlGame = createBalanceControlGame();
+export const GAME_NAME = BalanceControlGame.name;
+
