@@ -152,15 +152,95 @@ These are **client-only** issues and must be fixed without changing engine autho
 
 ### Work Summary
 
-*
+- Verified `packages/client-web` strict TypeScript build passes (no code changes required on this branch).
+- Verified lint + tests pass (sanity regression).
+- No engine/rules changes; client-only verification only.
 
 ### Commands Run
 
-*
+- `$env:NO_COLOR=1; pnpm -C packages/client-web build` (pass)
+- `$env:NO_COLOR=1; pnpm lint` (pass)
+- `$env:NO_COLOR=1; pnpm test` (pass)
+- `git status` (captured below)
+- `git diff --stat` (captured below)
 
 ### Postflight Proof
 
-* `pnpm -C packages/client-web build`:
-* `pnpm -r test`:
+* `pnpm -C packages/client-web build`: (captured below)
+* `pnpm test`: (captured below)
+
+- `git status`
+```text
+On branch task/0091-fix-client-web-build-strict-ts
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   docs/tasks/0091-fix-client-web-build-strict-ts.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+- `git diff --stat`
+```text
+ docs/tasks/0091-fix-client-web-build-strict-ts.md | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+```
+
+- `$env:NO_COLOR=1; pnpm -C packages/client-web build` (output excerpt)
+```text
+> @balance-control/client-web@0.0.1 build D:\__DEV\balance_control-anitgravity\packages\client-web
+> tsc && vite build
+
+vite v4.5.14 building for production...
+✓ 200 modules transformed.
+✓ built in 1.92s
+```
+
+- `$env:NO_COLOR=1; pnpm lint` (output excerpt)
+```text
+> balance-control-monorepo@0.0.0 lint D:\__DEV\balance_control-anitgravity
+> eslint "packages/**/*.{ts,tsx,js,cjs,mjs}" "scripts/**/*.{js,cjs,mjs}" "*.{js,cjs,mjs}"
+```
+
+- `$env:NO_COLOR=1; pnpm test` (output excerpt)
+```text
+> balance-control-monorepo@0.0.0 test D:\__DEV\balance_control-anitgravity
+> pnpm -r --if-present test
+
+packages/game test:  Test Files  28 passed (28)
+packages/game test:       Tests  109 passed (109)
+packages/game test: Done
+packages/client-web test:  Test Files  16 passed (16)
+packages/client-web test:       Tests  48 passed (48)
+packages/client-web test: Done
+```
+
+### PR Checklist (completed)
+
+- [x] `pnpm -C packages/client-web build` passes
+- [x] `pnpm -r test` / `pnpm test` passes
+- [x] `pnpm lint` passes
+- [x] No engine/rules changes (UI-only / docs-only)
+- [x] No tsconfig relaxations / no `any` / no unsafe assertions (no code changes)
+- [x] No temporary files committed
+- [x] `affected_guardrails` and `spec_anchor_refs` present
+- [ ] `docs/changelog.md` updated under Unreleased if required by contract (N/A: no logic changes)
+
+### Commit Proof
+
+- `git show -1 --stat`
+```text
+Author: Björn Ahlers <rewired.de@gmail.com>
+Date:   Tue Feb 17 07:33:25 2026 +0100
+
+    task(0091): verify client-web strict TS build
+
+- Confirm strict TS client-web build passes
+- Record lint/test/postflight proof in task log
+- No engine/rules changes
+
+ docs/tasks/0091-fix-client-web-build-strict-ts.md | 88 +++++++++++++++++++++--
+ 1 file changed, 84 insertions(+), 4 deletions(-)
+```
 
 ---
