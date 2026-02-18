@@ -47,7 +47,9 @@ describe('intent view model', () => {
         });
 
         expect(vm.stage).toBe('politicalAction');
-        expect(vm.political.others.map((i) => i.moveType)).toEqual(['convertResources', 'passTilePlacement']);
+        // passTilePlacement is specifically handled in drawAndPlace regardless of stage
+        expect(vm.drawAndPlace.passTilePlacement?.moveType).toBe('passTilePlacement');
+        expect(vm.political.others.map((i) => i.moveType)).toEqual(['convertResources']);
     });
 
     it('selects placeInfluence intent for selected tile and excludes all placeInfluence from others', () => {
@@ -66,7 +68,8 @@ describe('intent view model', () => {
         });
 
         expect(vm.political.placeInfluenceForSelected?.payload?.targetTileId).toBe('A');
-        expect(vm.political.others.map((i) => i.moveType)).toEqual(['moveInfluence']);
+        // moveInfluence is now handled separately via moveInfluenceFromSelected
+        expect(vm.political.others.map((i) => i.moveType)).toEqual([]);
     });
 
     it('surfaces pending choice intents and removes resolveChoice from others', () => {
