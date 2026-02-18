@@ -16,6 +16,7 @@
     "audit:spec": "pnpm run gen:spec-anchors && pnpm run verify:packs && pnpm -C packages/game test -- spec-anchor-tripwire.test.ts && pnpm -C packages/game test -- computeMajorirty.test.ts moves.test.ts hotspot.test.ts && pnpm -C packages/game test -- golden-replay.test.ts",
     "dev": "pnpm -r --parallel dev",
     "verify:packs": "node scripts/verify-packs.mjs",
+    "verify:docs": "node scripts/verify-docs.mjs",
     "verify:task": "node scripts/verify-task.mjs"
   },
   "devDependencies": {

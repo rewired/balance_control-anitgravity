@@ -6,6 +6,12 @@ import { EffectResolver } from '../../engine/resolver';
 import { passTilePlacementPayloadSchema, placeTilePayloadSchema, validateMovePayload } from '../../move-contracts';
 import { DRAW_AND_PLACE_STAGE, POLITICAL_ACTION_STAGE, requireStage } from '../shared';
 
+/**
+ * Checks if there is any open placement on the board.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function hasAnyOpenPlacement(G: any): boolean {
     const grid = G.grid ?? {};
     const coords = Object.keys(grid);

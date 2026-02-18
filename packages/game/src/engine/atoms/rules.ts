@@ -21,6 +21,12 @@ function handleRuleProhibit(G: any, _atom: any): void {
 
 type TriggerHook = (G: any, ctx: any, hook: any, payload?: any) => void;
 
+/**
+ * Creates the core rule atoms.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function createCoreRulesAtoms(opts: { triggerHook: TriggerHook }): AtomRegistration[] {
     return [
         {

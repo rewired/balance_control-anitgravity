@@ -6,6 +6,14 @@ import { assemblePacks } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
 import { getPublicSurface } from './surface';
 
+/**
+ * Normalizes boardgame.io context to ensure RNG is available.
+ * @remarks infrastructure; no direct SPEC binding
+ * @usesRNG
+ * @rule CORE-01-03-02A
+ * @deterministic
+ * @pure
+ */
 function normalizeBoardgameCtx(ctx: any): Ctx {
     if (ctx && typeof ctx === 'object' && (ctx as any).ctx && typeof (ctx as any).ctx === 'object') {
         const inner = (ctx as any).ctx as Ctx;
@@ -15,6 +23,14 @@ function normalizeBoardgameCtx(ctx: any): Ctx {
     return ctx as Ctx;
 }
 
+/**
+ * Main entry point for initializing the Balance Control game state.
+ * @rule CORE-01-03-01
+ * @usesRNG
+ * @rule CORE-01-03-02A
+ * @deterministic
+ * @sideEffects
+ */
 export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown }): GameState => {
     const normalizedCtx = normalizeBoardgameCtx(ctx);
 
@@ -107,7 +123,11 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
     return G;
 };
 
-/** CORE-01-03-02A.1: Fisher-Yates shuffle; j = RNG.nextInt(i+1). Uses ctx.random for determinism. */
+/**
+ * CORE-01-03-02A.1: Fisher-Yates shuffle; j = RNG.nextInt(i+1). Uses ctx.random for determinism.
+ * @usesRNG
+ * @rule CORE-01-03-02A
+ */
 function shuffleFisherYates<T>(arr: T[], random: { Die?: (n: number) => number; Shuffle?: (a: T[]) => T[] }): T[] {
     if (typeof random.Die === 'function') {
         const result = [...arr];

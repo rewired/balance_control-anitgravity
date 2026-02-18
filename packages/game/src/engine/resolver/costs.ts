@@ -17,6 +17,7 @@ export type CostValidationResult =
 
 /**
  * Validates if a player can pay a specific cost.
+ * @remarks infrastructure; no direct SPEC binding
  * @deterministic
  * @pure
  */
@@ -134,6 +135,7 @@ export function validateCost(
 
 /**
  * Commits the cost by moving resources from supply to bank.
+ * @remarks infrastructure; no direct SPEC binding
  * @deterministic
  * @sideEffects
  */
@@ -246,6 +248,7 @@ export function getExtraCostSlots(
 
 /**
  * Orchestrates checking and paying costs for an action.
+ * @remarks infrastructure; no direct SPEC binding
  * @deterministic
  * @sideEffects
  */

@@ -11,6 +11,12 @@ export type MeasureDeckLookup = Readonly<{
     finalDiscardId: string;
 }>;
 
+/**
+ * Looks up the measure deck descriptor for a given measure object ID.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function lookupMeasureDeckForObjectId(G: GameState, measureObjectId: string): MeasureDeckLookup {
     const candidates = EnginePackRegistry.getMeasureDeckDescriptors(G);
     const matches = candidates.filter(c => measureObjectId.startsWith(c.deck.objectIdPrefix));

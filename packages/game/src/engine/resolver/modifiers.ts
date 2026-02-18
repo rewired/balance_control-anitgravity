@@ -4,6 +4,7 @@ import { evaluateTileSelector } from '../selectors';
 
 /**
  * Removes a modifier from the engine state.
+ * @remarks infrastructure; no direct SPEC binding
  * @deterministic
  * @sideEffects
  */
@@ -52,6 +53,7 @@ export function applyModifiers(
 
 /**
  * Maps an atom kind to its corresponding hook point.
+ * @remarks infrastructure; no direct SPEC binding
  * @deterministic
  * @pure
  */

@@ -32,10 +32,22 @@ function canonicalize(value: JsonLike): JsonLike {
     return ordered;
 }
 
+/**
+ * Canonical JSON stringification for deterministic hashing.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function canonicalJsonStringify(value: JsonLike): string {
     return JSON.stringify(canonicalize(value));
 }
 
+/**
+ * Hashes the game state for determinism verification.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function hashState(G: JsonLike): string {
     const utf8 = new TextEncoder().encode(canonicalJsonStringify(G));
     return bytesToHex(sha256(utf8));

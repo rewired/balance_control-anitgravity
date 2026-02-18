@@ -127,6 +127,12 @@ function flagsToEnabledPacks(flags: ExpansionFlags): ExpansionId[] {
     return enabled;
 }
 
+/**
+ * Normalizes game configuration from setup data.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function normalizeGameConfig(setupData: unknown): GameConfig {
     const expansionsCandidate = readExpansionConfigCandidate(setupData);
     const candidate = (expansionsCandidate ?? {}) as Record<string, unknown>;
