@@ -6,7 +6,7 @@
  * @rule EXP-03-10
  */
 
-import { Expansion03 } from '@balance-control/expansion-03';
+import { Expansion03 } from '@balance-control/expansion-03/engine';
 import { RULESET_MANIFEST } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
 import { takeMeasure, playMeasure } from '../_shared/measure-moves';

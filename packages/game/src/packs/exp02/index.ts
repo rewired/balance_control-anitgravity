@@ -6,7 +6,7 @@
  * @rule EXP-02-04-B
  */
 
-import { Expansion02 } from '@balance-control/expansion-02';
+import { Expansion02 } from '@balance-control/expansion-02/engine';
 import { RULESET_MANIFEST } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
 import { takeMeasure, playMeasure } from '../_shared/measure-moves';

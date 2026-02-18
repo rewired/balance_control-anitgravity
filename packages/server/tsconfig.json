@@ -19,6 +19,15 @@
             ],
             "@balance-control/expansion-03": [
                 "../expansion-03/dist/index.d.ts"
+            ],
+            "@balance-control/expansion-01/engine": [
+                "../expansion-01/dist/engine/index.d.ts"
+            ],
+            "@balance-control/expansion-02/engine": [
+                "../expansion-02/dist/engine/index.d.ts"
+            ],
+            "@balance-control/expansion-03/engine": [
+                "../expansion-03/dist/engine/index.d.ts"
             ]
         }
     },
