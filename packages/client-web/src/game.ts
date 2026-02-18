@@ -15,4 +15,4 @@ if (!registeredPackIds.has('exp03')) {
 }
 
 export const BalanceControlGame = createBalanceControlGame();
-export const GAME_NAME = BalanceControlGame.name;
+export const GAME_NAME = BalanceControlGame.name!;
