@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "test": "vitest run --no-threads --sequence.concurrent false",
     "dev": "tsc -w"
   },
   "dependencies": {

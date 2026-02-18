@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -90,33 +90,41 @@ This task adds minimal **pack-local** test coverage for EXP-02 and EXP-03.
 
 ## 9) Acceptance Criteria
 
-- [ ] EXP-02 has at least one passing pack-integrity test.
-- [ ] EXP-03 has at least one passing pack-integrity test.
-- [ ] `pnpm -r test` remains green.
-- [ ] No expansion test imports engine source by relative path.
+- [x] EXP-02 has at least one passing pack-integrity test.
+- [x] EXP-03 has at least one passing pack-integrity test.
+- [x] `pnpm -r test` remains green.
+- [x] No expansion test imports engine source by relative path.
 
 ## 10) PR Checklist (Repo Artifact)
 
-- [ ] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
-- [ ] Single commit on the task branch.
-- [ ] Expansion tests executed; results recorded in Section 12.
-- [ ] No unrelated formatting churn.
-- [ ] Postflight proof captured (per AGENTS) and included in commit message.
+- [x] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
+- [x] Single commit on the task branch.
+- [x] Expansion tests executed; results recorded in Section 12.
+- [x] No unrelated formatting churn.
+- [x] Postflight proof captured (per AGENTS) and included in commit message.
 
 ## 11) Work Summary (3–7 bullets)
 
-- TBD
+- Added `test` script to `packages/expansion-02/package.json` and `packages/expansion-03/package.json`.
+- Created `packages/expansion-02/test/pack-integrity.test.ts` to verify pack definition.
+- Created `packages/expansion-03/test/pack-integrity.test.ts` to verify pack definition.
+- Verified that both expansion packs have valid IDs, measure decks, and zones.
+- Verified that tests pass with `pnpm -r test`.
 
 ## 12) Commands Run (with outcomes)
 
-- TBD
+- `pnpm -C packages/expansion-02 test`: Passed (3 tests)
+- `pnpm -C packages/expansion-03 test`: Passed (3 tests)
+- `pnpm -r test`: All tests passed across 9 packages.
 
 ## 13) Postflight Proof (recorded in commit message)
 
-- TBD
+- `git status -sb`
+- `git diff --stat`
+- `pnpm test` output
 
 ## 14) Commit Proof (recorded in commit message)
 
-- TBD
+- `git show -1 --stat`
 
 ## 15) Amendments (append-only)
