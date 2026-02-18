@@ -1,4 +1,4 @@
-# Codex Task 0106 - Determinism & RNG Documentation Guard (Repo Script)
+# Codex Task 0005 - Determinism & RNG Documentation Guard (Repo Script)
 
 **Date:** 2026-02-17
 **Style:** Codex task contract

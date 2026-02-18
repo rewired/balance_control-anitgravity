@@ -1,4 +1,4 @@
-# Codex Task 0103 - Engine Core TSDoc Annotation Pass (Rule-Linked)
+# Codex Task 0002 - Engine Core TSDoc Annotation Pass (Rule-Linked)
 
 **Date:** 2026-02-17
 **Style:** Codex task contract
