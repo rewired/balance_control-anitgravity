@@ -85,8 +85,7 @@ export interface GameObject {
     // EXP-02 attributes
     regType?: RegulationType;
     targetTileId?: string;
-    mode?: 'PingPong' | 'Shift' | 'Convert';
-    expiresRound?: number;
+    mode?: 'PingPong' | 'Convert';
 }
 
 export interface Zone {
@@ -129,6 +128,8 @@ export interface PackSelection {
 export interface GameConfig {
     expansions: ExpansionFlags;
     packs?: PackSelection;
+    tileRecycling?: boolean;
+    firstPlayerHandicap?: boolean;
 }
 
 export type PackManifestRecord = Readonly<{

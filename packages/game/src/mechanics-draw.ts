@@ -1,5 +1,6 @@
 import { CoreZoneNames, GameState } from '@balance-control/rules';
 import { enumerateLegalIntents } from './engine/legal-intents';
+import { hasAnyOpenPlacement } from './moves/stages/drawAndPlace';
 
 export const UNPLACEABLE_DRAW_CHOICE_SOURCE_ID = 'system.tile.unplaceable.confirm';
 const PUBLIC_LOG_CAP = 20;
@@ -59,6 +60,24 @@ function markDrawPileEmptyForFinalSettlement(G: GameState): void {
     G.engine.attributes = attrs;
 }
 
+function shuffleDrawPile(G: GameState, ctx: any): void {
+    const drawPile = G.zones[CoreZoneNames.DrawPile];
+    const random = ctx?.random;
+    if (!drawPile || !random) return;
+    if (typeof random.Die === 'function') {
+        const result = [...drawPile.items];
+        for (let i = result.length - 1; i >= 1; i--) {
+            const j = random.Die(i + 1) - 1;
+            [result[i], result[j]] = [result[j], result[i]];
+        }
+        drawPile.items = result;
+        return;
+    }
+    if (typeof random.Shuffle === 'function') {
+        drawPile.items = random.Shuffle([...drawPile.items]);
+    }
+}
+
 /**
  * CORE-01-04-04: Draw one tile from DrawPile to staging.
  * CORE-01-04-06: If tile cannot be legally placed -> DiscardFaceUp.
@@ -95,10 +114,28 @@ export function drawTileToStaging(G: GameState, ctx: any): void {
 
     if (hasAnyLegalPlacementIntent(G, ctx, playerId)) return;
 
-    // CORE-01-04-06: Cannot be placed -> move to DiscardFaceUp.
     staging.items = staging.items.filter((id) => id !== tileId);
-    const discardZone = G.zones[CoreZoneNames.DiscardFaceUp];
-    discardZone.items.push(tileId);
+    if (!hasAnyOpenPlacement(G)) {
+        const attrs = G.engine.attributes ?? {};
+        attrs.noLegalPlacements = true;
+        G.engine.attributes = attrs;
+        if (G.meta?.cfg?.tileRecycling) {
+            drawPile.items.push(tileId);
+            shuffleDrawPile(G, ctx);
+        } else {
+            const discardZone = G.zones[CoreZoneNames.DiscardFaceUp];
+            discardZone.items.push(tileId);
+        }
+        return;
+    }
+
+    if (G.meta?.cfg?.tileRecycling) {
+        drawPile.items.push(tileId);
+        shuffleDrawPile(G, ctx);
+    } else {
+        const discardZone = G.zones[CoreZoneNames.DiscardFaceUp];
+        discardZone.items.push(tileId);
+    }
 
     if (drawPile.items.length === 0) {
         markDrawPileEmptyForFinalSettlement(G);

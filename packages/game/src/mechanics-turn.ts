@@ -34,38 +34,6 @@ export function allStartingInfluencePlaced(G: any, ctx: any): boolean {
     return true;
 }
 
-export function returnMetaMarkersAtRoundStart(G: GameState) {
-    const currentRound = G.roundNumber ?? 0;
-    const attrs = G.engine.attributes || {};
-    if (attrs.roundStartProcessed === currentRound) return;
-    attrs.roundStartProcessed = currentRound;
-    G.engine.attributes = attrs;
-
-    for (const obj of Object.values(G.objects)) {
-        if (!obj || obj.type !== 'MetaMarker') continue;
-        if (!obj.owner) continue;
-        if (typeof obj.expiresRound !== 'number') continue;
-        if (obj.expiresRound > currentRound) continue;
-
-        const supplyId = `${CoreZoneNames.PersonalSupply}:${obj.owner}`;
-        const supply = G.zones[supplyId];
-        if (!supply) continue;
-
-        const currentZoneId = findObjectZoneId(G, obj.id);
-        if (currentZoneId && currentZoneId !== supplyId) {
-            const currentZone = G.zones[currentZoneId];
-            currentZone.items = currentZone.items.filter(id => id !== obj.id);
-        }
-
-        if (!supply.items.includes(obj.id)) {
-            supply.items.push(obj.id);
-        }
-
-        obj.expiresRound = undefined;
-        obj.mode = undefined;
-    }
-}
-
 /** CORE-01-04-09A: Return Meta-Marker to PersonalSupply and set mode = None when Political Action did not place/update it. */
 export function returnMetaMarkerToSupply(G: GameState, playerId: string): void {
     const supplyId = `${CoreZoneNames.PersonalSupply}:${playerId}`;
@@ -87,7 +55,6 @@ export function returnMetaMarkerToSupply(G: GameState, playerId: string): void {
             supply.items.push(obj.id);
         }
         obj.mode = undefined;
-        obj.expiresRound = undefined;
     }
 }
 

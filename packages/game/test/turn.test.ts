@@ -37,7 +37,7 @@ function createTinyDrawPileGame() {
     };
 }
 
-function createMetaMarkerRoundReturnGame() {
+function createMetaMarkerPersistenceGame() {
     return {
         ...BalanceControlNoPlayerView,
         setup: (ctx: any) => {
@@ -54,8 +54,7 @@ function createMetaMarkerRoundReturnGame() {
             const marker = G.objects[markerId] as any;
             G.zones[supplyId].items = G.zones[supplyId].items.filter(id => id !== marker.id);
             G.zones['tile_start_committee'].items.push(marker.id);
-            marker.mode = 'Shift';
-            marker.expiresRound = 1;
+            marker.mode = 'PingPong';
             return G;
         }
     };
@@ -218,8 +217,8 @@ describe('Turn Structure (Stages)', () => {
         expect(finalState.ctx.gameover).toBeDefined();
     });
 
-    it('should return expiring meta-markers at round start', () => {
-        const client = Client({ game: createMetaMarkerRoundReturnGame(), numPlayers: 2 });
+    it('should return meta-markers to supply when not updated by Political Action', () => {
+        const client = Client({ game: createMetaMarkerPersistenceGame(), numPlayers: 2 });
         client.start();
 
         const startState = client.getState();
@@ -231,15 +230,9 @@ describe('Turn Structure (Stages)', () => {
         client.moves.placeTile({ targetCoord: firstCoord });
         client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, firstCoord) });
 
-        const secondState = client.getState();
-        const secondCoord = findFirstOpenNeighborCoord(secondState.G.grid);
-        client.moves.placeTile({ targetCoord: secondCoord });
-        client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, secondCoord) });
-
-        const roundStartState = client.getState();
-        expect(roundStartState.ctx.currentPlayer).toBe('0');
-        expect(roundStartState.G.zones['tile_start_committee'].items).not.toContain(marker.id);
-        expect(roundStartState.G.zones['PersonalSupply:0'].items).toContain(marker.id);
+        const afterActionState = client.getState();
+        expect(afterActionState.G.zones['tile_start_committee'].items).not.toContain(marker.id);
+        expect(afterActionState.G.zones['PersonalSupply:0'].items).toContain(marker.id);
     });
 
     it('should complete two full rounds in 3-player hotseat without softlock', () => {

@@ -97,6 +97,11 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         );
     }
 
+    if ((normalizedCtx as any)?.random?.Die) {
+        const seatCount = Math.max(1, normalizedCtx.numPlayers ?? 1);
+        (normalizedCtx as any).random.Die(seatCount);
+    }
+
     packAssembly.applySetupPostShuffle(G, normalizedCtx);
 
     return G;

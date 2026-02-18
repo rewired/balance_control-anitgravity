@@ -100,26 +100,45 @@ export const PoliticalActionMoves = {
         // CORE-01-04-12B
         const marker = getPlayerMetaMarker(G, pid);
         const markerZoneId = marker ? findObjectZoneId(G, marker.id) : null;
-        const markerOnDestination = markerZoneId === targetId;
-
-        const penaltySlots = EffectResolver.getExtraCostSlots(G, pid, 'influence.move', targetId);
-        if (penaltySlots.length > 0) {
-            // CORE-01-04-12B: Ping-Pong penalty — validate and queue move to Noise
-            if (!extraResourceIds || extraResourceIds.length !== penaltySlots.length) return INVALID_MOVE;
+        let penaltyCount = 0;
+        if (marker && marker.mode === 'PingPong' && markerZoneId === targetId) {
             const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
             const supply = G.zones[supplyId];
-            for (const rid of extraResourceIds) {
+            const R = supply?.items?.filter((id: string) => G.objects[id]?.type === 'Resource').length ?? 0;
+            penaltyCount = Math.min(10, Math.floor(R / 2));
+        }
+
+        const extraCostSlots = EffectResolver.getExtraCostSlots(G, pid, 'influence.move', targetId, { includePingPongPenalty: false });
+        const totalSlots = penaltyCount + extraCostSlots.length;
+
+        if (totalSlots > 0) {
+            if (!extraResourceIds || extraResourceIds.length !== totalSlots) return INVALID_MOVE;
+            if (hasDuplicateIds(extraResourceIds)) return INVALID_MOVE;
+        }
+
+        const penaltyResourceIds = penaltyCount > 0 ? extraResourceIds.slice(0, penaltyCount) : [];
+        const extraCostResourceIds = extraCostSlots.length > 0 ? extraResourceIds.slice(penaltyCount) : [];
+
+        if (hasOverlap(penaltyResourceIds, extraCostResourceIds)) return INVALID_MOVE;
+
+        if (penaltyCount > 0) {
+            const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+            const supply = G.zones[supplyId];
+            for (const rid of penaltyResourceIds) {
                 if (!supply?.items.includes(rid)) return INVALID_MOVE;
                 if (G.objects[rid]?.owner !== pid || G.objects[rid]?.type !== 'Resource') return INVALID_MOVE;
             }
-            if (hasDuplicateIds(extraResourceIds)) return INVALID_MOVE;
             G.engine.effectQueue.push({
                 kind: 'resource.penaltyToNoise',
                 playerId: pid,
-                resourceIds: extraResourceIds
+                resourceIds: penaltyResourceIds
             });
-        } else if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.move', targetId, extraResourceIds)) {
-            return INVALID_MOVE;
+        }
+
+        if (extraCostSlots.length > 0) {
+            if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.move', targetId, extraCostResourceIds, { includePingPongPenalty: false })) {
+                return INVALID_MOVE;
+            }
         }
 
         G.engine.effectQueue.push({
@@ -133,8 +152,7 @@ export const PoliticalActionMoves = {
 
         // CORE-01-04-12A: Only place Meta-Marker when source is ResortTile; set mode = PingPong
         if (marker && sourceTile?.type === TileType.Resort) {
-            const expiresRound = (G.roundNumber ?? 0) + 1;
-            placeMetaMarkerOnTile(G, marker, sourceId, 'PingPong', expiresRound);
+            placeMetaMarkerOnTile(G, marker, sourceId, 'PingPong');
         } else if (marker) {
             returnMetaMarkerToSupply(G, pid);
         }
@@ -308,8 +326,7 @@ export const PoliticalActionMoves = {
 
         const marker = getPlayerMetaMarker(G, pid);
         if (marker) {
-            const expiresRound = (G.roundNumber ?? 0) + 1;
-            placeMetaMarkerOnTile(G, marker, grassrootsTileId, 'Convert', expiresRound);
+            placeMetaMarkerOnTile(G, marker, grassrootsTileId, 'Convert');
         }
 
         // Usage tracking
@@ -317,4 +334,3 @@ export const PoliticalActionMoves = {
         events.endTurn();
     },
 };
-

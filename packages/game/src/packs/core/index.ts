@@ -61,7 +61,7 @@ export const CorePack: EnginePackDefinition = {
                 G.zones[tile.id] = { id: tile.id, name: tile.name || tile.id, items: [] };
             }
         },
-        postShuffle: (G: GameState, ctx: any, _cfg: GameConfig) => {
+        postShuffle: (G: GameState, ctx: any, cfg: GameConfig) => {
             // CORE-01-03-03B(5): Assign Starting Influence after Shuffle
             for (let i = 0; i < ctx.numPlayers; i++) {
                 const pid = i.toString();
@@ -72,6 +72,10 @@ export const CorePack: EnginePackDefinition = {
                 else if (ctx.numPlayers === 4) influenceCount = 2;
                 // ADD56-01-02-01/02: 5-6 players get 2 Influence each
                 else if (ctx.numPlayers === 5 || ctx.numPlayers === 6) influenceCount = 2;
+
+                if (cfg.firstPlayerHandicap && pid === String(ctx.currentPlayer ?? '0')) {
+                    influenceCount = Math.max(0, influenceCount - 1);
+                }
 
                 for (let k = 0; k < influenceCount; k++) {
                     const infId = `inf_${pid}_${k}`;

@@ -12,6 +12,8 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     packs: {
         enabledPacks: [],
     },
+    tileRecycling: false,
+    firstPlayerHandicap: false,
 };
 
 function readExpansionConfigCandidate(setupData: unknown): unknown {
@@ -67,6 +69,31 @@ function readPackConfigCandidate(setupData: unknown): Record<string, unknown> | 
     return undefined;
 }
 
+function readVariantConfigCandidate(setupData: unknown): Record<string, unknown> | undefined {
+    if (!setupData || typeof setupData !== 'object') return undefined;
+    const source = setupData as Record<string, unknown>;
+
+    if (source.variants && typeof source.variants === 'object') {
+        return source.variants as Record<string, unknown>;
+    }
+
+    if (source.coreVariants && typeof source.coreVariants === 'object') {
+        return source.coreVariants as Record<string, unknown>;
+    }
+
+    if (source.config && typeof source.config === 'object') {
+        const nested = source.config as Record<string, unknown>;
+        if (nested.variants && typeof nested.variants === 'object') {
+            return nested.variants as Record<string, unknown>;
+        }
+        if (nested.coreVariants && typeof nested.coreVariants === 'object') {
+            return nested.coreVariants as Record<string, unknown>;
+        }
+    }
+
+    return source;
+}
+
 function normalizeEnabledPacks(candidate: Record<string, unknown> | undefined): ExpansionId[] {
     if (!candidate) return [];
     const raw = candidate.enabledPacks;
@@ -104,6 +131,7 @@ export function normalizeGameConfig(setupData: unknown): GameConfig {
     const expansionsCandidate = readExpansionConfigCandidate(setupData);
     const candidate = (expansionsCandidate ?? {}) as Record<string, unknown>;
     const packCandidate = readPackConfigCandidate(setupData);
+    const variantCandidate = readVariantConfigCandidate(setupData);
 
     const expansionsFromFlags: ExpansionFlags = {
         ex01: candidate.ex01 === true,
@@ -126,5 +154,7 @@ export function normalizeGameConfig(setupData: unknown): GameConfig {
             enabledPacks,
             pinnedVersions: normalizePinnedVersions(packCandidate),
         },
+        tileRecycling: variantCandidate?.tileRecycling === true,
+        firstPlayerHandicap: variantCandidate?.firstPlayerHandicap === true,
     };
 }

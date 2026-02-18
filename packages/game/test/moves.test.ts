@@ -133,7 +133,6 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should set PingPong mode when meta-marker starts on destination', () => {
-        G.roundNumber = 1;
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'meta_p1');
@@ -144,7 +143,6 @@ describe('Moves', () => {
         expect(G.zones.board_t1.items).toContain('meta_p1');
         expect(G.zones.board_t2.items).not.toContain('meta_p1');
         expect(G.objects.meta_p1.mode).toBe('PingPong');
-        expect(G.objects.meta_p1.expiresRound).toBe(2);
     });
 
     it('moveInfluence should require and apply PingPong penalty resources to Noise (CORE-01-04-12B)', () => {
@@ -177,7 +175,6 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should set PingPong mode when source is ResortTile (CORE-01-04-12A)', () => {
-        G.roundNumber = 3;
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
 
@@ -185,7 +182,6 @@ describe('Moves', () => {
 
         expect(G.zones.board_t1.items).toContain('meta_p1');
         expect(G.objects.meta_p1.mode).toBe('PingPong');
-        expect(G.objects.meta_p1.expiresRound).toBe(4);
     });
 
     it('moveInfluence should preserve zone exclusivity', () => {
@@ -354,7 +350,6 @@ describe('Moves', () => {
     });
 
     it('convertResources should place meta-marker on the anchor with Convert mode', () => {
-        G.roundNumber = 5;
         G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1', 'meta_p1'];
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
         G.zones.board_gr.items.push('inf_1');
@@ -366,7 +361,6 @@ describe('Moves', () => {
 
         expect(G.zones.board_gr.items).toContain('meta_p1');
         expect(G.objects.meta_p1.mode).toBe('Convert');
-        expect(G.objects.meta_p1.expiresRound).toBe(6);
     });
 
     it('convertResources should preserve zone exclusivity', () => {

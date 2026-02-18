@@ -161,10 +161,12 @@ export function getExtraCostSlots(
     G: GameState & { engine: EngineState },
     pid: string,
     actionType: string,
-    tileId?: string
+    tileId?: string,
+    options?: { includePingPongPenalty?: boolean }
 ): CostSlot[] {
     const attr = G.engine.attributes;
     const costSlots: CostSlot[] = [];
+    const includePingPongPenalty = options?.includePingPongPenalty !== false;
 
     if (tileId && attr.tileExtraCosts?.[tileId]) {
         for (let i = 0; i < attr.tileExtraCosts[tileId]; i++) costSlots.push('ANY');
@@ -202,7 +204,7 @@ export function getExtraCostSlots(
     }
 
     // CORE-01-04-12B: Ping-Pong Penalty — N = min(10, floor(R/2)) resources to Noise
-    if (actionType === 'influence.move' && tileId) {
+    if (includePingPongPenalty && actionType === 'influence.move' && tileId) {
         const marker = getPlayerMetaMarker(G, pid);
         if (marker && marker.mode === 'PingPong') {
             const markerZoneId = findObjectZoneId(G, marker.id);
@@ -228,10 +230,11 @@ export function checkAndPayCosts(
     pid: string,
     actionType: string,
     tileId?: string,
-    extraResourceIds?: string[]
+    extraResourceIds?: string[],
+    options?: { includePingPongPenalty?: boolean }
 ): boolean {
     const attr = G.engine.attributes;
-    const costSlots = getExtraCostSlots(G, pid, actionType, tileId);
+    const costSlots = getExtraCostSlots(G, pid, actionType, tileId, options);
 
     if (costSlots.length === 0) return true;
 

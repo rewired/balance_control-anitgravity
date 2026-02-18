@@ -128,12 +128,25 @@ export class EffectResolver {
         return commitCostImpl(G, _ctx, costSpec);
     }
 
-    public static getExtraCostSlots(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string): CostSlot[] {
-        return getExtraCostSlotsImpl(G, pid, actionType, tileId);
+    public static getExtraCostSlots(
+        G: GameState & { engine: EngineState },
+        pid: string,
+        actionType: string,
+        tileId?: string,
+        options?: { includePingPongPenalty?: boolean }
+    ): CostSlot[] {
+        return getExtraCostSlotsImpl(G, pid, actionType, tileId, options);
     }
 
-    public static checkAndPayCosts(G: GameState & { engine: EngineState }, pid: string, actionType: string, tileId?: string, extraResourceIds?: string[]): boolean {
-        return checkAndPayCostsImpl(G, pid, actionType, tileId, extraResourceIds);
+    public static checkAndPayCosts(
+        G: GameState & { engine: EngineState },
+        pid: string,
+        actionType: string,
+        tileId?: string,
+        extraResourceIds?: string[],
+        options?: { includePingPongPenalty?: boolean }
+    ): boolean {
+        return checkAndPayCostsImpl(G, pid, actionType, tileId, extraResourceIds, options);
     }
 
     public static resolve(G: GameState & { engine: EngineState }, ctx: any): boolean {

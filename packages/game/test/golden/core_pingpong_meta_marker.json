@@ -60,6 +60,6 @@
     { "move": "placeTile", "args": [{ "targetCoord": "-1,1" }] },
     { "move": "placeInfluence", "args": [{ "targetCoord": "-1,1" }] }
   ],
-  "expectedFinalHash": "a73ff37ceb06254e240534255d05e71b05a57df5bf85e37dc7601d97f6daa847",
+  "expectedFinalHash": "4026ce05ae1128a6c4e45f23a35ec71634a7887bba6d7092be263021e5574734",
   "expectedPublicSurfaceHash": "ac11f9da4045a3512d4a62e99eb0ec23a1b2e386fc388bd8a14171620a9befd4"
 }

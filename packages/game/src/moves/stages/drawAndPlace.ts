@@ -6,6 +6,20 @@ import { EffectResolver } from '../../engine/resolver';
 import { passTilePlacementPayloadSchema, placeTilePayloadSchema, validateMovePayload } from '../../move-contracts';
 import { DRAW_AND_PLACE_STAGE, POLITICAL_ACTION_STAGE, requireStage } from '../shared';
 
+export function hasAnyOpenPlacement(G: any): boolean {
+    const grid = G.grid ?? {};
+    const coords = Object.keys(grid);
+    if (coords.length === 0) return false;
+    for (const coordStr of coords) {
+        const coord = stringToCoord(coordStr);
+        const neighbors = getNeighbors(coord);
+        for (const n of neighbors) {
+            if (!grid[coordToString(n)]) return true;
+        }
+    }
+    return false;
+}
+
 export const DrawAndPlaceMoves = {
     // CORE-01-04-02: DrawAndPlaceTile — place drawn tile at coord
     placeTile: ({ G, ctx, events }: any, payload: unknown) => {
@@ -99,8 +113,9 @@ export const DrawAndPlaceMoves = {
         if (!staging || staging.items.length > 0) return INVALID_MOVE;
 
         // CORE-01-09-01A: DrawPile was empty at turn start â†’ final Round Settlement, then end (skip Political Action)
-        if (G.engine.attributes.drawPileEmptyAtTurnStart) {
+        if (G.engine.attributes.drawPileEmptyAtTurnStart || G.engine.attributes.noLegalPlacements) {
             delete G.engine.attributes.drawPileEmptyAtTurnStart;
+            delete G.engine.attributes.noLegalPlacements;
             if (!G.roundNumber) G.roundNumber = 0;
             G.roundNumber++;
             runFinalRoundSettlement(G, ctx);
@@ -116,4 +131,3 @@ export const DrawAndPlaceMoves = {
         }
     }
 };
-

@@ -72,7 +72,7 @@ export function isCoreResort(resort: string): boolean {
     return resort === CoreResources.DOM || resort === CoreResources.FOR || resort === CoreResources.INF;
 }
 
-export function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'PingPong' | 'Convert', expiresRound: number) {
+export function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'PingPong' | 'Convert') {
     const currentZoneId = findObjectZoneId(G, marker.id);
     if (currentZoneId && currentZoneId !== tileId) {
         const currentZone = G.zones[currentZoneId];
@@ -87,6 +87,4 @@ export function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode:
     }
 
     marker.mode = mode;
-    marker.expiresRound = expiresRound;
 }
-

@@ -46,7 +46,6 @@ type PreludeAction =
           playerId: string;
           zoneId: string;
           mode?: string;
-          expiresRound?: number;
       };
 
 function loadGoldenFixtures(): GoldenFixture[] {
@@ -123,7 +122,6 @@ function applyPrelude(G: any, prelude?: PreludeAction[]): void {
             if (!targetZone) continue;
             targetZone.items.push(markerId);
             if (step.mode !== undefined) marker.mode = step.mode;
-            if (step.expiresRound !== undefined) marker.expiresRound = step.expiresRound;
         }
     }
 }

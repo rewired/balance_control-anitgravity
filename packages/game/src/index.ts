@@ -2,7 +2,6 @@ import { Game } from 'boardgame.io';
 import { GameState, CoreZoneNames, TileType } from '@balance-control/rules';
 import { SetupGame } from './setup';
 import { positionKeyFromCoordString } from './topology';
-import { returnMetaMarkersAtRoundStart } from './mechanics-turn';
 import { drawTileToStaging } from './mechanics-draw';
 import { EffectResolver } from './engine/resolver';
 import { assemblePacks, buildStageMoveMap, type MoveMap } from './move-assembly';
@@ -164,9 +163,6 @@ export function createBalanceControlGame(): Game<GameState> {
             },
             onBegin: ({ G, ctx }: any) => {
                 validateSurfaceHash(G);
-                if (ctx.currentPlayer === '0') {
-                    returnMetaMarkersAtRoundStart(G as any);
-                }
                 EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
                 drawTileToStaging(G, ctx);
                 // CORE-01-09-01A: Flag when DrawPile is empty and no tile is staged (skip Political Action)
