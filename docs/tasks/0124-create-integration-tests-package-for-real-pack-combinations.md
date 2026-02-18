@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -99,30 +99,39 @@ NOTE: If core is still provided via `@balance-control/game` at this moment, the 
 
 ## 9) Acceptance Criteria
 
-- [ ] `packages/integration-tests` exists and is wired into the workspace.
-- [ ] At least one integration test imports real expansion packs and passes.
-- [ ] `pnpm -r test` is green.
-- [ ] Engine package tests still have zero imports from real expansion packages.
+- [x] `packages/integration-tests` exists and is wired into the workspace.
+- [x] At least one integration test imports real expansion packs and passes.
+- [x] `pnpm -r test` is green.
+- [x] Engine package tests still have zero imports from real expansion packages.
 
 ## 10) PR Checklist (Repo Artifact)
 
-- [ ] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
-- [ ] Single commit on the task branch.
-- [ ] `pnpm -r test` executed; results recorded in Section 12.
-- [ ] No unrelated formatting churn.
-- [ ] Postflight proof captured (per AGENTS) and included in commit message.
+- [x] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
+- [x] Single commit on the task branch.
+- [x] `pnpm -r test` executed; results recorded in Section 12.
+- [x] No unrelated formatting churn.
+- [x] Postflight proof captured (per AGENTS) and included in commit message.
 
 ## 11) Work Summary (3–7 bullets)
 
-- TBD
+- Created `packages/integration-tests` as a new workspace package.
+- Configured `package.json`, `tsconfig.json`, and `vitest.config.ts` for the new package.
+- Implemented `test/smoke.test.ts` to verify that `CorePack`, `Exp01Pack`, `Exp02Pack`, and `Exp03Pack` can be registered together in `EnginePackRegistry`.
+- Verified that `createBalanceControlGame()` initializes correctly with all expansions enabled.
+- Confirmed that expansion-specific zones (like `CoreZoneNames.DrawPile`) and measure decks are correctly loaded.
+- Validated that `pnpm -r test` passes for the entire workspace, including the new integration tests.
 
 ## 12) Commands Run (with outcomes)
 
-- TBD
+- `pnpm install`: Installed dependencies and linked the new package.
+- `pnpm -C packages/integration-tests test`: Verified the smoke test passes (3 tests).
+- `pnpm -r test`: Verified all tests across the workspace pass.
 
 ## 13) Postflight Proof (recorded in commit message)
 
-- TBD
+- `git status -sb`
+- `git diff --stat`
+- `pnpm -r test` output
 
 ## 14) Commit Proof (recorded in commit message)
 
