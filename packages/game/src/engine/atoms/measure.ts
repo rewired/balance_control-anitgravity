@@ -19,9 +19,13 @@ function handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): v
     const mId = obj.measureId;
     if (!mId) return;
 
-    const atoms = EnginePackRegistry.getMeasureAtoms(G, mId, atom);
+    const deck = lookupMeasureDeckForObjectId(G, measureObjectId);
+    const atoms = EnginePackRegistry.getMeasureAtomsForExpansion(G, deck.expansionId, mId, atom);
+
     if (atoms && atoms.length > 0) {
         G.engine.effectQueue.unshift(...atoms);
+    } else {
+        throw new Error(`Engine: measure "${mId}" not defined in expansion "${deck.expansionId}".`);
     }
 
     // Standard Recycle and Hand Removal
@@ -35,7 +39,6 @@ function handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): v
     obj.playCount = (obj.playCount || 0) + 1;
     obj.owner = undefined;
 
-    const deck = lookupMeasureDeckForObjectId(G, measureObjectId);
     const targetZone = obj.playCount === 1 ? deck.recyclePileId : deck.finalDiscardId;
     if (G.zones[targetZone]) {
         G.zones[targetZone].items.push(measureObjectId);

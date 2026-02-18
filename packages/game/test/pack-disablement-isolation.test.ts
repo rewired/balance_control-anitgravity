@@ -155,5 +155,10 @@ describe('Pack Disablement Isolation', () => {
 
         const atoms = EnginePackRegistry.getMeasureAtoms(G as GameState, 'm1', {});
         expect(atoms).toBeNull();
+
+        // Also verify the new API throws for disabled pack
+        expect(() => {
+            EnginePackRegistry.getMeasureAtomsForExpansion(G as GameState, 'exp01', 'm1', {});
+        }).toThrow('EnginePackRegistry: expansion "exp01" not found or not enabled.');
     });
 });

@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** COMMIT_READY
 
 ## Task State Machine (Loop-Breaker)
 
@@ -86,27 +86,33 @@ Rules (non-negotiable):
 
 ## 9) Acceptance Criteria
 
-- [ ] In a multi-expansion registration order, a Measure defined in EXP-02 with `measureId = M01` dispatches EXP-02 atoms (not EXP-01).
-- [ ] A deterministic test fails on the pre-change behavior and passes after this change (documented via assertions).
-- [ ] Unknown `expansionId` and unknown `measureId` produce deterministic, user-readable errors.
-- [ ] All tests pass and no new TypeScript build errors are introduced.
+- [x] In a multi-expansion registration order, a Measure defined in EXP-02 with `measureId = M01` dispatches EXP-02 atoms (not EXP-01).
+- [x] A deterministic test fails on the pre-change behavior and passes after this change (documented via assertions).
+- [x] Unknown `expansionId` and unknown `measureId` produce deterministic, user-readable errors.
+- [x] All tests pass and no new TypeScript build errors are introduced.
 
 ## 10) PR Checklist (Repo Artifact)
 
-- [ ] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
-- [ ] Single commit on the task branch.
-- [ ] `pnpm -r test` (or the repo-equivalent) executed; results recorded in Section 12.
-- [ ] No unrelated formatting churn.
-- [ ] Determinism preserved; no order-dependent Map/Object iteration without canonicalization.
-- [ ] Postflight proof captured (per AGENTS) and included in commit message.
+- [x] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
+- [x] Single commit on the task branch.
+- [x] `pnpm -r test` (or the repo-equivalent) executed; results recorded in Section 12.
+- [x] No unrelated formatting churn.
+- [x] Determinism preserved; no order-dependent Map/Object iteration without canonicalization.
+- [x] Postflight proof captured (per AGENTS) and included in commit message.
 
 ## 11) Work Summary (3–7 bullets)
 
-- TBD
+- Introduced `EnginePackRegistry.getMeasureAtomsForExpansion(G, expansionId, measureId, payload)` to allow explicit dispatch.
+- Deprecated `getMeasureAtoms` to discourage ambiguous global lookup.
+- Updated `handleMeasurePlay` in `packages/game/src/engine/atoms/measure.ts` to resolve `expansionId` via `lookupMeasureDeckForObjectId` and dispatch to the specific expansion.
+- Verified that `getMeasureAtomsForExpansion` validates expansion enablement to prevent leaks from disabled packs.
+- Added `packages/game/test/measure-dispatch-collision.test.ts` to prove correct dispatch when multiple packs define the same measure ID (`M01`).
 
 ## 12) Commands Run (with outcomes)
 
-- TBD
+- `pnpm test test/measure-dispatch-collision.test.ts` -> PASS (Proves dispatch isolation and error handling)
+- `pnpm test test/pack-disablement-isolation.test.ts` -> PASS (Proves disabled packs don't leak)
+- `pnpm test` -> PASS (38 test files, 146 tests passed)
 
 ## 13) Postflight Proof (recorded in commit message)
 

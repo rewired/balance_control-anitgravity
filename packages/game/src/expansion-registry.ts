@@ -265,7 +265,32 @@ class EnginePackRegistryImpl {
     }
 
     /**
+     * Retrieves atoms for a measure from a specific expansion pack.
+     * @expansion EXP-01|02|03
+     * @deterministic
+     * @pure
+     */
+    public getMeasureAtomsForExpansion(G: GameState, expansionId: ExpansionId, measureId: string, payload: any): any[] | null {
+        const enabledPackIds = new Set(this.resolveEnabledPackIds(G));
+        if (!enabledPackIds.has(expansionId)) {
+             throw new Error(`EnginePackRegistry: expansion "${expansionId}" not found or not enabled.`);
+        }
+
+        const pack = this.packs[expansionId];
+        if (!pack) {
+             // This should be unreachable if resolveEnabledPackIds validates packs, but for safety:
+             throw new Error(`EnginePackRegistry: expansion "${expansionId}" enabled but not registered.`);
+        }
+
+        if (pack.getMeasureAtoms) {
+             return pack.getMeasureAtoms(G, measureId, payload);
+        }
+        return null;
+    }
+
+    /**
      * Retrieves atoms for a measure from the appropriate expansion pack.
+     * @deprecated Use getMeasureAtomsForExpansion instead to avoid ambiguity.
      * @expansion EXP-01|02|03
      * @deterministic
      * @pure
