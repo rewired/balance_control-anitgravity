@@ -1,0 +1,60 @@
+{
+  "summary": "Compliance audit of tasks 0097-0101 against AGENTS.md requirements.",
+  "tasks": {
+    "0097": {
+      "checklist_errors": [
+        "Unchecked: [ ] pnpm test (or repo equivalent) passes",
+        "Unchecked: [ ] Meaningful commit message"
+      ],
+      "process_errors": [
+        "Section 13.1 (Postflight Proof) marked as 'Pending'",
+        "Section 14.1 (Commit Proof) marked as 'Pending'",
+        "Missing task-specific commit in git history"
+      ]
+    },
+    "0098": {
+      "state_error": "Task State remains 'FROZEN' instead of 'COMMIT_READY' or 'DONE'",
+      "checklist_errors": [
+        "Section 5.3 (Docs) all items unchecked",
+        "Section 8 (Implementation Plan) all items unchecked",
+        "Section 9 (Acceptance Criteria) all items unchecked",
+        "Section 10 (PR Checklist) all items unchecked"
+      ],
+      "process_errors": [
+        "Section 11 (Work Summary) is 'N/A'",
+        "Section 12 (Commands Run) is 'N/A'",
+        "Missing task-specific commit in git history (Section 13/14 claims recorded but not found)"
+      ]
+    },
+    "0099": {
+      "template_error": "Standard task template (defined in AGENTS.md and _TASK_TEMPLATE_NONNEGOTIABLE.md) not used",
+      "checklist_errors": [
+        "Missing standard PR Checklist section (Section 10)",
+        "Missing Section 11 (Work Summary), 12 (Commands Run), 13 (Postflight), 14 (Commit Proof), 15 (Amendments)"
+      ],
+      "process_errors": [
+        "Missing task-specific commit in git history"
+      ]
+    },
+    "0100": {
+      "process_errors": [
+        "Section 13.1 (Postflight Proof) marked as 'Pending'",
+        "Section 14.1 (Commit Proof) marked as 'Pending'",
+        "Missing task-specific commit in git history"
+      ]
+    },
+    "0101": {
+      "checklist_errors": [
+        "Unchecked: [ ] Meaningful commit message"
+      ],
+      "process_errors": [
+        "Section 14.1 (Commit Proof) marked as 'N/A (no commit performed)'",
+        "Missing task-specific commit in git history"
+      ]
+    }
+  },
+  "global_violations": [
+    "AGENTS.md Section 4 (Single Meaningful Commit): No task-specific commits found for any listed task.",
+    "AGENTS.md Section 3 (Postflight Proof): Postflight proofs are missing from both task files and commit messages."
+  ]
+}
