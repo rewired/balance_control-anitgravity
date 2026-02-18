@@ -5,6 +5,12 @@ import { computeMajority } from '../../mechanics';
 import { applyModifiers } from '../resolver/modifiers';
 import { isProhibited } from '../resolver/prohibitions';
 
+/**
+ * Processes hotspot resolution for a single tile.
+ * @rule CORE-01-06-04
+ * @deterministic
+ * @sideEffects
+ */
 function handleHotspotResolve(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
     const { tileId } = atom;
     const tile = G.tiles[tileId];

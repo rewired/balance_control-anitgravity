@@ -20,6 +20,12 @@ const CORE_PACK_MANIFEST: PackManifest = {
     required: true,
 };
 
+/**
+ * Core engine pack implementing CORE-01 ruleset.
+ * @rule CORE-01
+ * @deterministic
+ * @pure
+ */
 export const CorePack: EnginePackDefinition = {
     id: 'core',
     name: 'CORE-01 (v1.1.0)',

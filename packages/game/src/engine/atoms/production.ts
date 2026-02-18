@@ -6,6 +6,12 @@ import { EnginePackRegistry } from '../../expansion-registry';
 import { applyModifiers } from '../resolver/modifiers';
 import { isProhibited } from '../resolver/prohibitions';
 
+/**
+ * Processes production resolution for a single resort tile.
+ * @rule CORE-01-06-16
+ * @deterministic
+ * @sideEffects
+ */
 function handleProductionResolve(G: GameState & { engine: EngineState }, atom: any): void {
     const { tileId } = atom;
     const tile = G.tiles[tileId];

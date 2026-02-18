@@ -98,6 +98,12 @@ function buildPlayerView(G: GameState, playerID?: string | null): GameState {
     return { ...G, zones, objects, tiles, engine };
 }
 
+/**
+ * Factory for creating the Balance Control game configuration.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function createBalanceControlGame(): Game<GameState> {
     ensureCorePackRegistered();
     const packAssembly = assemblePacks({ mode: 'registered' });

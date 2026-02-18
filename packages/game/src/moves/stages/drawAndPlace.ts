@@ -21,7 +21,13 @@ export function hasAnyOpenPlacement(G: any): boolean {
 }
 
 export const DrawAndPlaceMoves = {
-    // CORE-01-04-02: DrawAndPlaceTile — place drawn tile at coord
+    /**
+     * Places the drawn tile at the target coordinate.
+     * @rule CORE-01-04-02
+     * @rule CORE-01-04-05
+     * @deterministic
+     * @sideEffects
+     */
     placeTile: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('placeTile', placeTilePayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
@@ -100,7 +106,13 @@ export const DrawAndPlaceMoves = {
         }
     },
 
-    // CORE-01-09-01 / CORE-01-07-02 / CORE-01-09-01A: DrawPile empty at turn start â†’ final settlement, skip Political Action
+    /**
+     * Passes tile placement when no tile is staged.
+     * @rule CORE-01-04-04
+     * @rule CORE-01-09-01A
+     * @deterministic
+     * @sideEffects
+     */
     passTilePlacement: ({ G, ctx, events }: any, payload?: unknown) => {
         const validated = validateMovePayload('passTilePlacement', passTilePlacementPayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;

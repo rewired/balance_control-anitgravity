@@ -39,9 +39,11 @@ export function isBoardTile(G: any, tileId: string): boolean {
 }
 
 /**
- * CORE-01-04-22K/22L: Validates declared variant and returns spec.
- * Untyped: 3 inputs only. Typed: 2 inputs (Variant A) or 3 inputs (Variant B, output â‰  T).
- * Legacy: tile with inputSlots:2 but no resort = Typed 2:1 only (Variant A).
+ * Validates declared variant and returns spec for Grassroots conversion.
+ * @rule CORE-01-04-22K
+ * @rule CORE-01-04-22L
+ * @deterministic
+ * @pure
  */
 export function getGrassrootsConversionSpec(tile: any, inputCount: number, outputResort?: string): GrassrootsConversionSpec | null {
     const spec = tile?.conversion;
@@ -72,6 +74,12 @@ export function isCoreResort(resort: string): boolean {
     return resort === CoreResources.DOM || resort === CoreResources.FOR || resort === CoreResources.INF;
 }
 
+/**
+ * Places a meta-marker on a tile and sets its mode.
+ * @rule CORE-01-02-17C
+ * @deterministic
+ * @sideEffects
+ */
 export function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'PingPong' | 'Convert') {
     const currentZoneId = findObjectZoneId(G, marker.id);
     if (currentZoneId && currentZoneId !== tileId) {
