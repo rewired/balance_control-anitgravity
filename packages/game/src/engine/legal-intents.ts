@@ -209,6 +209,7 @@ function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
             const marker = getPlayerMetaMarker(G, playerID);
 
             // CORE-01-04-12B: PingPong Penalty
+            // Only applicable to MoveInfluence, not PlaceInfluence
             if (marker && marker.tileId === targetId && marker.mode === 'PingPong') {
                 consequences.push('PingPong Penalty applies');
             }
