@@ -22,7 +22,10 @@
             "@balance-control/shared": ["../shared/src"],
             "@balance-control/expansion-01": ["../expansion-01/src"],
             "@balance-control/expansion-02": ["../expansion-02/src"],
-            "@balance-control/expansion-03": ["../expansion-03/src"]
+            "@balance-control/expansion-03": ["../expansion-03/src"],
+            "@balance-control/expansion-01/engine": ["../expansion-01/src/engine"],
+            "@balance-control/expansion-02/engine": ["../expansion-02/src/engine"],
+            "@balance-control/expansion-03/engine": ["../expansion-03/src/engine"]
         }
     },
     "include": [
