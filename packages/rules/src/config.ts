@@ -1,6 +1,10 @@
 import type { ExpansionId } from './ids';
 import type { RulesetManifest } from './manifest';
 
+/**
+ * @deprecated Use PackSelection instead.
+ * This interface is kept for compatibility but should be derived from packs.
+ */
 export interface ExpansionFlags {
     ex01: boolean;
     ex02: boolean;
@@ -13,6 +17,7 @@ export interface PackSelection {
 }
 
 export interface GameConfig {
+    /** @deprecated Use packs.enabledPacks instead. */
     expansions: ExpansionFlags;
     packs?: PackSelection;
     tileRecycling?: boolean;

@@ -1,5 +1,20 @@
 import type { ZoneId } from './ids';
 
+export enum CoreZoneName {
+    DrawPile = 'DrawPile',
+    DiscardFaceUp = 'DiscardFaceUp',
+    Board = 'Board',
+    Bank = 'Bank',
+    Noise = 'Noise',
+    PersonalSupply = 'PersonalSupply',
+    PlayerHand = 'PlayerHand',
+    SelectionStaging = 'SelectionStaging'
+}
+
+/**
+ * @deprecated Use CoreZoneName for core zones.
+ * This enum leaks expansion zones and will be removed in a future version.
+ */
 export enum CoreZoneNames {
     DrawPile = 'DrawPile',
     DiscardFaceUp = 'DiscardFaceUp',

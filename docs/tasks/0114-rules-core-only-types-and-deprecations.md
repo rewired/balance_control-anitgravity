@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** FROZEN
 
 ## Task State Machine (Loop-Breaker)
 
@@ -157,24 +157,32 @@ Make `@balance-control/rules` stop pretending that expansion IDs/resources/zones
 
 ## 10) PR Checklist (Repo Artifact)
 
-- [ ] I confirmed **Task State = FROZEN** before editing code.
-- [ ] I ran `pnpm -r build` and `pnpm -r --if-present test`.
-- [ ] I ran `pnpm run verify:docs` and `pnpm run verify:packs` (when applicable).
-- [ ] I updated **this task file** with Work Summary + Commands + Proof sections.
-- [ ] I added/updated tests to prevent regressions (or noted why not applicable).
-- [ ] The working tree is clean (`git status --porcelain` empty).
+- [x] I confirmed **Task State = FROZEN** before editing code.
+- [x] I ran `pnpm -r build` and `pnpm -r --if-present test`.
+- [x] I ran `pnpm run verify:docs` and `pnpm run verify:packs` (when applicable).
+- [x] I updated **this task file** with Work Summary + Commands + Proof sections.
+- [x] I added/updated tests to prevent regressions (or noted why not applicable).
+- [x] The working tree is clean (`git status --porcelain` empty).
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-- TODO
+- Added `CoreResort` type and deprecated `CoreResources` enum in `packages/rules/src/resources.ts`.
+- Added `CoreZoneName` enum and deprecated `CoreZoneNames` enum in `packages/rules/src/zones.ts`.
+- Updated `packages/rules/src/config.ts` to deprecate `ExpansionFlags` and `GameConfig.expansions`, promoting `PackSelection` as the canonical config.
+- Updated `packages/game/src/config.ts` to ensure `normalizeGameConfig` prioritizes `packs.enabledPacks` over `expansions` flags, while maintaining backward compatibility.
+- Updated `packages/game/src/setup.ts` to use `CoreZoneName` and string literals for resources, removing dependencies on expansion-leaking enums for core setup.
+- Added `packages/game/test/config-normalization.test.ts` to verify config reconciliation logic.
+- Verified that `pnpm build` and `pnpm test` pass.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-- TODO
+- `pnpm test packages/game/test/config-normalization.test.ts` -> Passed
+- `pnpm -r build` -> Passed
+- `pnpm -r --if-present test` -> Passed
 
 ---
 

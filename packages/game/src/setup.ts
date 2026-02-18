@@ -1,4 +1,4 @@
-import { GameState, CoreZoneNames, TileType, CoreResources, RULESET_MANIFEST, RulesetManifest, GameMeta } from '@balance-control/rules';
+import { GameState, CoreZoneName, TileType, RULESET_MANIFEST, RulesetManifest, GameMeta } from '@balance-control/rules';
 import { Ctx } from 'boardgame.io';
 import { normalizeGameConfig } from './config';
 import { hashState } from './hash-state';
@@ -103,12 +103,14 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
     packAssembly.applySetupPreShuffle(G, normalizedCtx);
 
     // CORE-01-03-02B: Canonical Pre-Shuffle Ordering before shuffle
-    G.zones[CoreZoneNames.DrawPile].items = sortDrawPileCanonical(G);
+    if (G.zones[CoreZoneName.DrawPile]) {
+        G.zones[CoreZoneName.DrawPile].items = sortDrawPileCanonical(G);
+    }
 
     // CORE-01-03-02 / CORE-01-03-02A.1: Canonical Fisher-Yates shuffle (i from n-1 down to 1, j = RNG.nextInt(i+1))
-    if (normalizedCtx && (normalizedCtx as any).random) {
-        G.zones[CoreZoneNames.DrawPile].items = shuffleFisherYates(
-            G.zones[CoreZoneNames.DrawPile].items,
+    if (normalizedCtx && (normalizedCtx as any).random && G.zones[CoreZoneName.DrawPile]) {
+        G.zones[CoreZoneName.DrawPile].items = shuffleFisherYates(
+            G.zones[CoreZoneName.DrawPile].items,
             (normalizedCtx as any).random
         );
     }
@@ -143,7 +145,7 @@ function shuffleFisherYates<T>(arr: T[], random: { Die?: (n: number) => number; 
 
 /** CORE-01-03-02B: Canonical Pre-Shuffle Ordering. */
 function sortDrawPileCanonical(G: GameState): string[] {
-    const items = G.zones[CoreZoneNames.DrawPile]?.items ?? [];
+    const items = G.zones[CoreZoneName.DrawPile]?.items ?? [];
     const TILE_TYPE_ORDER: Record<string, number> = {
         [TileType.Resort]: 0,
         [TileType.Committee]: 1,
@@ -152,9 +154,9 @@ function sortDrawPileCanonical(G: GameState): string[] {
         [TileType.Hotspot]: 4
     };
     const RESORT_ORDER: Record<string, number> = {
-        [CoreResources.DOM]: 0,
-        [CoreResources.FOR]: 1,
-        [CoreResources.INF]: 2
+        'DOM': 0,
+        'FOR': 1,
+        'INF': 2
     };
 
     return [...items].sort((aId, bId) => {
