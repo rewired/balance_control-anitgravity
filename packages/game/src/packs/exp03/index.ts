@@ -1,8 +1,7 @@
 import { Expansion03 } from '@balance-control/expansion-03';
 import { RULESET_MANIFEST } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
-import { placeCountdownMarker, playMeasure, takeMeasure } from '../../expansion-moves';
-import { exp03CountdownAtoms } from '../../engine/atoms/countdown';
+import { placeCountdownMarker, playMeasure, takeMeasure, exp03CountdownAtoms } from '../pack-api';
 
 const EXP03_PACK_VERSION = (RULESET_MANIFEST.expansions.exp03Version ?? '0.0.0').replace(/^v/i, '');
 const EXP03_PACK_MANIFEST: PackManifest = {

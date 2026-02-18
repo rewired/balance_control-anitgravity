@@ -6,7 +6,6 @@ import { EngineModuleRegistry } from './engine/engine-module-registry';
 import type { EngineState, HookPoint } from './engine/types';
 import { MoveModuleRegistry, type MoveFn, type MoveMap, type MoveModule } from './move-module-registry';
 import type { EnginePackDefinition } from './packs/types';
-import { CorePack } from './packs/core';
 import { ensureCorePackRegistered } from './packs/register-core';
 
 export type { MoveFn, MoveMap, MoveModule };
@@ -79,14 +78,11 @@ export function assemblePacks(options: { config?: GameConfig; mode?: PackAssembl
     const expansionMoves = mergeMoveModules(expansionMoveModules);
 
     const applySetupPreShuffle = (G: GameState, ctx: any) => {
-        CorePack.setup?.preShuffle?.(G, ctx, config);
         EnginePackRegistry.applySetupPreShuffle(G, ctx, config);
     };
 
     const applySetupPostShuffle = (G: GameState, ctx: any) => {
-        for (const pack of packs) {
-            pack.setup?.postShuffle?.(G, ctx, config);
-        }
+        EnginePackRegistry.applySetupPostShuffle(G, ctx, config);
     };
 
     const buildAtomDispatch = (
