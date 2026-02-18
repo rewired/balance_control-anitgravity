@@ -15,10 +15,24 @@
         "isolatedModules": true,
         "noEmit": true,
         "types": ["vite/client"],
-        "jsx": "react-jsx"
+        "jsx": "react-jsx",
+        "paths": {
+            "@balance-control/game": ["../game/src"],
+            "@balance-control/rules": ["../rules/src"],
+            "@balance-control/shared": ["../shared/src"],
+            "@balance-control/expansion-01": ["../expansion-01/src"],
+            "@balance-control/expansion-02": ["../expansion-02/src"],
+            "@balance-control/expansion-03": ["../expansion-03/src"]
+        }
     },
     "include": [
-        "src"
+        "src",
+        "../game/src",
+        "../rules/src",
+        "../shared/src",
+        "../expansion-01/src",
+        "../expansion-02/src",
+        "../expansion-03/src"
     ],
     "references": [
         {
