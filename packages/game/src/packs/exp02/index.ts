@@ -1,7 +1,8 @@
 import { Expansion02 } from '@balance-control/expansion-02';
 import { RULESET_MANIFEST } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
-import { playMeasure, takeMeasure, exp02RegulationAtoms } from '../pack-api';
+import { takeMeasure, playMeasure } from '../_shared/measure-moves';
+import { exp02RegulationAtoms } from '../pack-api';
 
 const EXP02_PACK_VERSION = (RULESET_MANIFEST.expansions.exp02Version ?? '0.0.0').replace(/^v/i, '');
 const EXP02_PACK_MANIFEST: PackManifest = {

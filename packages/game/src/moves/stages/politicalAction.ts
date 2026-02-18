@@ -70,7 +70,7 @@ export const PoliticalActionMoves = {
     moveInfluence: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('moveInfluence', moveInfluencePayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
-        const { sourceId, targetId, extraResourceIds } = validated.value;
+        const { sourceId, targetId, extraResourceIds = [] } = validated.value;
 
         const pid = ctx.currentPlayer;
         if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'moveInfluence')) return INVALID_MOVE;
