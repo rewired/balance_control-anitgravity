@@ -96,7 +96,7 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     });
     page.on('pageerror', (err) => consoleErrors.push(String(err)));
 
-    await page.goto('/');
+    await page.goto('/?mode=online');
 
     await expect(page.getByTestId('lobby-screen')).toBeVisible();
 

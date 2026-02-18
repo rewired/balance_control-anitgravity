@@ -11,3 +11,4 @@
 - 2026-02-17: task(0097) Remove legacy registry alias usage, centralize pack assembly, and enforce duplicate move detection.
 - 2026-02-17: task(0096) Renumber tasks 0097-0101 to 0102-0106 to make room for Pack-System insertion (0097→0102, 0098→0103, 0099→0104, 0100→0105, 0101→0106).
 - 2026-02-17: task(0100) Lock enabled packs in match meta, hash public surface, and validate replays against mismatched surfaces.
+- 2026-02-18: task(0106) Fix E2E board-viewport test by bypassing start screen; fix server tsconfig rootDir.
