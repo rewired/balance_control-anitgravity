@@ -15,6 +15,11 @@ interface GameLayoutProps {
     isActive: boolean;
 }
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID, isActive }) => {
     const zoneNames = {
         PersonalSupply: 'PersonalSupply',

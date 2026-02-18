@@ -8,6 +8,11 @@ type SeatID = '0' | '1';
 
 const MATCH_ID = 'local-hotseat-2p';
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const HotseatShell: React.FC = () => {
     const [activeSeat, setActiveSeat] = useState<SeatID>('0');
 
