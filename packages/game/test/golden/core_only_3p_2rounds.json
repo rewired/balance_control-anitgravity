@@ -35,6 +35,6 @@
     { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
     { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] }
   ],
-  "expectedFinalHash": "afadd0bc4d366a77cc6e239c85adf1149a8531ae3899a85dcc8e5c9224f5587a",
+  "expectedFinalHash": "17a145d0bcae25543fbcc9d37b156d8377ee72b2a24d34b6981150b6adbf8b9c",
   "expectedPublicSurfaceHash": "ac11f9da4045a3512d4a62e99eb0ec23a1b2e386fc388bd8a14171620a9befd4"
 }

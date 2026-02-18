@@ -1,0 +1,41 @@
+{
+  "base": [
+    { "type": "Resort", "resort": "DOM", "weight": 1, "count": 2 },
+    { "type": "Resort", "resort": "DOM", "weight": 2, "count": 4 },
+    { "type": "Resort", "resort": "DOM", "weight": 3, "count": 4 },
+    { "type": "Resort", "resort": "DOM", "weight": 4, "count": 1 },
+    { "type": "Resort", "resort": "DOM", "weight": 5, "count": 1 },
+    { "type": "Resort", "resort": "FOR", "weight": 1, "count": 2 },
+    { "type": "Resort", "resort": "FOR", "weight": 2, "count": 4 },
+    { "type": "Resort", "resort": "FOR", "weight": 3, "count": 4 },
+    { "type": "Resort", "resort": "FOR", "weight": 4, "count": 1 },
+    { "type": "Resort", "resort": "FOR", "weight": 5, "count": 1 },
+    { "type": "Resort", "resort": "INF", "weight": 1, "count": 2 },
+    { "type": "Resort", "resort": "INF", "weight": 2, "count": 4 },
+    { "type": "Resort", "resort": "INF", "weight": 3, "count": 4 },
+    { "type": "Resort", "resort": "INF", "weight": 4, "count": 1 },
+    { "type": "Resort", "resort": "INF", "weight": 5, "count": 1 },
+    { "type": "Committee", "count": 10 },
+    { "type": "Grassroots", "count": 2, "conversion": { "inputSlots": 3, "outputSlots": 1 } },
+    { "type": "Grassroots", "count": 2, "resort": "DOM", "conversion": { "inputSlots": 2, "outputSlots": 1, "typedResort": "DOM" } },
+    { "type": "Grassroots", "count": 2, "resort": "FOR", "conversion": { "inputSlots": 2, "outputSlots": 1, "typedResort": "FOR" } },
+    { "type": "Grassroots", "count": 2, "resort": "INF", "conversion": { "inputSlots": 2, "outputSlots": 1, "typedResort": "INF" } },
+    { "type": "Lobbyist", "count": 9 },
+    { "type": "Hotspot", "count": 8 }
+  ],
+  "add56": [
+    { "type": "Resort", "resort": "DOM", "weight": 2, "count": 1 },
+    { "type": "Resort", "resort": "DOM", "weight": 3, "count": 1 },
+    { "type": "Resort", "resort": "DOM", "weight": 4, "count": 1 },
+    { "type": "Resort", "resort": "FOR", "weight": 2, "count": 1 },
+    { "type": "Resort", "resort": "FOR", "weight": 3, "count": 1 },
+    { "type": "Resort", "resort": "FOR", "weight": 4, "count": 1 },
+    { "type": "Resort", "resort": "INF", "weight": 2, "count": 1 },
+    { "type": "Resort", "resort": "INF", "weight": 3, "count": 1 },
+    { "type": "Resort", "resort": "INF", "weight": 4, "count": 1 },
+    { "type": "Committee", "count": 2 },
+    { "type": "Lobbyist", "count": 3 },
+    { "type": "Grassroots", "count": 2, "conversion": { "inputSlots": 3, "outputSlots": 1 } },
+    { "type": "Hotspot", "count": 2 }
+  ]
+}

@@ -146,6 +146,10 @@ function shuffleFisherYates<T>(arr: T[], random: { Die?: (n: number) => number; 
 /** CORE-01-03-02B: Canonical Pre-Shuffle Ordering. */
 function sortDrawPileCanonical(G: GameState): string[] {
     const items = G.zones[CoreZoneName.DrawPile]?.items ?? [];
+    // Capture original indices for stable tie-breaking (SerialIndex)
+    const indexById = new Map<string, number>();
+    items.forEach((id, index) => indexById.set(id, index));
+
     const TILE_TYPE_ORDER: Record<string, number> = {
         [TileType.Resort]: 0,
         [TileType.Committee]: 1,
@@ -179,6 +183,8 @@ function sortDrawPileCanonical(G: GameState): string[] {
         const wB = b.weight ?? 99;
         if (wA !== wB) return wA - wB;
 
-        return aId.localeCompare(bId);
+        // CORE-01-03-02B: Final tie-break: SerialIndex (original generation order)
+        // Replaces lexicographic ID comparison for improved canonical stability
+        return (indexById.get(aId)! - indexById.get(bId)!);
     });
 }

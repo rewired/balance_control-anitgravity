@@ -1,5 +1,6 @@
 import { CoreResources, CoreZoneNames, RULESET_MANIFEST, TileType, type GameConfig, type GameObject, type GameState, type Tile } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
+import { generateCoreTiles } from './tile-loader';
 import {
     CoreMoves,
     coreResourceAtoms,
@@ -108,77 +109,3 @@ export const CorePack: EnginePackDefinition = {
         },
     },
 };
-
-// CORE-01-02-10 to CORE-01-02-16
-function generateCoreTiles(numPlayers: number): Tile[] {
-    const tiles: Tile[] = [];
-    let idCounter = 1;
-
-    const add = (type: TileType, count: number, props: Partial<Tile> = {}) => {
-        for (let i = 0; i < count; i++) {
-            tiles.push({
-                id: `tile_core_${idCounter++}`,
-                type,
-                name: `${type} ${i + 1}`,
-                ...props,
-            });
-        }
-    };
-
-    // Resorts (DOM, FOR, INF)
-    // W1x2, W2x4, W3x4, W4x1, W5x1 = 12 each
-    [CoreResources.DOM, CoreResources.FOR, CoreResources.INF].forEach((res) => {
-        add(TileType.Resort, 2, { resort: res, weight: 1 });
-        add(TileType.Resort, 4, { resort: res, weight: 2 });
-        add(TileType.Resort, 4, { resort: res, weight: 3 });
-        add(TileType.Resort, 1, { resort: res, weight: 4 });
-        add(TileType.Resort, 1, { resort: res, weight: 5 });
-    });
-
-    // Committees x10
-    add(TileType.Committee, 10);
-
-    // CORE-01-02-14A: Grassroots — Untyped ×2, Typed(DOM) ×2, Typed(FOR) ×2, Typed(INF) ×2
-    add(TileType.Grassroots, 2, {
-        conversion: { inputSlots: 3, outputSlots: 1 },
-    }); // Untyped: CORE-01-04-22K
-    [CoreResources.DOM, CoreResources.FOR, CoreResources.INF].forEach((res) => {
-        add(TileType.Grassroots, 2, {
-            resort: res,
-            conversion: { inputSlots: 2, outputSlots: 1, typedResort: res },
-        }); // Typed: CORE-01-04-22L
-    });
-
-    // Lobbyists x9
-    add(TileType.Lobbyist, 9);
-
-    // Hotspots x8
-    add(TileType.Hotspot, 8);
-
-    // ADD56-01-01-02 to 01-16: 5-6 Player Add-On tiles
-    if (numPlayers >= 5) {
-        // DOM-W2 ×1, DOM-W3 ×1, DOM-W4 ×1 (ADD56-01-01-02/03/04)
-        add(TileType.Resort, 1, { resort: CoreResources.DOM, weight: 2 });
-        add(TileType.Resort, 1, { resort: CoreResources.DOM, weight: 3 });
-        add(TileType.Resort, 1, { resort: CoreResources.DOM, weight: 4 });
-        // FOR-W2/3/4 (ADD56-01-01-05/06/07)
-        add(TileType.Resort, 1, { resort: CoreResources.FOR, weight: 2 });
-        add(TileType.Resort, 1, { resort: CoreResources.FOR, weight: 3 });
-        add(TileType.Resort, 1, { resort: CoreResources.FOR, weight: 4 });
-        // INF-W2/3/4 (ADD56-01-01-08/09/10)
-        add(TileType.Resort, 1, { resort: CoreResources.INF, weight: 2 });
-        add(TileType.Resort, 1, { resort: CoreResources.INF, weight: 3 });
-        add(TileType.Resort, 1, { resort: CoreResources.INF, weight: 4 });
-        // Committee ×2 (ADD56-01-01-11)
-        add(TileType.Committee, 2);
-        // Lobbyist ×3 (ADD56-01-01-12)
-        add(TileType.Lobbyist, 3);
-        // Grassroots Untyped ×2 (ADD56-01-01-13, 01-13A)
-        add(TileType.Grassroots, 2, { conversion: { inputSlots: 3, outputSlots: 1 } });
-        // Hotspot (DOM) ×1, Hotspot (FOR) ×1 (ADD56-01-01-14/15/16)
-        add(TileType.Hotspot, 1);
-        add(TileType.Hotspot, 1);
-    }
-
-    return tiles;
-}

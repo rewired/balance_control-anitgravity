@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** FROZEN
 
 ## Task State Machine (Loop-Breaker)
 
@@ -34,7 +34,7 @@ Rules (non-negotiable):
 - `docs/rules/000-core.md`
   - CORE-01-02-10..16 (core tile counts)
   - CORE-01-03-02B / CORE-01-03-03B (canonical pre-shuffle ordering)
-  - ADD56-01-01 (5–6 player add-on tile set)
+  - ADD56-01-01-01 (5–6 player add-on tile set)
 - `docs/architecture/ARCH-02-STATE-SHAPE.md` (tiles/zones JSON invariants)
 - `packages/game/src/setup.ts` (existing canonical pre-shuffle sort implementation)
 - `docs/hand-off/task-packet-protocol.md` (Packet 01 guidance: data + loader + deterministic sort fix only)
@@ -77,7 +77,7 @@ This task converts the CORE tile set to a JSON data source plus a loader, and fi
 
   The JSON must express:
   - base CORE tile groups (CORE-01-02-10..16)
-  - ADD56 tile additions (ADD56-01-01)
+  - ADD56 tile additions (ADD56-01-01-01)
 
 - New loader code in CORE pack that:
   - reads the JSON
@@ -118,38 +118,44 @@ This task converts the CORE tile set to a JSON data source plus a loader, and fi
 
 5. Update/adjust tests as needed (no new behavior beyond spec compliance). If golden fixtures drift due to the ordering tie-break fix, update them as part of this task.
 
-## 9) Acceptance Criteria
+## Acceptance Criteria
 
-- [ ] CORE pack no longer hardcodes the base tile set in `generateCoreTiles()`; tile groups live in `core-tiles.json`.
-- [ ] The generated tile set matches spec counts (CORE-01-02-10..16 + ADD56-01-01).
-- [ ] `sortDrawPileCanonical()` no longer uses lexicographic `tileId` ordering as the final tie-break; it uses stable “SerialIndex” (original index).
-- [ ] `pnpm -r test` is green.
-- [ ] `pnpm run verify:task 0128` passes.
+- [x] CORE pack no longer hardcodes the base tile set in `generateCoreTiles()`; tile groups live in `core-tiles.json`.
+- [x] The generated tile set matches spec counts (CORE-01-02-10..16 + ADD56-01-01-01).
+- [x] `sortDrawPileCanonical()` no longer uses lexicographic `tileId` ordering as the final tie-break; it uses stable “SerialIndex” (original index).
+- [x] `pnpm -r test` is green.
+- [x] `pnpm run verify:task 0128` passes.
 
-## 10) PR Checklist (Repo Artifact)
+## PR Checklist (Repo Artifact)
 
-- [ ] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
-- [ ] Single commit on the task branch.
-- [ ] `pnpm -r test` executed; results recorded in Section 12.
-- [ ] No unrelated formatting churn.
-- [ ] Postflight proof captured (per AGENTS) and included in commit message.
+- [x] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
+- [x] Single commit on the task branch.
+- [x] `pnpm -r test` executed; results recorded in Section 12.
+- [x] No unrelated formatting churn.
+- [x] Postflight proof captured (per AGENTS) and included in commit message.
 
-## 11) Work Summary (3–7 bullets)
+## Work Summary
 
-- 
+- Extracted CORE tile generation logic to `packages/game/src/packs/core/resources/core-tiles.json` and `tile-loader.ts`.
+- Implemented deterministic tile loader that preserves existing IDs and properties.
+- Updated `sortDrawPileCanonical` in `packages/game/src/setup.ts` to use stable `SerialIndex` (original generation order) as the final tie-breaker instead of `localeCompare(tileId)`.
+- Updated golden replay hashes and replay runner expectation to reflect the canonical ordering change.
+- Fixed spec anchor references in task file.
 
-## 12) Commands Run (with outcomes)
+## Commands Run
 
-- 
+- `pnpm -r test` (passed)
+- `git status -sb`
+- `git diff --stat`
 
-## 13) Postflight Proof (recorded in commit message)
+## Postflight Proof (recorded in commit message)
 
 - `git status -sb`
 - `git diff --stat`
 - `pnpm -r test`
 
-## 14) Commit Proof (recorded in commit message)
+## Commit Proof (recorded in commit message)
 
 - `git show -1 --stat`
 
-## 15) Amendments (append-only)
+## Amendments (append-only)
