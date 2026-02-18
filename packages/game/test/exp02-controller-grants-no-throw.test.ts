@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreZoneNames, TileType } from '@balance-control/rules';
-import { Expansion02 } from '../../expansion-02/src/index';
-import { Exp02Pack } from '../src';
+import { Expansion02 } from '@balance-control/expansion-02';
+import { Exp02Pack } from '../src/packs/exp02';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';

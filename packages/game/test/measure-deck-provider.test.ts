@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { EnginePackRegistry, packFromExpansionDefinition } from '../src/expansion-registry';
+import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { lookupMeasureDeckForObjectId } from '../src/engine/measure-deck-provider';
 import { Exp02Pack, Exp03Pack } from '../src';
 import { registerTestPacks } from './_helpers/registerPacks';
+import { makeTestPack } from './_helpers/makeTestPack';
 
 describe('Measure deck provider lookup', () => {
     beforeEach(() => {
@@ -66,7 +67,7 @@ describe('Measure deck provider lookup', () => {
 
     it('fails deterministically when multiple enabled decks match the same object id', () => {
         EnginePackRegistry.registerPack(
-            packFromExpansionDefinition({
+            makeTestPack({
                 id: 'exp01',
                 name: 'Mock EXP-01',
                 measureDecks: [
@@ -81,7 +82,7 @@ describe('Measure deck provider lookup', () => {
                         }
                     }
                 ]
-            } as any)
+            })
         );
 
         const G = SetupGame({
