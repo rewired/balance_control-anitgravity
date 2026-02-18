@@ -9,10 +9,10 @@
   },
   "source_of_truth": [
     { "id": "SPEC-CORE", "path": "/docs/rules/000-core.md", "version": "v1.1.0" },
-    { "id": "ARCH-01", "path": "/docs/arch/ARCH-01-ENGINE-CLIENT-SEPARATION.md", "version": "v1.1" },
-    { "id": "ARCH-02", "path": "/docs/arch/ARCH-02-STATE-SHAPE.md", "version": "v1.1" },
-    { "id": "ARCH-03", "path": "/docs/arch/ARCH-03-MEASURE-CPU.md", "version": "v1.1" },
-    { "id": "ARCH-04", "path": "/docs/arch/ARCH-04-LLM-BOT-CONTRACT.md", "version": "v1.1" },
+    { "id": "ARCH-01", "path": "/docs/architecture/ARCH-01-ENGINE-CONTRACT.md", "version": "v1.1" },
+    { "id": "ARCH-02", "path": "/docs/architecture/ARCH-02-STATE-SHAPE.md", "version": "v1.1" },
+    { "id": "ARCH-03", "path": "/docs/architecture/ARCH-03-MEASURE-CPU.md", "version": "v1.1" },
+    { "id": "ARCH-04", "path": "/docs/architecture/ARCH-04-LLM-BOT-CONTRACT.md", "version": "v1.1" },
     { "id": "UI-ICONS", "path": "/docs/ui/icon-mapping.md", "note": "Presentation-only; keep stable" }
   ],
   "guardrails": [
@@ -29,9 +29,9 @@
       "id": "GR-002",
       "level": "MUST",
       "title": "Engine-only Rule Execution",
-      "applies_to": ["packages/game", "packages/client-web"],
-      "rule": "Rule execution (legality, costs, majority, modifiers, production) occurs only in packages/game.",
-      "forbidden": ["Client computes legality/costs/majority/modifiers"],
+      "applies_to": ["packages/game", "packages/client-web", "packages/expansion-*"],
+      "rule": "Rule execution (legality, costs, majority, modifiers, production) is engine-owned; implementations may reside in packages/game or registered packs.",
+      "forbidden": ["Client computes legality/costs/majority/modifiers", "Bypassing engine execution pipeline"],
       "references": ["ARCH-01:CLIENT_RESTRICTIONS"]
     },
     {

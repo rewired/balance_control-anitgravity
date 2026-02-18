@@ -46,9 +46,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -120,11 +120,11 @@ N/A
 
 ### 5.3 Docs
 
-* [ ] Update `docs/architecture/ARCH-01-ENGINE-CONTRACT.md` to allow pack-based rule code packaging.
-* [ ] Update `docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json` GR-002 rule text to match.
-* [ ] Update `docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md` scope to include pack packages that contain rule execution.
-* [ ] `/docs/changelog.md` updated (required if logic/state/resolver changes) — **N/A (docs only)**
-* [ ] `/docs/design-decisions/DD-XXXX-<topic>.md` created (only if ambiguity/conflict)
+* [x] Update `docs/architecture/ARCH-01-ENGINE-CONTRACT.md` to allow pack-based rule code packaging.
+* [x] Update `docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json` GR-002 rule text to match.
+* [x] Update `docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md` scope to include pack packages that contain rule execution.
+* [x] `/docs/changelog.md` updated (required if logic/state/resolver changes) — **N/A (docs only)**
+* [x] `/docs/design-decisions/DD-XXXX-<topic>.md` created (only if ambiguity/conflict)
 
   * If any contributor believes this contract change is ambiguous, STOP and create a DD doc.
 
@@ -153,7 +153,7 @@ N/A
 
 Write the plan as a checklist. Each item should be small and verifiable.
 
-* [ ] Update `docs/architecture/ARCH-01-ENGINE-CONTRACT.md`:
+* [x] Update `docs/architecture/ARCH-01-ENGINE-CONTRACT.md`:
 
   * Rewrite **RULE EXECUTION**:
 
@@ -166,16 +166,16 @@ Write the plan as a checklist. Each item should be small and verifiable.
     * Core pack is mandatory.
     * Packs must be registered before `createBalanceControlGame()`.
 
-* [ ] Update `docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`:
+* [x] Update `docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`:
 
   * Update GR-002 `rule` and `forbidden` fields to match the new architecture.
   * (Optional, if trivial) fix `source_of_truth[*].path` entries that point to non-existent `/docs/arch/*` to the correct `/docs/architecture/*` paths.
 
-* [ ] Update `docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md`:
+* [x] Update `docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md`:
 
   * Expand “Required on” scope to include exported symbols in `packages/expansion-*` that implement/mutate authoritative rules.
 
-* [ ] Ensure wording remains consistent with:
+* [x] Ensure wording remains consistent with:
 
   * `ARCH-01:CLIENT_RESTRICTIONS`
   * `ARCH-03` measure CPU contract (no resolution order change)
@@ -190,10 +190,10 @@ Notes:
 
 Write pass/fail criteria; avoid vague language.
 
-* [ ] ARCH-01 explicitly permits rule code to be packaged in `packages/expansion-*` while keeping engine authority.
-* [ ] GR-002 no longer claims “only in packages/game”; it forbids rule logic in the client and forbids bypassing the engine.
-* [ ] ARCH-05 scope includes pack packages where rule code exists.
-* [ ] No code files were changed.
+* [x] ARCH-01 explicitly permits rule code to be packaged in `packages/expansion-*` while keeping engine authority.
+* [x] GR-002 no longer claims “only in packages/game”; it forbids rule logic in the client and forbids bypassing the engine.
+* [x] ARCH-05 scope includes pack packages where rule code exists.
+* [x] No code files were changed.
 
 ---
 
@@ -201,28 +201,33 @@ Write pass/fail criteria; avoid vague language.
 
 This section MUST be completed in this task file before declaring done.
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* TBD
+* Updated `ARCH-01-ENGINE-CONTRACT.md` to explicitly allow rule execution in pack packages (`packages/expansion-*`).
+* Clarified in `ARCH-01` that the engine remains the sole executor and authority.
+* Updated `ARCH-00-MASTERPLAN-GUARDRAILS.json` GR-002 to permit pack-based rule implementations while forbidding client-side execution.
+* Fixed incorrect paths in `ARCH-00-MASTERPLAN-GUARDRAILS.json` `source_of_truth`.
+* Updated `ARCH-05-DOCUMENTATION-CONTRACT.md` to include pack packages in the documentation scope for rule-related symbols.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* TBD
+* `pnpm lint` - Passed
+* `pnpm test` - Passed (All packages)
 
 ---
 

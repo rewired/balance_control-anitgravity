@@ -20,7 +20,9 @@ State must be JSON-serializable.
 No functions or derived caches allowed.
 
 ## RULE EXECUTION
-All rule execution occurs exclusively in packages/game.
+Rule execution is engine-owned.
+Rule implementations may be packaged in engine-loadable pack packages (packages/expansion-*).
+The engine is the only executor; packs are registered and assembled; client does not execute rules.
 Moves must be pure and deterministic.
 Production must follow SPEC-CORE-01 CORE-01-06-16.
 Regulation resolution must follow SPEC-EXP-02 EXP-02-04-B.
@@ -40,4 +42,5 @@ Identical move sequence must produce identical state hash.
 No hidden state permitted.
 
 ## BOOT CONTRACT
-CorePack must be registered before createBalanceControlGame().
+CorePack is mandatory and must be registered before createBalanceControlGame().
+Packs must be registered before createBalanceControlGame().

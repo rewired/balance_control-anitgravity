@@ -12,6 +12,7 @@ Define mandatory documentation standards to ensure rule traceability, determinis
 ## 2. SCOPE
 Required on:
 - All exported symbols in `packages/game`.
+- All exported symbols in `packages/expansion-*` that implement or mutate authoritative rules.
 - `enumerateLegalIntents` and all move resolvers.
 - Any function that mutates authoritative state.
 Recommended elsewhere.
