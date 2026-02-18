@@ -3,12 +3,26 @@
   "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./engine": {
+      "types": "./dist/engine/index.d.ts",
+      "default": "./dist/engine/index.js"
+    },
+    "./ui": {
+      "types": "./dist/ui/index.d.ts",
+      "default": "./dist/ui/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w"
   },
   "dependencies": {
-    "@balance-control/rules": "workspace:*"  
+    "@balance-control/rules": "workspace:*"
   },
   "devDependencies": {
      "typescript": "^5.0.0"
