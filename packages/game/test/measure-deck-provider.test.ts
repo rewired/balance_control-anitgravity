@@ -2,17 +2,35 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { lookupMeasureDeckForObjectId } from '../src/engine/measure-deck-provider';
-import { Exp02Pack, Exp03Pack } from '../src';
+import { Exp02Pack, Exp03Pack, Exp01Pack } from '../src';
 import { registerTestPacks } from './_helpers/registerPacks';
 import { makeTestPack } from './_helpers/makeTestPack';
 
 describe('Measure deck provider lookup', () => {
     beforeEach(() => {
-        registerTestPacks([Exp02Pack, Exp03Pack]);
+        registerTestPacks([Exp02Pack, Exp03Pack, Exp01Pack]);
     });
 
     afterEach(() => {
         EnginePackRegistry.clear();
+    });
+
+    it('routes EXP-01 measure object ids to the EXP-01 measure zones', () => {
+        const G = SetupGame({
+            ctx: { numPlayers: 2, random: { Shuffle: (items: string[]) => items } } as any,
+            setupData: { expansions: { ex01: true, ex02: false, ex03: false } }
+        }) as any;
+
+        const deck = lookupMeasureDeckForObjectId(G, 'exp01_measure_M01');
+        expect(deck).toEqual({
+            expansionId: 'exp01',
+            deckId: 'measures',
+            objectIdPrefix: 'exp01_measure_',
+            drawPileId: 'MeasureDrawPile',
+            openZoneId: 'OpenMeasures',
+            recyclePileId: 'MeasureRecyclePile',
+            finalDiscardId: 'MeasureFinalDiscard'
+        });
     });
 
     it('routes EXP-02 measure object ids to the EXP-02 measure zones', () => {
@@ -66,7 +84,7 @@ describe('Measure deck provider lookup', () => {
     });
 
     it('fails deterministically when multiple enabled decks match the same object id', () => {
-        EnginePackRegistry.registerPack(
+        registerTestPacks([
             makeTestPack({
                 id: 'exp01',
                 name: 'Mock EXP-01',
@@ -82,8 +100,9 @@ describe('Measure deck provider lookup', () => {
                         }
                     }
                 ]
-            })
-        );
+            }),
+            Exp02Pack
+        ]);
 
         const G = SetupGame({
             ctx: { numPlayers: 2, random: { Shuffle: (items: string[]) => items } } as any,

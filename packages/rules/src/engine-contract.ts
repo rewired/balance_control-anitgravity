@@ -5,7 +5,7 @@ import type { GameState } from './state';
 export interface MeasureDeckDescriptor {
     /** Stable identifier within an expansion (e.g. "measures"). */
     id: string;
-    /** Deterministic object-id routing key (e.g. "exp02_measure_"). */
+    /** Deterministic object-id routing key (e.g. "exp01_measure_"). */
     objectIdPrefix: string;
     zones: {
         drawPileId: string;

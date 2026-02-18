@@ -39,7 +39,7 @@ export const Expansion01: ExpansionDefinition = {
     measureDecks: [
         {
             id: 'measures',
-            objectIdPrefix: 'measure_',
+            objectIdPrefix: 'exp01_measure_',
             zones: {
                 drawPileId: 'MeasureDrawPile',
                 openZoneId: 'OpenMeasures',
@@ -110,7 +110,7 @@ export const Expansion01: ExpansionDefinition = {
 
         // 5. Initialize Measures (EXP-01-03)
         MEASURE_IDS.forEach(mId => {
-            const objId = `measure_${mId}`;
+            const objId = `exp01_measure_${mId}`;
             G.objects[objId] = {
                 id: objId,
                 type: 'Measure',
