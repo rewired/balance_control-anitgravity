@@ -858,3 +858,15 @@ button.btn-primary:hover {
     outline: 2px solid var(--accent-control);
     outline-offset: 2px;
 }
+
+.hex-ghost-active {
+    border-color: var(--accent-control);
+    background: rgba(6, 182, 212, 0.15);
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+}
+
+.hex-ghost-active:hover {
+    background: rgba(6, 182, 212, 0.25);
+    box-shadow: 0 0 16px rgba(6, 182, 212, 0.4);
+}

@@ -6,6 +6,7 @@ import { BoardViewport } from './BoardViewport';
 import { PendingChoiceModal } from './PendingChoiceModal';
 import { PublicNoticeOverlay } from './PublicNoticeOverlay';
 import { useIntentViewModel } from '../ui/useIntentViewModel';
+import { ResortIcon } from '../ui/tiles/ResortIcon';
 
 interface GameLayoutProps {
     G: GameState;
@@ -109,6 +110,53 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
 
     const isInteractive = isActive && !vm.hasPendingChoice;
 
+    const pendingTile = useMemo(() => {
+        // 1. Staged tile (Normal draw & place)
+        if (stagedTileId && G.tiles[stagedTileId]) {
+            return G.tiles[stagedTileId];
+        }
+
+        // 2. Pending choice (if it involves placing a tile)
+        if (vm.hasPendingChoice) {
+            // Try to find tile in pending choice
+            const pending = (G.engine as any).pendingChoice;
+            // Common patterns for pending choice payload: { tile: {...} } or { tileId: "..." }
+            if (pending?.tile && typeof pending.tile === 'object') {
+                return pending.tile;
+            }
+            if (pending?.tileId && G.tiles[pending.tileId]) {
+                return G.tiles[pending.tileId];
+            }
+            if (pending?.payload?.tile && typeof pending.payload.tile === 'object') {
+                return pending.payload.tile;
+            }
+            if (pending?.payload?.tileId && G.tiles[pending.payload.tileId]) {
+                return G.tiles[pending.payload.tileId];
+            }
+        }
+        return null;
+    }, [G, stagedTileId, vm.hasPendingChoice]);
+
+    const placementIntents = useMemo(() => {
+        if (vm.hasPendingChoice) {
+             // Filter resolveChoice intents that are spatial
+             return vm.pendingChoice.resolveChoice.filter(intent => {
+                 const sel = (intent.payload as any)?.selection;
+                 return typeof sel === 'string' && /^-?\d+,-?\d+$/.test(sel);
+             });
+        }
+        return vm.drawAndPlace.placeTile;
+    }, [vm.hasPendingChoice, vm.pendingChoice.resolveChoice, vm.drawAndPlace.placeTile]);
+
+    const placementGhostCoords = useMemo(() => {
+        if (vm.hasPendingChoice && placementIntents.length > 0) {
+            return placementIntents.map(i => (i.payload as any).selection as string);
+        }
+        return vm.ghostCoords;
+    }, [vm.hasPendingChoice, placementIntents, vm.ghostCoords]);
+
+    const isBoardInteractive = isActive && (!vm.hasPendingChoice || placementIntents.length > 0);
+
     return (
         <div className="game-layout">
             <PublicNoticeOverlay G={G} />
@@ -129,17 +177,47 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
             </aside>
 
             {/* Center: Board */}
-            <main className="center-panel glass-panel">
+            <main className="center-panel glass-panel" style={{ position: 'relative' }}>
                 <h3>Board</h3>
+                {pendingTile && (
+                    <div className="tile-placement-hud" style={{
+                        position: 'absolute',
+                        top: '50px',
+                        left: '20px',
+                        zIndex: 100,
+                        background: 'rgba(20, 20, 30, 0.95)',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color, #444)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        pointerEvents: 'none',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                    }}>
+                        <div style={{ width: '48px', height: '48px', position: 'relative' }}>
+                            <ResortIcon resort={pendingTile.resort} />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontWeight: 'bold', color: 'white' }}>
+                                {pendingTile.resort} {pendingTile.weight ? `W${pendingTile.weight}` : ''}
+                            </span>
+                            <span style={{ fontSize: '0.8em', color: '#aaa', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                {pendingTile.type}
+                            </span>
+                        </div>
+                    </div>
+                )}
                 <BoardViewport
                     G={G}
                     moves={moves}
-                    placeTileIntents={vm.drawAndPlace.placeTile}
-                    ghostCoords={vm.ghostCoords}
-                    isInteractive={isInteractive}
+                    placeTileIntents={placementIntents}
+                    ghostCoords={placementGhostCoords}
+                    isInteractive={isBoardInteractive}
                     selectedTileId={selectedTileId}
                     selectedCoord={selectedCoord}
                     onSelectTile={handleSelectTile}
+                    pendingTile={pendingTile}
                 />
             </main>
 

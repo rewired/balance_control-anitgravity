@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import type { GameState } from '@balance-control/rules';
+import type { GameState, Tile } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import { selectTileController } from '@balance-control/game';
 import { axialToPixel, computeBoardLayout, parseCoordString, stableSortCoords } from '../ui/hexLayout';
@@ -17,6 +17,7 @@ interface HexBoardProps {
     selectedTileId?: string | null;
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
+    pendingTile?: Tile | null;
 }
 
 export const HEX_SIZE = 110;
@@ -34,9 +35,11 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     isInteractive,
     selectedTileId,
     selectedCoord,
-    onSelectTile
+    onSelectTile,
+    pendingTile
 }) => {
     const [hoveredTileId, setHoveredTileId] = useState<string | null>(null);
+    const [hoveredGhostCoord, setHoveredGhostCoord] = useState<string | null>(null);
 
     const occupiedCoords = useMemo(() => {
         return stableSortCoords(Object.keys(G.grid || {}));
@@ -45,7 +48,16 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     const placeTileByCoord = useMemo(() => {
         const map = new Map<string, LegalIntent>();
         for (const intent of placeTileIntents) {
-            const coord = intent.payload?.targetCoord;
+            let coord = intent.payload?.targetCoord;
+
+            // Also support resolveChoice where selection is a coordinate
+            if (!coord && intent.moveType === 'resolveChoice') {
+                const sel = (intent.payload as any)?.selection;
+                if (typeof sel === 'string' && /^-?\d+,-?\d+$/.test(sel)) {
+                    coord = sel;
+                }
+            }
+
             if (typeof coord !== 'string' || coord.length === 0) continue;
             if (!map.has(coord)) {
                 map.set(coord, intent);
@@ -146,12 +158,19 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     const coord = parseCoordString(coordStr);
                     const { x, y } = axialToPixel(coord, HEX_SIZE);
                     const testId = `hex-ghost-${coordStr.replace(',', '_')}`;
+                    const isGhostHovered = hoveredGhostCoord === coordStr;
                     return (
                         <button
                             key={`ghost-${coordStr}`}
-                            className="hex-cell hex-ghost"
+                            className={[
+                                'hex-cell',
+                                'hex-ghost',
+                                isInteractive ? 'hex-ghost-active' : null
+                            ].filter(Boolean).join(' ')}
                             disabled={!isInteractive}
                             onClick={!isInteractive ? undefined : () => moves[intent.moveType](intent.payload)}
+                            onMouseEnter={() => setHoveredGhostCoord(coordStr)}
+                            onMouseLeave={() => setHoveredGhostCoord((prev) => (prev === coordStr ? null : prev))}
                             data-testid={testId}
                             style={{
                                 left: x + offsetX,
@@ -160,7 +179,24 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 ['--hex-cell-h' as any]: `${cellHeight}px`
                             }}
                             title={`Place at ${coordStr}`}
-                        />
+                        >
+                            {pendingTile && isGhostHovered && (
+                                <div className="ghost-preview" style={{ opacity: 0.6, pointerEvents: 'none' }}>
+                                    <HexTileVisual
+                                        majoritySeat={null}
+                                        seatColor={seatColor}
+                                        isHovered={false}
+                                        isSelected={false}
+                                        influenceBySeat={{}}
+                                        metaIconsBySeat={{}}
+                                        badges={[]}
+                                        resortIcon={<ResortIcon resort={pendingTile.resort} />}
+                                        valueW={typeof pendingTile.weight === 'number' ? pendingTile.weight : undefined}
+                                        className="hex-tile-visual"
+                                    />
+                                </div>
+                            )}
+                        </button>
                     );
                 })}
             </div>

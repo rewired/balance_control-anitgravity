@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { GameState } from '@balance-control/rules';
+import type { GameState, Tile } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { HexBoard, HEX_SIZE } from './HexBoard';
@@ -17,6 +17,7 @@ type BoardViewportGameProps = {
     selectedTileId?: string | null;
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
+    pendingTile?: Tile | null;
 };
 
 type BoardViewportDevProps = {
@@ -148,6 +149,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             selectedTileId={gameProps!.selectedTileId}
                                             selectedCoord={gameProps!.selectedCoord}
                                             onSelectTile={gameProps!.onSelectTile}
+                                            pendingTile={gameProps!.pendingTile}
                                         />
                                     )}
                             </TransformComponent>
