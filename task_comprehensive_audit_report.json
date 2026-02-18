@@ -1,0 +1,80 @@
+{
+  "summary": "Comprehensive audit of tasks 0097-0101 (Process & Code).",
+  "audit_results": {
+    "0097": {
+      "process_status": "FAIL",
+      "code_status": "SUCCESS",
+      "findings": {
+        "process": [
+          "Section 13.1/14.1 marked as 'Pending'",
+          "Missing task-specific commit in git history"
+        ],
+        "code": [
+          "ExpansionRegistry shim removed; EnginePackRegistry is active.",
+          "move-assembly.ts and setup.ts updated."
+        ]
+      }
+    },
+    "0098": {
+      "process_status": "FAIL",
+      "code_status": "SUCCESS",
+      "findings": {
+        "process": [
+          "Task State remains 'FROZEN'",
+          "Checklists (Implementation, Acceptance, PR) are unchecked",
+          "Missing task-specific commit"
+        ],
+        "code": [
+          "Expansion01 measureDecks descriptors added.",
+          "enumerateLegalIntents correctly enumerates expansion intents."
+        ]
+      }
+    },
+    "0099": {
+      "process_status": "FAIL",
+      "code_status": "SUCCESS",
+      "findings": {
+        "process": [
+          "Standard task template not used",
+          "Missing multiple required sections (11-15)",
+          "Missing task-specific commit"
+        ],
+        "code": [
+          "PackManifest type implemented.",
+          "EnginePackRegistry manifest support added.",
+          "GameConfig handles pack selection."
+        ]
+      }
+    },
+    "0100": {
+      "process_status": "FAIL",
+      "code_status": "SUCCESS",
+      "findings": {
+        "process": [
+          "Section 13.1/14.1 marked as 'Pending'",
+          "Missing task-specific commit"
+        ],
+        "code": [
+          "publicSurfaceHash computed and persisted in G.meta.",
+          "validateSurfaceHash implemented and integrated."
+        ]
+      }
+    },
+    "0101": {
+      "process_status": "PARTIAL",
+      "code_status": "SUCCESS",
+      "findings": {
+        "process": [
+          "Section 14.1 marked as N/A",
+          "Missing task-specific commit"
+        ],
+        "code": [
+          "verify-packs.mjs implemented and working.",
+          "Golden replay matrix expanded.",
+          "Registry tests updated."
+        ]
+      }
+    }
+  },
+  "overall_conclusion": "The code changes for all tasks are correctly implemented and verified by tests. However, the execution process severely violates AGENTS.md requirements regarding task state management, documentation completeness, and the single-meaningful-commit policy."
+}
