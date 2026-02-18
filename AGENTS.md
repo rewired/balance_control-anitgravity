@@ -17,6 +17,7 @@ Primary Architecture Contracts:
 * /docs/architecture/ARCH-02-STATE-SHAPE.md
 * /docs/architecture/ARCH-03-MEASURE-CPU.md
 * /docs/architecture/ARCH-04-LLM-BOT-CONTRACT.md
+* /docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md
 
 ---
 
@@ -77,7 +78,13 @@ Rule:
 
 * Commit must include the updated task file in `docs/tasks/`.
 
-### 5) Failure Mode
+### 5) Mandatory Documentation Protocol (ARCH-05)
+
+* Documentation is mandatory for task completion when touching engine or client state boundaries.
+* TSDoc + required tags (e.g., `@rule`, `@deterministic`) are required as per `/docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md`.
+* PRs that change engine behavior MUST keep rule bindings (`@rule`) accurate and canonical.
+
+### 6) Failure Mode
 
 If any requirement above cannot be satisfied, STOP and explain why.
 Do not mark the task as complete.

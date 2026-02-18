@@ -133,12 +133,25 @@ Keep wording strict and unambiguous.
 
 ---
 
+## Work Summary
+- Created /docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md defining TSDoc standards.
+- Updated AGENTS.md to include ARCH-05 in architecture contracts and mandatory documentation protocol.
+- Enforced canonical rule-ID references in ARCH-05 to ensure consistency.
+
+## Commands Run
+- pnpm build: Success
+- pnpm run verify:packs: Success
+- pnpm test: Success
+
+## Guardrails
+- affected_guardrails: NONE
+
 ## PR Checklist
 
-- [ ] /docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md added
-- [ ] AGENTS.md updated (ARCH-05 listed + doc policy section)
-- [ ] ARCH-05 includes canonical @rule mini-rule
-- [ ] No runtime changes
-- [ ] Encoding UTF-8, no BOM
-- [ ] No trailing whitespace
-- [ ] Meaningful commit message
+- [x] /docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md added
+- [x] AGENTS.md updated (ARCH-05 listed + doc policy section)
+- [x] ARCH-05 includes canonical @rule mini-rule
+- [x] No runtime changes
+- [x] Encoding UTF-8, no BOM
+- [x] No trailing whitespace
+- [x] Meaningful commit message
