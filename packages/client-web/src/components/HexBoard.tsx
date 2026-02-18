@@ -12,11 +12,13 @@ interface HexBoardProps {
     G: GameState;
     moves: any;
     placeTileIntents: LegalIntent[];
+    moveInfluenceIntents?: LegalIntent[];
     ghostCoords: string[];
     isInteractive: boolean;
     selectedTileId?: string | null;
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
+    onProposeMove?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
 }
 
@@ -31,11 +33,13 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     G,
     moves,
     placeTileIntents,
+    moveInfluenceIntents,
     ghostCoords,
     isInteractive,
     selectedTileId,
     selectedCoord,
     onSelectTile,
+    onProposeMove,
     pendingTile
 }) => {
     const [hoveredTileId, setHoveredTileId] = useState<string | null>(null);
@@ -90,8 +94,10 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     if (!G.tiles[tileId]) return null;
                     const coord = parseCoordString(coordStr);
                     const { x, y } = axialToPixel(coord, HEX_SIZE);
+                    const moveIntent = moveInfluenceIntents?.find(i => i.payload.targetId === tileId);
+                    const isValidTarget = !!moveIntent;
                     const isSelected = selectedTileId === tileId || selectedCoord === coordStr;
-                    const isHot = isSelected || hoveredTileId === tileId;
+                    const isHot = isSelected || hoveredTileId === tileId || isValidTarget;
                     const disabled = !isInteractive;
                     const testId = `hex-tile-${coordStr.replace(',', '_')}`;
 
@@ -117,6 +123,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             className={[
                                 'hex-cell',
                                 isSelected ? 'hex-cell-selected' : null,
+                                isValidTarget ? 'hex-cell-target' : null,
                                 isHot ? 'hex-cell-hot' : null
                             ]
                                 .filter(Boolean)
@@ -131,7 +138,13 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             title={`coord ${coordStr}`}
                             onMouseEnter={() => setHoveredTileId(tileId)}
                             onMouseLeave={() => setHoveredTileId((prev) => (prev === tileId ? null : prev))}
-                            onClick={disabled ? undefined : () => onSelectTile && onSelectTile(tileId, coordStr)}
+                            onClick={
+                                disabled
+                                    ? undefined
+                                    : isValidTarget && onProposeMove
+                                        ? () => onProposeMove(moveIntent!)
+                                        : () => onSelectTile && onSelectTile(tileId, coordStr)
+                            }
                             role={disabled ? undefined : 'button'}
                             tabIndex={disabled ? undefined : 0}
                         >

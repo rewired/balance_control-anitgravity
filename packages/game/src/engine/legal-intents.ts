@@ -5,6 +5,7 @@ import { coordToString, getNeighbors, stringToCoord } from '../topology';
 import { EffectResolver } from './resolver';
 import { evaluateTileSelector } from './selectors';
 import { EnginePackRegistry } from '../expansion-registry';
+import { getPlayerMetaMarker } from '../state-lookup';
 
 type CostSlot = string[] | 'ANY';
 type JsonLike =
@@ -46,6 +47,8 @@ export interface LegalIntent {
     moveType: string;
     payload: any;
     contextTileId?: string;
+    description?: string;
+    consequences?: string[];
 }
 
 /**
@@ -195,15 +198,32 @@ function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
 
     for (const sourceId of sources) {
         for (const targetId of boardTiles) {
+            if (sourceId === targetId) continue;
             const targetTile = G.tiles[targetId];
             if (targetTile && targetTile.type === TileType.StartCommittee) continue;
             if (EffectResolver.isProhibited(G as any, 'influence.move', playerID, targetId)) continue;
             const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.move', targetId);
             if (!canPayExtraCosts(G, playerID, costSlots)) continue;
+
+            const consequences: string[] = [];
+            const marker = getPlayerMetaMarker(G, playerID);
+
+            // CORE-01-04-12B: PingPong Penalty
+            if (marker && marker.tileId === targetId && marker.mode === 'PingPong') {
+                consequences.push('PingPong Penalty applies');
+            }
+
+            // CORE-01-04-12A: Enter PingPong Mode
+            const sourceTile = G.tiles[sourceId];
+            if (marker && sourceTile?.type === TileType.Resort) {
+                consequences.push('Enter PingPong Mode');
+            }
+
             intents.push({
                 moveType: 'moveInfluence',
                 payload: { sourceId, targetId },
-                contextTileId: targetId
+                contextTileId: targetId,
+                consequences: consequences.length > 0 ? consequences : undefined
             });
         }
     }

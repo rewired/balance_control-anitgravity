@@ -12,11 +12,13 @@ type BoardViewportGameProps = {
     G: GameState;
     moves: any;
     placeTileIntents: LegalIntent[];
+    moveInfluenceIntents?: LegalIntent[];
     ghostCoords: string[];
     isInteractive: boolean;
     selectedTileId?: string | null;
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
+    onProposeMove?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
 };
 
@@ -144,11 +146,13 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             G={gameProps!.G}
                                             moves={gameProps!.moves}
                                             placeTileIntents={gameProps!.placeTileIntents}
+                                            moveInfluenceIntents={gameProps!.moveInfluenceIntents}
                                             ghostCoords={gameProps!.ghostCoords}
                                             isInteractive={gameProps!.isInteractive}
                                             selectedTileId={gameProps!.selectedTileId}
                                             selectedCoord={gameProps!.selectedCoord}
                                             onSelectTile={gameProps!.onSelectTile}
+                                            onProposeMove={gameProps!.onProposeMove}
                                             pendingTile={gameProps!.pendingTile}
                                         />
                                     )}

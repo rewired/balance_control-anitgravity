@@ -62,6 +62,7 @@ export type IntentViewModel = {
     };
     political: {
         placeInfluenceForSelected: LegalIntent | null;
+        moveInfluenceFromSelected: LegalIntent[];
         others: LegalIntent[];
     };
     ghostCoords: string[];
@@ -103,18 +104,20 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         ) ?? null)
         : null;
 
+    const moveInfluenceFromSelected = input.selectedTileId
+        ? input.intents.filter(
+            (intent) => intent.moveType === 'moveInfluence' && intent.payload?.sourceId === input.selectedTileId
+        )
+        : [];
+
     const baseOthers = input.intents.filter((intent) => {
         if (intent.moveType === 'resolveChoice') return false;
         if (intent.moveType === 'placeTile') return false;
         if (intent.moveType === 'placeInfluence') return false;
+        if (intent.moveType === 'moveInfluence') return false;
         if (intent.moveType === 'passTilePlacement') return false;
         return true;
     });
-
-    const trailing: LegalIntent[] = [];
-    if (stage !== 'drawAndPlace') {
-        trailing.push(...input.intents.filter((intent) => intent.moveType === 'passTilePlacement'));
-    }
 
     const ghostCoords = stableSortCoords(
         Array.from(
@@ -133,7 +136,7 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         stagedTileId: input.stagedTileId,
         pendingChoice: { resolveChoice },
         drawAndPlace: { placeTile, passTilePlacement },
-        political: { placeInfluenceForSelected, others: [...baseOthers, ...trailing] },
+        political: { placeInfluenceForSelected, moveInfluenceFromSelected, others: baseOthers },
         ghostCoords
     };
 }

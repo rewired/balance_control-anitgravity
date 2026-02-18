@@ -4,9 +4,11 @@ import { Zone } from './Zone';
 import { ActionPanel } from './ActionPanel';
 import { BoardViewport } from './BoardViewport';
 import { PendingChoiceModal } from './PendingChoiceModal';
+import { MoveConfirmationModal } from './MoveConfirmationModal';
 import { PublicNoticeOverlay } from './PublicNoticeOverlay';
 import { useIntentViewModel } from '../ui/useIntentViewModel';
 import { ResortIcon } from '../ui/tiles/ResortIcon';
+import type { LegalIntent } from '@balance-control/game';
 
 interface GameLayoutProps {
     G: GameState;
@@ -40,11 +42,25 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     const stagingZoneId = `staging_${myPid}`;
     const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
     const vm = useIntentViewModel({ G, ctx, playerID: myPid, selectedTileId, stagedTileId });
+    const [proposedMove, setProposedMove] = useState<LegalIntent | null>(null);
 
     const handleSelectTile = useCallback((tileId: string | null, coordStr: string | null) => {
         setSelectedTileId(tileId);
         setSelectedCoord(coordStr);
     }, []);
+
+    const handleProposeMove = useCallback((intent: LegalIntent) => {
+        setProposedMove(intent);
+    }, []);
+
+    const confirmMove = useCallback(() => {
+        if (proposedMove) {
+            moves[proposedMove.moveType](proposedMove.payload);
+            setProposedMove(null);
+            setSelectedTileId(null);
+            setSelectedCoord(null);
+        }
+    }, [proposedMove, moves]);
 
     useEffect(() => {
         if (selectedCoord) {
@@ -161,6 +177,11 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
         <div className="game-layout">
             <PublicNoticeOverlay G={G} />
             <PendingChoiceModal resolveChoiceIntents={vm.pendingChoice.resolveChoice} moves={moves} />
+            <MoveConfirmationModal
+                intent={proposedMove}
+                onConfirm={confirmMove}
+                onCancel={() => setProposedMove(null)}
+            />
 
             {/* Left Panel: Bank & Supply */}
             <aside className="left-panel glass-panel">
@@ -212,11 +233,13 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     G={G}
                     moves={moves}
                     placeTileIntents={placementIntents}
+                    moveInfluenceIntents={vm.political.moveInfluenceFromSelected}
                     ghostCoords={placementGhostCoords}
                     isInteractive={isBoardInteractive}
                     selectedTileId={selectedTileId}
                     selectedCoord={selectedCoord}
                     onSelectTile={handleSelectTile}
+                    onProposeMove={handleProposeMove}
                     pendingTile={pendingTile}
                 />
             </main>
