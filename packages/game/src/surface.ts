@@ -16,6 +16,12 @@ export type PublicSurface = Readonly<{
     atomIds: string[];
 }>;
 
+/**
+ * Returns the public surface description for a given configuration.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function getPublicSurface(config: GameConfig): PublicSurface {
     const enabledPacks = EnginePackRegistry.getEnabledPacks(undefined, config);
     const packs: PackManifestRecord[] = enabledPacks.map((pack) => ({
@@ -38,10 +44,22 @@ export function getPublicSurface(config: GameConfig): PublicSurface {
     return { packs, moveIds, atomIds };
 }
 
+/**
+ * Returns the hash of the public surface description.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function getPublicSurfaceHash(config: GameConfig): string {
     return hashState(getPublicSurface(config));
 }
 
+/**
+ * Validates the public surface hash of the game state.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function validateSurfaceHash(state: GameState): void {
     const loadedHash = state.meta?.publicSurfaceHash;
     if (!loadedHash) {

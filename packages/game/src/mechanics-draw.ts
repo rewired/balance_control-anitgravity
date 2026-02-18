@@ -60,6 +60,11 @@ function markDrawPileEmptyForFinalSettlement(G: GameState): void {
     G.engine.attributes = attrs;
 }
 
+/**
+ * CORE-01-03-02A.1: Fisher-Yates shuffle for draw pile.
+ * @usesRNG
+ * @rule CORE-01-03-02A
+ */
 function shuffleDrawPile(G: GameState, ctx: any): void {
     const drawPile = G.zones[CoreZoneNames.DrawPile];
     const random = ctx?.random;
@@ -82,6 +87,13 @@ function shuffleDrawPile(G: GameState, ctx: any): void {
  * CORE-01-04-04: Draw one tile from DrawPile to staging.
  * CORE-01-04-06: If tile cannot be legally placed -> DiscardFaceUp.
  * CORE-01-04-07: After discard due to illegality, draw again (confirm-gated via pendingChoice).
+ * @rule CORE-01-04-04
+ * @rule CORE-01-04-06
+ * @rule CORE-01-04-07
+ * @usesRNG
+ * @rule CORE-01-03-02A
+ * @deterministic
+ * @sideEffects
  */
 export function drawTileToStaging(G: GameState, ctx: any): void {
     if (G.engine.pendingChoice) return;

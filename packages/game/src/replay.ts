@@ -53,6 +53,12 @@ function resolveMoveArgs(G: any, move: string, args: any[]): any[] {
     });
 }
 
+/**
+ * Runs a replay and returns the final hash and state.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function runReplay(replay: ReplaySpec): { hash: string; state: any } {
     if (replay.publicSurfaceHash) {
         const config = normalizeGameConfig(replay.config);

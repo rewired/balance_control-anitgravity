@@ -7,6 +7,7 @@ import { EffectResolver, lookupMeasureDeckForObjectId } from '../pack-api';
  * @expansion EXP-01|02|03
  * @requires SPEC-CORE-01
  * @deterministic
+ * @sideEffects
  * @rule EXP-01-06
  */
 export const takeMeasure = ({ G, ctx, events }: any, measureObjectId: string) => {
@@ -47,6 +48,7 @@ export const takeMeasure = ({ G, ctx, events }: any, measureObjectId: string) =>
  * @expansion EXP-01|02|03
  * @requires SPEC-CORE-01
  * @deterministic
+ * @sideEffects
  * @rule EXP-01-06
  */
 export const playMeasure = ({ G, ctx, events }: any, measureObjectId: string, targetPayload: any) => {

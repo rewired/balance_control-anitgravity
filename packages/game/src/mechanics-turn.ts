@@ -50,7 +50,12 @@ export function allStartingInfluencePlaced(G: any, ctx: any): boolean {
     return true;
 }
 
-/** CORE-01-04-09A: Return Meta-Marker to PersonalSupply and set mode = None when Political Action did not place/update it. */
+/**
+ * CORE-01-04-09A: Return Meta-Marker to PersonalSupply and set mode = None when Political Action did not place/update it.
+ * @rule CORE-01-04-09A
+ * @deterministic
+ * @sideEffects
+ */
 export function returnMetaMarkerToSupply(G: GameState, playerId: string): void {
     const supplyId = `${CoreZoneNames.PersonalSupply}:${playerId}`;
     const supply = G.zones[supplyId];
@@ -74,6 +79,12 @@ export function returnMetaMarkerToSupply(G: GameState, playerId: string): void {
     }
 }
 
+/**
+ * Draws a measure (EXP-01/02 stub).
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @sideEffects
+ */
 export function drawMeasure(G: GameState, ctx: any) {
     // Basic drawMeasure for EXP-01/02
     // ... logic would go here, or just stub for now if not used yet

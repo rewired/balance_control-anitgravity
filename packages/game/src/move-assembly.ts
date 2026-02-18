@@ -28,6 +28,12 @@ export type PackAssembly = Readonly<{
     ) => ReadonlyMap<string, AtomHandler>;
 }>;
 
+/**
+ * Returns the enabled move modules for a given configuration.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
     ensureCorePackRegistered();
     const modules = EnginePackRegistry.getEnabledMoveModules(config);
@@ -42,6 +48,12 @@ export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
     return out;
 }
 
+/**
+ * Returns the superset of all registered move modules.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function getMoveModulesSuperset(): MoveModule[] {
     ensureCorePackRegistered();
     const modules = EnginePackRegistry.getRegisteredMoveModules();
@@ -64,6 +76,12 @@ function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
     return reg.buildMoveMap();
 }
 
+/**
+ * Assembles the packs based on the provided configuration and mode.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function assemblePacks(options: { config?: GameConfig; mode?: PackAssemblyMode }): PackAssembly {
     ensureCorePackRegistered();
     const mode = options.mode ?? 'enabled';
@@ -123,22 +141,52 @@ export function assemblePacks(options: { config?: GameConfig; mode?: PackAssembl
     };
 }
 
+/**
+ * Builds the moves for a given configuration.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function buildMovesForConfig(config: GameConfig): MoveMap {
     return assemblePacks({ config, mode: 'enabled' }).moves;
 }
 
+/**
+ * Builds the expansion moves for a given configuration.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function buildExpansionMovesForConfig(config: GameConfig): MoveMap {
     return assemblePacks({ config, mode: 'enabled' }).expansionMoves;
 }
 
+/**
+ * Builds the superset of all registered moves.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function buildMovesSuperset(): MoveMap {
     return assemblePacks({ mode: 'registered' }).moves;
 }
 
+/**
+ * Builds the superset of all registered expansion moves.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function buildExpansionMovesSuperset(): MoveMap {
     return assemblePacks({ mode: 'registered' }).expansionMoves;
 }
 
+/**
+ * Builds a stage move map from core stage moves and expansion modules.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function buildStageMoveMap(coreStageMoves: MoveMap, expansionModules: MoveModule[]): MoveMap {
     return mergeMoveModules([{ moduleId: 'core', moves: coreStageMoves }, ...expansionModules]);
 }

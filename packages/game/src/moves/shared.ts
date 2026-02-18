@@ -8,6 +8,12 @@ function getCurrentStage(ctx: any): string | undefined {
     return ctx?.activePlayers?.[ctx?.currentPlayer];
 }
 
+/**
+ * Requires that the current stage matches the expected stage.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function requireStage(ctx: any, expectedStage: string, moveName: string): boolean {
     const stage = getCurrentStage(ctx);
     if (stage === expectedStage) return true;
@@ -16,10 +22,22 @@ export function requireStage(ctx: any, expectedStage: string, moveName: string):
     return false;
 }
 
+/**
+ * Checks if a list of IDs contains duplicates.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function hasDuplicateIds(ids: string[]): boolean {
     return new Set(ids).size !== ids.length;
 }
 
+/**
+ * Checks if two lists of IDs have any overlap.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function hasOverlap(a: string[], b?: string[]): boolean {
     if (!b || b.length === 0) return false;
     const set = new Set(a);
@@ -33,6 +51,12 @@ interface GrassrootsConversionSpec {
     outputSlots: number;
 }
 
+/**
+ * Checks if a tile is on the board.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function isBoardTile(G: any, tileId: string): boolean {
     const boardZone = G.zones[CoreZoneNames.Board];
     return Boolean(boardZone?.items?.includes(tileId));
@@ -70,6 +94,12 @@ export function getGrassrootsConversionSpec(tile: any, inputCount: number, outpu
     return null;
 }
 
+/**
+ * Checks if a resort is a core resort.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function isCoreResort(resort: string): boolean {
     return resort === CoreResources.DOM || resort === CoreResources.FOR || resort === CoreResources.INF;
 }

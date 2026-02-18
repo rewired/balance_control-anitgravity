@@ -6,6 +6,7 @@ import { EffectResolver } from '../pack-api';
  * @expansion EXP-03
  * @requires SPEC-CORE-01
  * @deterministic
+ * @sideEffects
  * @rule EXP-03-04-B
  */
 export const placeCountdownMarker = ({ G, ctx }: any, { targetTileId, extraResourceIds }: { targetTileId: string, extraResourceIds?: string[] }) => {

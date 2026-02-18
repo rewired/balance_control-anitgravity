@@ -1,3 +1,9 @@
+/**
+ * Returns the player's meta marker object.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function getPlayerMetaMarker(G: any, playerId: string): any | null {
     const directId = `meta_${playerId}`;
     const objects = (G?.objects ?? {}) as Record<string, any>;
@@ -12,6 +18,12 @@ export function getPlayerMetaMarker(G: any, playerId: string): any | null {
     return null;
 }
 
+/**
+ * Finds the zone ID containing the specified object.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function findObjectZoneId(G: any, objectId: string): string | null {
     const zones = (G?.zones ?? {}) as Record<string, any>;
     for (const zone of Object.values(zones)) {

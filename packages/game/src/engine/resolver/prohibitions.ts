@@ -1,6 +1,12 @@
 import type { GameState } from '@balance-control/rules';
 import type { EngineState } from '../types';
 
+/**
+ * Checks if an action is prohibited for a player or tile.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function isProhibited(
     G: GameState & { engine: EngineState },
     actionType: string,

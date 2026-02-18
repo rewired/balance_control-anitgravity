@@ -45,6 +45,8 @@ function handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): v
 /**
  * Shuffles the recycle pile into the draw pile when needed.
  * @expansion EXP-01
+ * @usesRNG
+ * @rule CORE-01-03-02A
  * @deterministic
  * @sideEffects
  * @rule EXP-01-07-05
@@ -63,6 +65,8 @@ function handleMeasureRecycle(G: GameState & { engine: EngineState }, ctx: any, 
 /**
  * Handles taking a measure from the open display.
  * @expansion EXP-01
+ * @usesRNG
+ * @rule CORE-01-03-02A
  * @deterministic
  * @sideEffects
  * @rule EXP-01-06

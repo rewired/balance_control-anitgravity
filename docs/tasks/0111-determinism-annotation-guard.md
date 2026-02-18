@@ -90,10 +90,33 @@ Ensure CI runs it in the normal pipeline (where other verification scripts run).
 
 ---
 
+## Work Summary
+
+- Created `scripts/verify-docs.mjs` to enforce TSDoc standards and forbid `Math.random`.
+- Added `verify:docs` script to root `package.json`.
+- Integrated `verify:docs` into GitHub Actions CI pipeline.
+- Fixed 91 documentation violations in `packages/game/src` to satisfy the new verification.
+- Verified workspace health with `pnpm lint`, `pnpm test`, and `pnpm run verify:docs`.
+
+## Commands Run
+
+- `pnpm run verify:docs`: Initial run failed with 91 errors; final run passed.
+- `pnpm install`: Restored environment binaries.
+- `pnpm build`: Rebuilt workspace packages.
+- `pnpm lint`: Verified linting standards.
+- `pnpm test`: Verified that documentation changes did not break engine logic.
+
+## Guardrails
+
+- Affected IDs: NONE
+
 ## PR Checklist
 
-- [ ] verify-docs.mjs added and documented
-- [ ] verify:docs script wired
-- [ ] CI runs verify:docs
-- [ ] No runtime behavior changes
-- [ ] Meaningful commit message
+- [x] verify-docs.mjs added and documented
+- [x] verify:docs script wired
+- [x] CI runs verify:docs
+- [x] No runtime behavior changes
+- [x] Meaningful commit message
+
+## Status
+COMMIT_READY

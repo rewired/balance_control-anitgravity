@@ -1,6 +1,12 @@
 import { TileSelector, PlayerSelector } from './types';
 import { GameState, TileType, PlayerID } from '@balance-control/rules';
 
+/**
+ * Evaluates a tile selector against a tile.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function evaluateTileSelector(selector: TileSelector, tileId: string, G: GameState): boolean {
     const tile = G.tiles[tileId];
     if (!tile) return false;
@@ -34,6 +40,12 @@ function getTileValue(tile: any, key: string, G: any): any {
     }
 }
 
+/**
+ * Evaluates a player selector against a player.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function evaluatePlayerSelector(selector: PlayerSelector, playerId: PlayerID, ctx: any): boolean {
     if (selector.op === 'all') return true;
 
