@@ -2,12 +2,22 @@ import type { GameState } from '@balance-control/rules';
 import type { EffectAtom, HookPoint, EngineState } from '../types';
 import { evaluateTileSelector } from '../selectors';
 
+/**
+ * Removes a modifier from the engine state.
+ * @deterministic
+ * @sideEffects
+ */
 export function removeModifier(G: GameState & { engine: EngineState }, id: string): void {
     G.engine.activeModifiers = G.engine.activeModifiers.filter(m => m.id !== id);
 }
 
 /**
  * Find all modifiers matching the current hook and context, and trigger them.
+ * @remarks Stacking order follows priority; Regulations resolve in order: Blockade (1), Costs (2), Output (3).
+ * @expansion EXP-02
+ * @deterministic
+ * @sideEffects
+ * @rule EXP-02-04-B
  */
 export function applyModifiers(
     G: GameState & { engine: EngineState },
@@ -40,6 +50,11 @@ export function applyModifiers(
     }
 }
 
+/**
+ * Maps an atom kind to its corresponding hook point.
+ * @deterministic
+ * @pure
+ */
 export function getHookForAtom(atom: EffectAtom): string | null {
     if (atom.kind === 'resource.pay') return 'PayCost';
     if (atom.kind === 'resource.grant') return 'Grant';

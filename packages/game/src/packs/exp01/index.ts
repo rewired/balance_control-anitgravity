@@ -1,3 +1,11 @@
+/**
+ * Expansion Pack: Economy & Labor (EXP-01).
+ * @expansion EXP-01
+ * @requires SPEC-CORE-01
+ * @deterministic
+ * @rule EXP-01-07
+ */
+
 import { Expansion01 } from '@balance-control/expansion-01';
 import { RULESET_MANIFEST } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
@@ -11,6 +19,9 @@ const EXP01_PACK_MANIFEST: PackManifest = {
     required: false,
 };
 
+/**
+ * Engine Pack Definition for EXP-01.
+ */
 export const Exp01Pack: EnginePackDefinition = {
     id: 'exp01',
     name: Expansion01.name,

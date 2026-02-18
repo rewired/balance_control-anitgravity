@@ -16,9 +16,17 @@ const EXPANSION_ID_TO_FLAG_KEY: Record<ExpansionId, keyof ExpansionFlags> = {
     exp03: 'ex03',
 };
 
+/**
+ * Registry for engine packs and their associated logic.
+ */
 class EnginePackRegistryImpl {
     private packs: Partial<Record<EnginePackId, EnginePackDefinition>> = {};
 
+    /**
+     * Resolves expansion flags from config.
+     * @deterministic
+     * @pure
+     */
     private resolveFlags(config?: GameConfig): ExpansionFlags {
         const candidate = config?.expansions;
         if (!candidate) return { ...DEFAULT_EXPANSION_FLAGS };
@@ -76,6 +84,11 @@ class EnginePackRegistryImpl {
         return enabledPackIds;
     }
 
+    /**
+     * Returns manifests for all registered packs.
+     * @deterministic
+     * @pure
+     */
     public getPackManifests(): PackManifest[] {
         const out: PackManifest[] = [];
         for (const id of CANONICAL_ENGINE_MODULE_ORDER as readonly EnginePackId[]) {
@@ -86,6 +99,11 @@ class EnginePackRegistryImpl {
         return out;
     }
 
+    /**
+     * Validates that all enabled packs are registered and versions match if pinned.
+     * @deterministic
+     * @pure
+     */
     public validateEnabledPacks(enabledPackIds: EnginePackId[], pinnedVersions?: Partial<Record<ExpansionId, string>>): void {
         const registered = new Map<EnginePackId, EnginePackDefinition>();
         for (const pack of this.getRegisteredPacks()) {
@@ -124,6 +142,10 @@ class EnginePackRegistryImpl {
         }
     }
 
+    /**
+     * Registers a new engine pack.
+     * @sideEffects
+     */
     public registerPack(def: EnginePackDefinition): void {
         if (!def) {
             throw new Error(`EnginePackRegistry: registerPack called with undefined/null def.`);
@@ -144,6 +166,11 @@ class EnginePackRegistryImpl {
         this.packs[def.id] = def;
     }
 
+    /**
+     * Returns all registered engine packs in canonical order.
+     * @deterministic
+     * @pure
+     */
     public getRegisteredPacks(): EnginePackDefinition[] {
         const out: EnginePackDefinition[] = [];
         for (const id of CANONICAL_ENGINE_MODULE_ORDER as readonly EnginePackId[]) {
@@ -153,6 +180,11 @@ class EnginePackRegistryImpl {
         return out;
     }
 
+    /**
+     * Returns all enabled engine packs for the current game state or config.
+     * @deterministic
+     * @pure
+     */
     public getEnabledPacks(G?: GameState, cfg?: GameConfig): EnginePackDefinition[] {
         const enabledPackIds = this.resolveEnabledPackIds(G, cfg);
         const out: EnginePackDefinition[] = [];
@@ -165,6 +197,11 @@ class EnginePackRegistryImpl {
         return out;
     }
 
+    /**
+     * Returns move modules for all registered packs.
+     * @deterministic
+     * @pure
+     */
     public getRegisteredMoveModules(): MoveModule[] {
         const out: MoveModule[] = [];
         for (const pack of this.getRegisteredPacks()) {
@@ -174,6 +211,11 @@ class EnginePackRegistryImpl {
         return out;
     }
 
+    /**
+     * Returns move modules for enabled packs.
+     * @deterministic
+     * @pure
+     */
     public getEnabledMoveModules(cfg?: GameConfig): MoveModule[] {
         const enabledPackIds = new Set(this.resolveEnabledPackIds(undefined, cfg));
         const out: MoveModule[] = [];
@@ -188,6 +230,10 @@ class EnginePackRegistryImpl {
         return out;
     }
 
+    /**
+     * Executes pre-shuffle setup hooks for all enabled packs.
+     * @sideEffects
+     */
     public applySetupPreShuffle(G: GameState, ctx: any, cfg?: GameConfig): void {
         const resolvedCfg =
             cfg ??
@@ -199,6 +245,10 @@ class EnginePackRegistryImpl {
         }
     }
 
+    /**
+     * Executes post-shuffle setup hooks for all enabled packs.
+     * @sideEffects
+     */
     public applySetupPostShuffle(G: GameState, ctx: any, cfg?: GameConfig): void {
         const resolvedCfg =
             cfg ??
@@ -214,6 +264,12 @@ class EnginePackRegistryImpl {
         this.packs = {};
     }
 
+    /**
+     * Retrieves atoms for a measure from the appropriate expansion pack.
+     * @expansion EXP-01|02|03
+     * @deterministic
+     * @pure
+     */
     public getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
         const enabledPackIds = new Set(this.resolveEnabledPackIds(G));
         for (const expId of CANONICAL_EXPANSION_ORDER) {
@@ -228,6 +284,12 @@ class EnginePackRegistryImpl {
         return null;
     }
 
+    /**
+     * Retrieves all measure deck descriptors from enabled packs.
+     * @expansion EXP-01|02|03
+     * @deterministic
+     * @pure
+     */
     public getMeasureDeckDescriptors(G: GameState): Array<{ expansionId: ExpansionId; deck: MeasureDeckDescriptor }> {
         const enabledPackIds = new Set(this.resolveEnabledPackIds(G));
         const out: Array<{ expansionId: ExpansionId; deck: MeasureDeckDescriptor }> = [];
@@ -247,6 +309,11 @@ class EnginePackRegistryImpl {
         return out;
     }
 
+    /**
+     * Dispatches an effect to the appropriate expansion-specific effect handler.
+     * @expansion EXP-01|02|03
+     * @sideEffects
+     */
     public applyEffect(G: GameState, ctx: any, effect: any, contextTileId?: string, utils?: any, config?: GameConfig) {
         const enabledPackIds = new Set(this.resolveEnabledPackIds(G, config));
         for (const expId of CANONICAL_EXPANSION_ORDER) {
@@ -259,6 +326,14 @@ class EnginePackRegistryImpl {
         }
     }
 
+    /**
+     * Applies production modifiers from all enabled packs.
+     * @remarks Expansion order: EXP-01 doubling first, then Climate modifications [EXP-03-10-04].
+     * @expansion EXP-01|03
+     * @deterministic
+     * @pure
+     * @rule EXP-03-10-04
+     */
     public applyProductionModifiers(G: GameState, tileId: string, baseAmount: number, config?: GameConfig): number {
         const enabledPackIds = new Set(this.resolveEnabledPackIds(G, config));
         let amount = baseAmount;

@@ -1,3 +1,11 @@
+/**
+ * Expansion Pack: Security & Order (EXP-02).
+ * @expansion EXP-02
+ * @requires SPEC-CORE-01
+ * @deterministic
+ * @rule EXP-02-04-B
+ */
+
 import { Expansion02 } from '@balance-control/expansion-02';
 import { RULESET_MANIFEST } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
@@ -12,6 +20,9 @@ const EXP02_PACK_MANIFEST: PackManifest = {
     required: false,
 };
 
+/**
+ * Engine Pack Definition for EXP-02.
+ */
 export const Exp02Pack: EnginePackDefinition = {
     id: 'exp02',
     name: Expansion02.name,
