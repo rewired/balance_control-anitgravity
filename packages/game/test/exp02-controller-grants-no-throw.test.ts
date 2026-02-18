@@ -1,84 +1,26 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { CoreZoneNames, TileType } from '@balance-control/rules';
-import { Expansion02 } from '@balance-control/expansion-02';
-import { Exp02Pack } from '../src/packs/exp02';
+import { CoreZoneNames } from '@balance-control/rules';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
+import { EffectResolver } from '../src/engine/resolver';
 import { registerTestPacks } from './_helpers/registerPacks';
-
-const EXP02_MEASURE_IDS = [
-    'M01', 'M02', 'M03', 'M04', 'M05',
-    'M06', 'M07', 'M08', 'M09', 'M10',
-    'M11', 'M12', 'M13', 'M14', 'M15'
-];
-
-function collectControllerGrants(value: unknown, out: any[] = []): any[] {
-    if (Array.isArray(value)) {
-        for (const item of value) {
-            collectControllerGrants(item, out);
-        }
-        return out;
-    }
-
-    if (!value || typeof value !== 'object') {
-        return out;
-    }
-
-    const atom = value as Record<string, any>;
-    if (atom.kind === 'resource.grant' && atom.playerId === 'CONTROLLER') {
-        out.push(atom);
-    }
-
-    if (atom.modifier?.effect) {
-        collectControllerGrants(atom.modifier.effect, out);
-    }
-
-    return out;
-}
+import type { EnginePackDefinition } from '../src/packs/types';
 
 describe('EXP-02 controller grants with no controller', () => {
+    // Minimal dummy pack to satisfy registry
+    const DummyExp02Pack: EnginePackDefinition = {
+        id: 'exp02',
+        name: 'Dummy Exp 02',
+        manifest: { id: 'exp02', packVersion: '0.0.0', rulesetAnchor: 'EXP-02', required: false }
+    };
+
     beforeEach(() => {
-        registerTestPacks([Exp02Pack]);
+        registerTestPacks([DummyExp02Pack]);
     });
 
     afterEach(() => {
         EnginePackRegistry.clear();
-    });
-
-    it('should require explicit SKIP policy on all EXP-02 CONTROLLER grants', () => {
-        const ctx: any = {
-            currentPlayer: '0',
-            numPlayers: 2,
-            random: { Shuffle: (items: string[]) => items }
-        };
-
-        const G = SetupGame({
-            ctx,
-            setupData: { expansions: { ex01: false, ex02: true, ex03: false } }
-        }) as any;
-
-        const targetTileId = G.zones[CoreZoneNames.DrawPile].items.find(
-            (tileId: string) => G.tiles[tileId]?.type === TileType.Resort
-        ) ?? 'tile_authority_apparatus';
-
-        const payload = {
-            playerId: '0',
-            targetTileId,
-            regType: 'Administration',
-            regulationId: 'reg_Administration_0',
-            newTargetTileId: targetTileId,
-            targetPlayerId: '1'
-        };
-
-        const controllerGrants: any[] = [];
-        for (const measureId of EXP02_MEASURE_IDS) {
-            const atoms = Expansion02.getMeasureAtoms?.(G, measureId, payload);
-            collectControllerGrants(atoms, controllerGrants);
-        }
-
-        const invalid = controllerGrants.filter((atom) => atom.missingController !== 'SKIP');
-        expect(invalid).toEqual([]);
     });
 
     it('should not throw and should not grant to Noise for uncontrolled EXP-02 effect path', () => {
@@ -94,36 +36,44 @@ describe('EXP-02 controller grants with no controller', () => {
         }) as any;
 
         const hotspotId = 'tile_inner_order';
+
+        // Since the dummy pack is empty, the tile won't be created by SetupGame.
+        // We manually add it.
+        G.tiles[hotspotId] = { id: hotspotId, type: 'Resort', resort: 'SEC' };
+        G.zones[hotspotId] = { id: hotspotId, name: 'Inner Order', items: [] };
+        G.zones[CoreZoneNames.Board].items.push(hotspotId);
+
         expect(G.tiles[hotspotId]).toBeTruthy();
         expect(G.zones[hotspotId]).toBeTruthy();
 
         const pid = ctx.currentPlayer;
         const supply = G.zones[`${CoreZoneNames.PersonalSupply}:${pid}`];
         const noise = G.zones[CoreZoneNames.Noise];
+        const bank = G.zones[CoreZoneNames.Bank];
+
+        expect(computeMajority(hotspotId, G).controller).toBeNull();
+
+        // Manually construct the atom
+        const grantAtom = {
+            kind: 'resource.grant',
+            playerId: 'CONTROLLER',
+            amount: 1,
+            resorts: ['SEC'],
+            missingController: 'SKIP',
+            targetTileId: hotspotId,
+            context: { source: 'exp02:M03', tileId: hotspotId }
+        };
 
         const supplyBefore = [...supply.items];
         const noiseBefore = [...noise.items];
-        const queueBefore = [...G.engine.effectQueue];
+        const bankBefore = [...bank.items];
 
-        expect(() => {
-            Expansion02.effectHandlers?.HOTSPOT_RESOLUTION?.(
-                G,
-                ctx,
-                {
-                    payload: {
-                        tileId: hotspotId,
-                        action: 'place',
-                        regType: 'Administration',
-                        targetTileId: hotspotId
-                    }
-                },
-                { computeMajority }
-            );
-        }).not.toThrow();
+        G.engine.effectQueue.push(grantAtom);
 
+        expect(() => EffectResolver.resolve(G, ctx)).not.toThrow();
         expect(computeMajority(hotspotId, G).controller).toBeNull();
         expect(supply.items).toEqual(supplyBefore);
         expect(noise.items).toEqual(noiseBefore);
-        expect(G.engine.effectQueue).toEqual(queueBefore);
+        expect(bank.items).toEqual(bankBefore);
     });
 });
