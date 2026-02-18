@@ -1,13 +1,15 @@
 import { CoreResources, CoreZoneNames, RULESET_MANIFEST, TileType, type GameConfig, type GameObject, type GameState, type Tile } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
-import { CoreMoves } from '../../moves';
-import { coreResourceAtoms } from '../../engine/atoms/resource';
-import { coreInfluenceAtoms } from '../../engine/atoms/influence';
-import { coreProductionAtoms } from '../../engine/atoms/production';
-import { coreMeasureAtoms } from '../../engine/atoms/measure';
-import { coreChoiceAtoms } from '../../engine/atoms/choice';
-import { coreHotspotAtoms } from '../../engine/atoms/hotspot';
-import { createCoreRulesAtoms } from '../../engine/atoms/rules';
+import {
+    CoreMoves,
+    coreResourceAtoms,
+    coreInfluenceAtoms,
+    coreProductionAtoms,
+    coreMeasureAtoms,
+    coreChoiceAtoms,
+    coreHotspotAtoms,
+    createCoreRulesAtoms
+} from '../pack-api';
 
 const START_COMMITTEE_TILE_ID = 'tile_start_committee';
 const CORE_PACK_VERSION = RULESET_MANIFEST.coreVersion.replace(/^v/i, '');
