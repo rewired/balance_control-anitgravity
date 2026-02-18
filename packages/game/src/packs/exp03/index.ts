@@ -1,3 +1,11 @@
+/**
+ * Expansion Pack: Climate & Future (EXP-03).
+ * @expansion EXP-03
+ * @requires SPEC-CORE-01
+ * @deterministic
+ * @rule EXP-03-10
+ */
+
 import { Expansion03 } from '@balance-control/expansion-03';
 import { RULESET_MANIFEST } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
@@ -13,6 +21,9 @@ const EXP03_PACK_MANIFEST: PackManifest = {
     required: false,
 };
 
+/**
+ * Engine Pack Definition for EXP-03.
+ */
 export const Exp03Pack: EnginePackDefinition = {
     id: 'exp03',
     name: Expansion03.name,

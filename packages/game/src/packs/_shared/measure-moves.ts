@@ -4,6 +4,10 @@ import { EffectResolver, lookupMeasureDeckForObjectId } from '../pack-api';
 /**
  * Standard Expansion Move: Take a measure from the open display.
  * Logic is generic and depends on zone naming conventions.
+ * @expansion EXP-01|02|03
+ * @requires SPEC-CORE-01
+ * @deterministic
+ * @rule EXP-01-06
  */
 export const takeMeasure = ({ G, ctx, events }: any, measureObjectId: string) => {
     const pid = ctx.currentPlayer;
@@ -40,6 +44,10 @@ export const takeMeasure = ({ G, ctx, events }: any, measureObjectId: string) =>
 
 /**
  * Standard Expansion Move: Play a measure from hand.
+ * @expansion EXP-01|02|03
+ * @requires SPEC-CORE-01
+ * @deterministic
+ * @rule EXP-01-06
  */
 export const playMeasure = ({ G, ctx, events }: any, measureObjectId: string, targetPayload: any) => {
     const pid = ctx.currentPlayer;

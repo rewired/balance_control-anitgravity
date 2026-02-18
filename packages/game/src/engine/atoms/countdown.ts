@@ -2,6 +2,13 @@ import type { GameState } from '@balance-control/rules';
 import type { AtomRegistration } from '../engine-module-registry';
 import type { EngineState } from '../types';
 
+/**
+ * Handles the placement of a countdown marker.
+ * @expansion EXP-03
+ * @deterministic
+ * @sideEffects
+ * @rule EXP-03-04-B
+ */
 function handleCountdownPlace(G: GameState & { engine: EngineState }, atom: any): void {
     const { targetTileId, amount = 3 } = atom;
     const supply = G.zones.CountdownSupply;
@@ -20,6 +27,13 @@ function handleCountdownPlace(G: GameState & { engine: EngineState }, atom: any)
     }
 }
 
+/**
+ * Atom registrations for Countdown markers (EXP-03).
+ * @expansion EXP-03
+ * @requires SPEC-CORE-01
+ * @deterministic
+ * @rule EXP-03-04-B
+ */
 export const exp03CountdownAtoms: AtomRegistration[] = [
     { kind: 'countdown.place', handler: (G, _ctx, atom) => handleCountdownPlace(G as any, atom) }
 ];

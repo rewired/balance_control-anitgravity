@@ -4,6 +4,13 @@ import type { EngineState } from '../types';
 import { EnginePackRegistry } from '../../expansion-registry';
 import { lookupMeasureDeckForObjectId } from '../measure-deck-provider';
 
+/**
+ * Executes the play of a measure.
+ * @expansion EXP-01
+ * @deterministic
+ * @sideEffects
+ * @rule EXP-01-07
+ */
 function handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): void {
     const { playerId, measureObjectId } = atom;
     const obj = G.objects[measureObjectId];
@@ -35,6 +42,13 @@ function handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): v
     }
 }
 
+/**
+ * Shuffles the recycle pile into the draw pile when needed.
+ * @expansion EXP-01
+ * @deterministic
+ * @sideEffects
+ * @rule EXP-01-07-05
+ */
 function handleMeasureRecycle(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
     const { drawPileId, recyclePileId } = atom;
     const drawPile = G.zones[drawPileId];
@@ -46,6 +60,13 @@ function handleMeasureRecycle(G: GameState & { engine: EngineState }, ctx: any, 
     }
 }
 
+/**
+ * Handles taking a measure from the open display.
+ * @expansion EXP-01
+ * @deterministic
+ * @sideEffects
+ * @rule EXP-01-06
+ */
 function handleMeasureTake(G: GameState & { engine: EngineState }, ctx: any, atom: any): void {
     const { playerId, measureObjectId } = atom;
     const obj = G.objects[measureObjectId];
@@ -77,6 +98,13 @@ function handleMeasureTake(G: GameState & { engine: EngineState }, ctx: any, ato
     }
 }
 
+/**
+ * Atom registrations for measure lifecycle (EXP-01).
+ * @expansion EXP-01
+ * @requires SPEC-CORE-01
+ * @deterministic
+ * @rule EXP-01-07
+ */
 export const coreMeasureAtoms: AtomRegistration[] = [
     { kind: 'measure.play', handler: (G, _ctx, atom) => handleMeasurePlay(G as any, atom) },
     { kind: 'measure.take', handler: (G, ctx, atom) => handleMeasureTake(G as any, ctx, atom) },

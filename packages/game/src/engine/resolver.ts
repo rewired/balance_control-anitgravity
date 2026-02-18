@@ -28,9 +28,11 @@ export class EffectResolver {
 
     /**
      * Triggers a hook and resolves the resulting effects.
-     * @remarks infrastructure; no direct SPEC binding
+     * @remarks Stacking order follows priority; Regulations resolve in order: Blockade (1), Costs (2), Output (3).
+     * @expansion EXP-02
      * @deterministic
      * @sideEffects
+     * @rule EXP-02-04-B
      */
     public static triggerHook(G: GameState & { engine: EngineState }, ctx: any, hook: HookPoint, payload?: any): void {
         const modifiers = G.engine.activeModifiers
@@ -52,10 +54,20 @@ export class EffectResolver {
         this.resolve(G, ctx);
     }
 
+    /**
+     * Checks if an action is prohibited by current rules.
+     * @deterministic
+     * @pure
+     */
     public static isProhibited(G: GameState & { engine: EngineState }, actionType: string, playerId: string, tileId?: string): boolean {
         return isProhibitedImpl(G, actionType, playerId, tileId);
     }
 
+    /**
+     * Checks if a player has reached the usage limit for an action.
+     * @deterministic
+     * @pure
+     */
     public static checkUsageLimit(G: GameState & { engine: EngineState }, actionType: string, playerId: string): boolean {
         const limits = G.engine.attributes.limits || {};
         const usage = G.engine.attributes.usage || {};
@@ -133,6 +145,11 @@ export class EffectResolver {
         }
     }
 
+    /**
+     * Validates if a cost can be paid.
+     * @deterministic
+     * @pure
+     */
     public static validateCost(
         G: GameState & { engine: EngineState },
         _ctx: any,
@@ -155,6 +172,11 @@ export class EffectResolver {
         return commitCostImpl(G, _ctx, costSpec);
     }
 
+    /**
+     * Retrieves extra cost slots for an action.
+     * @deterministic
+     * @pure
+     */
     public static getExtraCostSlots(
         G: GameState & { engine: EngineState },
         pid: string,

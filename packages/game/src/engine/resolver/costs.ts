@@ -15,6 +15,11 @@ export type CostValidationResult =
     | { ok: true; resourceIds: string[] }
     | { ok: false; error: string };
 
+/**
+ * Validates if a player can pay a specific cost.
+ * @deterministic
+ * @pure
+ */
 export function validateCost(
     G: GameState & { engine: EngineState },
     _ctx: any,
@@ -127,6 +132,11 @@ export function validateCost(
     return { ok: true, resourceIds: selectedResourceIds };
 }
 
+/**
+ * Commits the cost by moving resources from supply to bank.
+ * @deterministic
+ * @sideEffects
+ */
 export function commitCost(
     G: GameState & { engine: EngineState },
     _ctx: any,
@@ -157,6 +167,15 @@ export function commitCost(
     return true;
 }
 
+/**
+ * Calculates extra cost slots based on regulations and climate effects.
+ * @remarks Climate cost increases stack additively with Regulation cost increases [EXP-03-10-02].
+ * @expansion EXP-02|03
+ * @deterministic
+ * @pure
+ * @rule EXP-03-06-03
+ * @rule EXP-02-04-B
+ */
 export function getExtraCostSlots(
     G: GameState & { engine: EngineState },
     pid: string,
@@ -225,6 +244,11 @@ export function getExtraCostSlots(
     return costSlots;
 }
 
+/**
+ * Orchestrates checking and paying costs for an action.
+ * @deterministic
+ * @sideEffects
+ */
 export function checkAndPayCosts(
     G: GameState & { engine: EngineState },
     pid: string,

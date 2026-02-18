@@ -3,6 +3,13 @@ import type { AtomRegistration } from '../engine-module-registry';
 import type { EngineState } from '../types';
 import { allocId } from '../resolver/ids';
 
+/**
+ * Places a regulation on the board.
+ * @expansion EXP-02
+ * @deterministic
+ * @sideEffects
+ * @rule EXP-02-04-A
+ */
 function handleRegulationPlace(G: GameState & { engine: EngineState }, atom: any): void {
     const { regType, targetTileId } = atom;
     const supply = G.zones.RegulationSupply;
@@ -20,6 +27,13 @@ function handleRegulationPlace(G: GameState & { engine: EngineState }, atom: any
     G.objects[regId].targetTileId = targetTileId;
 }
 
+/**
+ * Moves an existing regulation to a new target tile.
+ * @expansion EXP-02
+ * @deterministic
+ * @sideEffects
+ * @rule EXP-02-02-F
+ */
 function handleRegulationMove(G: GameState & { engine: EngineState }, atom: any): void {
     const { regulationId, targetTileId } = atom;
     const obj = G.objects[regulationId];
@@ -32,6 +46,13 @@ function handleRegulationMove(G: GameState & { engine: EngineState }, atom: any)
     obj.targetTileId = targetTileId;
 }
 
+/**
+ * Removes a regulation from the board.
+ * @expansion EXP-02
+ * @deterministic
+ * @sideEffects
+ * @rule EXP-02-02-E
+ */
 function handleRegulationRemove(G: GameState & { engine: EngineState }, atom: any): void {
     const { regulationId } = atom;
     const obj = G.objects[regulationId];
@@ -51,6 +72,13 @@ function handleRegulationRemove(G: GameState & { engine: EngineState }, atom: an
     }
 }
 
+/**
+ * Atom registrations for Regulations (EXP-02).
+ * @expansion EXP-02
+ * @requires SPEC-CORE-01
+ * @deterministic
+ * @rule EXP-02-04-A
+ */
 export const exp02RegulationAtoms: AtomRegistration[] = [
     { kind: 'regulation.place', handler: (G, _ctx, atom) => handleRegulationPlace(G as any, atom) },
     { kind: 'regulation.move', handler: (G, _ctx, atom) => handleRegulationMove(G as any, atom) },
