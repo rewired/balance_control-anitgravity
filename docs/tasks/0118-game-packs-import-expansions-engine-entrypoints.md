@@ -169,7 +169,7 @@ Update engine pack adapters in `packages/game/src/packs/exp01..exp03` to import 
 
 ---
 
-## 13) Postflight Proof (recorded in commit message)
+## 13) Postflight Proof (recorded in commit message) - not given
 
 - See commit message body for `git status -sb`, `git diff --stat`, and test outputs.
 
