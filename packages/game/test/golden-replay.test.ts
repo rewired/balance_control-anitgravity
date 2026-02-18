@@ -5,9 +5,9 @@ import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from '../src/index';
 import { SetupGame } from '../src/setup';
 import { hashState } from '../src/hash-state';
-import { Expansion01 } from '../../expansion-01/src/index';
-import { Expansion02 } from '../../expansion-02/src/index';
-import { Expansion03 } from '../../expansion-03/src/index';
+import { Exp01Pack } from '../src/packs/exp01';
+import { Exp02Pack } from '../src/packs/exp02';
+import { Exp03Pack } from '../src/packs/exp03';
 import { CoreZoneNames, TileType } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';
 
@@ -63,13 +63,13 @@ function loadGoldenFixtures(): GoldenFixture[] {
 function registerFixtureExpansions(names?: string[]): void {
     const expansions: any[] = [];
     if (names?.includes('ex01')) {
-        expansions.push(Expansion01 as any);
+        expansions.push(Exp01Pack);
     }
     if (names?.includes('ex02')) {
-        expansions.push(Expansion02 as any);
+        expansions.push(Exp02Pack);
     }
     if (names?.includes('ex03')) {
-        expansions.push(Expansion03 as any);
+        expansions.push(Exp03Pack);
     }
     registerTestPacks(expansions);
 }
@@ -201,8 +201,10 @@ describe('Golden replays', () => {
                 const state = client.getState();
                 expect(state).toBeTruthy();
                 const actualHash = hashState(state!.G as any);
+                const actualPublicSurfaceHash = state!.G.meta?.publicSurfaceHash;
+
                 expect(actualHash).toBe(fixture.expectedFinalHash);
-                expect(state!.G.meta?.publicSurfaceHash).toBe(fixture.expectedPublicSurfaceHash);
+                expect(actualPublicSurfaceHash).toBe(fixture.expectedPublicSurfaceHash);
                 expect(warnSpy).not.toHaveBeenCalled();
                 expect(errorSpy).not.toHaveBeenCalled();
             } finally {

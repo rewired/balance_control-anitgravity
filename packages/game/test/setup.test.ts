@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { SetupGame } from '../src/setup';
-import { EnginePackRegistry, packFromExpansionDefinition } from '../src/expansion-registry';
+import { EnginePackRegistry } from '../src/expansion-registry';
 import { registerTestPacks } from './_helpers/registerPacks';
-import { CoreZoneNames, ExpansionDefinition, TileType } from '@balance-control/rules';
+import { CoreZoneNames, TileType } from '@balance-control/rules';
+import { makeTestPack } from './_helpers/makeTestPack';
 
 function createSeededRandom(seed: number) {
     let state = seed >>> 0;
@@ -120,16 +121,18 @@ describe('SetupGame', () => {
     });
 
     it('should not apply ex01 setup when ex01 flag is disabled', () => {
-        const mockEx01: ExpansionDefinition = {
+        const mockPack = makeTestPack({
             id: 'exp01',
             name: 'EXP-01 Economy & Labor',
-            onSetup: (G) => {
-                G.tiles.tile_ex01_mock = { id: 'tile_ex01_mock', type: TileType.Resort, resort: 'ECO', weight: 1 };
-                G.zones[CoreZoneNames.DrawPile].items.push('tile_ex01_mock');
-                G.zones.tile_ex01_mock = { id: 'tile_ex01_mock', name: 'EX01 Mock', items: [] };
+            setup: {
+                preShuffle: (G) => {
+                    G.tiles.tile_ex01_mock = { id: 'tile_ex01_mock', type: TileType.Resort, resort: 'ECO', weight: 1 };
+                    G.zones[CoreZoneNames.DrawPile].items.push('tile_ex01_mock');
+                    G.zones.tile_ex01_mock = { id: 'tile_ex01_mock', name: 'EX01 Mock', items: [] };
+                }
             }
-        };
-        EnginePackRegistry.registerPack(packFromExpansionDefinition(mockEx01));
+        });
+        EnginePackRegistry.registerPack(mockPack);
 
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx, setupData: { expansions: { ex01: false } } });
@@ -139,16 +142,18 @@ describe('SetupGame', () => {
     });
 
     it('should apply ex01 setup when enabled and keep deterministic deck composition', () => {
-        const mockEx01: ExpansionDefinition = {
+        const mockPack = makeTestPack({
             id: 'exp01',
             name: 'EXP-01 Economy & Labor',
-            onSetup: (G) => {
-                G.tiles.tile_ex01_mock = { id: 'tile_ex01_mock', type: TileType.Resort, resort: 'ECO', weight: 1 };
-                G.zones[CoreZoneNames.DrawPile].items.push('tile_ex01_mock');
-                G.zones.tile_ex01_mock = { id: 'tile_ex01_mock', name: 'EX01 Mock', items: [] };
+            setup: {
+                preShuffle: (G) => {
+                    G.tiles.tile_ex01_mock = { id: 'tile_ex01_mock', type: TileType.Resort, resort: 'ECO', weight: 1 };
+                    G.zones[CoreZoneNames.DrawPile].items.push('tile_ex01_mock');
+                    G.zones.tile_ex01_mock = { id: 'tile_ex01_mock', name: 'EX01 Mock', items: [] };
+                }
             }
-        };
-        EnginePackRegistry.registerPack(packFromExpansionDefinition(mockEx01));
+        });
+        EnginePackRegistry.registerPack(mockPack);
 
         const enabledA = SetupGame({
             ctx: { numPlayers: 2, random: createSeededRandom(2028) } as any,

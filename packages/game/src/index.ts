@@ -222,7 +222,7 @@ export function createBalanceControlGame(): Game<GameState> {
     };
 }
 
-export { EnginePackRegistry, packFromExpansionDefinition } from './expansion-registry';
+export { EnginePackRegistry } from './expansion-registry';
 export type { EnginePackDefinition, EnginePackId } from './packs/types';
 export { CorePack } from './packs/core';
 export { Exp01Pack } from './packs/exp01';

@@ -1,4 +1,4 @@
-import type { ExpansionDefinition, ExpansionFlags, ExpansionId, GameConfig, GameState, MeasureDeckDescriptor } from '@balance-control/rules';
+import type { ExpansionFlags, ExpansionId, GameConfig, GameState, MeasureDeckDescriptor } from '@balance-control/rules';
 import { DEFAULT_EXPANSION_FLAGS, DEFAULT_GAME_CONFIG } from './config';
 import type { EnginePackDefinition, EnginePackId, PackManifest } from './packs/types';
 import type { MoveModule } from './move-module-registry';
@@ -15,39 +15,6 @@ const EXPANSION_ID_TO_FLAG_KEY: Record<ExpansionId, keyof ExpansionFlags> = {
     exp02: 'ex02',
     exp03: 'ex03',
 };
-
-export function packFromExpansionDefinition(def: ExpansionDefinition): EnginePackDefinition {
-    const setup = def.onSetup
-        ? {
-              preShuffle: (G: GameState, ctx: any, _cfg: GameConfig) => def.onSetup?.(G, ctx),
-          }
-        : undefined;
-    const versionMap: Record<ExpansionId, string> = {
-        exp01: '1.3.0',
-        exp02: '1.0.0',
-        exp03: '1.0.0',
-    };
-    const manifest: PackManifest = {
-        id: def.id as EnginePackId,
-        packVersion: versionMap[def.id] ?? '0.0.0',
-        rulesetAnchor: `${def.id.toUpperCase().replace('EXP', 'EXP-')} v${versionMap[def.id] ?? '0.0.0'}`,
-        required: false,
-    };
-
-    return {
-        id: def.id as EnginePackId,
-        name: def.name,
-        manifest,
-        moves: def.moves,
-        resources: def.resources,
-        zones: def.zones,
-        measureDecks: def.measureDecks,
-        modifiers: def.modifiers,
-        effectHandlers: def.effectHandlers,
-        getMeasureAtoms: def.getMeasureAtoms,
-        setup,
-    };
-}
 
 class EnginePackRegistryImpl {
     private packs: Partial<Record<EnginePackId, EnginePackDefinition>> = {};
@@ -158,6 +125,13 @@ class EnginePackRegistryImpl {
     }
 
     public registerPack(def: EnginePackDefinition): void {
+        if (!def) {
+            throw new Error(`EnginePackRegistry: registerPack called with undefined/null def.`);
+        }
+        if (!def.manifest) {
+            console.error('PACK DEF WITHOUT MANIFEST:', JSON.stringify(def, (key, value) => typeof value === 'function' ? '[Function]' : value, 2));
+            throw new Error(`EnginePackRegistry: pack "${def.id}" has no manifest.`);
+        }
         if (!CANONICAL_PACK_IDS.has(def.id)) {
             throw new Error(`EnginePackRegistry: pack id "${def.id}" is not in CANONICAL_ENGINE_MODULE_ORDER.`);
         }

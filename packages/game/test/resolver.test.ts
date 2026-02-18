@@ -3,6 +3,7 @@ import { TileType } from '@balance-control/rules';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { EffectResolver } from '../src/engine/resolver';
 import { registerTestPacks } from './_helpers/registerPacks';
+import { makeTestPack } from './_helpers/makeTestPack';
 
 describe('EffectResolver cost and production behavior', () => {
     beforeEach(() => {
@@ -176,13 +177,13 @@ describe('EffectResolver cost and production behavior', () => {
 
     it('should apply production modifiers (no PingPong production reduction)', () => {
         registerTestPacks([
-            {
+            makeTestPack({
                 id: 'exp01',
                 name: 'PingPongModExp',
                 modifiers: {
                     production: (_tileId, _G, base) => base + 2
                 }
-            } as any
+            })
         ]);
 
         const bankIds = ['res_dom_1', 'res_dom_2', 'res_dom_3', 'res_dom_4', 'res_dom_5', 'res_dom_6', 'res_dom_7'];
