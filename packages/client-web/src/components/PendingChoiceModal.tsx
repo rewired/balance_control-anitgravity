@@ -18,6 +18,11 @@ const formatChoiceLabel = (intent: LegalIntent) => {
 
 const intentKey = (intent: LegalIntent) => JSON.stringify(intent.payload ?? {});
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const PendingChoiceModal: React.FC<PendingChoiceModalProps> = ({ resolveChoiceIntents, moves }) => {
     if (resolveChoiceIntents.length === 0) return null;
 

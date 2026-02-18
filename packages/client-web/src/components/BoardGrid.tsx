@@ -13,6 +13,11 @@ interface BoardGridProps {
     onSelectTile?: (tileId: string, coordStr: string) => void;
 }
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const BoardGrid: React.FC<BoardGridProps> = ({
     G,
     moves,

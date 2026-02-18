@@ -80,6 +80,11 @@ function inferStageBestEffort(ctx: any, playerID: string): IntentStage {
     return activePlayers[playerID] ?? null;
 }
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<IntentViewModel, 'intents'> {
     const stage = inferStageBestEffort(input.ctx, input.playerID);
 
@@ -133,6 +138,11 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
     };
 }
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export function useIntentViewModel({ G, ctx, playerID, selectedTileId, stagedTileId }: IntentViewModelInput): IntentViewModel {
     const pid = playerID ?? ctx?.currentPlayer ?? '0';
     const intents = useMemo(() => enumerateLegalIntents(G, ctx, pid), [G, ctx, pid]);

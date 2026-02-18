@@ -3,6 +3,23 @@
 **Date:** 2026-02-17
 **Style:** Codex task contract
 **Primary contract:** AGENTS.md (repo root)
+**Status:** COMMIT_READY
+**Affected Guardrails:** ["GR-002", "GR-014"]
+
+---
+
+## Work Summary
+
+- Added ARCH-01 boundary TSDoc to 15 client modules in `packages/client-web`.
+- Each documentation explicitly states the presentation-only nature of the client and references ARCH-01.
+- Verified that no legality, cost, or majority computation was added to the client.
+- Confirmed build and tests pass for the entire workspace.
+
+## Commands Run
+
+- `pnpm install`
+- `pnpm build`
+- `pnpm test`
 
 ---
 
@@ -65,8 +82,8 @@ Where helpful, include @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md.
 
 ## PR Checklist
 
-- [ ] Client boundary documented in relevant modules
-- [ ] No legality logic added
-- [ ] No engine changes
-- [ ] CI/tests pass
-- [ ] Meaningful commit message
+- [x] Client boundary documented in relevant modules
+- [x] No legality logic added
+- [x] No engine changes
+- [x] CI/tests pass
+- [x] Meaningful commit message

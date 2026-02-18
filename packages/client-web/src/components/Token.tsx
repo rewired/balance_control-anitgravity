@@ -5,6 +5,11 @@ interface TokenProps {
     object: GameObject;
 }
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const Token: React.FC<TokenProps> = ({ object }) => {
     let className = 'token';
     const knownResorts = new Set(['dom', 'for', 'inf', 'eco', 'sec', 'clm']);

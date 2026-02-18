@@ -12,6 +12,11 @@ type TileUnplaceableEntry = {
     tileId: string;
 };
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const PublicNoticeOverlay: React.FC<PublicNoticeOverlayProps> = ({ G }) => {
     const latest = useMemo(() => {
         const entries = (G.engine?.attributes as any)?.publicLog;

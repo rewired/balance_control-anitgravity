@@ -52,6 +52,11 @@ function getReplaySeed(state: any): string | number | null {
     return state?.ctx?.randomSeed ?? state?.ctx?._randomSeed ?? null;
 }
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 const App: React.FC = () => {
     const [mode, setMode] = useState<AppMode>(() => getInitialModeFromUrl());
     const [session, setSession] = useState<LobbyJoinPayload | null>(null);

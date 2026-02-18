@@ -28,6 +28,11 @@ const CONTENT_COLOR = "#FFFFFF";
 const DEFAULT_ICON_VIEWBOX_SIZE = 24;
 const RESORT_ICON_SIZE = 160;
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export function HexTileVisual({
   majoritySeat,
   seatColor,

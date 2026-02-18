@@ -30,6 +30,11 @@ type BoardViewportProps = BoardViewportGameProps | BoardViewportDevProps;
 
 const FIT_PADDING = 48;
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
     const viewportRef = useRef<HTMLDivElement | null>(null);
     const setTransformRef = useRef<((x: number, y: number, scale: number) => void) | null>(null);

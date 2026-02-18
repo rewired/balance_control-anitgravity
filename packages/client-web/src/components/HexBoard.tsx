@@ -21,6 +21,11 @@ interface HexBoardProps {
 
 export const HEX_SIZE = 110;
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const HexBoard: React.FC<HexBoardProps> = ({
     G,
     moves,

@@ -34,6 +34,11 @@ const intentSortKey = (intent: LegalIntent) => {
     return `${intent.moveType}:${payloadKey}`;
 };
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const ActionPanel: React.FC<ActionPanelProps> = ({
     moves,
     isActive,

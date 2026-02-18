@@ -12,6 +12,11 @@ interface TileProps {
     testId?: string;
 }
 
+/**
+ * @remarks
+ * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ */
 export const Tile: React.FC<TileProps> = ({
     tileId,
     G,
