@@ -3,12 +3,23 @@ import { positionKeyFromCoordString } from './topology';
 import { EffectResolver } from './engine/resolver';
 import { findObjectZoneId } from './state-lookup';
 
-/** CORE-01-08-01: Max influence cap */
+/**
+ * Returns the maximum influence cap based on player count.
+ * @rule CORE-01-08-01
+ * @rule ADD56-01-03-00-01
+ * @deterministic
+ * @pure
+ */
 export function getInfluenceCap(ctx: any): number {
     return ctx.numPlayers >= 5 ? 8 : 7;
 }
 
-/** Count total Influence objects owned by a player */
+/**
+ * Counts the total Influence objects owned by a player.
+ * @rule CORE-01-08-01
+ * @deterministic
+ * @pure
+ */
 export function countPlayerInfluence(G: any, pid: string): number {
     let count = 0;
     for (const obj of Object.values(G.objects) as any[]) {
@@ -17,7 +28,12 @@ export function countPlayerInfluence(G: any, pid: string): number {
     return count;
 }
 
-/** CORE-01-08-02: Check if ALL starting influence has been placed on Board by ALL players */
+/**
+ * Checks if all starting influence has been placed by all players.
+ * @rule CORE-01-08-02
+ * @deterministic
+ * @pure
+ */
 export function allStartingInfluencePlaced(G: any, ctx: any): boolean {
     for (let i = 0; i < ctx.numPlayers; i++) {
         const pid = i.toString();
@@ -63,7 +79,12 @@ export function drawMeasure(G: GameState, ctx: any) {
     // ... logic would go here, or just stub for now if not used yet
 }
 
-/** CORE-01-09-01A: Run final Round Settlement (production sweep in PositionKey order). */
+/**
+ * Runs the final round settlement.
+ * @rule CORE-01-09-01A
+ * @deterministic
+ * @sideEffects
+ */
 export function runFinalRoundSettlement(G: GameState & { engine: any; grid?: Record<string, string> }, ctx: any): void {
     const boardZone = G.zones[CoreZoneNames.Board];
     const grid = G.grid ?? {};

@@ -47,6 +47,12 @@ export type ConvertResourcesPayload = z.infer<typeof convertResourcesPayloadSche
 export type PlaceTilePayload = z.infer<typeof placeTilePayloadSchema>;
 export type PassTilePlacementPayload = z.infer<typeof passTilePlacementPayloadSchema>;
 
+/**
+ * Validates a move payload against a schema.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function validateMovePayload<TSchema extends z.ZodTypeAny>(
     moveName: string,
     schema: TSchema,

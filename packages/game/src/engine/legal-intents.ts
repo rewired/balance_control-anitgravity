@@ -48,6 +48,13 @@ export interface LegalIntent {
     contextTileId?: string;
 }
 
+/**
+ * Enumerates all legal moves for a player in the current state.
+ * @rule CORE-01-04-05A
+ * @rule CORE-01-04-09
+ * @deterministic
+ * @pure
+ */
 export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string): LegalIntent[] {
     if (!playerID) return [];
     if (ctx.currentPlayer !== playerID) return [];

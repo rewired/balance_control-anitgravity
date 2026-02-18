@@ -29,7 +29,13 @@ import {
 } from '../shared';
 
 export const PoliticalActionMoves = {
-    // CORE-01-04-10–12: PlaceInfluence via Lobbyist
+    /**
+     * Places one influence from supply onto a board tile.
+     * @rule CORE-01-04-10
+     * @rule CORE-01-04-11
+     * @deterministic
+     * @sideEffects
+     */
     placeInfluence: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('placeInfluence', placeInfluencePayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
@@ -66,7 +72,14 @@ export const PoliticalActionMoves = {
         events.endTurn();
     },
 
-    // CORE-01-04-12: Move exactly one Influence from one Board Tile to another
+    /**
+     * Moves exactly one influence from one board tile to another.
+     * @rule CORE-01-04-12
+     * @rule CORE-01-04-12A
+     * @rule CORE-01-04-12B
+     * @deterministic
+     * @sideEffects
+     */
     moveInfluence: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('moveInfluence', moveInfluencePayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
@@ -162,7 +175,15 @@ export const PoliticalActionMoves = {
         events.endTurn();
     },
 
-    // CORE-01-04-13–19: FormalizeInfluence via Committee
+    /**
+     * Formalizes influence via a committee tile, creating new influence.
+     * @rule CORE-01-04-13
+     * @rule CORE-01-04-15
+     * @rule CORE-01-08-07
+     * @rule CORE-01-08-08
+     * @deterministic
+     * @sideEffects
+     */
     formalizeInfluence: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('formalizeInfluence', formalizeInfluencePayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
@@ -259,7 +280,15 @@ export const PoliticalActionMoves = {
         events.endTurn();
     },
 
-    // CORE-01-04-20–22: ConvertResources via Grassroots tile
+    /**
+     * Converts resources via a grassroots tile.
+     * @rule CORE-01-04-20
+     * @rule CORE-01-04-22
+     * @rule CORE-01-04-22K
+     * @rule CORE-01-04-22L
+     * @deterministic
+     * @sideEffects
+     */
     convertResources: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('convertResources', convertResourcesPayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;

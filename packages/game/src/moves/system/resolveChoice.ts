@@ -4,7 +4,12 @@ import { EffectResolver } from '../../engine/resolver';
 import { resolveChoicePayloadSchema, validateMovePayload } from '../../move-contracts';
 
 export const SystemMoves = {
-    // SYSTEM: Multi-stage Choice Resolution
+    /**
+     * Resolves a pending choice for a player.
+     * @remarks infrastructure; no direct SPEC binding
+     * @deterministic
+     * @sideEffects
+     */
     resolveChoice: ({ G, ctx }: any, payload: unknown) => {
         const validated = validateMovePayload('resolveChoice', resolveChoicePayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;

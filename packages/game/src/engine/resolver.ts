@@ -27,7 +27,10 @@ export class EffectResolver {
     ];
 
     /**
-     * Entry point: Run the effect queue until empty or paused by choice.
+     * Triggers a hook and resolves the resulting effects.
+     * @remarks infrastructure; no direct SPEC binding
+     * @deterministic
+     * @sideEffects
      */
     public static triggerHook(G: GameState & { engine: EngineState }, ctx: any, hook: HookPoint, payload?: any): void {
         const modifiers = G.engine.activeModifiers
@@ -69,6 +72,12 @@ export class EffectResolver {
         return true;
     }
 
+    /**
+     * Increments the usage count for an action.
+     * @remarks infrastructure; no direct SPEC binding
+     * @deterministic
+     * @sideEffects
+     */
     public static incrementUsage(G: GameState & { engine: EngineState }, actionType: string, playerId: string): void {
         if (!G.engine.attributes.usage) G.engine.attributes.usage = {};
         const usage = G.engine.attributes.usage;
@@ -78,6 +87,12 @@ export class EffectResolver {
         usage[actionType] = (usage[actionType] || 0) + 1;
     }
 
+    /**
+     * Resets turn-scoped usage for a player.
+     * @remarks infrastructure; no direct SPEC binding
+     * @deterministic
+     * @sideEffects
+     */
     public static resetTurnScopedUsage(G: GameState & { engine: EngineState }, playerId: string): void {
         const usage = G.engine.attributes.usage;
         if (!usage) return;
@@ -103,6 +118,12 @@ export class EffectResolver {
         }
     }
 
+    /**
+     * Resets round-scoped usage.
+     * @remarks infrastructure; no direct SPEC binding
+     * @deterministic
+     * @sideEffects
+     */
     public static resetRoundScopedUsage(G: GameState & { engine: EngineState }): void {
         const usage = G.engine.attributes.usage;
         if (!usage) return;
@@ -120,6 +141,12 @@ export class EffectResolver {
         return validateCostImpl(G, _ctx, costSpec);
     }
 
+    /**
+     * Commits a cost by moving resources to the bank.
+     * @remarks infrastructure; no direct SPEC binding
+     * @deterministic
+     * @sideEffects
+     */
     public static commitCost(
         G: GameState & { engine: EngineState },
         _ctx: any,
@@ -138,6 +165,12 @@ export class EffectResolver {
         return getExtraCostSlotsImpl(G, pid, actionType, tileId, options);
     }
 
+    /**
+     * Checks and pays costs for an action.
+     * @remarks infrastructure; no direct SPEC binding
+     * @deterministic
+     * @sideEffects
+     */
     public static checkAndPayCosts(
         G: GameState & { engine: EngineState },
         pid: string,
@@ -149,6 +182,12 @@ export class EffectResolver {
         return checkAndPayCostsImpl(G, pid, actionType, tileId, extraResourceIds, options);
     }
 
+    /**
+     * Resolves the effect queue.
+     * @remarks infrastructure; no direct SPEC binding
+     * @deterministic
+     * @sideEffects
+     */
     public static resolve(G: GameState & { engine: EngineState }, ctx: any): boolean {
         const engine = G.engine;
         let ok = true;

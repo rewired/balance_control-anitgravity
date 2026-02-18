@@ -5,6 +5,12 @@ export interface MajorityResult {
     winners: string[];
 }
 
+/**
+ * Computes the relative majority for a given tile.
+ * @rule CORE-01-05-03A
+ * @deterministic
+ * @pure
+ */
 export function computeMajority(tileId: string, G: GameState, visited: Set<string> = new Set()): MajorityResult {
     // CORE-01-08-05: Start Committee cannot be controlled
     const tile = G.tiles[tileId];
