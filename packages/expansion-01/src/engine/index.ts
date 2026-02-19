@@ -8,7 +8,7 @@ const CORE_ZONES = {
     Board: 'Board'
 } as const;
 
-const MEASURE_IDS = [
+export const MEASURE_IDS = [
     'M01', 'M02', 'M03', 'M04', 'M05',
     'M06', 'M07', 'M08', 'M09', 'M10'
 ];
@@ -25,6 +25,130 @@ const MEASURE_DETAILS: Record<string, { name: string, cost: Record<string, numbe
     'M09': { name: 'Investment Freeze', cost: { ECO: 2, INF: 1 } },
     'M10': { name: 'Supplemental Budget', cost: { ECO: 1 } },
 };
+
+export const MEASURE_ATOM_BUILDERS: Record<string, (G: GameState, payload: any) => any[] | null> = {
+    'M01': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 3, resorts: ['DOM', 'ECO', 'INF'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, `M01_${payload.targetTileId}`),
+                sourceId: 'M01',
+                hook: 'onSettlement', // Or a new hook for hotspots
+                effect: { kind: 'hotspot.prohibit', tileId: payload.targetTileId, window: 'thisTurn' },
+                expiry: 'thisTurn',
+                targetTileId: payload.targetTileId
+            }
+        }
+    ],
+    'M02': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M02'].cost.ECO, resorts: ['ECO', 'FOR'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, `M02_${payload.targetTileId}`),
+                sourceId: 'M02',
+                hook: 'onProduction',
+                priority: 100, // Doubling runs early
+                effect: {
+                    kind: 'resource.grant',
+                    playerId: 'CONTROLLER',
+                    missingController: 'SKIP',
+                    amount: 'CONTEXT_BASE',
+                    resort: 'CONTEXT_RESORT',
+                    context: { tileId: payload.targetTileId }
+                },
+                expiry: 'thisRound',
+                targetTileId: payload.targetTileId
+            }
+        }
+    ],
+    'M03': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M03'].cost.ECO, resorts: ['ECO'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, 'M03'),
+                sourceId: 'M03',
+                hook: 'beforeAction',
+                effect: { kind: 'rule.prohibit', actionType: 'CONVERT', targetResort: 'ECO' },
+                expiry: 'thisRound'
+            }
+        }
+    ],
+    'M04': (G, payload) => buildM04M05(G, 'M04', payload),
+    'M05': (G, payload) => buildM04M05(G, 'M05', payload),
+    'M06': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M06'].cost.ECO, resorts: ['ECO'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, `M06_${payload.targetPlayerId}`),
+                sourceId: 'M06',
+                hook: 'beforeAction',
+                priority: 10,
+                playerId: payload.targetPlayerId,
+                effect: { kind: 'resource.pay', playerId: payload.targetPlayerId, amount: 1, resorts: ['ANY'] },
+                expiry: 'thisTurn'
+            }
+        }
+    ],
+    'M07': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M07'].cost.ECO, resorts: ['DOM', 'ECO'] },
+        { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M07'].cost.ECO, resorts: ['ECO'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, 'M07'),
+                sourceId: 'M07',
+                hook: 'beforeAction',
+                effect: { kind: 'rule.prohibit', actionType: 'convertResources' },
+                expiry: 'nextRound'
+            }
+        }
+    ],
+    'M08': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M08'].cost.ECO, resorts: ['ECO'] },
+        { kind: 'rule.attribute', attribute: `ecoSubstitute:${payload.playerId}`, value: true }
+    ],
+    'M09': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M09'].cost.ECO, resorts: ['ECO', 'INF'] },
+        { kind: 'rule.attribute', attribute: `ignoreMeasureModifiers:${payload.targetPlayerId}`, value: true }
+    ],
+    'M10': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M10'].cost.ECO, resorts: ['ECO'] },
+        { kind: 'rule.attribute', attribute: `ignoreCostIncrease:${payload.playerId}`, value: true, context: { expiry: 'thisTurn' } }
+    ],
+};
+
+function buildM04M05(G: GameState, measureId: string, payload: any): any[] | null {
+    const details = MEASURE_DETAILS[measureId];
+    const costResorts = measureId === 'M04' ? ['ECO', 'DOM'] : ['ECO', 'INF'];
+    const costAmount = (details.cost.ECO || 0) + (details.cost.DOM || 0) + (details.cost.INF || 0);
+    return [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: costAmount, resorts: costResorts },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, `${measureId}_${payload.targetTileId}`),
+                sourceId: measureId,
+                hook: 'onProduction',
+                priority: 10, // Reductions run after doubling
+                effect: {
+                    kind: 'resource.grant',
+                    playerId: 'CONTROLLER',
+                    missingController: 'SKIP',
+                    amount: -1,
+                    resort: 'CONTEXT_RESORT',
+                    context: { tileId: payload.targetTileId }
+                },
+                expiry: 'thisRound',
+                targetTileId: payload.targetTileId
+            }
+        }
+    ];
+}
+
 
 export const Expansion01: ExpansionDefinition = {
     id: 'exp01',
@@ -136,135 +260,8 @@ export const Expansion01: ExpansionDefinition = {
     },
 
     getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
-        switch (measureId) {
-            case 'M01': // Budget Compromise
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 3, resorts: ['DOM', 'ECO', 'INF'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, `M01_${payload.targetTileId}`),
-                            sourceId: 'M01',
-                            hook: 'onSettlement', // Or a new hook for hotspots
-                            effect: { kind: 'hotspot.prohibit', tileId: payload.targetTileId, window: 'thisTurn' },
-                            expiry: 'thisTurn',
-                            targetTileId: payload.targetTileId
-                        }
-                    }
-                ];
-            case 'M02': // Economic Stimulus
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M02'].cost.ECO, resorts: ['ECO', 'FOR'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, `M02_${payload.targetTileId}`),
-                            sourceId: 'M02',
-                            hook: 'onProduction',
-                            priority: 100, // Doubling runs early
-                            effect: {
-                                kind: 'resource.grant',
-                                playerId: 'CONTROLLER',
-                                missingController: 'SKIP',
-                                amount: 'CONTEXT_BASE',
-                                resort: 'CONTEXT_RESORT',
-                                context: { tileId: payload.targetTileId }
-                            },
-                            expiry: 'thisRound',
-                            targetTileId: payload.targetTileId
-                        }
-                    }
-                ];
-            case 'M03': // Collective Bargaining
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M03'].cost.ECO, resorts: ['ECO'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, 'M03'),
-                            sourceId: 'M03',
-                            hook: 'beforeAction',
-                            effect: { kind: 'rule.prohibit', actionType: 'CONVERT', targetResort: 'ECO' },
-                            expiry: 'thisRound'
-                        }
-                    }
-                ];
-            case 'M04': // Subsidy Reduction
-            case 'M05': // Location Debate
-                const costM04 = MEASURE_DETAILS['M04'].cost;
-                const costM05 = MEASURE_DETAILS['M05'].cost;
-                const costResorts = measureId === 'M04' ? ['ECO', 'DOM'] : ['ECO', 'INF'];
-                const costAmount = measureId === 'M04' ? costM04.ECO + (costM04.DOM || 0) : costM05.ECO + (costM05.INF || 0);
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: costAmount, resorts: costResorts },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, `${measureId}_${payload.targetTileId}`),
-                            sourceId: measureId,
-                            hook: 'onProduction',
-                            priority: 10, // Reductions run after doubling
-                            effect: {
-                                kind: 'resource.grant',
-                                playerId: 'CONTROLLER',
-                                missingController: 'SKIP',
-                                amount: -1,
-                                resort: 'CONTEXT_RESORT',
-                                context: { tileId: payload.targetTileId }
-                            },
-                            expiry: 'thisRound',
-                            targetTileId: payload.targetTileId
-                        }
-                    }
-                ];
-            case 'M06': // Budget Deficit
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M06'].cost.ECO, resorts: ['ECO'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, `M06_${payload.targetPlayerId}`),
-                            sourceId: 'M06',
-                            hook: 'beforeAction',
-                            priority: 10,
-                            playerId: payload.targetPlayerId,
-                            effect: { kind: 'resource.pay', playerId: payload.targetPlayerId, amount: 1, resorts: ['ANY'] },
-                            expiry: 'thisTurn'
-                        }
-                    }
-                ];
-            case 'M07': // Debt Brake
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M07'].cost.ECO, resorts: ['DOM', 'ECO'] },
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M07'].cost.ECO, resorts: ['ECO'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, 'M07'),
-                            sourceId: 'M07',
-                            hook: 'beforeAction',
-                            effect: { kind: 'rule.prohibit', actionType: 'convertResources' },
-                            expiry: 'nextRound'
-                        }
-                    }
-                ];
-            case 'M08': // Economic Council
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M08'].cost.ECO, resorts: ['ECO'] },
-                    { kind: 'rule.attribute', attribute: `ecoSubstitute:${payload.playerId}`, value: true }
-                ];
-            case 'M09': // Investment Freeze
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M09'].cost.ECO, resorts: ['ECO', 'INF'] },
-                    { kind: 'rule.attribute', attribute: `ignoreMeasureModifiers:${payload.targetPlayerId}`, value: true }
-                ];
-            case 'M10': // Supplemental Budget (active for this turn)
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: MEASURE_DETAILS['M10'].cost.ECO, resorts: ['ECO'] },
-                    { kind: 'rule.attribute', attribute: `ignoreCostIncrease:${payload.playerId}`, value: true, context: { expiry: 'thisTurn' } }
-                ];
-        }
-        return null;
+        const builder = MEASURE_ATOM_BUILDERS[measureId];
+        return builder ? builder(G, payload) : null;
     },
 
     effectHandlers: {
