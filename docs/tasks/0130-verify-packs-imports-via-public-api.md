@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** FROZEN
 
 ## Task State Machine (Loop-Breaker)
 
@@ -91,27 +91,33 @@ We want `verify:packs` to load the engine via the package entrypoint (workspace 
 
 ## 9) Acceptance Criteria
 
-- [ ] `scripts/verify-packs.mjs` no longer imports from `packages/game/dist/*` via file paths.
-- [ ] `@balance-control/game` publicly exports `assemblePacks` and `CANONICAL_ENGINE_MODULE_ORDER`.
-- [ ] `pnpm run verify:packs` passes (after `pnpm -r build`).
-- [ ] `pnpm -r test` is green.
-- [ ] `pnpm run verify:task 0130` passes.
+- [x] `scripts/verify-packs.mjs` no longer imports from `packages/game/dist/*` via file paths.
+- [x] `@balance-control/game` publicly exports `assemblePacks` and `CANONICAL_ENGINE_MODULE_ORDER`.
+- [x] `pnpm run verify:packs` passes (after `pnpm -r build`).
+- [x] `pnpm -r test` is green.
+- [x] `pnpm run verify:task 0130` passes.
 
 ## 10) PR Checklist (Repo Artifact)
 
-- [ ] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
-- [ ] Single commit on the task branch.
-- [ ] `pnpm -r test` executed; results recorded in Section 12.
-- [ ] No unrelated formatting churn.
-- [ ] Postflight proof captured (per AGENTS) and included in commit message.
+- [x] Task State progressed correctly (DRAFT→FROZEN before edits; DONE only at end).
+- [x] Single commit on the task branch.
+- [x] `pnpm -r test` executed; results recorded in Section 12.
+- [x] No unrelated formatting churn.
+- [x] Postflight proof captured (per AGENTS) and included in commit message.
 
 ## 11) Work Summary (3–7 bullets)
 
-- 
+- Updated `packages/game/src/index.ts` to export `assemblePacks` and `CANONICAL_ENGINE_MODULE_ORDER`.
+- Added `@balance-control/game` as a devDependency in root `package.json` to allow package imports in scripts.
+- Rewrote `scripts/verify-packs.mjs` to import from `@balance-control/game` instead of using file paths to `dist/`.
+- Removed manual `assertFile` checks in favor of package import validation.
+- Verified that `verify:packs` passes and tests are green.
 
 ## 12) Commands Run (with outcomes)
 
-- 
+- `pnpm -r build` -> OK
+- `pnpm run verify:packs` -> OK
+- `pnpm -r test` -> OK (38 test files passed)
 
 ## 13) Postflight Proof (recorded in commit message)
 

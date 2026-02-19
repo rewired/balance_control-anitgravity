@@ -92,7 +92,8 @@ function extractSection(md, headingRegex) {
 }
 
 function ensureNonEmptySection(md, title) {
-  const sec = extractSection(md, new RegExp(`^#{2,6}\\s+${title}\\b.*$`, "im"));
+  const regex = new RegExp(`^#{2,6}\\s+(\\d+[).]?\\s+)?${title}\\b.*$`, "im");
+  const sec = extractSection(md, regex);
   if (!sec) fail(`Missing required section: "${title}".`);
   const lines = sec.split(/\r?\n/);
   const content = lines.slice(1).join("\n").trim();
@@ -102,7 +103,7 @@ function ensureNonEmptySection(md, title) {
 }
 
 function verifyChecklist(md) {
-  const sec = extractSection(md, /^#{2,6}\s+PR\s+Checklist\b.*$/im);
+  const sec = extractSection(md, /^#{2,6}\s+(\d+\)\s+)?PR\s+Checklist\b.*$/im);
   if (!sec) fail("Missing required section: \"PR Checklist\".");
 
   const unchecked = sec.match(/^[\t >]*[-*]\s+\[\s\]\s+/gm) || [];

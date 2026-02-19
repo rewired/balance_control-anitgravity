@@ -11,12 +11,6 @@ function ok(msg) {
   console.log(`[verify-packs] OK: ${msg}`);
 }
 
-function assertFile(filePath, label) {
-  if (!fs.existsSync(filePath)) {
-    fail(`${label} not found: ${filePath}. Run "pnpm -C packages/game build" first.`);
-  }
-}
-
 function expect(condition, message) {
   if (!condition) fail(message);
 }
@@ -26,22 +20,23 @@ function getFlagConfig(expansions) {
 }
 
 async function main() {
-  const distDir = path.resolve("packages", "game", "dist");
-  const indexFile = path.join(distDir, "index.js");
-  const assemblyFile = path.join(distDir, "move-assembly.js");
-  const registryFile = path.join(distDir, "expansion-registry.js");
+  let gameModule;
+  try {
+    gameModule = await import("@balance-control/game");
+  } catch (e) {
+    fail(`Could not import @balance-control/game. Run "pnpm -r build" first.\nOriginal error: ${e.message}`);
+  }
 
-  assertFile(indexFile, "Game bundle");
-  assertFile(assemblyFile, "Move assembly bundle");
-  assertFile(registryFile, "Expansion registry bundle");
-
-  const gameModule = await import(pathToFileURL(indexFile));
-  const assemblyModule = await import(pathToFileURL(assemblyFile));
-  const registryModule = await import(pathToFileURL(registryFile));
-
-  const { EnginePackRegistry, CorePack, Exp01Pack, Exp02Pack, Exp03Pack, getPublicSurfaceHash } = gameModule;
-  const { assemblePacks } = assemblyModule;
-  const { CANONICAL_ENGINE_MODULE_ORDER } = registryModule;
+  const {
+    EnginePackRegistry,
+    CorePack,
+    Exp01Pack,
+    Exp02Pack,
+    Exp03Pack,
+    getPublicSurfaceHash,
+    assemblePacks,
+    CANONICAL_ENGINE_MODULE_ORDER
+  } = gameModule;
 
   EnginePackRegistry.clear();
   EnginePackRegistry.registerPack(CorePack);
