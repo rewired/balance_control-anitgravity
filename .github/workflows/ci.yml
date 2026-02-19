@@ -49,6 +49,9 @@ jobs:
       - name: Run documentation verification
         run: pnpm run verify:docs
 
+      - name: Run hand-off verification
+        run: pnpm run verify:handoff
+
       - name: Run test suite
         run: pnpm -w test
 
