@@ -6,7 +6,7 @@
 >
 > **BASE CONTRACTS:** AGENTS.md + ARCH-01..05
 >
-> **LAST COMPLETED TASK:** 0138
+> **LAST COMPLETED TASK:** 0141
 >
 > **CURRENT STATE (facts):**
 >
@@ -23,7 +23,7 @@
 >
 > - (None currently)
 >
-> **NEXT PACKET GOAL:** Refresh the Task Packet Protocol so the Context Capsule cannot go stale.
+> **NEXT PACKET GOAL:** Reintroduce **golden replays** as the canonical integration gate (public API + real packs), and keep engine tests pack-agnostic.
 >
 > **CONSTRAINTS:**
 >
@@ -37,7 +37,7 @@
 
 ## Last done
 
-- **Task:** 0138
+- **Task:** 0141
 - **Date:** 2026-02-19
 
 ## Current state (facts)
@@ -55,7 +55,7 @@
 
 ### Binding
 
-- **Pack split:** Option 2. Rule code may live in pack packages (`packages/expansion-*`), but the engine remains the only executor. (`ARCH-01` already reflects this.)
+- **Pack split:** Option 2. Rule code may live in pack packages (`packages/expansion-*`), but the engine remains the only executor. (`ARCH-01` reflects this.)
 - **Canonical Pack Entrypoint:** `@balance-control/packs` is the single source of truth for app wiring.
 - **EnginePackRegistry Location:** Stays in `packages/game` as the kernel registry mechanism.
 
@@ -72,12 +72,19 @@
 
 ## Next packet goal
 
-**Refresh Protocol:** Refresh the Task Packet Protocol so the Context Capsule cannot go stale.
+**Golden replays as an integration gate:**
+
+- Put the authoritative golden replay fixtures + runner in `packages/integration-tests`.
+- Ensure `audit:spec` runs that runner (public APIs + real packs).
+- Keep `packages/game/test` pack-agnostic and focused on engine invariants.
 
 ## Mini diff map (likely touched)
 
-- `docs/hand-off/task-packet-protocol.md`
+- `packages/integration-tests/test/golden/*`
+- `packages/integration-tests/test/golden-replay.test.ts`
+- `packages/integration-tests/scripts/*` (new)
+- `packages/integration-tests/package.json`
+- `package.json` (root: `audit:spec`)
+- `packages/game/test/golden-replay.test.ts` (delete)
+- `packages/game/test/golden/*` (delete)
 - `docs/hand-off/current.md`
-- `scripts/verify-handoff.mjs` (if we add a staleness tripwire)
-- `package.json` (if we add a `verify:handoff` script)
-- `.github/workflows/ci.yml` (if we wire the tripwire into CI)
