@@ -1,7 +1,4 @@
 {
-  "id": "core_only_3p_2rounds",
-  "seed": "golden-core-3p-2rounds",
-  "numPlayers": 3,
   "config": {
     "expansions": {
       "ex01": false,
@@ -9,32 +6,123 @@
       "ex03": false
     }
   },
+  "expectedFinalHash": "17a145d0bcae25543fbcc9d37b156d8377ee72b2a24d34b6981150b6adbf8b9c",
+  "expectedPublicSurfaceHash": "ac11f9da4045a3512d4a62e99eb0ec23a1b2e386fc388bd8a14171620a9befd4",
+  "id": "core_only_3p_2rounds",
+  "moves": [
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    }
+  ],
+  "notes": {
+    "previousExpectedFinalHash": "716ad9b3870deab369002d989dc24abf502c3060328677f9ab1bddeaaa8b081c",
+    "updatedFor": "CORE-01 v1.0.20 migration"
+  },
+  "numPlayers": 3,
   "prelude": [
-    { "action": "stackDrawPileByType", "tileType": "Committee", "count": 1 }
+    {
+      "action": "stackDrawPileByType",
+      "count": 1,
+      "tileType": "Committee"
+    }
   ],
   "rulesetManifest": {
     "coreVersion": "v1.1.0",
     "expansions": {},
     "specAnchorHash": "5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3"
   },
-  "notes": {
-    "updatedFor": "CORE-01 v1.0.20 migration",
-    "previousExpectedFinalHash": "716ad9b3870deab369002d989dc24abf502c3060328677f9ab1bddeaaa8b081c"
-  },
-  "moves": [
-    { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "placeTile", "args": [{ "targetCoord": "0,-1" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "placeTile", "args": [{ "targetCoord": "-1,1" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] }
-  ],
-  "expectedFinalHash": "17a145d0bcae25543fbcc9d37b156d8377ee72b2a24d34b6981150b6adbf8b9c",
-  "expectedPublicSurfaceHash": "ac11f9da4045a3512d4a62e99eb0ec23a1b2e386fc388bd8a14171620a9befd4"
+  "seed": "golden-core-3p-2rounds"
 }

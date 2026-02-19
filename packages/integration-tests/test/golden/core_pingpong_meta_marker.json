@@ -1,7 +1,4 @@
 {
-  "id": "core_pingpong_meta_marker",
-  "seed": "golden-core-pingpong-meta",
-  "numPlayers": 2,
   "config": {
     "expansions": {
       "ex01": false,
@@ -9,39 +6,86 @@
       "ex03": false
     }
   },
-  "notes": {
-    "purpose": "Exercise PingPong meta-marker Move penalty (resources to Noise)",
-    "updatedFor": "CORE-01 v1.1.0"
-  },
-  "prelude": [
-    {
-      "action": "stackDrawPileByType",
-      "tileType": "Resort",
-      "count": 1
-    },
-    {
-      "action": "seedResources",
-      "playerId": "0",
-      "resort": "DOM",
-      "count": 20
-    }
-  ],
+  "expectedFinalHash": "bd563664dd7922b0bd889c5ce1b17f933c81b23fb3ca78eecab43097b87c3e77",
+  "expectedPublicSurfaceHash": "ac11f9da4045a3512d4a62e99eb0ec23a1b2e386fc388bd8a14171620a9befd4",
+  "id": "core_pingpong_meta_marker",
   "moves": [
-    { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
-    { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "1,-1" }] },
-    { "move": "placeTile", "args": [{ "targetCoord": "0,-1" }] },
-    { "move": "moveInfluence", "args": [{ "sourceCoord": "1,0", "targetCoord": "1,-1" }] },
-    { "move": "placeTile", "args": [{ "targetCoord": "0,1" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "0,1" }] },
-    { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
     {
-      "move": "moveInfluence",
       "args": [
         {
-          "sourceCoord": "1,-1",
-          "targetCoord": "1,0",
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,-1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "sourceCoord": "1,0",
+          "targetCoord": "1,-1"
+        }
+      ],
+      "move": "moveInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
           "extraResourceIds": [
             "pre_res_0_DOM_1",
             "pre_res_0_DOM_2",
@@ -53,13 +97,47 @@
             "pre_res_0_DOM_8",
             "pre_res_0_DOM_9",
             "pre_res_0_DOM_10"
-          ]
+          ],
+          "sourceCoord": "1,-1",
+          "targetCoord": "1,0"
         }
-      ]
+      ],
+      "move": "moveInfluence"
     },
-    { "move": "placeTile", "args": [{ "targetCoord": "-1,1" }] },
-    { "move": "placeInfluence", "args": [{ "targetCoord": "-1,1" }] }
+    {
+      "args": [
+        {
+          "targetCoord": "-1,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,1"
+        }
+      ],
+      "move": "placeInfluence"
+    }
   ],
-  "expectedFinalHash": "bd563664dd7922b0bd889c5ce1b17f933c81b23fb3ca78eecab43097b87c3e77",
-  "expectedPublicSurfaceHash": "ac11f9da4045a3512d4a62e99eb0ec23a1b2e386fc388bd8a14171620a9befd4"
+  "notes": {
+    "purpose": "Exercise PingPong meta-marker Move penalty (resources to Noise)",
+    "updatedFor": "CORE-01 v1.1.0"
+  },
+  "numPlayers": 2,
+  "prelude": [
+    {
+      "action": "stackDrawPileByType",
+      "count": 1,
+      "tileType": "Resort"
+    },
+    {
+      "action": "seedResources",
+      "count": 20,
+      "playerId": "0",
+      "resort": "DOM"
+    }
+  ],
+  "seed": "golden-core-pingpong-meta"
 }

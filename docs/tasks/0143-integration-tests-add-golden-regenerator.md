@@ -115,19 +115,23 @@ This task adds a small Node script that replays fixtures and rewrites only the e
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Integration tests pass (`pnpm -C packages/integration-tests test`)
-- [ ] `golden:check` passes
-- [ ] `golden:update` is idempotent
-- [ ] No rules changes (SPEC-anchored)
+- [x] Integration tests pass (`pnpm -C packages/integration-tests test`)
+- [x] `golden:check` passes
+- [x] `golden:update` is idempotent
+- [x] No rules changes (SPEC-anchored)
 - [ ] Updated docs/hand-off/current.md if any fact/decision changed
 
 ## 11) Work Summary (fill after implementation)
 
--
+- Implemented `packages/integration-tests/scripts/update-golden.mjs` using `@balance-control/game` and `boardgame.io/dist/cjs/client.js` for Node ESM compatibility.
+- Added scripts to `packages/integration-tests/package.json`: `golden:update` and `golden:check`.
+- Verified that the tool correctly identifies stale hashes and updates them deterministically with stable key sorting.
 
 ## 12) Commands Run (fill after implementation)
 
--
+- `pnpm -C packages/integration-tests golden:check`
+- `pnpm -C packages/integration-tests golden:update`
+- `pnpm -C packages/integration-tests test`
 
 ## 13) Postflight (fill after implementation)
 

@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "test": "vitest run --no-threads --sequence.concurrent false"
+    "test": "vitest run --no-threads --sequence.concurrent false",
+    "golden:update": "node scripts/update-golden.mjs --write",
+    "golden:check": "node scripts/update-golden.mjs --check"
   },
   "dependencies": {
     "@balance-control/game": "workspace:*",
