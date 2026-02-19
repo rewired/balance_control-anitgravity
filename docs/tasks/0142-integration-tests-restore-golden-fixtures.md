@@ -96,18 +96,22 @@ This task restores the **real** golden fixtures in the integration test package,
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Integration tests pass (`pnpm -C packages/integration-tests test`)
-- [ ] No rules changes (SPEC-anchored)
-- [ ] Golden fixtures are deterministic and filenames are sorted
+- [x] Integration tests pass (`pnpm -C packages/integration-tests test`)
+- [x] No rules changes (SPEC-anchored)
+- [x] Golden fixtures are deterministic and filenames are sorted
 - [ ] Updated docs/hand-off/current.md if any fact/decision changed
 
 ## 11) Work Summary (fill after implementation)
 
--
+- Ported `core_only_3p_2rounds.json`, `core_pingpong_meta_marker.json`, and `production_uncontrolled_produces_zero.json` from `packages/game/test/golden/` to `packages/integration-tests/test/golden/`.
+- Deleted placeholder `dummy.json` in integration tests.
+- Verified that `packages/integration-tests/test/golden-replay.test.ts` passes with these fixtures.
 
 ## 12) Commands Run (fill after implementation)
 
--
+- `cp packages/game/test/golden/*.json packages/integration-tests/test/golden/`
+- `rm packages/integration-tests/test/golden/dummy.json`
+- `pnpm -C packages/integration-tests test`
 
 ## 13) Postflight (fill after implementation)
 

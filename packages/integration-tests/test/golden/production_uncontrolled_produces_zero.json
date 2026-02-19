@@ -1,0 +1,32 @@
+{
+  "id": "production_uncontrolled_produces_zero",
+  "seed": "golden-production-uncontrolled-zero",
+  "numPlayers": 2,
+  "config": {
+    "expansions": {
+      "ex01": false,
+      "ex02": false,
+      "ex03": false
+    }
+  },
+  "prelude": [
+    { "action": "stackDrawPileByType", "tileType": "Resort", "count": 3 },
+    { "action": "stackDrawPileByType", "tileType": "Committee", "count": 1 }
+  ],
+  "notes": {
+    "updatedFor": "CORE-01 v1.0.20 migration",
+    "previousExpectedFinalHash": "609372d9b0bd8b8272ed1e87f77668f7c0f9d7957f4b9ddf923deeace8e29f1c"
+  },
+  "moves": [
+    { "move": "placeTile", "args": [{ "targetCoord": "1,0" }] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
+    { "move": "placeTile", "args": [{ "targetCoord": "1,-1" }] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
+    { "move": "placeTile", "args": [{ "targetCoord": "0,-1" }] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] },
+    { "move": "placeTile", "args": [{ "targetCoord": "-1,0" }] },
+    { "move": "placeInfluence", "args": [{ "targetCoord": "1,0" }] }
+  ],
+  "expectedFinalHash": "0df25fbac1efe9373a475f466c0808354f9624db730601ef992006663db7145d",
+  "expectedPublicSurfaceHash": "ac11f9da4045a3512d4a62e99eb0ec23a1b2e386fc388bd8a14171620a9befd4"
+}
