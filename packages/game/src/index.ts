@@ -240,3 +240,6 @@ export * from './hash-state';
 export * from './surface';
 export * from './engine/legal-intents';
 export { selectTileController } from './public-selectors';
+export { assemblePacks } from './move-assembly';
+export { CANONICAL_ENGINE_MODULE_ORDER } from './expansion-registry';
+
