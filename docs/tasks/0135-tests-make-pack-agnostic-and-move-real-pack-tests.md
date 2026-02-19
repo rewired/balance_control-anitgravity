@@ -125,27 +125,35 @@ The desired split is:
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Game tests pass (`pnpm -C packages/game test`)
-- [ ] Integration tests pass (`pnpm -C packages/integration-tests test`)
-- [ ] No rules changes (SPEC-anchored)
-- [ ] `packages/game/test` contains no real expansion imports
-- [ ] Updated docs/hand-off/current.md if any decision/fact changed
+- [x] Game tests pass (`pnpm -C packages/game test`)
+- [x] Integration tests pass (`pnpm -C packages/integration-tests test`)
+- [x] No rules changes (SPEC-anchored)
+- [x] `packages/game/test` contains no real expansion imports
+- [x] Updated docs/hand-off/current.md if any decision/fact changed
 
 ## 11) Work Summary (fill after implementation)
 
-- 
+- Created `packages/game/test/_helpers/dummyPacks.ts` to create dummy expansion packs for testing.
+- Refactored `packages/game/test` to use dummy packs instead of importing real packs (`Exp01Pack`, etc.).
+- Moved real-pack dependent golden replay tests to `packages/integration-tests/test/golden-replay.test.ts`.
+- Moved expansion golden fixtures to `packages/integration-tests/test/golden/`.
+- Updated `packages/game/test/golden-replay.test.ts` to run only core-only scenarios using dummy/core packs.
+- Removed all imports of `@balance-control/expansion-*` and `src/packs/exp0*` from `packages/game/test`.
+- Verified that `packages/game` tests pass and `packages/integration-tests` pass.
 
 ## 12) Commands Run (fill after implementation)
 
-- 
+- `pnpm -C packages/game test` (Passed)
+- `pnpm -C packages/integration-tests test` (Passed)
+- `grep -r "Exp0[1-3]Pack" packages/game/test` (No imports found)
 
 ## 13) Postflight (fill after implementation)
 
-- 
+-
 
 ## 14) Patch Notes (fill after implementation)
 
-- 
+-
 
 ## 15) Downstream follow-ups
 

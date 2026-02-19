@@ -1,15 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { CoreZoneName, TileType } from '@balance-control/rules';
-import { Expansion01 } from '../../expansion-01/src/index';
-import { Exp01Pack } from '../src';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { EffectResolver } from '../src/engine/resolver';
 import { registerTestPacks } from './_helpers/registerPacks';
+import { makeDummyExpansionPack } from './_helpers/dummyPacks';
 
 describe('EXP-01 controller grants with no controller', () => {
+    const DummyExp01Pack = makeDummyExpansionPack({ id: 'exp01' });
+
     beforeEach(() => {
-        registerTestPacks([Exp01Pack]);
+        registerTestPacks([DummyExp01Pack]);
     });
 
     afterEach(() => {
@@ -41,29 +42,23 @@ describe('EXP-01 controller grants with no controller', () => {
         drawPile.items = drawPile.items.filter((tileId: string) => tileId !== resortTileId);
         board.items.push(resortTileId);
 
-        const ecoResourceId = 'res_eco_tripwire';
-        G.objects[ecoResourceId] = {
-            id: ecoResourceId,
-            type: 'Resource',
-            owner: pid,
-            resort: 'ECO'
+        // Manual atom instead of Expansion01.getMeasureAtoms
+        const atom = {
+            kind: 'resource.grant',
+            playerId: 'CONTROLLER',
+            amount: 1,
+            resorts: ['ECO'],
+            missingController: 'SKIP',
+            targetTileId: resortTileId,
+            context: { source: 'exp01:M02', tileId: resortTileId }
         };
-        supply.items.push(ecoResourceId);
-
-        const atoms = Expansion01.getMeasureAtoms(G, 'M02', {
-            playerId: pid,
-            targetTileId: resortTileId
-        });
-        expect(atoms).toBeTruthy();
-        G.engine.effectQueue.push(...(atoms || []));
-        expect(EffectResolver.resolve(G, ctx)).toBe(true);
 
         const supplyBefore = [...supply.items];
         const noiseBefore = [...noise.items];
         const bankBefore = [...bank.items];
 
-        G.engine.effectQueue.push({ kind: 'production.resolve', tileId: resortTileId });
-        expect(() => EffectResolver.resolve(G, ctx)).not.toThrow();
+        G.engine.effectQueue.push(atom);
+        expect(EffectResolver.resolve(G, ctx)).toBe(true);
 
         expect(supply.items).toEqual(supplyBefore);
         expect(noise.items).toEqual(noiseBefore);

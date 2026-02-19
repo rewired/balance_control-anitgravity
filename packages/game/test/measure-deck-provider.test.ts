@@ -2,13 +2,54 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { lookupMeasureDeckForObjectId } from '../src/engine/measure-deck-provider';
-import { Exp02Pack, Exp03Pack, Exp01Pack } from '../src';
 import { registerTestPacks } from './_helpers/registerPacks';
-import { makeTestPack } from './_helpers/makeTestPack';
+import { makeDummyExpansionPack } from './_helpers/dummyPacks';
 
 describe('Measure deck provider lookup', () => {
+    const Exp01Pack = makeDummyExpansionPack({
+        id: 'exp01',
+        measureDecks: [{
+            id: 'measures',
+            objectIdPrefix: 'exp01_measure_',
+            zones: {
+                drawPileId: 'MeasureDrawPile',
+                openZoneId: 'OpenMeasures',
+                recyclePileId: 'MeasureRecyclePile',
+                finalDiscardId: 'MeasureFinalDiscard'
+            }
+        }]
+    });
+
+    const Exp02Pack = makeDummyExpansionPack({
+        id: 'exp02',
+        measureDecks: [{
+            id: 'measures',
+            objectIdPrefix: 'exp02_measure_',
+            zones: {
+                drawPileId: 'EXP02_MeasureDrawPile',
+                openZoneId: 'EXP02_OpenMeasures',
+                recyclePileId: 'EXP02_MeasureRecyclePile',
+                finalDiscardId: 'EXP02_MeasureFinalDiscard'
+            }
+        }]
+    });
+
+    const Exp03Pack = makeDummyExpansionPack({
+        id: 'exp03',
+        measureDecks: [{
+            id: 'measures',
+            objectIdPrefix: 'exp03_measure_',
+            zones: {
+                drawPileId: 'EXP03_MeasureDrawPile',
+                openZoneId: 'EXP03_OpenMeasures',
+                recyclePileId: 'EXP03_MeasureRecyclePile',
+                finalDiscardId: 'EXP03_MeasureFinalDiscard'
+            }
+        }]
+    });
+
     beforeEach(() => {
-        registerTestPacks([Exp02Pack, Exp03Pack, Exp01Pack]);
+        registerTestPacks([Exp01Pack, Exp02Pack, Exp03Pack]);
     });
 
     afterEach(() => {
@@ -85,7 +126,7 @@ describe('Measure deck provider lookup', () => {
 
     it('fails deterministically when multiple enabled decks match the same object id', () => {
         registerTestPacks([
-            makeTestPack({
+            makeDummyExpansionPack({
                 id: 'exp01',
                 name: 'Mock EXP-01',
                 measureDecks: [

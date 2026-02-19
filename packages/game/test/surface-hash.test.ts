@@ -3,11 +3,13 @@ import type { Ctx } from 'boardgame.io';
 import { getPublicSurface, getPublicSurfaceHash, validateSurfaceHash } from '../src/surface';
 import { SetupGame } from '../src/setup';
 import { registerTestPacks } from './_helpers/registerPacks';
-import { Exp01Pack } from '../src/packs/exp01';
-import { Exp02Pack } from '../src/packs/exp02';
-import { Exp03Pack } from '../src/packs/exp03';
+import { makeDummyExpansionPack } from './_helpers/dummyPacks';
 
 describe('Public surface hashing', () => {
+    const Exp01Pack = makeDummyExpansionPack({ id: 'exp01' });
+    const Exp02Pack = makeDummyExpansionPack({ id: 'exp02' });
+    const Exp03Pack = makeDummyExpansionPack({ id: 'exp03' });
+
     beforeEach(() => {
         registerTestPacks([Exp01Pack, Exp02Pack, Exp03Pack]);
     });

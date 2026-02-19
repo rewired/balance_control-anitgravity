@@ -2,11 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { Client } from 'boardgame.io/client';
-import { createBalanceControlGame } from '../src/index';
-import { SetupGame } from '../src/setup';
-import { hashState } from '../src/hash-state';
+import { createBalanceControlGame, hashState } from '@balance-control/game';
+import { registerCanonicalPacks } from '@balance-control/packs';
 import { CoreZoneName, TileType } from '@balance-control/rules';
-import { registerTestPacks } from './_helpers/registerPacks';
 
 interface GoldenMove {
     move: string;
@@ -148,14 +146,15 @@ function buildReplayGame(seed: string | number, numPlayers: number, config?: unk
             if (!ctx.numPlayers) {
                 ctx.numPlayers = numPlayers;
             }
-            const G = SetupGame({ ctx, setupData: config });
+            // Use baseGame.setup to avoid importing internal SetupGame
+            const G = baseGame.setup(ctx, config);
             applyPrelude(G, prelude);
             return G;
         },
     };
 }
 
-describe('Golden replays', () => {
+describe('Golden replays (Integration)', () => {
     const fixtures = loadGoldenFixtures();
 
     for (const fixture of fixtures) {
@@ -164,7 +163,8 @@ describe('Golden replays', () => {
             const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
             try {
-                registerTestPacks([]);
+                // Register all canonical packs (real packs)
+                registerCanonicalPacks();
 
                 const game = buildReplayGame(fixture.seed, fixture.numPlayers, fixture.config, fixture.prelude);
                 const client = Client({

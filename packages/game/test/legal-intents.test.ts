@@ -7,9 +7,8 @@ import { CoreMoves } from '../src/moves';
 import { drawTileToStaging } from '../src/mechanics-draw';
 import { registerTestPacks } from './_helpers/registerPacks';
 import { buildMovesForConfig } from '../src/move-assembly';
-import { Exp01Pack } from '../src/packs/exp01';
-import { Exp02Pack } from '../src/packs/exp02';
-import { Exp03Pack } from '../src/packs/exp03';
+import { makeDummyExpansionPack } from './_helpers/dummyPacks';
+import { takeMeasure } from '../src/_shared/measure-moves';
 
 function createCtx(stage: string) {
     return {
@@ -207,10 +206,37 @@ describe('enumerateLegalIntents', () => {
         expect(intents).toHaveLength(0);
     });
 
+
+    function createMeasureDummyPack(id: string) {
+        const zones = {
+            drawPileId: `${id}_MeasureDrawPile`,
+            openZoneId: `${id}_OpenMeasures`,
+            recyclePileId: `${id}_MeasureRecyclePile`,
+            finalDiscardId: `${id}_MeasureFinalDiscard`
+        };
+        return makeDummyExpansionPack({
+            id,
+            moves: { [`${id}.takeMeasure`]: takeMeasure },
+            zones: Object.values(zones),
+            measureDecks: [{
+                id: 'measures',
+                objectIdPrefix: `${id}_measure_`,
+                zones
+            }],
+            setup: {
+                preShuffle: (G: any) => {
+                    Object.values(zones).forEach(zoneId => {
+                        G.zones[zoneId] = { id: zoneId, name: zoneId, items: [] };
+                    });
+                }
+            }
+        });
+    }
+
     it('enumerates exp01 takeMeasure intents when exp01 is enabled', () => {
         assertTakeMeasureIntent(
             'exp01',
-            [Exp01Pack],
+            [createMeasureDummyPack('exp01')],
             { expansions: { ex01: true, ex02: false, ex03: false } }
         );
     });
@@ -218,7 +244,7 @@ describe('enumerateLegalIntents', () => {
     it('enumerates exp02 takeMeasure intents when exp02 is enabled', () => {
         assertTakeMeasureIntent(
             'exp02',
-            [Exp02Pack],
+            [createMeasureDummyPack('exp02')],
             { expansions: { ex01: false, ex02: true, ex03: false } }
         );
     });
@@ -226,7 +252,7 @@ describe('enumerateLegalIntents', () => {
     it('enumerates exp03 takeMeasure intents when exp03 is enabled', () => {
         assertTakeMeasureIntent(
             'exp03',
-            [Exp03Pack],
+            [createMeasureDummyPack('exp03')],
             { expansions: { ex01: false, ex02: false, ex03: true } }
         );
     });

@@ -4,14 +4,52 @@ import { EngineModuleRegistry } from '../src/engine/engine-module-registry';
 import { EffectResolver } from '../src/engine/resolver';
 import { TileType } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';
-import { Exp02Pack } from '../src/packs/exp02';
-import { Exp03Pack } from '../src/packs/exp03';
+import { makeDummyExpansionPack } from './_helpers/dummyPacks';
 
 function cloneJson<T>(value: T): T {
     return JSON.parse(JSON.stringify(value)) as T;
 }
 
 describe('REF_RESOLVER invariants (tripwires)', () => {
+    const Exp02Pack = makeDummyExpansionPack({
+        id: 'exp02',
+        engine: {
+            atoms: [{
+                kind: 'regulation.place',
+                handler: (G: any, ctx: any, atom: any) => {
+                    const { targetTileId } = atom;
+                    const supply = G.zones.RegulationSupply;
+                    const attached = G.zones.BoardAttached;
+                    const item = supply.items.pop();
+                    if (item) {
+                        attached.items.push(item);
+                        G.objects[item].targetTileId = targetTileId;
+                    }
+                }
+            }]
+        }
+    });
+
+    const Exp03Pack = makeDummyExpansionPack({
+        id: 'exp03',
+        engine: {
+            atoms: [{
+                kind: 'countdown.place',
+                handler: (G: any, ctx: any, atom: any) => {
+                    const { targetTileId, amount } = atom;
+                    const supply = G.zones.CountdownSupply;
+                    const tileZone = G.zones[targetTileId];
+                    const item = supply.items.pop();
+                    if (item) {
+                        tileZone.items.push(item);
+                        G.objects[item].targetTileId = targetTileId;
+                        G.objects[item].amount = amount;
+                    }
+                }
+            }]
+        }
+    });
+
     beforeEach(() => {
         registerTestPacks([Exp02Pack, Exp03Pack]);
     });
