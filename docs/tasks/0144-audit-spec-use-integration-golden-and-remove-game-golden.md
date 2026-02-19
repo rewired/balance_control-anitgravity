@@ -107,19 +107,25 @@ To keep the separation clean and future-proof:
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] `pnpm -w test` passes
-- [ ] `pnpm run audit:spec` passes
-- [ ] Golden replay enforcement remains in place (now via integration-tests)
-- [ ] No rules changes (SPEC-anchored)
+- [x] `pnpm -w test` passes
+- [x] `pnpm run audit:spec` passes
+- [x] Golden replay enforcement remains in place (now via integration-tests)
+- [x] No rules changes (SPEC-anchored)
 - [ ] Updated docs/hand-off/current.md if any fact/decision changed
 
 ## 11) Work Summary (fill after implementation)
 
--
+- Updated root `package.json` `audit:spec` to run the golden replay test from `packages/integration-tests` instead of `packages/game`.
+- Removed redundant `packages/game/test/golden-replay.test.ts` and `packages/game/test/golden/` directory.
+- Added `@balance-control/packs` to root `devDependencies` to fix module resolution for `verify:packs` script in `audit:spec`.
+- Verified that `audit:spec` still enforces consistency across the engine and golden fixtures.
 
 ## 12) Commands Run (fill after implementation)
 
--
+- `pnpm run audit:spec`
+- `pnpm -w test`
+- `Remove-Item -Recurse -Force packages/game/test/golden` (fix for Windows `rm -rf`)
+- `pnpm install`
 
 ## 13) Postflight (fill after implementation)
 

@@ -13,7 +13,7 @@
     "lint": "eslint \"packages/**/*.{ts,tsx,js,cjs,mjs}\" \"scripts/**/*.{js,cjs,mjs}\" \"*.{js,cjs,mjs}\"",
     "check:encoding": "node scripts/check-encoding.mjs",
     "gen:spec-anchors": "node scripts/gen-spec-anchors.mjs",
-    "audit:spec": "pnpm run gen:spec-anchors && pnpm run verify:packs && pnpm -C packages/game test -- spec-anchor-tripwire.test.ts && pnpm -C packages/game test -- computeMajorirty.test.ts moves.test.ts hotspot.test.ts && pnpm -C packages/game test -- golden-replay.test.ts",
+    "audit:spec": "pnpm run gen:spec-anchors && pnpm run verify:packs && pnpm -C packages/game test -- spec-anchor-tripwire.test.ts && pnpm -C packages/game test -- computeMajorirty.test.ts moves.test.ts hotspot.test.ts && pnpm -C packages/integration-tests test -- golden-replay.test.ts",
     "dev": "pnpm -r --parallel dev",
     "verify:packs": "node scripts/verify-packs.mjs",
     "verify:docs": "node scripts/verify-docs.mjs",
@@ -23,6 +23,7 @@
   "devDependencies": {
     "@playwright/test": "^1.58.2",
     "@balance-control/game": "workspace:*",
+    "@balance-control/packs": "workspace:*",
     "@types/node": "^20.0.0",
     "@typescript-eslint/parser": "^7.18.0",
     "concurrently": "^9.2.1",
