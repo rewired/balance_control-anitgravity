@@ -1,36 +1,50 @@
-# Hand-off — current
+# Hand-off — Current Snapshot
 
-Date: 2026-02-19
-Last completed task: 0127 (ARCH: allow pack-based rule execution)
+## Last done
+
+- **Task:** 0130 — verify-packs imports via public API
+- **Date:** 2026-02-19
+- **Outcome (facts):** verify-packs imports `@balance-control/game`; CORE tiles are data-driven; measures dispatch uses `getMeasureAtomsForExpansion(...)`.
 
 ## Current state (facts)
-- EnginePackRegistry is canonical (order + duplicate checks); pack assembly is routed through the registry.
-- `getMeasureAtomsForExpansion(expansionId, measureId, ...)` is the central dispatch hook; deprecated `getMeasureAtoms(...)` still exists.
-- CORE tiles are still hardcoded via `generateCoreTiles()` in `packages/game/src/packs/core/index.ts`.
-- EXP-01..03 measure atoms are still switch-based in `packages/expansion-xx/src/engine/index.ts`.
-- Deprecated rules exports (CoreZoneNames/CoreResources etc.) are still used in code/tests.
-- Config still carries legacy expansion flags; `packs.enabledPacks` exists and is used in some paths.
-- `@balance-control/game` still depends directly on `@balance-control/expansion-01..03`.
-- `scripts/verify-packs.mjs` imports packs via `packages/game/dist/*` and assumes packs are exported from the game bundle.
 
-## Decisions (binding)
-- **Pack-split direction:** Option 2 is permitted and is the target architecture: pack packages may include rule execution code, but execution remains *engine-owned* (ARCH-01).
-- **Client boundary:** the client remains presentation-only; legality/cost/modifier evaluation stays in engine (`enumerateLegalIntents`).
+- EnginePackRegistry is canonical (single registry) and enforces deterministic canonical ordering + duplicate checks.
+- CORE tiles are loaded from JSON (`packages/game/src/packs/core/resources/core-tiles.json`) via `tile-loader.ts`.
+- Measures: EXP-01..03 use builder maps (no switch); engine routes measure atoms via `EnginePackRegistry.getMeasureAtomsForExpansion(...)`.
+- `scripts/verify-packs.mjs` imports from `@balance-control/game` public surface (no `game-dist` path).
+- Deprecated exports `CoreZoneNames` / `CoreResources` from `@balance-control/rules` are still used in engine code + tests.
+- Config supports `packs.enabledPacks`, but runtime paths still rely on legacy `cfg.expansions` in places (e.g. ruleset manifest selection).
+- EnginePackRegistry still exposes deprecated `getMeasureAtoms(...)` API (should become unused before deletion).
+- `@balance-control/game` still has hard dependencies on `@balance-control/expansion-01..03` (pack split not started).
 
-## Open decisions (must be made explicit when they close)
-- When we do the “real split”, do we:
-  - A) keep a short-lived compatibility re-export layer in `@balance-control/game`, or
-  - B) force all consumers to import packs directly from their pack packages immediately?
+## Decisions
+
+### Binding
+
+- **Pack split:** Option 2. Rule code may live in pack packages (`packages/expansion-*`), but the engine remains the only executor. (`ARCH-01` already reflects this.)
+
+### Open
+
+- How to remove the hard dependency `@balance-control/game -> @balance-control/expansion-*` (introduce a separate packs-aggregator package vs other split).
 
 ## Invariants (must not break)
-- Determinism: identical move sequence → identical state hash.
-- Authoritative state remains JSON-serializable and stays in `packages/game`.
-- `packages/game/test/*` must remain expansion-independent.
-- Canonical ordering: registry order and pre-shuffle ordering must remain deterministic and spec-anchored.
+
+- Build + tests stay green.
+- No rules changes without SPEC anchor.
+- Deterministic ordering and hashing stay stable (canonical pack order, deterministic shuffles, sorted lists).
+- No client-side rule execution; engine stays authoritative (ARCH-01).
 
 ## Next packet goal
 
-Packet 0128–0130 (prep for pack extraction):
-- 0128: CORE tiles become data-driven (JSON + loader) and canonical pre-shuffle tie-break becomes SerialIndex-stable.
-- 0129: EXP-01..03 measure dispatch becomes map-based (no switches) with minimal pack-local coverage tests.
-- 0130: `verify:packs` stops importing dist file paths and uses the public `@balance-control/game` API surface.
+Deprecations Wave 1: migrate runtime + tests off legacy `cfg.expansions`, `CoreZoneNames/CoreResources`, and stop using deprecated `EnginePackRegistry.getMeasureAtoms(...)`.
+
+## Mini diff map (likely touched)
+
+- `packages/game/src/setup.ts`
+- `packages/game/src/config.ts`
+- `packages/game/src/expansion-registry.ts`
+- `packages/game/src/engine/legal-intents.ts`
+- `packages/game/src/moves/*`
+- `packages/game/src/packs/core/index.ts`
+- `packages/game/test/*`
+- `scripts/verify-packs.mjs`
