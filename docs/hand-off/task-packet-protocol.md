@@ -66,26 +66,25 @@ You let Codex execute, commit, and paste the ZIP back here.
 
 ## 4) Context Capsule (Copy/Paste for every new chat)
 
-> **IMPORTANT:** Do NOT copy the example below blindly.
-> Open `docs/hand-off/current.md` and copy the *actual* state from there.
+> **STOP:** Do NOT copy the text below. It is a template only.
+> **ACTION:** Go to `docs/hand-off/current.md` and copy the *actual* Context Capsule from there.
 
 > **PROJECT:** BALANCE // CONTROL (monorepo, pnpm)
 >
-> **BASE CONTRACTS:** AGENTS.md + ARCH-01..04
+> **BASE CONTRACTS:** AGENTS.md + ARCH-01..05
 >
 > **LAST COMPLETED TASK:** <Task ID> (<Short description>)
 >
 > **CURRENT STATE (facts):**
 >
-> * <Fact 1 from current.md>
-> * <Fact 2 from current.md>
-> * <Fact 3 from current.md>
-> * ...
+> * <Fact 1 from docs/hand-off/current.md>
+> * <Fact 2 from docs/hand-off/current.md>
+> * <Fact 3 ...>
 >
 > **OPEN DECISION (must be explicit):**
 >
-> * <Decision 1>
-> * <Decision 2>
+> * (None)
+> * OR <Decision 1>
 >
 > **NEXT PACKET GOAL:** <one sentence>
 >

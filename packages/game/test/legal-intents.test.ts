@@ -8,7 +8,7 @@ import { drawTileToStaging } from '../src/mechanics-draw';
 import { registerTestPacks } from './_helpers/registerPacks';
 import { buildMovesForConfig } from '../src/move-assembly';
 import { makeDummyExpansionPack } from './_helpers/dummyPacks';
-import { takeMeasure } from '../src/_shared/measure-moves';
+import { takeMeasure } from './_helpers/measureMoves';
 
 function createCtx(stage: string) {
     return {
@@ -224,10 +224,22 @@ describe('enumerateLegalIntents', () => {
                 zones
             }],
             setup: {
-                preShuffle: (G: any) => {
+                preShuffle: (G: any, ctx: any) => {
                     Object.values(zones).forEach(zoneId => {
                         G.zones[zoneId] = { id: zoneId, name: zoneId, items: [] };
                     });
+                    // Populate open zone so intents can be found
+                    const openZone = G.zones[zones.openZoneId];
+                    const measureId = `${id}_measure_1`;
+                    openZone.items.push(measureId);
+                    G.objects[measureId] = { id: measureId, type: 'Measure' };
+
+                    // Initialize PlayerHand for current player so move execution is valid
+                    // (Assuming test player is '0')
+                    const handId = `PlayerHand:0`;
+                    if (!G.zones[handId]) {
+                        G.zones[handId] = { id: handId, name: handId, items: [] };
+                    }
                 }
             }
         });

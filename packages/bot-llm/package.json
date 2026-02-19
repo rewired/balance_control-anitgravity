@@ -9,7 +9,8 @@
     "@balance-control/expansion-01": "workspace:*",
     "@balance-control/expansion-02": "workspace:*",
     "@balance-control/expansion-03": "workspace:*",
-    "@balance-control/game": "workspace:*"
+    "@balance-control/game": "workspace:*",
+    "@balance-control/packs": "workspace:*"
   },
   "devDependencies": {
      "typescript": "^5.0.0"
