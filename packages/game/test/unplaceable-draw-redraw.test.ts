@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { CoreZoneNames } from '@balance-control/rules';
+import { CoreZoneName } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
 import { enumerateLegalIntents } from '../src/engine/legal-intents';
 import { CoreMoves } from '../src/moves';
@@ -24,7 +24,7 @@ describe('Unplaceable draw handling', () => {
         const ctx = createCtx();
         const G = SetupGame({ ctx });
 
-        const drawPile = G.zones[CoreZoneNames.DrawPile];
+        const drawPile = G.zones[CoreZoneName.DrawPile];
         const tile1 = drawPile.items[drawPile.items.length - 1] as string;
         const tile2 = drawPile.items[drawPile.items.length - 2] as string;
         drawPile.items = [tile2, tile1];
@@ -35,7 +35,7 @@ describe('Unplaceable draw handling', () => {
         drawTileToStaging(G as any, ctx);
 
         expect(G.zones[`staging_${ctx.currentPlayer}`].items).toHaveLength(0);
-        expect(G.zones[CoreZoneNames.DiscardFaceUp].items).toEqual([tile1]);
+        expect(G.zones[CoreZoneName.DiscardFaceUp].items).toEqual([tile1]);
 
         const log = G.engine.attributes.publicLog as any[];
         expect(log).toHaveLength(1);
@@ -56,7 +56,7 @@ describe('Unplaceable draw handling', () => {
         const result = CoreMoves.resolveChoice({ G, ctx }, { choiceId, selection: 'OK' });
         expect(result).not.toBe(INVALID_MOVE);
 
-        expect(G.zones[CoreZoneNames.DiscardFaceUp].items).toEqual([tile1, tile2]);
+        expect(G.zones[CoreZoneName.DiscardFaceUp].items).toEqual([tile1, tile2]);
         expect((G.engine.attributes.publicLog as any[])).toHaveLength(2);
         expect(G.engine.pendingChoice).toBeDefined();
     });
@@ -65,7 +65,7 @@ describe('Unplaceable draw handling', () => {
         const ctx = createCtx();
         const G = SetupGame({ ctx });
 
-        const drawPile = G.zones[CoreZoneNames.DrawPile];
+        const drawPile = G.zones[CoreZoneName.DrawPile];
         const tile1 = drawPile.items[drawPile.items.length - 1] as string;
         drawPile.items = [tile1];
 

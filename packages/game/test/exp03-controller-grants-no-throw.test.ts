@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { CoreResources, CoreZoneNames, TileType } from '@balance-control/rules';
+import { CoreZoneName, TileType } from '@balance-control/rules';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
@@ -36,11 +36,11 @@ describe('EXP-03 controller grants with no controller', () => {
         }) as any;
 
         const pid = ctx.currentPlayer;
-        const drawPile = G.zones[CoreZoneNames.DrawPile];
-        const board = G.zones[CoreZoneNames.Board];
-        const supply = G.zones[`${CoreZoneNames.PersonalSupply}:${pid}`];
-        const noise = G.zones[CoreZoneNames.Noise];
-        const bank = G.zones[CoreZoneNames.Bank];
+        const drawPile = G.zones[CoreZoneName.DrawPile];
+        const board = G.zones[CoreZoneName.Board];
+        const supply = G.zones[`${CoreZoneName.PersonalSupply}:${pid}`];
+        const noise = G.zones[CoreZoneName.Noise];
+        const bank = G.zones[CoreZoneName.Bank];
 
         const targetTileId = drawPile.items.find((tileId: string) => G.tiles[tileId]?.type === TileType.Resort);
         expect(targetTileId).toBeTruthy();
@@ -57,7 +57,7 @@ describe('EXP-03 controller grants with no controller', () => {
             kind: 'resource.grant',
             playerId: 'CONTROLLER',
             amount: 1,
-            resorts: [CoreResources.CLM],
+            resorts: ['CLM'],
             missingController: 'SKIP',
             targetTileId: targetTileId,
             context: { source: 'exp03:M03', tileId: targetTileId }

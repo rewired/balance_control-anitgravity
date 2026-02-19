@@ -7,7 +7,7 @@ import {
     Exp02Pack,
     Exp03Pack
 } from '@balance-control/game';
-import { CoreZoneNames } from '@balance-control/rules';
+import { CoreZoneName } from '@balance-control/rules';
 
 describe('Integration: Real Pack Combinations', () => {
     beforeEach(() => {
@@ -64,8 +64,8 @@ describe('Integration: Real Pack Combinations', () => {
         });
 
         // Verify Core zones exist
-        expect(state.zones[CoreZoneNames.DrawPile]).toBeDefined();
-        expect(state.zones[CoreZoneNames.Board]).toBeDefined();
+        expect(state.zones[CoreZoneName.DrawPile]).toBeDefined();
+        expect(state.zones[CoreZoneName.Board]).toBeDefined();
 
         // Verify Expansion-specific state/logic if applicable
         // This confirms that the expansion modules were actually loaded and executed

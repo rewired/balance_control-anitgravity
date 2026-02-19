@@ -2,7 +2,7 @@ import { beforeEach, describe, it, expect } from 'vitest';
 import { Client } from 'boardgame.io/client';
 import { Game } from 'boardgame.io';
 import { CoreMoves } from '../src/moves';
-import { TileType, CoreZoneNames, GameState } from '@balance-control/rules';
+import { TileType, CoreZoneName, GameState } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';
 
 /**
@@ -36,15 +36,15 @@ function makeHotspotTestGame(): Game {
             };
 
             // Board zone
-            G.zones[CoreZoneNames.Board] = { id: CoreZoneNames.Board, name: 'Board', items: [] };
-            G.zones[CoreZoneNames.Bank] = { id: CoreZoneNames.Bank, name: 'Bank', items: [] };
-            G.zones[CoreZoneNames.Noise] = { id: CoreZoneNames.Noise, name: 'Noise', items: [] };
-            G.zones[CoreZoneNames.DrawPile] = { id: CoreZoneNames.DrawPile, name: 'DrawPile', items: [] };
+            G.zones[CoreZoneName.Board] = { id: CoreZoneName.Board, name: 'Board', items: [] };
+            G.zones[CoreZoneName.Bank] = { id: CoreZoneName.Bank, name: 'Bank', items: [] };
+            G.zones[CoreZoneName.Noise] = { id: CoreZoneName.Noise, name: 'Noise', items: [] };
+            G.zones[CoreZoneName.DrawPile] = { id: CoreZoneName.DrawPile, name: 'DrawPile', items: [] };
 
             // Player zones
             for (let i = 0; i < 2; i++) {
                 const pid = String(i);
-                const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+                const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
                 G.zones[supplyId] = { id: supplyId, name: supplyId, items: [] };
                 const stagingId = `staging_${pid}`;
                 G.zones[stagingId] = { id: stagingId, name: stagingId, items: [] };
@@ -53,7 +53,7 @@ function makeHotspotTestGame(): Game {
             // Center tile at 0,0 (a Resort, not StartCommittee, so hotspot can resolve)
             const centerId = 'tile_center';
             G.tiles[centerId] = { id: centerId, type: TileType.Resort, weight: 1, resort: 'DOM' };
-            G.zones[CoreZoneNames.Board].items.push(centerId);
+            G.zones[CoreZoneName.Board].items.push(centerId);
             G.grid['0,0'] = centerId;
             G.adjacency[centerId] = [];
             // Create a zone for this tile (to hold influence)
@@ -67,14 +67,14 @@ function makeHotspotTestGame(): Game {
             // Place 1 Influence in Player 0's supply (to be pulled during resolution)
             const infInSupply = 'inf_p0_supply';
             G.objects[infInSupply] = { id: infInSupply, type: 'Influence', owner: '0' };
-            G.zones[`${CoreZoneNames.PersonalSupply}:0`].items.push(infInSupply);
+            G.zones[`${CoreZoneName.PersonalSupply}:0`].items.push(infInSupply);
 
             // Place 5 of 6 neighbors around 0,0
             const prefillCoords = ['1,0', '1,-1', '0,-1', '-1,0', '-1,1'];
             prefillCoords.forEach((coord, i) => {
                 const tid = `tile_n${i}`;
                 G.tiles[tid] = { id: tid, type: TileType.Resort, weight: 1, resort: 'DOM' };
-                G.zones[CoreZoneNames.Board].items.push(tid);
+                G.zones[CoreZoneName.Board].items.push(tid);
                 G.grid[coord] = tid;
                 G.adjacency[tid] = [centerId];
                 G.adjacency[centerId].push(tid);
@@ -136,7 +136,7 @@ describe('Hotspot Mechanics', () => {
         expect(infCount).toBe(2); // original 1 + hotspot reward 1
 
         // Supply should be empty now
-        const supply = state1.G.zones[`${CoreZoneNames.PersonalSupply}:0`];
+        const supply = state1.G.zones[`${CoreZoneName.PersonalSupply}:0`];
         const supplyInf = supply.items.filter(
             (id: string) => state1.G.objects[id]?.type === 'Influence'
         ).length;
@@ -151,8 +151,8 @@ describe('Hotspot Mechanics', () => {
             const G = origSetup(...args);
             // Remove tile_n4 at -1,1
             delete G.grid['-1,1'];
-            const idx = G.zones[CoreZoneNames.Board].items.indexOf('tile_n4');
-            if (idx >= 0) G.zones[CoreZoneNames.Board].items.splice(idx, 1);
+            const idx = G.zones[CoreZoneName.Board].items.indexOf('tile_n4');
+            if (idx >= 0) G.zones[CoreZoneName.Board].items.splice(idx, 1);
             delete G.tiles['tile_n4'];
             G.adjacency['tile_center'] = G.adjacency['tile_center'].filter(
                 (id: string) => id !== 'tile_n4'
@@ -182,7 +182,7 @@ describe('Hotspot Mechanics', () => {
         game.setup = (...args: any[]) => {
             const G = origSetup(...args);
             // Empty supply: remove inf_p0_supply
-            const supplyId = `${CoreZoneNames.PersonalSupply}:0`;
+            const supplyId = `${CoreZoneName.PersonalSupply}:0`;
             G.zones[supplyId].items = [];
             delete G.objects['inf_p0_supply'];
             return G;

@@ -1,4 +1,4 @@
-import { ExpansionDefinition, GameState, ResourceType, TileType, CoreResources, GameObject } from '@balance-control/rules';
+import { ExpansionDefinition, GameState, ResourceType, TileType, GameObject } from '@balance-control/rules';
 
 const EXP_01_NAME = 'EXP-01 Economy & Labor';
 

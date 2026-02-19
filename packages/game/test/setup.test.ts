@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { SetupGame } from '../src/setup';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { registerTestPacks } from './_helpers/registerPacks';
-import { CoreZoneNames, TileType } from '@balance-control/rules';
+import { CoreZoneName, TileType } from '@balance-control/rules';
 import { makeTestPack } from './_helpers/makeTestPack';
 
 function createSeededRandom(seed: number) {
@@ -37,7 +37,7 @@ describe('SetupGame', () => {
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
 
-        const drawPile = G.zones[CoreZoneNames.DrawPile].items;
+        const drawPile = G.zones[CoreZoneName.DrawPile].items;
 
         // Resorts: 3 types * 12 = 36
         // Committees: 10
@@ -63,7 +63,7 @@ describe('SetupGame', () => {
         const ctx: any = { numPlayers: 5, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
 
-        const drawPile = G.zones[CoreZoneNames.DrawPile].items;
+        const drawPile = G.zones[CoreZoneName.DrawPile].items;
         // Core 71 + ADD56 5-6 Player Add-On: 9 Resort(W2-4) + 2 Committee + 3 Lobbyist + 2 Grassroots + 2 Hotspot = 89
         expect(drawPile.length).toBe(89);
 
@@ -84,7 +84,7 @@ describe('SetupGame', () => {
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
 
-        const board = G.zones[CoreZoneNames.Board].items;
+        const board = G.zones[CoreZoneName.Board].items;
         expect(board.length).toBe(1);
         expect(G.tiles[board[0]].type).toBe(TileType.StartCommittee);
     });
@@ -97,7 +97,7 @@ describe('SetupGame', () => {
         expect(markers.length).toBe(3);
 
         for (const marker of markers) {
-            const supplyId = `${CoreZoneNames.PersonalSupply}:${marker.owner}`;
+            const supplyId = `${CoreZoneName.PersonalSupply}:${marker.owner}`;
             expect(G.zones[supplyId].items).toContain(marker.id);
         }
     });
@@ -127,7 +127,7 @@ describe('SetupGame', () => {
             setup: {
                 preShuffle: (G) => {
                     G.tiles.tile_ex01_mock = { id: 'tile_ex01_mock', type: TileType.Resort, resort: 'ECO', weight: 1 };
-                    G.zones[CoreZoneNames.DrawPile].items.push('tile_ex01_mock');
+                    G.zones[CoreZoneName.DrawPile].items.push('tile_ex01_mock');
                     G.zones.tile_ex01_mock = { id: 'tile_ex01_mock', name: 'EX01 Mock', items: [] };
                 }
             }
@@ -137,7 +137,7 @@ describe('SetupGame', () => {
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx, setupData: { expansions: { ex01: false } } });
 
-        expect(G.zones[CoreZoneNames.DrawPile].items.includes('tile_ex01_mock')).toBe(false);
+        expect(G.zones[CoreZoneName.DrawPile].items.includes('tile_ex01_mock')).toBe(false);
         expect(G.tiles.tile_ex01_mock).toBeUndefined();
     });
 
@@ -148,7 +148,7 @@ describe('SetupGame', () => {
             setup: {
                 preShuffle: (G) => {
                     G.tiles.tile_ex01_mock = { id: 'tile_ex01_mock', type: TileType.Resort, resort: 'ECO', weight: 1 };
-                    G.zones[CoreZoneNames.DrawPile].items.push('tile_ex01_mock');
+                    G.zones[CoreZoneName.DrawPile].items.push('tile_ex01_mock');
                     G.zones.tile_ex01_mock = { id: 'tile_ex01_mock', name: 'EX01 Mock', items: [] };
                 }
             }
@@ -168,10 +168,10 @@ describe('SetupGame', () => {
             setupData: { expansions: { ex01: false } }
         });
 
-        expect(enabledA.zones[CoreZoneNames.DrawPile].items.includes('tile_ex01_mock')).toBe(true);
-        expect(enabledB.zones[CoreZoneNames.DrawPile].items.includes('tile_ex01_mock')).toBe(true);
-        expect(disabled.zones[CoreZoneNames.DrawPile].items.includes('tile_ex01_mock')).toBe(false);
-        expect(enabledA.zones[CoreZoneNames.DrawPile].items).toEqual(enabledB.zones[CoreZoneNames.DrawPile].items);
-        expect(enabledA.zones[CoreZoneNames.DrawPile].items).not.toEqual(disabled.zones[CoreZoneNames.DrawPile].items);
+        expect(enabledA.zones[CoreZoneName.DrawPile].items.includes('tile_ex01_mock')).toBe(true);
+        expect(enabledB.zones[CoreZoneName.DrawPile].items.includes('tile_ex01_mock')).toBe(true);
+        expect(disabled.zones[CoreZoneName.DrawPile].items.includes('tile_ex01_mock')).toBe(false);
+        expect(enabledA.zones[CoreZoneName.DrawPile].items).toEqual(enabledB.zones[CoreZoneName.DrawPile].items);
+        expect(enabledA.zones[CoreZoneName.DrawPile].items).not.toEqual(disabled.zones[CoreZoneName.DrawPile].items);
     });
 });

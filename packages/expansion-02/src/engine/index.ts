@@ -1,10 +1,4 @@
-import { ExpansionDefinition, GameState, TileType, GameObject, RegulationType } from '@balance-control/rules';
-
-const CoreZoneNames = {
-    PersonalSupply: 'PersonalSupply',
-    DrawPile: 'DrawPile',
-    Board: 'Board'
-} as const;
+import { ExpansionDefinition, GameState, TileType, GameObject, RegulationType, CoreZoneName } from '@balance-control/rules';
 
 const EXP_02_NAME = 'EXP-02 Security & Order';
 export const EXP02_TILE_INNER_ORDER_ID = 'tile_inner_order' as const;
@@ -171,7 +165,7 @@ export const Expansion02: ExpansionDefinition = {
         G.zones.EXP02_OpenMeasures = { id: 'EXP02_OpenMeasures', name: 'EXP-02 Open Measures', items: [] };
 
         const playerIds = Object.keys(G.zones)
-            .filter(z => z.startsWith(CoreZoneNames.PersonalSupply))
+            .filter(z => z.startsWith(CoreZoneName.PersonalSupply))
             .map(z => z.split(':')[1]);
 
         playerIds.forEach(pid => {
@@ -184,7 +178,7 @@ export const Expansion02: ExpansionDefinition = {
             for (let i = 0; i < count; i++) {
                 const id = allocId(G, `tile_sec_w${weight}_${i}`);
                 G.tiles[id] = { id, type: TileType.Resort, resort: 'SEC', weight, name: `SEC W${weight}` };
-                G.zones[CoreZoneNames.DrawPile].items.push(id);
+                G.zones[CoreZoneName.DrawPile].items.push(id);
                 G.zones[id] = { id, name: `SEC W${weight}`, items: [] };
             }
         };
@@ -196,13 +190,13 @@ export const Expansion02: ExpansionDefinition = {
 
         // 3. Add Inner Order Hotspot
         G.tiles[EXP02_TILE_INNER_ORDER_ID] = { id: EXP02_TILE_INNER_ORDER_ID, type: TileType.Hotspot, name: 'Inner Order', isHotspot: true };
-        G.zones[CoreZoneNames.DrawPile].items.push(EXP02_TILE_INNER_ORDER_ID);
+        G.zones[CoreZoneName.DrawPile].items.push(EXP02_TILE_INNER_ORDER_ID);
         G.zones[EXP02_TILE_INNER_ORDER_ID] = { id: EXP02_TILE_INNER_ORDER_ID, name: 'Inner Order', items: [] };
 
         // 4. Add Authority Apparatus
         const authorityId = 'tile_authority_apparatus';
         G.tiles[authorityId] = { id: authorityId, type: TileType.SystemTile, name: 'Authority Apparatus' };
-        G.zones[CoreZoneNames.Board].items.push(authorityId);
+        G.zones[CoreZoneName.Board].items.push(authorityId);
 
         // 5. Initialize Measures
         MEASURE_IDS.forEach(mId => {

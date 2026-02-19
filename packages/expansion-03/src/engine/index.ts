@@ -1,10 +1,4 @@
-import { ExpansionDefinition, GameState, TileType } from '@balance-control/rules';
-
-// Local constants to avoid runtime dependency on CoreZoneNames
-const ZONE_PERSONAL_SUPPLY = 'PersonalSupply';
-const ZONE_DRAW_PILE = 'DrawPile';
-const ZONE_BANK = 'Bank';
-const ZONE_BOARD_ATTACHED = 'BoardAttached';
+import { ExpansionDefinition, GameState, TileType, CoreZoneName } from '@balance-control/rules';
 
 const EXP_03_NAME = 'EXP-03 Climate & Future';
 
@@ -210,7 +204,7 @@ export const Expansion03: ExpansionDefinition = {
         G.zones.EXP03_OpenMeasures = { id: 'EXP03_OpenMeasures', name: 'EXP-03 Open Measures', items: [] };
 
         const playerIds = Object.keys(G.zones)
-            .filter(z => z.startsWith(ZONE_PERSONAL_SUPPLY))
+            .filter(z => z.startsWith(CoreZoneName.PersonalSupply))
             .map(z => z.split(':')[1]);
 
         playerIds.forEach(pid => {
@@ -223,7 +217,7 @@ export const Expansion03: ExpansionDefinition = {
             for (let i = 0; i < count; i++) {
                 const id = allocId(G, `tile_clm_w${weight}_${i}`);
                 G.tiles[id] = { id, type: TileType.Resort, resort: 'CLM', weight, name: `CLM W${weight}` };
-                G.zones[ZONE_DRAW_PILE].items.push(id);
+                G.zones[CoreZoneName.DrawPile].items.push(id);
                 G.zones[id] = { id, name: `CLM W${weight}`, items: [] };
             }
         };
@@ -235,7 +229,7 @@ export const Expansion03: ExpansionDefinition = {
         // 3. Add Transformation Hotspot
         const transformationId = 'tile_transformationsdruck';
         G.tiles[transformationId] = { id: transformationId, type: TileType.Hotspot, name: 'Transformation Pressure', isHotspot: true };
-        G.zones[ZONE_DRAW_PILE].items.push(transformationId);
+        G.zones[CoreZoneName.DrawPile].items.push(transformationId);
         G.zones[transformationId] = { id: transformationId, name: 'Transformation Pressure', items: [] };
 
         // 4. Initialize Measures
@@ -311,7 +305,7 @@ function allocId(G: GameState, prefix: string): string {
 }
 
 function payResources(G: GameState, playerId: string, cost: Record<string, number>): boolean {
-    const supplyId = `${ZONE_PERSONAL_SUPPLY}:${playerId}`;
+    const supplyId = `${CoreZoneName.PersonalSupply}:${playerId}`;
     const supplyZone = G.zones[supplyId];
     if (!supplyZone) return false;
 
@@ -328,7 +322,7 @@ function payResources(G: GameState, playerId: string, cost: Record<string, numbe
         if ((inventory[res]?.length || 0) < amt) return false;
     }
 
-    const bankZone = G.zones[ZONE_BANK];
+    const bankZone = G.zones[CoreZoneName.Bank];
     for (const [res, amt] of Object.entries(cost)) {
         for (let i = 0; i < amt; i++) {
             const rid = inventory[res].pop()!;
@@ -341,8 +335,8 @@ function payResources(G: GameState, playerId: string, cost: Record<string, numbe
 }
 
 function grantResource(G: GameState, playerId: string, resort: string) {
-    const bank = G.zones[ZONE_BANK];
-    const supply = G.zones[`${ZONE_PERSONAL_SUPPLY}:${playerId}`];
+    const bank = G.zones[CoreZoneName.Bank];
+    const supply = G.zones[`${CoreZoneName.PersonalSupply}:${playerId}`];
     const rid = bank.items.find(id => G.objects[id].resort === resort);
     if (rid) {
         bank.items.splice(bank.items.indexOf(rid), 1);
@@ -357,7 +351,7 @@ function placeCountdown(G: GameState, targetTileId: string) {
 
     const cid = supply.items.pop()!;
     G.objects[cid].targetTileId = targetTileId;
-    G.zones[ZONE_BOARD_ATTACHED] = G.zones[ZONE_BOARD_ATTACHED] || { id: 'BoardAttached', name: 'Attached', items: [] };
+    G.zones['BoardAttached'] = G.zones['BoardAttached'] || { id: 'BoardAttached', name: 'Attached', items: [] };
     G.zones.BoardAttached.items.push(cid);
 }
 

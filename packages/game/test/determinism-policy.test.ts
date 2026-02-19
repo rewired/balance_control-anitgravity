@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { SetupGame } from '../src/setup';
 import { EffectResolver } from '../src/engine/resolver';
-import { CoreZoneNames } from '@balance-control/rules';
+import { CoreZoneName } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';
 
 function createSeededRandom(seed: number) {
@@ -55,7 +55,7 @@ function runDeterministicScenario(seed: number): { snapshot: string; pendingChoi
     const G = SetupGame({ ctx });
 
     // Force deterministic ID creation path in resolver (bank miss -> synthetic resource IDs).
-    G.zones[CoreZoneNames.Bank].items = [];
+    G.zones[CoreZoneName.Bank].items = [];
 
     G.engine.effectQueue.push(
         { kind: 'resource.grant', playerId: '0', amount: 2, resort: 'DOM' },

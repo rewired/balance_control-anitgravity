@@ -8,7 +8,7 @@ import { hashState } from '../src/hash-state';
 import { Exp01Pack } from '../src/packs/exp01';
 import { Exp02Pack } from '../src/packs/exp02';
 import { Exp03Pack } from '../src/packs/exp03';
-import { CoreZoneNames, TileType } from '@balance-control/rules';
+import { CoreZoneName, TileType } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';
 
 interface GoldenMove {
@@ -78,7 +78,7 @@ function applyPrelude(G: any, prelude?: PreludeAction[]): void {
     if (!prelude || prelude.length === 0) return;
     for (const step of prelude) {
         if (step.action === 'stackDrawPileByType') {
-            const drawPile = G.zones[CoreZoneNames.DrawPile];
+            const drawPile = G.zones[CoreZoneName.DrawPile];
             if (!drawPile) continue;
             const count = Math.max(1, step.count ?? 1);
             for (let i = 0; i < count; i++) {
@@ -96,7 +96,7 @@ function applyPrelude(G: any, prelude?: PreludeAction[]): void {
             continue;
         }
         if (step.action === 'seedResources') {
-            const supplyId = `${CoreZoneNames.PersonalSupply}:${step.playerId}`;
+            const supplyId = `${CoreZoneName.PersonalSupply}:${step.playerId}`;
             const supply = G.zones[supplyId];
             if (!supply) continue;
             const count = Math.max(1, step.count ?? 1);

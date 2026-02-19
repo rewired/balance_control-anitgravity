@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { computeMajority } from '../src/mechanics';
-import { GameState, TileType, CoreZoneNames, GameObject } from '@balance-control/rules';
+import { GameState, TileType, GameObject } from '@balance-control/rules';
 
 describe('computeMajority', () => {
     // Stub G

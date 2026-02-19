@@ -1,4 +1,4 @@
-import { GameState, CoreZoneNames, TileType } from '@balance-control/rules';
+import { GameState, CoreZoneName, TileType } from '@balance-control/rules';
 import { positionKeyFromCoordString } from './topology';
 import { EffectResolver } from './engine/resolver';
 import { findObjectZoneId } from './state-lookup';
@@ -37,7 +37,7 @@ export function countPlayerInfluence(G: any, pid: string): number {
 export function allStartingInfluencePlaced(G: any, ctx: any): boolean {
     for (let i = 0; i < ctx.numPlayers; i++) {
         const pid = i.toString();
-        const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+        const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
         const supply = G.zones[supplyId];
         if (!supply) continue;
         for (const itemId of supply.items) {
@@ -57,7 +57,7 @@ export function allStartingInfluencePlaced(G: any, ctx: any): boolean {
  * @sideEffects
  */
 export function returnMetaMarkerToSupply(G: GameState, playerId: string): void {
-    const supplyId = `${CoreZoneNames.PersonalSupply}:${playerId}`;
+    const supplyId = `${CoreZoneName.PersonalSupply}:${playerId}`;
     const supply = G.zones[supplyId];
     if (!supply) return;
 
@@ -97,7 +97,7 @@ export function drawMeasure(G: GameState, ctx: any) {
  * @sideEffects
  */
 export function runFinalRoundSettlement(G: GameState & { engine: any; grid?: Record<string, string> }, ctx: any): void {
-    const boardZone = G.zones[CoreZoneNames.Board];
+    const boardZone = G.zones[CoreZoneName.Board];
     const grid = G.grid ?? {};
     if (!boardZone) return;
 

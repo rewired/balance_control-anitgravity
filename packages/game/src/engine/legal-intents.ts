@@ -1,4 +1,4 @@
-import { CoreResources, CoreZoneNames, GameState, TileType } from '@balance-control/rules';
+import { CoreZoneName, GameState, TileType } from '@balance-control/rules';
 import { allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
 import { computeMajority } from '../mechanics';
 import { coordToString, getNeighbors, stringToCoord } from '../topology';
@@ -281,7 +281,7 @@ function enumerateConvertResources(G: GameState, playerID: string): LegalIntent[
     const intents: LegalIntent[] = [];
     const boardTiles = getBoardTileIds(G);
     const supplyResources = getPlayerResourceIds(G, playerID);
-    const coreResorts = [CoreResources.DOM, CoreResources.FOR, CoreResources.INF];
+    const coreResorts = ['DOM', 'FOR', 'INF'];
 
     for (const tileId of boardTiles) {
         const tile = G.tiles[tileId];
@@ -342,7 +342,7 @@ function enumerateTakeMeasure(G: GameState, playerID: string): LegalIntent[] {
 }
 
 function getBoardTileIds(G: GameState): string[] {
-    const board = G.zones[CoreZoneNames.Board];
+    const board = G.zones[CoreZoneName.Board];
     if (!board) return [];
     return [...board.items].sort((a, b) => a.localeCompare(b));
 }
@@ -365,7 +365,7 @@ function getGhostCoords(G: GameState): string[] {
 }
 
 function getPlayerResourceIds(G: GameState, playerID: string): string[] {
-    const supplyId = `${CoreZoneNames.PersonalSupply}:${playerID}`;
+    const supplyId = `${CoreZoneName.PersonalSupply}:${playerID}`;
     const supply = G.zones[supplyId];
     if (!supply) return [];
     return supply.items

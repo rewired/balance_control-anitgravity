@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CoreZoneNames, TileType, type GameConfig, type GameState } from '@balance-control/rules';
+import { CoreZoneName, TileType, type GameConfig, type GameState } from '@balance-control/rules';
 import { CorePack } from '../src/packs/core';
 
 function makeBaseState(cfg: GameConfig): GameState {
@@ -51,30 +51,30 @@ describe('CorePack.setup.preShuffle', () => {
         const G2 = makeBaseState(cfg);
         CorePack.setup?.preShuffle?.(G2, ctx, cfg);
 
-        expect(G1.zones[CoreZoneNames.DrawPile]).toBeTruthy();
-        expect(G1.zones[CoreZoneNames.DiscardFaceUp]).toBeTruthy();
-        expect(G1.zones[CoreZoneNames.Board]).toBeTruthy();
-        expect(G1.zones[CoreZoneNames.Bank]).toBeTruthy();
-        expect(G1.zones[CoreZoneNames.Noise]).toBeTruthy();
+        expect(G1.zones[CoreZoneName.DrawPile]).toBeTruthy();
+        expect(G1.zones[CoreZoneName.DiscardFaceUp]).toBeTruthy();
+        expect(G1.zones[CoreZoneName.Board]).toBeTruthy();
+        expect(G1.zones[CoreZoneName.Bank]).toBeTruthy();
+        expect(G1.zones[CoreZoneName.Noise]).toBeTruthy();
 
         const startId = 'tile_start_committee';
         expect(G1.tiles[startId]?.type).toBe(TileType.StartCommittee);
-        expect(G1.zones[CoreZoneNames.Board].items).toContain(startId);
+        expect(G1.zones[CoreZoneName.Board].items).toContain(startId);
         expect(G1.zones[startId]).toBeTruthy();
         expect(G1.grid['0,0']).toBe(startId);
 
         for (let i = 0; i < ctx.numPlayers; i++) {
             const pid = i.toString();
-            const zoneId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+            const zoneId = `${CoreZoneName.PersonalSupply}:${pid}`;
             const markerId = `meta_${pid}`;
             expect(G1.objects[markerId]).toBeTruthy();
             expect(G1.zones[zoneId]?.items).toContain(markerId);
         }
 
-        expect(G1.zones[CoreZoneNames.DrawPile].items.length).toBe(71);
-        expect(G1.zones[CoreZoneNames.DrawPile].items).toEqual(G2.zones[CoreZoneNames.DrawPile].items);
+        expect(G1.zones[CoreZoneName.DrawPile].items.length).toBe(71);
+        expect(G1.zones[CoreZoneName.DrawPile].items).toEqual(G2.zones[CoreZoneName.DrawPile].items);
 
-        for (const tileId of G1.zones[CoreZoneNames.DrawPile].items) {
+        for (const tileId of G1.zones[CoreZoneName.DrawPile].items) {
             expect(G1.zones[tileId]).toBeTruthy();
         }
     });

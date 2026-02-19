@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { CoreZoneNames } from '@balance-control/rules';
+import { CoreZoneName } from '@balance-control/rules';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
@@ -9,7 +9,7 @@ import type { EnginePackDefinition } from '../src/packs/types';
 describe('EXP-02 Inner Order hotspot id consistency', () => {
     // Define a dummy pack to replace Exp02Pack
     const DUMMY_TILE_ID = 'tile_dummy_inner_order';
-    
+
     const DummyExp02Pack: EnginePackDefinition = {
         id: 'exp02', // Use 'exp02' to mimic the expansion ID if needed, or 'dummy'
         name: 'Dummy Exp 02',
@@ -33,7 +33,7 @@ describe('EXP-02 Inner Order hotspot id consistency', () => {
             preShuffle: (G) => {
                  G.tiles[DUMMY_TILE_ID] = { id: DUMMY_TILE_ID, type: 'Resort', resort: 'SEC' };
                  G.zones[DUMMY_TILE_ID] = { id: DUMMY_TILE_ID, name: 'Inner Order', items: [] };
-                 G.zones[CoreZoneNames.Board].items.push(DUMMY_TILE_ID);
+                 G.zones[CoreZoneName.Board].items.push(DUMMY_TILE_ID);
                  // Also need to initialize adjacency for computeMajority to work without error (though it handles missing)
                  G.adjacency[DUMMY_TILE_ID] = [];
             }
@@ -65,7 +65,7 @@ describe('EXP-02 Inner Order hotspot id consistency', () => {
         expect(G.zones[innerOrderId]).toBeTruthy();
 
         const pid = '0';
-        const supply = G.zones[`${CoreZoneNames.PersonalSupply}:${pid}`];
+        const supply = G.zones[`${CoreZoneName.PersonalSupply}:${pid}`];
         const innerOrderZone = G.zones[innerOrderId];
 
         const influenceId = supply.items.find((id: string) => G.objects[id]?.type === 'Influence');
