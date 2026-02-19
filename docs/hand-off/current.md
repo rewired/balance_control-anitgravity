@@ -2,9 +2,8 @@
 
 ## Last done
 
-- **Task:** 0131 — CONFIG: Make `packs.enabledPacks` canonical at runtime
+- **Task:** 0133
 - **Date:** 2026-02-19
-- **Outcome (facts):** `packs.enabledPacks` is now the canonical enablement surface. Runtime no longer reads `cfg.expansions` directly (except normalization). Mismatch detection added for conflicting `expansions` vs `packs.enabledPacks` config.
 
 ## Current state (facts)
 

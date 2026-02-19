@@ -78,17 +78,20 @@ Update tests to use only `EnginePackRegistry.getMeasureAtomsForExpansion(...)` (
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] `pnpm -C packages/game test` passes
-- [ ] No deprecated API usage remains in tests
-- [ ] No rules behavior change
+- [x] `pnpm -C packages/game test` passes
+- [x] No deprecated API usage remains in tests
+- [x] No rules behavior change
 
 ## 11) Work Summary (fill after implementation)
 
-- 
+- Identified usage of deprecated `EnginePackRegistry.getMeasureAtoms` in `packages/game/test/pack-disablement-isolation.test.ts`.
+- Updated `pack-disablement-isolation.test.ts` to use `EnginePackRegistry.getMeasureAtomsForExpansion` and verified it throws for disabled packs, ensuring isolation.
+- Verified no other tests use the deprecated API (excluding direct implementation calls in `Expansion01`).
 
 ## 12) Commands Run (fill after implementation)
 
-- 
+- `grep -r "getMeasureAtoms" packages/game`
+- `pnpm -C packages/game test`
 
 ## 13) Postflight (fill after implementation)
 
