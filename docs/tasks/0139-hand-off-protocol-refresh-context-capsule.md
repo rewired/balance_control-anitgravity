@@ -89,17 +89,19 @@ We want the protocol to be robust:
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Protocol updated: capsule uses placeholders (no stale facts)
-- [ ] Protocol explicitly references `docs/hand-off/current.md` as copy source
-- [ ] Build passes (`pnpm -r build`)
+- [x] Protocol updated: capsule uses placeholders (no stale facts)
+- [x] Protocol explicitly references `docs/hand-off/current.md` as copy source
+- [x] Build passes (`pnpm -r build`)
 
 ## 11) Work Summary (fill after implementation)
 
-- (fill)
+- Replaced hardcoded example state in `docs/hand-off/task-packet-protocol.md` with placeholders.
+- Added explicit warning to copy state from `docs/hand-off/current.md`.
+- Verified build passes.
 
 ## 12) Commands Run (fill after implementation)
 
-- (fill)
+- `pnpm -r build` (Exited with 0)
 
 ## 13) Postflight (fill after implementation)
 
@@ -107,4 +109,4 @@ We want the protocol to be robust:
 
 ## 14) Patch Notes (fill after implementation)
 
-- (fill)
+- Updated `docs/hand-off/task-packet-protocol.md` to prevent context stale state.

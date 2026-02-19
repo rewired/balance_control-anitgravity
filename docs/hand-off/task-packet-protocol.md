@@ -66,26 +66,26 @@ You let Codex execute, commit, and paste the ZIP back here.
 
 ## 4) Context Capsule (Copy/Paste for every new chat)
 
+> **IMPORTANT:** Do NOT copy the example below blindly.
+> Open `docs/hand-off/current.md` and copy the *actual* state from there.
+
 > **PROJECT:** BALANCE // CONTROL (monorepo, pnpm)
 >
 > **BASE CONTRACTS:** AGENTS.md + ARCH-01..04
 >
-> **LAST COMPLETED TASK:** 0124 (Integration Tests in own package; pack tests in expansion packages; game tests without pack imports)
+> **LAST COMPLETED TASK:** <Task ID> (<Short description>)
 >
 > **CURRENT STATE (facts):**
 >
-> * EnginePackRegistry is canonical + Duplicate checks
-> * getMeasureAtomsForExpansion(...) is the central hook; deprecated getMeasureAtoms(...) still exists
-> * CORE Tiles are still hardcoded via generateCoreTiles() in packages/game/src/packs/core/index.ts
-> * Measures: EXP-01..03 still have Switch logic in packages/expansion-xx/src/engine/index.ts
-> * Deprecated: CoreZoneNames/CoreResources etc. are still used in code/tests
-> * Config still has legacy expansions flags; packs.enabledPacks exists
-> * @balance-control/game still depends directly on expansion-01..03
-> * scripts/verify-packs.mjs currently imports Packs from game-dist
+> * <Fact 1 from current.md>
+> * <Fact 2 from current.md>
+> * <Fact 3 from current.md>
+> * ...
 >
 > **OPEN DECISION (must be explicit):**
 >
-> * Pack-Split Option 1 (ARCH-01 remains true: only Data/UI outsourced) vs Option 2 (Rule code in Pack Packages; adapt ARCH-01)
+> * <Decision 1>
+> * <Decision 2>
 >
 > **NEXT PACKET GOAL:** <one sentence>
 >
