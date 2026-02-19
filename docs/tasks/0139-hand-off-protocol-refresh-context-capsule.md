@@ -8,75 +8,74 @@
 - **Task ID:** 0139
 - **Owner:** Codex
 - **Area:** `docs/hand-off/*` process documentation
-- **Priority:** P2
+- **Priority:** P1
 - **Risk:** Low (docs-only)
 - **Branch name:** `task/0139-hand-off-protocol-refresh-context-capsule`
 
 ## 1) Guardrails (frozen)
 
-- **GR-010 (No Downstream Breakage):** do not change code behavior; this is documentation/process.
-- **GR-014 (Operator UX):** reduce workflow footguns (copy/paste stale capsules).
+- **Affected Guardrails:** NONE (documentation-only; no engine/client behavior changes).
 
 ## 2) Spec anchors (frozen)
 
-- `docs/hand-off/task-packet-protocol.md` — "Repo is the Source of Truth" principle
-- `docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json` — GR-010, GR-014
+- `docs/hand-off/task-packet-protocol.md` — defines the Context Capsule and workflow
+- `docs/hand-off/current.md` — canonical, repo-persistent snapshot
 
 ## 3) Context (frozen)
 
-`docs/hand-off/task-packet-protocol.md` currently includes a Context Capsule example containing historical "CURRENT STATE" bullets.
-That example is easy to copy/paste verbatim, which can re-introduce stale facts into new chats.
+`docs/hand-off/task-packet-protocol.md` currently contains a Context Capsule example with **historical, concrete** facts (e.g., old task IDs and outdated state bullets).
+That section is intentionally copy/paste friendly, which turns it into a **footgun**: stale facts re-enter new chats.
 
-We want the protocol to be robust:
-- The capsule should be a **template**, not a snapshot.
-- The snapshot lives in `docs/hand-off/current.md` and must be the copy source.
+We need to make staleness impossible by design:
+- The protocol must treat the capsule as a **template**.
+- The factual snapshot must be copied from `docs/hand-off/current.md` (single source of truth).
 
 ## 4) Goal (frozen)
 
-- Update the Task Packet Protocol so the Context Capsule is **non-stale by design**.
-- Make it unambiguous that the capsule should be derived from `docs/hand-off/current.md`.
+- Remove hardcoded historical facts from the protocol’s Context Capsule section.
+- Make it explicit that the capsule’s facts come from `docs/hand-off/current.md`.
+- Ensure the protocol’s capsule structure still matches what we actually paste into chat.
 
 ## 5) Scope (frozen)
 
 ### 5.1 In-scope
 
 - Update `docs/hand-off/task-packet-protocol.md`:
-  - Replace any hardcoded "CURRENT STATE" example bullets with placeholders.
-  - Add explicit instruction: copy the factual bullets from `docs/hand-off/current.md`.
-  - Keep the capsule structure (PROJECT / BASE CONTRACTS / LAST DONE / CURRENT STATE / DECISIONS / NEXT GOAL / CONSTRAINTS / DELIVERABLE).
+  - Replace the entire capsule example with placeholders (no real task IDs, no real state bullets).
+  - Add a blunt instruction directly above the capsule:
+    - “Do not copy facts from this file. Copy the capsule from `docs/hand-off/current.md`.”
+  - Update BASE CONTRACTS line to match current baseline: `AGENTS.md + ARCH-01..05`.
 
 ### 5.2 Out-of-scope
 
 - Any engine/package changes.
-- Any rule/spec changes.
+- Any spec/rule changes.
 
 ## 6) Plan (frozen)
-
-### Entry criteria
-
-- None.
 
 ### Steps
 
 1) Edit `docs/hand-off/task-packet-protocol.md`:
-   - Add a prominent note above the capsule: "Do not copy the example state; copy from current.md".
-   - Turn the "CURRENT STATE" list into placeholder bullets (e.g., `* <fact>`), not real facts.
-   - Optionally include a tiny snippet showing how to copy/paste (e.g., "open current.md, copy sections").
+   - Replace the stale capsule with a **template**, e.g.:
+     - `LAST COMPLETED TASK: <####>`
+     - `CURRENT STATE (facts):` with `- <fact>` placeholders.
+     - `OPEN:` with `(None)` placeholder.
+   - Add a “Copy source” note pointing to `docs/hand-off/current.md`.
 
-2) Ensure the protocol still reads cleanly and stays short.
+2) Keep the doc short; avoid adding more prose than necessary.
 
-3) Run minimal repo checks (cheap sanity):
-   - `pnpm -r build` (should pass; docs-only change but keep standard discipline).
+3) Sanity check (cheap discipline):
+   - `pnpm -r build`
 
 ### Exit criteria
 
-- No historical state bullets remain in the protocol's capsule.
-- The protocol clearly points to `docs/hand-off/current.md` as the source of truth.
+- The protocol contains **no historical task IDs** or concrete “CURRENT STATE” bullets.
+- The protocol explicitly identifies `docs/hand-off/current.md` as the only copy source.
 
 ## 7) Acceptance Criteria (frozen)
 
-- `docs/hand-off/task-packet-protocol.md` contains a capsule template with placeholders.
-- The doc explicitly instructs copying snapshot facts from `docs/hand-off/current.md`.
+- `docs/hand-off/task-packet-protocol.md` capsule section uses placeholders only.
+- The doc explicitly instructs copying the factual capsule from `docs/hand-off/current.md`.
 - `pnpm -r build` passes.
 
 ## 8) Files likely touched (frozen)
@@ -85,23 +84,21 @@ We want the protocol to be robust:
 
 ## 9) Notes / hazards (frozen)
 
-- Keep it blunt. If the protocol can be misread, it will be.
+- If someone can paste stale facts again, we failed.
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [x] Protocol updated: capsule uses placeholders (no stale facts)
-- [x] Protocol explicitly references `docs/hand-off/current.md` as copy source
-- [x] Build passes (`pnpm -r build`)
+- [ ] Protocol updated: capsule uses placeholders only (no real task IDs, no state facts)
+- [ ] Protocol explicitly references `docs/hand-off/current.md` as copy source
+- [ ] Build passes (`pnpm -r build`)
 
 ## 11) Work Summary (fill after implementation)
 
-- Replaced hardcoded example state in `docs/hand-off/task-packet-protocol.md` with placeholders.
-- Added explicit warning to copy state from `docs/hand-off/current.md`.
-- Verified build passes.
+- (fill)
 
 ## 12) Commands Run (fill after implementation)
 
-- `pnpm -r build` (Exited with 0)
+- (fill)
 
 ## 13) Postflight (fill after implementation)
 
@@ -109,4 +106,4 @@ We want the protocol to be robust:
 
 ## 14) Patch Notes (fill after implementation)
 
-- Updated `docs/hand-off/task-packet-protocol.md` to prevent context stale state.
+- (fill)
