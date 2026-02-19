@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-19: task(0138) Remove deprecated `CoreZoneNames` and `CoreResources` exports from `@balance-control/rules` (API cleanup).
 - 2026-02-18: task(0112) Migrate `packages/client-web` to `type: module` and configure TS paths for source resolution (IDE support).
 - 2026-02-18: task(0106) Fix E2E board-viewport test by bypassing start screen; fix server tsconfig rootDir.
 - 2026-02-17: task(0100) Lock enabled packs in match meta, hash public surface, and validate replays against mismatched surfaces.

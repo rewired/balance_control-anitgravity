@@ -116,20 +116,29 @@ We now want to delete them to finish the deprecation cycle.
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Grep confirms no usage outside `packages/rules/src/*`
-- [ ] Deleted `CoreZoneNames` and `CoreResources`
-- [ ] Build passes (`pnpm -r build`)
-- [ ] Tests pass (`pnpm -r test`)
-- [ ] `docs/changelog.md` updated
-- [ ] `docs/hand-off/current.md` updated
+- [x] Grep confirms no usage outside `packages/rules/src/*`
+- [x] Deleted `CoreZoneNames` and `CoreResources`
+- [x] Build passes (`pnpm -r build`)
+- [x] Tests pass (`pnpm -r test`)
+- [x] `docs/changelog.md` updated
+- [x] `docs/hand-off/current.md` updated
 
 ## 11) Work Summary (fill after implementation)
 
-- (fill)
+- Verified zero usage of `CoreZoneNames` and `CoreResources` outside of their definitions using `grep`.
+- Removed `CoreZoneNames` enum from `packages/rules/src/zones.ts`.
+- Removed `CoreResources` enum from `packages/rules/src/resources.ts`.
+- Updated `docs/changelog.md` with the removal note.
+- Updated `docs/hand-off/current.md` to reflect the completed task and updated state.
+- Verified build and tests pass.
 
 ## 12) Commands Run (fill after implementation)
 
-- (fill)
+- `grep -r "CoreZoneNames" packages | grep -v "packages/rules/src"` (Clean)
+- `grep -r "CoreResources" packages | grep -v "packages/rules/src"` (Clean)
+- `pnpm -r build` (Passed)
+- `pnpm -r test` (Passed)
+- `git status -sb` (Clean)
 
 ## 13) Postflight (fill after implementation)
 
@@ -137,7 +146,7 @@ We now want to delete them to finish the deprecation cycle.
 
 ## 14) Patch Notes (fill after implementation)
 
-- (fill)
+- **API Breaking Change**: Removed deprecated `CoreZoneNames` and `CoreResources` from `@balance-control/rules`. Use `CoreZoneName` and `CoreResort` (or `ResourceId`) instead.
 
 ## 15) Downstream follow-ups
 

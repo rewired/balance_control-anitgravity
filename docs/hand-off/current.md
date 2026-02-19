@@ -2,7 +2,7 @@
 
 ## Last done
 
-- **Task:** 0137
+- **Task:** 0138
 - **Date:** 2026-02-19
 
 ## Current state (facts)
@@ -15,7 +15,6 @@
 - CORE tile definitions are data-driven (JSON) via `packages/game/src/packs/core/resources/core-tiles.json` and a deterministic generator.
 - Config `packs.enabledPacks` is the canonical enablement surface; legacy `cfg.expansions` is accepted only for compatibility and mismatch-detected.
 - `scripts/verify-packs.mjs` validates pack manifests, canonical order, and public-surface hashing using the public APIs (`@balance-control/game`, `@balance-control/packs`).
-- Deprecated exports `CoreZoneNames` / `CoreResources` still exist in `@balance-control/rules`, but have no repo usages outside their definitions.
 
 ## Decisions
 
@@ -38,12 +37,8 @@
 
 ## Next packet goal
 
-**Cleanup Wave 3:** Delete `CoreZoneNames` / `CoreResources` legacy exports from `@balance-control/rules` and refresh the Task Packet Protocol so the Context Capsule cannot go stale.
+**Refresh Protocol:** Refresh the Task Packet Protocol so the Context Capsule cannot go stale.
 
 ## Mini diff map (likely touched)
 
-- `packages/rules/src/zones.ts`
-- `packages/rules/src/resources.ts`
-- `docs/changelog.md`
-- `docs/hand-off/current.md`
 - `docs/hand-off/task-packet-protocol.md`
