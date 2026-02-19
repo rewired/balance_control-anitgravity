@@ -25,28 +25,31 @@ function getPacksConfig(expansions) {
 
 async function main() {
   let gameModule;
+  let packsModule;
   try {
     gameModule = await import("@balance-control/game");
+    packsModule = await import("@balance-control/packs");
   } catch (e) {
-    fail(`Could not import @balance-control/game. Run "pnpm -r build" first.\nOriginal error: ${e.message}`);
+    fail(`Could not import @balance-control/game or @balance-control/packs. Run "pnpm -r build" first.\nOriginal error: ${e.message}`);
   }
 
   const {
     EnginePackRegistry,
-    CorePack,
-    Exp01Pack,
-    Exp02Pack,
-    Exp03Pack,
     getPublicSurfaceHash,
     assemblePacks,
     CANONICAL_ENGINE_MODULE_ORDER
   } = gameModule;
 
+  const {
+    registerCanonicalPacks,
+    CorePack,
+    Exp01Pack,
+    Exp02Pack,
+    Exp03Pack
+  } = packsModule;
+
   EnginePackRegistry.clear();
-  EnginePackRegistry.registerPack(CorePack);
-  EnginePackRegistry.registerPack(Exp01Pack);
-  EnginePackRegistry.registerPack(Exp02Pack);
-  EnginePackRegistry.registerPack(Exp03Pack);
+  registerCanonicalPacks();
 
   const registered = EnginePackRegistry.getRegisteredPacks();
   const expectedRegisteredOrder = CANONICAL_ENGINE_MODULE_ORDER.filter((id) => registered.some((pack) => pack.id === id));

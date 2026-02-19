@@ -1,18 +1,7 @@
-import { CorePack, createBalanceControlGame, EnginePackRegistry, Exp01Pack, Exp02Pack, Exp03Pack } from '@balance-control/game';
+import { createBalanceControlGame } from '@balance-control/game';
+import { registerCanonicalPacks } from '@balance-control/packs';
 
-const registeredPackIds = new Set(EnginePackRegistry.getRegisteredPacks().map((pack) => pack.id));
-if (!registeredPackIds.has('core')) {
-    EnginePackRegistry.registerPack(CorePack);
-}
-if (!registeredPackIds.has('exp01')) {
-    EnginePackRegistry.registerPack(Exp01Pack);
-}
-if (!registeredPackIds.has('exp02')) {
-    EnginePackRegistry.registerPack(Exp02Pack);
-}
-if (!registeredPackIds.has('exp03')) {
-    EnginePackRegistry.registerPack(Exp03Pack);
-}
+registerCanonicalPacks();
 
 export const BalanceControlGame = createBalanceControlGame();
 export const GAME_NAME = BalanceControlGame.name!;

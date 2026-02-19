@@ -2,15 +2,17 @@
 
 ## Last done
 
-- **Task:** 0133
+- **Task:** 0134
 - **Date:** 2026-02-19
 
 ## Current state (facts)
 
+- `@balance-control/packs` is the canonical entrypoint for pack exports and registration.
+- `registerCanonicalPacks()` helper handles deterministic registration of all known packs (Core + Exp01..03).
 - EnginePackRegistry is canonical (single registry) and enforces deterministic canonical ordering + duplicate checks.
 - CORE tiles are loaded from JSON (`packages/game/src/packs/core/resources/core-tiles.json`) via `tile-loader.ts`.
 - Measures: EXP-01..03 use builder maps (no switch); engine routes measure atoms via `EnginePackRegistry.getMeasureAtomsForExpansion(...)`.
-- `scripts/verify-packs.mjs` imports from `@balance-control/game` public surface (no `game-dist` path).
+- `scripts/verify-packs.mjs` imports from `@balance-control/packs` and uses `registerCanonicalPacks()`.
 - Config `packs.enabledPacks` is the canonical enablement surface. Runtime no longer reads `cfg.expansions` directly (except normalization).
 - Deprecated exports `CoreZoneNames` / `CoreResources` still exist in `@balance-control/rules`, but are no longer used by engine runtime/tests (migration completed).
 - EnginePackRegistry still exposes deprecated `getMeasureAtoms(...)` API (tests should not use it; deletion is Wave 2).
@@ -21,10 +23,11 @@
 ### Binding
 
 - **Pack split:** Option 2. Rule code may live in pack packages (`packages/expansion-*`), but the engine remains the only executor. (`ARCH-01` already reflects this.)
+- **Canonical Pack Entrypoint:** `@balance-control/packs` is the single source of truth for app wiring.
 
 ### Open
 
-- Where to host canonical pack assembly for apps/tools (separate `@balance-control/packs` entrypoint vs alternative).
+- (None currently)
 
 ## Invariants (must not break)
 
@@ -35,7 +38,7 @@
 
 ## Next packet goal
 
-**Pack split Wave 1:** introduce a canonical pack entrypoint for apps/tools, make engine tests pack-agnostic, then remove the hard dependency `@balance-control/game -> @balance-control/expansion-*`.
+**Pack split Wave 1:** move real-pack tests out of `packages/game` and make engine tests pack-agnostic (Task 0135), then remove the hard dependency `@balance-control/game -> @balance-control/expansion-*` (Task 0136).
 
 ## Mini diff map (likely touched)
 
@@ -43,8 +46,5 @@
 - `packages/server/src/boot.ts`
 - `packages/client-web/src/game.ts`
 - `scripts/verify-packs.mjs`
-- `packages/game/test/*`
 - `packages/integration-tests/test/*`
-- `packages/game/package.json`
-- `packages/game/src/index.ts`
-- `packages/game/src/packs/exp0*` (removed in split)
+- `packages/game/test/*` (next task)

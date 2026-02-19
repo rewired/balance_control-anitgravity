@@ -118,27 +118,36 @@ This task introduces `@balance-control/packs` as that canonical entrypoint.
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Build passes (`pnpm -r build`)
-- [ ] Tests pass (`pnpm -r test`)
-- [ ] No rules changes (SPEC-anchored)
-- [ ] Registration remains explicit + deterministic
-- [ ] Updated docs/hand-off/current.md if any decision/fact changed
+- [x] Build passes (`pnpm -r build`)
+- [x] Tests pass (`pnpm -r test`)
+- [x] No rules changes (SPEC-anchored)
+- [x] Registration remains explicit + deterministic
+- [x] Updated docs/hand-off/current.md if any decision/fact changed
 
 ## 11) Work Summary (fill after implementation)
 
-- 
+- Created `@balance-control/packs` with `registerCanonicalPacks()` helper.
+- Migrated server, client-web, scripts, and integration tests to use `@balance-control/packs`.
+- Removed manual pack registration boilerplate from consumers.
+- Verified that no consumer imports packs directly from `@balance-control/game` (except `packs` package itself).
+- Integration tests updated to use `setupData.packs.enabledPacks`.
 
 ## 12) Commands Run (fill after implementation)
 
-- 
+- `pnpm -r build`
+- `pnpm -r test`
+- `node scripts/verify-packs.mjs`
+- `grep -r "from '@balance-control/game'" packages/server/src/boot.ts packages/client-web/src/game.ts scripts/verify-packs.mjs packages/integration-tests/test | grep -E "CorePack|Exp0"`
 
 ## 13) Postflight (fill after implementation)
 
-- 
+- See commit message.
 
 ## 14) Patch Notes (fill after implementation)
 
-- 
+- **New Package:** `@balance-control/packs` is now the canonical entrypoint for pack registration.
+- **Breaking Change (Internal):** Consumers should import packs from `@balance-control/packs` instead of `@balance-control/game`.
+- **Refactor:** Simplified pack registration in server and client-web.
 
 ## 15) Downstream follow-ups
 
