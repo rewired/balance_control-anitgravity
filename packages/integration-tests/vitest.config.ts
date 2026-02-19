@@ -12,6 +12,7 @@ export default defineConfig({
             '@balance-control/expansion-03': path.resolve(__dirname, '../expansion-03/src/index.ts'),
             '@balance-control/rules': path.resolve(__dirname, '../rules/src/index.ts'),
             '@balance-control/game': path.resolve(__dirname, '../game/src/index.ts'),
+            '@balance-control/packs': path.resolve(__dirname, '../packs/src/index.ts'),
         },
     },
 });

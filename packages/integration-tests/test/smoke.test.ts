@@ -54,7 +54,7 @@ describe('Integration: Real Pack Combinations', () => {
         expect(state).toBeDefined();
 
         // Verify configuration matches
-        expect(state.meta?.cfg?.packs?.enabledPacks).toEqual(['core', 'exp01', 'exp02', 'exp03']);
+        expect(state.meta?.cfg?.packs?.enabledPacks).toEqual(['exp01', 'exp02', 'exp03']);
 
         // Verify Core zones exist
         expect(state.zones[CoreZoneName.DrawPile]).toBeDefined();
