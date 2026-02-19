@@ -289,27 +289,6 @@ class EnginePackRegistryImpl {
     }
 
     /**
-     * Retrieves atoms for a measure from the appropriate expansion pack.
-     * @deprecated Use getMeasureAtomsForExpansion instead to avoid ambiguity.
-     * @expansion EXP-01|02|03
-     * @deterministic
-     * @pure
-     */
-    public getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
-        const enabledPackIds = new Set(this.resolveEnabledPackIds(G));
-        for (const expId of CANONICAL_EXPANSION_ORDER) {
-            if (!enabledPackIds.has(expId)) continue;
-            const pack = this.packs[expId];
-            if (!pack) continue;
-            if (pack.getMeasureAtoms) {
-                const atoms = pack.getMeasureAtoms(G, measureId, payload);
-                if (atoms) return atoms;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Retrieves all measure deck descriptors from enabled packs.
      * @expansion EXP-01|02|03
      * @deterministic
