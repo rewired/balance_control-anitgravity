@@ -11,9 +11,9 @@
 - CORE tiles are loaded from JSON (`packages/game/src/packs/core/resources/core-tiles.json`) via `tile-loader.ts`.
 - Measures: EXP-01..03 use builder maps (no switch); engine routes measure atoms via `EnginePackRegistry.getMeasureAtomsForExpansion(...)`.
 - `scripts/verify-packs.mjs` imports from `@balance-control/game` public surface (no `game-dist` path).
-- Deprecated exports `CoreZoneNames` / `CoreResources` from `@balance-control/rules` are still used in engine code + tests.
-- Config `packs.enabledPacks` is now the canonical enablement surface. Runtime no longer reads `cfg.expansions` directly (except normalization).
-- EnginePackRegistry still exposes deprecated `getMeasureAtoms(...)` API (should become unused before deletion).
+- Config `packs.enabledPacks` is the canonical enablement surface. Runtime no longer reads `cfg.expansions` directly (except normalization).
+- Deprecated exports `CoreZoneNames` / `CoreResources` still exist in `@balance-control/rules`, but are no longer used by engine runtime/tests (migration completed).
+- EnginePackRegistry still exposes deprecated `getMeasureAtoms(...)` API (tests should not use it; deletion is Wave 2).
 - `@balance-control/game` still has hard dependencies on `@balance-control/expansion-01..03` (pack split not started).
 
 ## Decisions
@@ -24,7 +24,7 @@
 
 ### Open
 
-- How to remove the hard dependency `@balance-control/game -> @balance-control/expansion-*` (introduce a separate packs-aggregator package vs other split).
+- Where to host canonical pack assembly for apps/tools (separate `@balance-control/packs` entrypoint vs alternative).
 
 ## Invariants (must not break)
 
@@ -35,15 +35,16 @@
 
 ## Next packet goal
 
-Deprecations Wave 1: migrate runtime + tests off legacy `cfg.expansions`, `CoreZoneNames/CoreResources`, and stop using deprecated `EnginePackRegistry.getMeasureAtoms(...)`.
+**Pack split Wave 1:** introduce a canonical pack entrypoint for apps/tools, make engine tests pack-agnostic, then remove the hard dependency `@balance-control/game -> @balance-control/expansion-*`.
 
 ## Mini diff map (likely touched)
 
-- `packages/game/src/setup.ts`
-- `packages/game/src/config.ts`
-- `packages/game/src/expansion-registry.ts`
-- `packages/game/src/engine/legal-intents.ts`
-- `packages/game/src/moves/*`
-- `packages/game/src/packs/core/index.ts`
-- `packages/game/test/*`
+- `packages/packs/*` (new)
+- `packages/server/src/boot.ts`
+- `packages/client-web/src/game.ts`
 - `scripts/verify-packs.mjs`
+- `packages/game/test/*`
+- `packages/integration-tests/test/*`
+- `packages/game/package.json`
+- `packages/game/src/index.ts`
+- `packages/game/src/packs/exp0*` (removed in split)
