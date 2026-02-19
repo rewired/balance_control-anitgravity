@@ -103,27 +103,33 @@ Make runtime and tooling use `packs.enabledPacks` as the only enablement signal,
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Build passes (`pnpm -r build`)
-- [ ] Tests pass (`pnpm -r test`)
-- [ ] No rules changes (SPEC-anchored)
-- [ ] Deterministic ordering preserved (no new nondeterminism)
-- [ ] Updated docs/hand-off/current.md if any decision/fact changed
+- [x] Build passes (`pnpm -r build`)
+- [x] Tests pass (`pnpm -r test`)
+- [x] No rules changes (SPEC-anchored)
+- [x] Deterministic ordering preserved (no new nondeterminism)
+- [x] Updated docs/hand-off/current.md if any decision/fact changed
 
 ## 11) Work Summary (fill after implementation)
 
-- 
+- Implemented strict mismatch detection in `normalizeGameConfig`: throws if both `expansions` and `packs.enabledPacks` are provided but conflict.
+- Updated `SetupGame` in `packages/game/src/setup.ts` to derive ruleset manifest and engine attributes solely from `packs.enabledPacks`.
+- Updated `scripts/verify-packs.mjs` to use `packs.enabledPacks` for configuration verification.
+- Updated `config-normalization.test.ts` to cover conflict scenarios and consistent dual-config scenarios.
+- Verified removal of runtime `cfg.expansions` dependencies (except for normalization compatibility).
 
 ## 12) Commands Run (fill after implementation)
 
-- 
+- `pnpm -r build` (Passed)
+- `pnpm -r test` (Passed)
+- `node scripts/verify-packs.mjs` (Passed)
 
 ## 13) Postflight (fill after implementation)
 
-- 
+-
 
 ## 14) Patch Notes (fill after implementation)
 
-- 
+-
 
 ## 15) Downstream follow-ups
 

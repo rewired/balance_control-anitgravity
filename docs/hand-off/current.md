@@ -2,9 +2,9 @@
 
 ## Last done
 
-- **Task:** 0130 — verify-packs imports via public API
+- **Task:** 0131 — CONFIG: Make `packs.enabledPacks` canonical at runtime
 - **Date:** 2026-02-19
-- **Outcome (facts):** verify-packs imports `@balance-control/game`; CORE tiles are data-driven; measures dispatch uses `getMeasureAtomsForExpansion(...)`.
+- **Outcome (facts):** `packs.enabledPacks` is now the canonical enablement surface. Runtime no longer reads `cfg.expansions` directly (except normalization). Mismatch detection added for conflicting `expansions` vs `packs.enabledPacks` config.
 
 ## Current state (facts)
 
@@ -13,7 +13,7 @@
 - Measures: EXP-01..03 use builder maps (no switch); engine routes measure atoms via `EnginePackRegistry.getMeasureAtomsForExpansion(...)`.
 - `scripts/verify-packs.mjs` imports from `@balance-control/game` public surface (no `game-dist` path).
 - Deprecated exports `CoreZoneNames` / `CoreResources` from `@balance-control/rules` are still used in engine code + tests.
-- Config supports `packs.enabledPacks`, but runtime paths still rely on legacy `cfg.expansions` in places (e.g. ruleset manifest selection).
+- Config `packs.enabledPacks` is now the canonical enablement surface. Runtime no longer reads `cfg.expansions` directly (except normalization).
 - EnginePackRegistry still exposes deprecated `getMeasureAtoms(...)` API (should become unused before deletion).
 - `@balance-control/game` still has hard dependencies on `@balance-control/expansion-01..03` (pack split not started).
 
