@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CoreMoves } from '../src/moves';
-import { GameState, TileType, CoreZoneNames } from '@balance-control/rules';
+import { GameState, TileType, CoreZoneName } from '@balance-control/rules';
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { registerTestPacks } from './_helpers/registerPacks';
 
@@ -37,7 +37,7 @@ describe('Moves', () => {
         events = { endTurn: () => { }, endStage: () => { } };
         G = {
             zones: {
-                [CoreZoneNames.Board]: { id: CoreZoneNames.Board, name: 'Board', items: ['board_t1', 'board_t2', 'board_gr', 'board_start'] },
+                [CoreZoneName.Board]: { id: CoreZoneName.Board, name: 'Board', items: ['board_t1', 'board_t2', 'board_gr', 'board_start'] },
                 'PersonalSupply:p1': { id: 'PersonalSupply:p1', name: 'PS', items: ['meta_p1', 'inf_1', 'res_dom', 'res_dom_2', 'res_for', 'res_inf'] },
                 board_t1: { id: 'board_t1', name: 'T1', items: [] },
                 board_t2: { id: 'board_t2', name: 'T2', items: [] },

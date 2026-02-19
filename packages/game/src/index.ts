@@ -1,5 +1,5 @@
 import { Game } from 'boardgame.io';
-import { GameState, CoreZoneNames, TileType } from '@balance-control/rules';
+import { GameState, CoreZoneName, TileType } from '@balance-control/rules';
 import { SetupGame } from './setup';
 import { positionKeyFromCoordString } from './topology';
 import { drawTileToStaging } from './mechanics-draw';
@@ -27,11 +27,11 @@ function selectMoves(mergedMoves: MoveMap, moveIds: readonly string[], stageName
 
 function isZoneVisible(zoneId: string, playerID: string): boolean {
     if (zoneId.startsWith('staging_')) return zoneId === `staging_${playerID}`;
-    if (zoneId.startsWith(`${CoreZoneNames.PersonalSupply}:`)) {
-        return zoneId === `${CoreZoneNames.PersonalSupply}:${playerID}`;
+    if (zoneId.startsWith(`${CoreZoneName.PersonalSupply}:`)) {
+        return zoneId === `${CoreZoneName.PersonalSupply}:${playerID}`;
     }
-    if (zoneId.startsWith(`${CoreZoneNames.PlayerHand}:`)) {
-        return zoneId === `${CoreZoneNames.PlayerHand}:${playerID}`;
+    if (zoneId.startsWith(`${CoreZoneName.PlayerHand}:`)) {
+        return zoneId === `${CoreZoneName.PlayerHand}:${playerID}`;
     }
     return true;
 }
@@ -58,13 +58,13 @@ function buildPlayerView(G: GameState, playerID?: string | null): GameState {
     const visibleTileIds = new Set<string>();
 
     const forbiddenPlaceholderIds = new Set<string>([...Object.keys(G.tiles), ...Object.keys(G.objects)]);
-    const drawPile = G.zones[CoreZoneNames.DrawPile];
+    const drawPile = G.zones[CoreZoneName.DrawPile];
     const maskedDrawPileItems = drawPile ? makeDrawPilePlaceholders(drawPile.items.length, forbiddenPlaceholderIds) : [];
 
     for (const [zoneId, zone] of Object.entries(G.zones)) {
         if (!isZoneVisible(zoneId, playerID)) continue;
 
-        if (zoneId === CoreZoneNames.DrawPile) {
+        if (zoneId === CoreZoneName.DrawPile) {
             zones[zoneId] = { ...zone, items: maskedDrawPileItems };
             for (const itemId of maskedDrawPileItems) {
                 objectIds.add(itemId);
@@ -124,11 +124,11 @@ export function createBalanceControlGame(): Game<GameState> {
 
         // CORE-01-09-01: End when DrawPile is empty
         endIf: ({ G }: { G: GameState }) => {
-            const drawPile = G.zones[CoreZoneNames.DrawPile];
+            const drawPile = G.zones[CoreZoneName.DrawPile];
             if (drawPile && drawPile.items.length === 0 && (G as any).roundSettlementDone) {
                 // CORE-01-09-03: Count Influence ON BOARD tiles only
                 const scores: Record<string, number> = {};
-                const boardZone = G.zones[CoreZoneNames.Board];
+                const boardZone = G.zones[CoreZoneName.Board];
                 if (boardZone) {
                     for (const tileId of boardZone.items) {
                         const tileZone = G.zones[tileId];
@@ -172,7 +172,7 @@ export function createBalanceControlGame(): Game<GameState> {
                 EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
                 drawTileToStaging(G, ctx);
                 // CORE-01-09-01A: Flag when DrawPile is empty and no tile is staged (skip Political Action)
-                const drawPile = G.zones[CoreZoneNames.DrawPile];
+                const drawPile = G.zones[CoreZoneName.DrawPile];
                 const stagingId = `staging_${ctx.currentPlayer}`;
                 const staging = G.zones[stagingId];
                 const stagingEmpty = !staging || staging.items.length === 0;
@@ -193,7 +193,7 @@ export function createBalanceControlGame(): Game<GameState> {
                     G.roundNumber++;
 
                     // CORE-01-07-03D: Round Settlement — resolve production in ascending PositionKey order
-                    const boardZone = G.zones[CoreZoneNames.Board];
+                    const boardZone = G.zones[CoreZoneName.Board];
                     const grid = G.grid ?? {};
                     if (boardZone) {
                         const resortTilesWithCoord: { tileId: string; posKey: string }[] = [];
@@ -218,7 +218,7 @@ export function createBalanceControlGame(): Game<GameState> {
                     EffectResolver.resetRoundScopedUsage(G as any);
 
                     // Check if draw pile is empty → flag for endIf
-                    const drawPile = G.zones[CoreZoneNames.DrawPile];
+                    const drawPile = G.zones[CoreZoneName.DrawPile];
                     if (drawPile && drawPile.items.length === 0) {
                         G.roundSettlementDone = true;
                     }

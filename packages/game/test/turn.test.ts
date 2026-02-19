@@ -1,7 +1,7 @@
 import { beforeEach, describe, it, expect } from 'vitest';
 import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from '../src/index';
-import { CoreZoneNames } from '@balance-control/rules';
+import { CoreZoneName } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
 import { registerTestPacks } from './_helpers/registerPacks';
 
@@ -30,7 +30,7 @@ function createTinyDrawPileGame() {
         ...BalanceControlNoPlayerView,
         setup: (ctx: any) => {
             const G = SetupGame({ ctx });
-            const drawPile = G.zones[CoreZoneNames.DrawPile];
+            const drawPile = G.zones[CoreZoneName.DrawPile];
             drawPile.items = drawPile.items.slice(0, 1);
             return G;
         }
@@ -43,7 +43,7 @@ function createMetaMarkerPersistenceGame() {
         setup: (ctx: any) => {
             const G = SetupGame({ ctx });
             const markerId = 'meta_0';
-            const supplyId = `${CoreZoneNames.PersonalSupply}:0`;
+            const supplyId = `${CoreZoneName.PersonalSupply}:0`;
             if (!G.zones[supplyId]) {
                 G.zones[supplyId] = { id: supplyId, name: supplyId, items: [] };
             }
@@ -196,7 +196,7 @@ describe('Turn Structure (Stages)', () => {
         client.start();
 
         const stateAfterStart = client.getState();
-        expect(stateAfterStart.G.zones[CoreZoneNames.DrawPile].items.length).toBe(0);
+        expect(stateAfterStart.G.zones[CoreZoneName.DrawPile].items.length).toBe(0);
 
         client.moves.placeTile({ targetCoord: '1,0' });
         client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, '1,0') });

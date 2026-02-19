@@ -1,4 +1,4 @@
-import { CoreZoneNames, CoreResources } from '@balance-control/rules';
+import { CoreZoneName } from '@balance-control/rules';
 import { findObjectZoneId } from '../state-lookup';
 
 export const DRAW_AND_PLACE_STAGE = 'drawAndPlace';
@@ -58,7 +58,7 @@ interface GrassrootsConversionSpec {
  * @pure
  */
 export function isBoardTile(G: any, tileId: string): boolean {
-    const boardZone = G.zones[CoreZoneNames.Board];
+    const boardZone = G.zones[CoreZoneName.Board];
     return Boolean(boardZone?.items?.includes(tileId));
 }
 
@@ -101,7 +101,7 @@ export function getGrassrootsConversionSpec(tile: any, inputCount: number, outpu
  * @pure
  */
 export function isCoreResort(resort: string): boolean {
-    return resort === CoreResources.DOM || resort === CoreResources.FOR || resort === CoreResources.INF;
+    return resort === 'DOM' || resort === 'FOR' || resort === 'INF';
 }
 
 /**

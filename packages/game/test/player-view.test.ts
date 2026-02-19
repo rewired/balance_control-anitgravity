@@ -1,7 +1,7 @@
 import { beforeEach, describe, it, expect } from 'vitest';
 import { createBalanceControlGame } from '../src/index';
 import { SetupGame } from '../src/setup';
-import { CoreZoneNames } from '@balance-control/rules';
+import { CoreZoneName } from '@balance-control/rules';
 import { registerTestPacks } from './_helpers/registerPacks';
 
 describe('playerView', () => {
@@ -15,11 +15,11 @@ describe('playerView', () => {
         const G = SetupGame({ ctx });
         const view = game.playerView?.({ G, ctx, playerID: '0' }) as any;
 
-        const otherSupplyId = `${CoreZoneNames.PersonalSupply}:1`;
+        const otherSupplyId = `${CoreZoneName.PersonalSupply}:1`;
         const otherSupplyItems = G.zones[otherSupplyId].items;
 
         expect(view.zones[otherSupplyId]).toBeUndefined();
-        expect(view.zones[`${CoreZoneNames.PersonalSupply}:0`]).toBeDefined();
+        expect(view.zones[`${CoreZoneName.PersonalSupply}:0`]).toBeDefined();
 
         for (const itemId of otherSupplyItems) {
             expect(view.objects[itemId]).toBeUndefined();
@@ -44,11 +44,11 @@ describe('playerView', () => {
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
 
-        const originalDrawPileItems = G.zones[CoreZoneNames.DrawPile].items.slice();
+        const originalDrawPileItems = G.zones[CoreZoneName.DrawPile].items.slice();
         expect(originalDrawPileItems.length).toBeGreaterThan(0);
 
         const view = game.playerView?.({ G, ctx, playerID: '0' }) as any;
-        const viewDrawPile = view.zones[CoreZoneNames.DrawPile];
+        const viewDrawPile = view.zones[CoreZoneName.DrawPile];
 
         expect(viewDrawPile).toBeDefined();
         expect(viewDrawPile.items.length).toBe(originalDrawPileItems.length);

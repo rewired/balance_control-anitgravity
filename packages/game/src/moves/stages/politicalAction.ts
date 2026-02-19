@@ -1,5 +1,5 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { CoreZoneNames, TileType } from '@balance-control/rules';
+import { CoreZoneName, TileType } from '@balance-control/rules';
 import { computeMajority } from '../../mechanics';
 import {
     allStartingInfluencePlaced,
@@ -115,7 +115,7 @@ export const PoliticalActionMoves = {
         const markerZoneId = marker ? findObjectZoneId(G, marker.id) : null;
         let penaltyCount = 0;
         if (marker && marker.mode === 'PingPong' && markerZoneId === targetId) {
-            const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+            const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
             const supply = G.zones[supplyId];
             const R = supply?.items?.filter((id: string) => G.objects[id]?.type === 'Resource').length ?? 0;
             penaltyCount = Math.min(10, Math.floor(R / 2));
@@ -135,7 +135,7 @@ export const PoliticalActionMoves = {
         if (hasOverlap(penaltyResourceIds, extraCostResourceIds)) return INVALID_MOVE;
 
         if (penaltyCount > 0) {
-            const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+            const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
             const supply = G.zones[supplyId];
             for (const rid of penaltyResourceIds) {
                 if (!supply?.items.includes(rid)) return INVALID_MOVE;
@@ -215,7 +215,7 @@ export const PoliticalActionMoves = {
         if (hasDuplicateIds(paymentResourceIds)) return INVALID_MOVE;
         if (hasOverlap(paymentResourceIds, extraResourceIds)) return INVALID_MOVE;
 
-        const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+        const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
         const supply = G.zones[supplyId];
         for (const rid of paymentResourceIds) {
             if (!supply.items.includes(rid)) return INVALID_MOVE;
@@ -316,7 +316,7 @@ export const PoliticalActionMoves = {
         const { controller } = computeMajority(grassrootsTileId, G);
         if (controller !== pid) return INVALID_MOVE;
 
-        const supplyId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+        const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
         const supply = G.zones[supplyId];
         for (const rid of inputResourceIds) {
             if (!supply.items.includes(rid)) return INVALID_MOVE;

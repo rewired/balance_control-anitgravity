@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { CoreZoneNames } from '@balance-control/rules';
+import { CoreZoneName } from '@balance-control/rules';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { SetupGame } from '../src/setup';
 import { computeMajority } from '../src/mechanics';
@@ -41,15 +41,15 @@ describe('EXP-02 controller grants with no controller', () => {
         // We manually add it.
         G.tiles[hotspotId] = { id: hotspotId, type: 'Resort', resort: 'SEC' };
         G.zones[hotspotId] = { id: hotspotId, name: 'Inner Order', items: [] };
-        G.zones[CoreZoneNames.Board].items.push(hotspotId);
+        G.zones[CoreZoneName.Board].items.push(hotspotId);
 
         expect(G.tiles[hotspotId]).toBeTruthy();
         expect(G.zones[hotspotId]).toBeTruthy();
 
         const pid = ctx.currentPlayer;
-        const supply = G.zones[`${CoreZoneNames.PersonalSupply}:${pid}`];
-        const noise = G.zones[CoreZoneNames.Noise];
-        const bank = G.zones[CoreZoneNames.Bank];
+        const supply = G.zones[`${CoreZoneName.PersonalSupply}:${pid}`];
+        const noise = G.zones[CoreZoneName.Noise];
+        const bank = G.zones[CoreZoneName.Bank];
 
         expect(computeMajority(hotspotId, G).controller).toBeNull();
 

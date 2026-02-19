@@ -1,4 +1,4 @@
-import { CoreZoneNames, GameState } from '@balance-control/rules';
+import { CoreZoneName, GameState } from '@balance-control/rules';
 import { enumerateLegalIntents } from './engine/legal-intents';
 import { hasAnyOpenPlacement } from './moves/stages/drawAndPlace';
 
@@ -66,7 +66,7 @@ function markDrawPileEmptyForFinalSettlement(G: GameState): void {
  * @rule CORE-01-03-02A
  */
 function shuffleDrawPile(G: GameState, ctx: any): void {
-    const drawPile = G.zones[CoreZoneNames.DrawPile];
+    const drawPile = G.zones[CoreZoneName.DrawPile];
     const random = ctx?.random;
     if (!drawPile || !random) return;
     if (typeof random.Die === 'function') {
@@ -105,7 +105,7 @@ export function drawTileToStaging(G: GameState, ctx: any): void {
     // If already has a tile, don't draw (idempotency).
     if (staging.items.length > 0) return;
 
-    const drawPile = G.zones[CoreZoneNames.DrawPile];
+    const drawPile = G.zones[CoreZoneName.DrawPile];
     if (!drawPile || drawPile.items.length === 0) {
         markDrawPileEmptyForFinalSettlement(G);
         return;
@@ -135,7 +135,7 @@ export function drawTileToStaging(G: GameState, ctx: any): void {
             drawPile.items.push(tileId);
             shuffleDrawPile(G, ctx);
         } else {
-            const discardZone = G.zones[CoreZoneNames.DiscardFaceUp];
+            const discardZone = G.zones[CoreZoneName.DiscardFaceUp];
             discardZone.items.push(tileId);
         }
         return;
@@ -145,7 +145,7 @@ export function drawTileToStaging(G: GameState, ctx: any): void {
         drawPile.items.push(tileId);
         shuffleDrawPile(G, ctx);
     } else {
-        const discardZone = G.zones[CoreZoneNames.DiscardFaceUp];
+        const discardZone = G.zones[CoreZoneName.DiscardFaceUp];
         discardZone.items.push(tileId);
     }
 

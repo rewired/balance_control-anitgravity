@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { CoreZoneNames, CoreResources, TileType } from '@balance-control/rules';
+import { CoreZoneName, TileType } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
 import { CoreMoves } from '../src/moves';
 import { registerTestPacks } from './_helpers/registerPacks';
@@ -17,7 +17,7 @@ function createCtx() {
 function prepareGameWithBoardGrassroots() {
     const ctx = createCtx();
     const G = SetupGame({ ctx });
-    const drawPile = G.zones[CoreZoneNames.DrawPile];
+    const drawPile = G.zones[CoreZoneName.DrawPile];
     // Use Typed Grassroots (2:1) for this test
     const grassrootsTileId = drawPile.items.find(
         (tileId) => G.tiles[tileId]?.type === TileType.Grassroots && (G.tiles[tileId]?.conversion?.inputSlots === 2 || G.tiles[tileId]?.resort)
@@ -28,7 +28,7 @@ function prepareGameWithBoardGrassroots() {
     }
 
     drawPile.items = drawPile.items.filter((tileId) => tileId !== grassrootsTileId);
-    G.zones[CoreZoneNames.Board].items.push(grassrootsTileId);
+    G.zones[CoreZoneName.Board].items.push(grassrootsTileId);
 
     return { G, ctx, grassrootsTileId };
 }
@@ -40,7 +40,7 @@ function addPlayerResource(G: any, playerId: string, resourceId: string, resort:
         owner: playerId,
         resort
     };
-    G.zones[`${CoreZoneNames.PersonalSupply}:${playerId}`].items.push(resourceId);
+    G.zones[`${CoreZoneName.PersonalSupply}:${playerId}`].items.push(resourceId);
 }
 
 describe('ConvertResources with real setup-generated Grassroots tiles', () => {
@@ -52,10 +52,10 @@ describe('ConvertResources with real setup-generated Grassroots tiles', () => {
         const { G, ctx, grassrootsTileId } = prepareGameWithBoardGrassroots();
         const events = { endTurn: () => { } };
         const pid = ctx.currentPlayer;
-        const supply = G.zones[`${CoreZoneNames.PersonalSupply}:${pid}`];
+        const supply = G.zones[`${CoreZoneName.PersonalSupply}:${pid}`];
 
-        addPlayerResource(G, pid, 'res_dom_input', CoreResources.DOM);
-        addPlayerResource(G, pid, 'res_for_input', CoreResources.FOR);
+        addPlayerResource(G, pid, 'res_dom_input', 'DOM');
+        addPlayerResource(G, pid, 'res_for_input', 'FOR');
         const influenceId = supply.items.find((itemId: string) => G.objects[itemId]?.type === 'Influence') as string;
         supply.items = supply.items.filter((itemId: string) => itemId !== influenceId);
         G.zones[grassrootsTileId].items.push(influenceId);
@@ -65,15 +65,15 @@ describe('ConvertResources with real setup-generated Grassroots tiles', () => {
             {
                 grassrootsTileId,
                 inputResourceIds: ['res_dom_input', 'res_for_input'],
-                outputResort: CoreResources.INF
+                outputResort: 'INF'
             }
         );
 
         expect(result).not.toBe(INVALID_MOVE);
         expect(supply.items).not.toContain('res_dom_input');
         expect(supply.items).not.toContain('res_for_input');
-        expect(G.zones[CoreZoneNames.Bank].items).toContain('res_dom_input');
-        expect(G.zones[CoreZoneNames.Bank].items).toContain('res_for_input');
+        expect(G.zones[CoreZoneName.Bank].items).toContain('res_dom_input');
+        expect(G.zones[CoreZoneName.Bank].items).toContain('res_for_input');
 
         const granted = supply.items
             .map((id: string) => G.objects[id])
@@ -81,7 +81,7 @@ describe('ConvertResources with real setup-generated Grassroots tiles', () => {
 
         expect(granted).toHaveLength(1);
         expect(granted[0].owner).toBe(pid);
-        expect(granted[0].resort).toBe(CoreResources.INF);
+        expect(granted[0].resort).toBe('INF');
     });
 
     it('should fail atomically on invalid conversion input count', () => {
@@ -89,7 +89,7 @@ describe('ConvertResources with real setup-generated Grassroots tiles', () => {
         const events = { endTurn: () => { } };
         const pid = ctx.currentPlayer;
 
-        addPlayerResource(G, pid, 'res_dom_input', CoreResources.DOM);
+        addPlayerResource(G, pid, 'res_dom_input', 'DOM');
         const before = JSON.stringify(G);
 
         const result = CoreMoves.convertResources(
@@ -97,7 +97,7 @@ describe('ConvertResources with real setup-generated Grassroots tiles', () => {
             {
                 grassrootsTileId,
                 inputResourceIds: ['res_dom_input'],
-                outputResort: CoreResources.INF
+                outputResort: 'INF'
             }
         );
 

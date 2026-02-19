@@ -1,4 +1,4 @@
-import { GameState, TileType, GameObject, CoreZoneNames, ResourceType } from '@balance-control/rules';
+import { GameState, TileType, GameObject, ResourceType } from '@balance-control/rules';
 
 export interface MajorityResult {
     controller: string | null;

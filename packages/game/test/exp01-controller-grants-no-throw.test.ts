@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { CoreResources, CoreZoneNames, TileType } from '@balance-control/rules';
+import { CoreZoneName, TileType } from '@balance-control/rules';
 import { Expansion01 } from '../../expansion-01/src/index';
 import { Exp01Pack } from '../src';
 import { EnginePackRegistry } from '../src/expansion-registry';
@@ -29,11 +29,11 @@ describe('EXP-01 controller grants with no controller', () => {
         }) as any;
 
         const pid = '0';
-        const drawPile = G.zones[CoreZoneNames.DrawPile];
-        const board = G.zones[CoreZoneNames.Board];
-        const supply = G.zones[`${CoreZoneNames.PersonalSupply}:${pid}`];
-        const noise = G.zones[CoreZoneNames.Noise];
-        const bank = G.zones[CoreZoneNames.Bank];
+        const drawPile = G.zones[CoreZoneName.DrawPile];
+        const board = G.zones[CoreZoneName.Board];
+        const supply = G.zones[`${CoreZoneName.PersonalSupply}:${pid}`];
+        const noise = G.zones[CoreZoneName.Noise];
+        const bank = G.zones[CoreZoneName.Bank];
 
         const resortTileId = drawPile.items.find((tileId: string) => G.tiles[tileId]?.type === TileType.Resort);
         expect(resortTileId).toBeTruthy();
@@ -46,7 +46,7 @@ describe('EXP-01 controller grants with no controller', () => {
             id: ecoResourceId,
             type: 'Resource',
             owner: pid,
-            resort: CoreResources.ECO
+            resort: 'ECO'
         };
         supply.items.push(ecoResourceId);
 

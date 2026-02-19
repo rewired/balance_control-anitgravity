@@ -1,4 +1,4 @@
-import { CoreResources, CoreZoneNames, RULESET_MANIFEST, TileType, type GameConfig, type GameObject, type GameState, type Tile } from '@balance-control/rules';
+import { CoreZoneName, RULESET_MANIFEST, TileType, type GameConfig, type GameObject, type GameState, type Tile } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
 import { generateCoreTiles } from './tile-loader';
 import {
@@ -35,7 +35,7 @@ export const CorePack: EnginePackDefinition = {
     setup: {
         preShuffle: (G: GameState, ctx: any, _cfg: GameConfig) => {
             // 1. Initialize Zones
-            const globalZones = [CoreZoneNames.DrawPile, CoreZoneNames.DiscardFaceUp, CoreZoneNames.Board, CoreZoneNames.Bank, CoreZoneNames.Noise];
+            const globalZones = [CoreZoneName.DrawPile, CoreZoneName.DiscardFaceUp, CoreZoneName.Board, CoreZoneName.Bank, CoreZoneName.Noise];
 
             for (const zoneId of globalZones) {
                 G.zones[zoneId] = { id: zoneId, name: zoneId, items: [] };
@@ -44,7 +44,7 @@ export const CorePack: EnginePackDefinition = {
             // Personal Zones (Meta-Marker only; CORE-01-03-03B: Influence after Shuffle)
             for (let i = 0; i < ctx.numPlayers; i++) {
                 const pid = i.toString();
-                const zoneId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+                const zoneId = `${CoreZoneName.PersonalSupply}:${pid}`;
                 G.zones[zoneId] = { id: zoneId, name: zoneId, items: [] };
 
                 const metaId = `meta_${pid}`;
@@ -55,7 +55,7 @@ export const CorePack: EnginePackDefinition = {
 
             // 2. Initialize Tiles (Start Committee)
             G.tiles[START_COMMITTEE_TILE_ID] = { id: START_COMMITTEE_TILE_ID, type: TileType.StartCommittee };
-            G.zones[CoreZoneNames.Board].items.push(START_COMMITTEE_TILE_ID);
+            G.zones[CoreZoneName.Board].items.push(START_COMMITTEE_TILE_ID);
             // Our mechanics assume G.zones[tileId] exists for placement.
             G.zones[START_COMMITTEE_TILE_ID] = { id: START_COMMITTEE_TILE_ID, name: 'Start Committee', items: [] };
             // Fix B: Start Committee needs a grid coordinate for adjacency checks
@@ -65,7 +65,7 @@ export const CorePack: EnginePackDefinition = {
             const coreTiles = generateCoreTiles(ctx.numPlayers);
             for (const tile of coreTiles) {
                 G.tiles[tile.id] = tile;
-                G.zones[CoreZoneNames.DrawPile].items.push(tile.id);
+                G.zones[CoreZoneName.DrawPile].items.push(tile.id);
                 // Create context zone for every tile to handle items on it
                 G.zones[tile.id] = { id: tile.id, name: tile.name || tile.id, items: [] };
             }
@@ -74,7 +74,7 @@ export const CorePack: EnginePackDefinition = {
             // CORE-01-03-03B(5): Assign Starting Influence after Shuffle
             for (let i = 0; i < ctx.numPlayers; i++) {
                 const pid = i.toString();
-                const zoneId = `${CoreZoneNames.PersonalSupply}:${pid}`;
+                const zoneId = `${CoreZoneName.PersonalSupply}:${pid}`;
                 let influenceCount = 0;
                 if (ctx.numPlayers === 2) influenceCount = 4;
                 else if (ctx.numPlayers === 3) influenceCount = 3;

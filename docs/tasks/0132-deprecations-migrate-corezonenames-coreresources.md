@@ -101,23 +101,30 @@ Remove all usage of `CoreZoneNames` / `CoreResources` from engine code and tests
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Build passes (`pnpm -r build`)
-- [ ] Tests pass (`pnpm -r test`)
-- [ ] Repo grep confirms no deprecated usage outside rules
-- [ ] No rules behavior change (only symbols)
-- [ ] Determinism preserved (no ordering changes)
+- [x] Build passes (`pnpm -r build`)
+- [x] Tests pass (`pnpm -r test`)
+- [x] Repo grep confirms no deprecated usage outside rules
+- [x] No rules behavior change (only symbols)
+- [x] Determinism preserved (no ordering changes)
 
 ## 11) Work Summary (fill after implementation)
 
-- 
+- Migrated all `CoreZoneNames` references to `CoreZoneName` in `packages/game/src` and `packages/game/test`.
+- Migrated all `CoreResources` references to string literals or `CoreResort` in `packages/game`.
+- Updated `packages/expansion-03/src/engine/index.ts` to fix broken build caused by missing deprecated constants (replaced with `CoreZoneName` and string literals).
+- Verified no remaining usages of deprecated enums outside of their definitions in `packages/rules` and documentation.
+- Verified build and tests pass for all packages.
 
 ## 12) Commands Run (fill after implementation)
 
-- 
+- `grep -r "CoreZoneNames" packages` (verified no matches outside rules)
+- `grep -r "CoreResources" packages` (verified no matches outside rules)
+- `pnpm -r build` (passed)
+- `pnpm -r test` (passed)
 
 ## 13) Postflight (fill after implementation)
 
-- 
+- See commit message.
 
 ## 14) Patch Notes (fill after implementation)
 

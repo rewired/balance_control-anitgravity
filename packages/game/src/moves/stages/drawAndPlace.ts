@@ -1,5 +1,5 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { CoreZoneNames, TileType } from '@balance-control/rules';
+import { CoreZoneName, TileType } from '@balance-control/rules';
 import { stringToCoord, coordToString, getNeighbors, isSurrounded, positionKeyFromCoordString } from '../../topology';
 import { runFinalRoundSettlement } from '../../mechanics-turn';
 import { EffectResolver } from '../../engine/resolver';
@@ -69,7 +69,7 @@ export const DrawAndPlaceMoves = {
             if (Object.keys(G.grid).length > 0) return INVALID_MOVE;
         }
 
-        const boardZone = G.zones[CoreZoneNames.Board];
+        const boardZone = G.zones[CoreZoneName.Board];
 
         staging.items.shift();
         boardZone.items.push(tileId);

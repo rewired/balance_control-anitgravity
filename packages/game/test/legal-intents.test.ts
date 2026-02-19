@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { CoreZoneNames, TileType } from '@balance-control/rules';
+import { CoreZoneName, TileType } from '@balance-control/rules';
 import { enumerateLegalIntents } from '../src/engine/legal-intents';
 import { SetupGame } from '../src/setup';
 import { CoreMoves } from '../src/moves';
@@ -59,7 +59,7 @@ describe('enumerateLegalIntents', () => {
         const ctx = createCtx('politicalAction');
         const G = SetupGame({ ctx });
         const committeeId = Object.values(G.tiles).find(tile => tile.type === TileType.Committee)?.id as string;
-        G.zones[CoreZoneNames.Board].items.push(committeeId);
+        G.zones[CoreZoneName.Board].items.push(committeeId);
         G.grid['1,0'] = committeeId;
 
         const supply = G.zones['PersonalSupply:0'];
@@ -87,13 +87,13 @@ describe('enumerateLegalIntents', () => {
         const G = SetupGame({ ctx });
 
         const committeeId = Object.values(G.tiles).find(tile => tile.type === TileType.Committee)?.id as string;
-        G.zones[CoreZoneNames.Board].items.push(committeeId);
-        G.zones[CoreZoneNames.DrawPile].items = G.zones[CoreZoneNames.DrawPile].items.filter(id => id !== committeeId);
+        G.zones[CoreZoneName.Board].items.push(committeeId);
+        G.zones[CoreZoneName.DrawPile].items = G.zones[CoreZoneName.DrawPile].items.filter(id => id !== committeeId);
         G.grid['1,0'] = committeeId;
 
         // Satisfy CORE-01-08-02/03 gate: remove all starting influence from all players' PersonalSupply.
         for (const pid of ['0', '1']) {
-            const supply = G.zones[`${CoreZoneNames.PersonalSupply}:${pid}`];
+            const supply = G.zones[`${CoreZoneName.PersonalSupply}:${pid}`];
             const startingInfluenceIds = supply.items.filter(itemId => G.objects[itemId]?.type === 'Influence' && G.objects[itemId]?.isStarting);
             supply.items = supply.items.filter(itemId => !startingInfluenceIds.includes(itemId));
             G.zones[committeeId].items.push(...startingInfluenceIds);
@@ -104,7 +104,7 @@ describe('enumerateLegalIntents', () => {
         const resourceB = 'res_for_0';
         G.objects[resourceA] = { id: resourceA, type: 'Resource', owner: '0', resort: 'DOM' } as any;
         G.objects[resourceB] = { id: resourceB, type: 'Resource', owner: '0', resort: 'FOR' } as any;
-        G.zones[`${CoreZoneNames.PersonalSupply}:0`].items.push(resourceA, resourceB);
+        G.zones[`${CoreZoneName.PersonalSupply}:0`].items.push(resourceA, resourceB);
 
         const intents = enumerateLegalIntents(G as any, ctx, '0');
         const formalize = intents.find(intent => intent.moveType === 'formalizeInfluence');
@@ -120,7 +120,7 @@ describe('enumerateLegalIntents', () => {
         const ctx = createCtx('politicalAction');
         const G = SetupGame({ ctx });
         const committeeId = Object.values(G.tiles).find(tile => tile.type === TileType.Committee)?.id as string;
-        G.zones[CoreZoneNames.Board].items.push(committeeId);
+        G.zones[CoreZoneName.Board].items.push(committeeId);
         G.grid['1,0'] = committeeId;
 
         const supply = G.zones['PersonalSupply:0'];
@@ -147,7 +147,7 @@ describe('enumerateLegalIntents', () => {
         const grassrootsId = Object.values(G.tiles).find(
             tile => tile.type === TileType.Grassroots && (tile.conversion?.inputSlots === 2 || tile.resort)
         )?.id as string;
-        G.zones[CoreZoneNames.Board].items.push(grassrootsId);
+        G.zones[CoreZoneName.Board].items.push(grassrootsId);
         G.grid['1,0'] = grassrootsId;
 
         let intents = enumerateLegalIntents(G as any, ctx, '0');
