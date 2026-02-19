@@ -17,7 +17,8 @@
     "dev": "pnpm -r --parallel dev",
     "verify:packs": "node scripts/verify-packs.mjs",
     "verify:docs": "node scripts/verify-docs.mjs",
-    "verify:task": "node scripts/verify-task.mjs"
+    "verify:task": "node scripts/verify-task.mjs",
+    "verify:handoff": "node scripts/verify-handoff.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
