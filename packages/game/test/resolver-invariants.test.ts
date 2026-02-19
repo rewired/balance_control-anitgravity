@@ -14,7 +14,7 @@ describe('REF_RESOLVER invariants (tripwires)', () => {
     const Exp02Pack = makeDummyExpansionPack({
         id: 'exp02',
         engine: {
-            atoms: [{
+            atoms: () => [{
                 kind: 'regulation.place',
                 handler: (G: any, ctx: any, atom: any) => {
                     const { targetTileId } = atom;
@@ -33,7 +33,7 @@ describe('REF_RESOLVER invariants (tripwires)', () => {
     const Exp03Pack = makeDummyExpansionPack({
         id: 'exp03',
         engine: {
-            atoms: [{
+            atoms: () => [{
                 kind: 'countdown.place',
                 handler: (G: any, ctx: any, atom: any) => {
                     const { targetTileId, amount } = atom;

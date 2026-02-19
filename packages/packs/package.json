@@ -13,7 +13,8 @@
     "@balance-control/rules": "workspace:*",
     "@balance-control/expansion-01": "workspace:*",
     "@balance-control/expansion-02": "workspace:*",
-    "@balance-control/expansion-03": "workspace:*"
+    "@balance-control/expansion-03": "workspace:*",
+    "boardgame.io": "^0.50.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
