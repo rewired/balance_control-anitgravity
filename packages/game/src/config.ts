@@ -145,14 +145,30 @@ export function normalizeGameConfig(setupData: unknown): GameConfig {
         ex03: candidate.ex03 === true,
     };
 
-    const enabledPacks = packCandidate ? normalizeEnabledPacks(packCandidate) : flagsToEnabledPacks(expansionsFromFlags);
-    const expansions = packCandidate
-        ? {
-              ex01: enabledPacks.includes('exp01'),
-              ex02: enabledPacks.includes('exp02'),
-              ex03: enabledPacks.includes('exp03'),
-          }
-        : expansionsFromFlags;
+    const enabledPacksFromFlags = flagsToEnabledPacks(expansionsFromFlags);
+    const enabledPacksFromPacks = packCandidate ? normalizeEnabledPacks(packCandidate) : undefined;
+
+    // GR-012: Mismatch detection
+    if (packCandidate && expansionsCandidate) {
+        const setA = new Set(enabledPacksFromFlags);
+        const setB = new Set(enabledPacksFromPacks);
+        const mismatch = setA.size !== setB.size || [...setA].some(x => !setB.has(x));
+
+        if (mismatch) {
+            throw new Error(
+                `Config mismatch: 'expansions' flags and 'packs.enabledPacks' are both provided but conflict.\n` +
+                `Flags: ${JSON.stringify(expansionsFromFlags)}\n` +
+                `Packs: ${JSON.stringify(enabledPacksFromPacks)}`
+            );
+        }
+    }
+
+    const enabledPacks = enabledPacksFromPacks ?? enabledPacksFromFlags;
+    const expansions = {
+        ex01: enabledPacks.includes('exp01'),
+        ex02: enabledPacks.includes('exp02'),
+        ex03: enabledPacks.includes('exp03'),
+    };
 
     return {
         expansions,

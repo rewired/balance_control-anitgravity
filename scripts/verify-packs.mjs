@@ -15,8 +15,12 @@ function expect(condition, message) {
   if (!condition) fail(message);
 }
 
-function getFlagConfig(expansions) {
-  return { expansions: { ex01: expansions.ex01 === true, ex02: expansions.ex02 === true, ex03: expansions.ex03 === true } };
+function getPacksConfig(expansions) {
+  const enabledPacks = [];
+  if (expansions.ex01) enabledPacks.push('exp01');
+  if (expansions.ex02) enabledPacks.push('exp02');
+  if (expansions.ex03) enabledPacks.push('exp03');
+  return { packs: { enabledPacks } };
 }
 
 async function main() {
@@ -61,11 +65,11 @@ async function main() {
   ok("Pack manifests present and consistent.");
 
   const configs = [
-    { id: "core", config: getFlagConfig({}) },
-    { id: "ex01", config: getFlagConfig({ ex01: true }) },
-    { id: "ex02", config: getFlagConfig({ ex02: true }) },
-    { id: "ex03", config: getFlagConfig({ ex03: true }) },
-    { id: "ex01ex02", config: getFlagConfig({ ex01: true, ex02: true }) },
+    { id: "core", config: getPacksConfig({}) },
+    { id: "ex01", config: getPacksConfig({ ex01: true }) },
+    { id: "ex02", config: getPacksConfig({ ex02: true }) },
+    { id: "ex03", config: getPacksConfig({ ex03: true }) },
+    { id: "ex01ex02", config: getPacksConfig({ ex01: true, ex02: true }) },
   ];
 
   for (const entry of configs) {

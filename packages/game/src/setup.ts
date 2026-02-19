@@ -45,13 +45,15 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         specAnchorHash: '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3'
     };
     const rulesetExpansions: RulesetManifest['expansions'] = {};
-    if (gameConfig.expansions.ex01) {
+    const enabledPacks = gameConfig.packs?.enabledPacks ?? [];
+
+    if (enabledPacks.includes('exp01')) {
         rulesetExpansions.exp01Version = rulesetBase.expansions.exp01Version;
     }
-    if (gameConfig.expansions.ex02) {
+    if (enabledPacks.includes('exp02')) {
         rulesetExpansions.exp02Version = rulesetBase.expansions.exp02Version;
     }
-    if (gameConfig.expansions.ex03) {
+    if (enabledPacks.includes('exp03')) {
         rulesetExpansions.exp03Version = rulesetBase.expansions.exp03Version;
     }
     const rulesetManifest: RulesetManifest = {
@@ -87,7 +89,11 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
                 tileExtraCosts: {},
                 playerExtraCosts: {},
                 climateCostRules: [],
-                enabledExpansions: { ...gameConfig.expansions }
+                enabledExpansions: {
+                    ex01: enabledPacks.includes('exp01'),
+                    ex02: enabledPacks.includes('exp02'),
+                    ex03: enabledPacks.includes('exp03'),
+                }
             }
         },
     };

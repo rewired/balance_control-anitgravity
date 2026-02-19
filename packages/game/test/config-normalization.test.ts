@@ -18,16 +18,20 @@ describe('normalizeGameConfig', () => {
         expect(config.expansions.ex03).toBe(false);
     });
 
-    it('should prioritize packs.enabledPacks over flags if both provided (reconciliation)', () => {
-        const config = normalizeGameConfig({
+    it('should throw if both provided and conflicting', () => {
+        expect(() => normalizeGameConfig({
             expansions: { ex01: false, ex02: true, ex03: true },
             packs: { enabledPacks: ['exp01'] }
+        })).toThrow('Config mismatch');
+    });
+
+    it('should accept both if consistent', () => {
+        const config = normalizeGameConfig({
+            expansions: { ex01: true, ex02: false, ex03: false },
+            packs: { enabledPacks: ['exp01'] }
         });
-        // Packs says exp01 only. Flags says ex02, ex03. Packs should win.
         expect(config.packs?.enabledPacks).toEqual(['exp01']);
         expect(config.expansions.ex01).toBe(true);
-        expect(config.expansions.ex02).toBe(false);
-        expect(config.expansions.ex03).toBe(false);
     });
 
     it('should handle legacy config structure', () => {
