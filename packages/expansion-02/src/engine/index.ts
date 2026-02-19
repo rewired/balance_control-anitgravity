@@ -9,7 +9,7 @@ const CoreZoneNames = {
 const EXP_02_NAME = 'EXP-02 Security & Order';
 export const EXP02_TILE_INNER_ORDER_ID = 'tile_inner_order' as const;
 
-const MEASURE_IDS = [
+export const MEASURE_IDS = [
     'M01', 'M02', 'M03', 'M04', 'M05',
     'M06', 'M07', 'M08', 'M09', 'M10',
     'M11', 'M12', 'M13', 'M14', 'M15'
@@ -32,6 +32,109 @@ const MEASURE_DETAILS: Record<string, { name: string, cost: Record<string, numbe
     'M14': { name: 'File Status', cost: { SEC: 1, DOM: 1 } },
     'M15': { name: 'Situation Assessment', cost: { SEC: 1 } },
 };
+
+export const MEASURE_ATOM_BUILDERS: Record<string, (G: GameState, payload: any) => any[] | null> = {
+    'M01': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'INF'] },
+        { kind: 'regulation.place', regType: payload.regType, targetTileId: payload.targetTileId }
+    ],
+    'M02': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC'] },
+        { kind: 'regulation.place', regType: 'Blockade', targetTileId: payload.targetTileId }
+    ],
+    'M03': (G, payload) => buildM03M04(G, payload),
+    'M04': (G, payload) => buildM03M04(G, payload),
+    'M05': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'DOM'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, 'M05'),
+                sourceId: 'M05',
+                hook: 'beforeAction',
+                targetTileId: 'tile_authority_apparatus',
+                effect: { kind: 'regulation.place', regType: 'Administration', targetTileId: 'tile_authority_apparatus' },
+                expiry: 'thisRound'
+            }
+        }
+    ],
+    'M06': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'FOR'] },
+        { kind: 'rule.attribute', attribute: 'secSubstitution', value: true, playerId: payload.playerId }
+    ],
+    'M07': () => null, // Intentionally not implemented in original switch
+    'M08': (G, payload) => {
+        const regsOnTile = G.zones.BoardAttached.items.filter(id => G.objects[id].targetTileId === payload.targetTileId);
+        return [
+            { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'INF'] },
+            ...regsOnTile.map(rid => ({ kind: 'regulation.remove' as const, regulationId: rid }))
+        ];
+    },
+    'M09': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'DOM'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, 'M09'),
+                sourceId: 'M09',
+                hook: 'beforeAction', // Trigger on reg placement
+                effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['ANY'] },
+                expiry: 'thisRound'
+            }
+        }
+    ],
+    'M10': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 3, resorts: ['SEC', 'DOM'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, 'M10'),
+                sourceId: 'M10',
+                hook: 'beforeAction',
+                priority: 10,
+                effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['ANY'] },
+                expiry: 'thisTurn'
+            }
+        }
+    ],
+    'M11': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['SEC'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, `M11_${payload.targetPlayerId}`),
+                sourceId: 'M11',
+                hook: 'beforeAction',
+                playerId: payload.targetPlayerId,
+                effect: { kind: 'rule.prohibit', actionType: 'measure.play' },
+                expiry: 'nextRound'
+            }
+        }
+    ],
+    'M12': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC'] },
+        { kind: 'regulation.place', regType: payload.regType, targetTileId: payload.targetTileId }
+    ],
+    'M13': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'INF'] },
+        { kind: 'rule.attribute', attribute: 'protectedTiles', value: payload.targetTileId, context: { append: true } }
+    ],
+    'M14': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'DOM'] },
+        { kind: 'rule.attribute', attribute: 'doubledRegs', value: payload.regulationId, context: { append: true } }
+    ],
+    'M15': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['SEC'] },
+        { kind: 'rule.attribute', attribute: `regDiscount:${payload.playerId}`, value: 1 }
+    ],
+};
+
+function buildM03M04(G: GameState, payload: any): any[] | null {
+    return [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['SEC'] },
+        { kind: 'regulation.move', regulationId: payload.regulationId, targetTileId: payload.newTargetTileId }
+    ];
+}
 
 export const Expansion02: ExpansionDefinition = {
     id: 'exp02',
@@ -131,115 +234,8 @@ export const Expansion02: ExpansionDefinition = {
     },
 
     getMeasureAtoms: (G: GameState, measureId: string, payload: any): any[] | null => {
-        switch (measureId) {
-            case 'M01': // Threat Situation
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'INF'] },
-                    { kind: 'regulation.place', regType: payload.regType, targetTileId: payload.targetTileId }
-                ];
-            case 'M02': // Emergency Decree
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC'] },
-                    { kind: 'regulation.place', regType: 'Blockade', targetTileId: payload.targetTileId }
-                ];
-            case 'M03':
-            case 'M04': // Jurisdiction Shift / Deployment Order
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['SEC'] },
-                    { kind: 'regulation.move', regulationId: payload.regulationId, targetTileId: payload.newTargetTileId }
-                ];
-            case 'M05': // Competence Conflict
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'DOM'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, 'M05'),
-                            sourceId: 'M05',
-                            hook: 'beforeAction',
-                            targetTileId: 'tile_authority_apparatus',
-                            effect: { kind: 'regulation.place', regType: 'Administration', targetTileId: 'tile_authority_apparatus' },
-                            expiry: 'thisRound'
-                        }
-                    }
-                ];
-            case 'M06': // Order Partnership
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'FOR'] },
-                    { kind: 'rule.attribute', attribute: 'secSubstitution', value: true, playerId: payload.playerId }
-                ];
-            case 'M08': // De-escalation
-                const regsOnTile = G.zones.BoardAttached.items.filter(id => G.objects[id].targetTileId === payload.targetTileId);
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'INF'] },
-                    ...regsOnTile.map(rid => ({ kind: 'regulation.remove' as const, regulationId: rid }))
-                ];
-            case 'M09': // Parliamentary Oversight
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'DOM'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, 'M09'),
-                            sourceId: 'M09',
-                            hook: 'beforeAction', // Trigger on reg placement
-                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['ANY'] },
-                            expiry: 'thisRound'
-                        }
-                    }
-                ];
-            case 'M10': // State of Exception
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 3, resorts: ['SEC', 'DOM'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, 'M10'),
-                            sourceId: 'M10',
-                            hook: 'beforeAction',
-                            priority: 10,
-                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['ANY'] },
-                            expiry: 'thisTurn'
-                        }
-                    }
-                ];
-            case 'M11': // Risk Address
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['SEC'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, `M11_${payload.targetPlayerId}`),
-                            sourceId: 'M11',
-                            hook: 'beforeAction',
-                            playerId: payload.targetPlayerId,
-                            effect: { kind: 'rule.prohibit', actionType: 'measure.play' },
-                            expiry: 'nextRound'
-                        }
-                    }
-                ];
-            case 'M12': // Loss of Control
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC'] },
-                    { kind: 'regulation.place', regType: payload.regType, targetTileId: payload.targetTileId }
-                ];
-            case 'M13': // Surveillance
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'INF'] },
-                    { kind: 'rule.attribute', attribute: 'protectedTiles', value: payload.targetTileId, context: { append: true } }
-                ];
-            case 'M14': // File Status
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'DOM'] },
-                    { kind: 'rule.attribute', attribute: 'doubledRegs', value: payload.regulationId, context: { append: true } }
-                ];
-            case 'M15': // Situation Assessment
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['SEC'] },
-                    { kind: 'rule.attribute', attribute: `regDiscount:${payload.playerId}`, value: 1 }
-                ];
-        }
-        return null;
+        const builder = MEASURE_ATOM_BUILDERS[measureId];
+        return builder ? builder(G, payload) : null;
     },
 
     effectHandlers: {

@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** FROZEN
 
 ## Task State Machine (Loop-Breaker)
 
@@ -134,11 +134,20 @@ For each expansion package:
 
 ## 11) Work Summary (3–7 bullets)
 
-- 
+- Refactored `getMeasureAtoms` in EXP-01, EXP-02, and EXP-03 to use declarative `MEASURE_ATOM_BUILDERS` maps.
+- Exported `MEASURE_IDS` and `MEASURE_ATOM_BUILDERS` from each expansion engine for testability.
+- Added `test` script to `packages/expansion-01/package.json`.
+- Implemented and extended `test/pack-integrity.test.ts` across all three expansions to verify measure dispatch coverage.
+- Verified workspace health via `verify:docs` and `verify:packs`.
 
 ## 12) Commands Run (with outcomes)
 
-- 
+- `pnpm -C packages/expansion-01 test`: PASS
+- `pnpm -C packages/expansion-02 test`: PASS
+- `pnpm -C packages/expansion-03 test`: PASS
+- `pnpm run verify:docs`: PASS
+- `pnpm run verify:packs`: PASS
+- `pnpm test`: PASS
 
 ## 13) Postflight Proof (recorded in commit message)
 

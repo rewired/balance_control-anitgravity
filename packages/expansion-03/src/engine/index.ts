@@ -8,7 +8,7 @@ const ZONE_BOARD_ATTACHED = 'BoardAttached';
 
 const EXP_03_NAME = 'EXP-03 Climate & Future';
 
-const MEASURE_IDS = [
+export const MEASURE_IDS = [
     'M01', 'M02', 'M03', 'M04', 'M05',
     'M06', 'M07', 'M08', 'M09', 'M10',
     'M11', 'M12', 'M13', 'M14', 'M15'
@@ -30,6 +30,148 @@ const MEASURE_DETAILS: Record<string, { name: string, cost: Record<string, numbe
     'M13': { name: 'Intergenerational Pact', cost: { CLM: 1, DOM: 1 } },
     'M14': { name: 'Transformation Blockade', cost: { CLM: 1, INF: 1 } },
     'M15': { name: 'Future Committee', cost: { CLM: 1, INF: 1, ECO: 1 } },
+};
+
+export const MEASURE_ATOM_BUILDERS: Record<string, (G: GameState, payload: any) => any[] | null> = {
+    'M01': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, `M01_${payload.targetTileId}`),
+                sourceId: 'M01',
+                hook: 'beforeAction',
+                targetTileId: payload.targetTileId,
+                effect: {
+                    kind: 'rule.attribute',
+                    attribute: 'climateCostRules',
+                    value: { type: 'tile', target: payload.targetTileId, amount: 1, resorts: ['CLM', 'DOM'] },
+                    context: { append: true }
+                },
+                expiry: 'nextTurn'
+            }
+        }
+    ],
+    'M02': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, `M02_${payload.targetResort}`),
+                sourceId: 'M02',
+                hook: 'beforeAction',
+                effect: {
+                    kind: 'rule.attribute',
+                    attribute: 'climateCostRules',
+                    value: { type: 'resort', target: payload.targetResort, amount: 1, resorts: ['CLM', 'DOM'] },
+                    context: { append: true }
+                },
+                expiry: 'nextRound'
+            }
+        }
+    ],
+    'M03': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
+        { kind: 'resource.grant', playerId: payload.playerId, missingController: 'SKIP', amount: 1, resort: payload.targetResort }
+    ],
+    'M04': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, `M04_${payload.targetPlayerId}`),
+                sourceId: 'M04',
+                hook: 'beforeAction',
+                playerId: payload.targetPlayerId,
+                effect: { kind: 'rule.prohibit', actionType: 'measure.play' },
+                expiry: 'nextRound'
+            }
+        }
+    ],
+    'M05': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'INF'] },
+        { kind: 'rule.attribute', attribute: 'noInfluence', value: true, playerId: payload.playerId }
+    ],
+    'M06': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'ECO'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, 'M06'),
+                sourceId: 'M06',
+                hook: 'beforeAction',
+                priority: 10,
+                effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['DOM'] },
+                expiry: 'thisTurn'
+            }
+        }
+    ],
+    'M07': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM'] },
+        { kind: 'rule.attribute', attribute: 'noMajorityInfluence', value: true, playerId: payload.playerId }
+    ],
+    'M08': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
+        { kind: 'rule.attribute', attribute: 'ignoreClimateCosts', value: true, playerId: payload.playerId }
+    ],
+    'M09': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'ECO', 'DOM'] },
+        { kind: 'rule.attribute', attribute: 'ignoreClimateCostThisAction', value: true }
+    ],
+    'M10': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'DOM', 'FOR'] },
+        { kind: 'rule.attribute', attribute: 'climateImmunity', value: true, playerId: payload.playerId }
+    ],
+    'M11': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'ECO'] },
+        { kind: 'rule.attribute', attribute: 'productionCap', value: 1, playerId: payload.targetPlayerId }
+    ],
+    'M12': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, 'M12'),
+                sourceId: 'M12',
+                hook: 'beforeAction', // Triggered by placeTile
+                priority: 10,
+                effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
+                expiry: 'thisTurn'
+            }
+        }
+    ],
+    'M13': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'DOM'] },
+        { kind: 'rule.attribute', attribute: 'transferableCost', value: true, playerId: payload.playerId }
+    ],
+    'M14': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'INF'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, 'M14'),
+                sourceId: 'M14',
+                hook: 'beforeAction', // Triggered by placeCountdown
+                priority: 10,
+                effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
+                expiry: 'thisTurn'
+            }
+        }
+    ],
+    'M15': (G, payload) => [
+        { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'INF', 'ECO'] },
+        {
+            kind: 'modifier.add',
+            modifier: {
+                id: allocId(G, 'M15'),
+                sourceId: 'M15',
+                hook: 'beforeAction',
+                priority: 10,
+                effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
+                expiry: 'thisTurn'
+            }
+        }
+    ],
 };
 
 export const Expansion03: ExpansionDefinition = {
@@ -119,163 +261,8 @@ export const Expansion03: ExpansionDefinition = {
     },
 
     getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
-        switch (measureId) {
-            case 'M01': // Transformation Directive
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, `M01_${payload.targetTileId}`),
-                            sourceId: 'M01',
-                            hook: 'beforeAction',
-                            targetTileId: payload.targetTileId,
-                            effect: {
-                                kind: 'rule.attribute',
-                                attribute: 'climateCostRules',
-                                value: { type: 'tile', target: payload.targetTileId, amount: 1, resorts: ['CLM', 'DOM'] },
-                                context: { append: true }
-                            },
-                            expiry: 'nextTurn'
-                        }
-                    }
-                ];
-            case 'M02': // Carbon Levy
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, `M02_${payload.targetResort}`),
-                            sourceId: 'M02',
-                            hook: 'beforeAction',
-                            effect: {
-                                kind: 'rule.attribute',
-                                attribute: 'climateCostRules',
-                                value: { type: 'resort', target: payload.targetResort, amount: 1, resorts: ['CLM', 'DOM'] },
-                                context: { append: true }
-                            },
-                            expiry: 'nextRound'
-                        }
-                    }
-                ];
-            case 'M03': // Future Investment
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
-                    { kind: 'resource.grant', playerId: payload.playerId, missingController: 'SKIP', amount: 1, resort: payload.targetResort }
-                ];
-            case 'M04': // Future Resolution
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, `M04_${payload.targetPlayerId}`),
-                            sourceId: 'M04',
-                            hook: 'beforeAction',
-                            playerId: payload.targetPlayerId,
-                            effect: { kind: 'rule.prohibit', actionType: 'measure.play' },
-                            expiry: 'nextRound'
-                        }
-                    }
-                ];
-            case 'M05': // Greenwashing
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'INF'] },
-                    { kind: 'rule.attribute', attribute: 'noInfluence', value: true, playerId: payload.playerId }
-                ];
-            case 'M06': // Energy Crisis
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'ECO'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, 'M06'),
-                            sourceId: 'M06',
-                            hook: 'beforeAction',
-                            priority: 10,
-                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['DOM'] },
-                            expiry: 'thisTurn'
-                        }
-                    }
-                ];
-            case 'M07': // Protest Movement
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM'] },
-                    { kind: 'rule.attribute', attribute: 'noMajorityInfluence', value: true, playerId: payload.playerId }
-                ];
-            case 'M08': // Adaptation Strategy
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
-                    { kind: 'rule.attribute', attribute: 'ignoreClimateCosts', value: true, playerId: payload.playerId }
-                ];
-            case 'M09': // Technology Initiative
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'ECO', 'DOM'] },
-                    { kind: 'rule.attribute', attribute: 'ignoreClimateCostThisAction', value: true }
-                ];
-            case 'M10': // Future Pact
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'DOM', 'FOR'] },
-                    { kind: 'rule.attribute', attribute: 'climateImmunity', value: true, playerId: payload.playerId }
-                ];
-            case 'M11': // Supply Chain Disruption
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'ECO'] },
-                    { kind: 'rule.attribute', attribute: 'productionCap', value: 1, playerId: payload.targetPlayerId }
-                ];
-            case 'M12': // Extreme Weather Event
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, 'M12'),
-                            sourceId: 'M12',
-                            hook: 'beforeAction', // Triggered by placeTile
-                            priority: 10,
-                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
-                            expiry: 'thisTurn'
-                        }
-                    }
-                ];
-            case 'M13': // Intergenerational Pact
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 1, resorts: ['CLM', 'DOM'] },
-                    { kind: 'rule.attribute', attribute: 'transferableCost', value: true, playerId: payload.playerId }
-                ];
-            case 'M14': // Transformation Blockade
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'INF'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, 'M14'),
-                            sourceId: 'M14',
-                            hook: 'beforeAction', // Triggered by placeCountdown
-                            priority: 10,
-                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
-                            expiry: 'thisTurn'
-                        }
-                    }
-                ];
-            case 'M15': // Future Committee
-                return [
-                    { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM', 'INF', 'ECO'] },
-                    {
-                        kind: 'modifier.add',
-                        modifier: {
-                            id: allocId(G, 'M15'),
-                            sourceId: 'M15',
-                            hook: 'beforeAction',
-                            priority: 10,
-                            effect: { kind: 'resource.pay', playerId: 'CONTEXT_PLAYER' as any, amount: 1, resorts: ['CLM', 'DOM'] },
-                            expiry: 'thisTurn'
-                        }
-                    }
-                ];
-        }
-        return null;
+        const builder = MEASURE_ATOM_BUILDERS[measureId];
+        return builder ? builder(G, payload) : null;
     },
 
     effectHandlers: {

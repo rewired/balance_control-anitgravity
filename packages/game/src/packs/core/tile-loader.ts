@@ -24,6 +24,9 @@ const data = coreTilesData as CoreTilesData;
 /**
  * Generates the CORE tile set from JSON definition.
  * Replaces the hardcoded logic in previous versions.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
  * @param numPlayers Number of players in the match
  */
 export function generateCoreTiles(numPlayers: number): Tile[] {
