@@ -103,7 +103,7 @@ Now we can remove the hard dependency and relocate the EXP pack wrappers.
 ### Exit criteria
 
 - `@balance-control/game` has no dependency edges to `@balance-control/expansion-*`.
-- All real-pack consumers import expansion packs from `@balance-control/packs`.
+- All real-pack consumers import packs from `@balance-control/packs`.
 
 ## 7) Acceptance Criteria (frozen)
 
@@ -129,28 +129,34 @@ Now we can remove the hard dependency and relocate the EXP pack wrappers.
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Build passes (`pnpm -r build`)
-- [ ] Tests pass (`pnpm -r test`)
-- [ ] No rules changes (SPEC-anchored)
-- [ ] `@balance-control/game` no longer depends on `@balance-control/expansion-*`
-- [ ] All consumers import packs from `@balance-control/packs`
-- [ ] Updated docs/hand-off/current.md
+- [x] Build passes (`pnpm -r build`)
+- [x] Tests pass (`pnpm -r test`)
+- [x] No rules changes (SPEC-anchored)
+- [x] `@balance-control/game` no longer depends on `@balance-control/expansion-*`
+- [x] All consumers import packs from `@balance-control/packs`
+- [x] Updated docs/hand-off/current.md
 
 ## 11) Work Summary (fill after implementation)
 
-- 
+- Moved pack wrappers (`Exp01Pack`, `Exp02Pack`, `Exp03Pack`) from `packages/game` to `packages/packs`.
+- Updated `packages/packs/src/index.ts` to export the new pack wrappers.
+- Removed `packages/game/src/packs/exp0*` and `packages/game/src/packs/_shared/measure-moves.ts`.
+- Removed `@balance-control/expansion-*` dependencies from `packages/game/package.json`.
+- Updated `packages/game/src/index.ts` to export internal APIs (`EffectResolver`, `lookupMeasureDeckForObjectId`, etc.) needed by `packages/packs`.
+- Updated `packages/bot-llm/src/boot.ts` and `packages/game/test/entrypoint-pack-wiring.test.ts` to use `registerCanonicalPacks` from `@balance-control/packs`.
 
 ## 12) Commands Run (fill after implementation)
 
-- 
+- `pnpm -r build`
+- `pnpm -r test`
 
 ## 13) Postflight (fill after implementation)
 
-- 
+-
 
 ## 14) Patch Notes (fill after implementation)
 
-- 
+-
 
 ## 15) Downstream follow-ups
 

@@ -8,8 +8,8 @@
 
 import { Expansion01 } from '@balance-control/expansion-01/engine';
 import { RULESET_MANIFEST } from '@balance-control/rules';
-import type { EnginePackDefinition, PackManifest } from '../types';
-import { takeMeasure, playMeasure } from '../_shared/measure-moves';
+import type { EnginePackDefinition, PackManifest } from '@balance-control/game';
+import { takeMeasure, playMeasure } from './measure-moves';
 
 const EXP01_PACK_VERSION = (RULESET_MANIFEST.expansions.exp01Version ?? '0.0.0').replace(/^v/i, '');
 const EXP01_PACK_MANIFEST: PackManifest = {
@@ -38,7 +38,7 @@ export const Exp01Pack: EnginePackDefinition = {
     getMeasureAtoms: Expansion01.getMeasureAtoms,
     setup: Expansion01.onSetup
         ? {
-              preShuffle: (G, ctx) => Expansion01.onSetup?.(G, ctx),
+              preShuffle: (G: any, ctx: any) => Expansion01.onSetup?.(G, ctx),
           }
         : undefined,
 };

@@ -1,5 +1,5 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { EffectResolver } from '../pack-api';
+import { EffectResolver } from '@balance-control/game';
 
 /**
  * Standard Expansion Move: Place a countdown marker (EXP-03).

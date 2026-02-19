@@ -7,8 +7,4 @@ export { coreMeasureAtoms } from '../engine/atoms/measure';
 export { coreChoiceAtoms } from '../engine/atoms/choice';
 export { coreHotspotAtoms } from '../engine/atoms/hotspot';
 export { createCoreRulesAtoms } from '../engine/atoms/rules';
-export { exp02RegulationAtoms } from '../engine/atoms/regulation';
-export { exp03CountdownAtoms } from '../engine/atoms/countdown';
-export { takeMeasure, playMeasure } from './_shared/measure-moves';
-export { placeCountdownMarker } from './exp03/moves';
 export { CoreMoves } from '../moves';

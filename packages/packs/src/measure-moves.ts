@@ -1,5 +1,5 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { EffectResolver, lookupMeasureDeckForObjectId } from '../pack-api';
+import { EffectResolver, lookupMeasureDeckForObjectId } from '@balance-control/game';
 
 /**
  * Standard Expansion Move: Take a measure from the open display.

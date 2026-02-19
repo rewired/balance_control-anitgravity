@@ -229,11 +229,8 @@ export function createBalanceControlGame(): Game<GameState> {
 }
 
 export { EnginePackRegistry } from './expansion-registry';
-export type { EnginePackDefinition, EnginePackId } from './packs/types';
+export type { EnginePackDefinition, EnginePackId, PackManifest } from './packs/types';
 export { CorePack } from './packs/core';
-export { Exp01Pack } from './packs/exp01';
-export { Exp02Pack } from './packs/exp02';
-export { Exp03Pack } from './packs/exp03';
 export * from './move-contracts';
 export * from './config';
 export * from './hash-state';
@@ -242,4 +239,10 @@ export * from './engine/legal-intents';
 export { selectTileController } from './public-selectors';
 export { assemblePacks } from './move-assembly';
 export { CANONICAL_ENGINE_MODULE_ORDER } from './expansion-registry';
+
+// Internal APIs exposed for pack implementations in @balance-control/packs
+export { EffectResolver } from './engine/resolver';
+export { lookupMeasureDeckForObjectId } from './engine/measure-deck-provider';
+export { exp02RegulationAtoms } from './engine/atoms/regulation';
+export { exp03CountdownAtoms } from './engine/atoms/countdown';
 

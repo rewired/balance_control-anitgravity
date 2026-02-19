@@ -6,26 +6,18 @@ const rootDir = path.resolve(__dirname, '../../..');
 
 function assertBootWiring(filePath: string) {
     const content = readFileSync(filePath, 'utf8');
-    const coreIndex = content.indexOf('registerPack(CorePack)');
-    const exp01Index = content.indexOf('registerPack(Exp01Pack)');
-    const exp02Index = content.indexOf('registerPack(Exp02Pack)');
-    const exp03Index = content.indexOf('registerPack(Exp03Pack)');
-
-    expect(coreIndex).toBeGreaterThan(-1);
-    expect(exp01Index).toBeGreaterThan(-1);
-    expect(exp02Index).toBeGreaterThan(-1);
-    expect(exp03Index).toBeGreaterThan(-1);
-    expect(coreIndex).toBeLessThan(exp01Index);
-    expect(coreIndex).toBeLessThan(exp02Index);
-    expect(coreIndex).toBeLessThan(exp03Index);
+    // Ensure we are using the canonical pack registration helper
+    // which guarantees correct load order (GR-003)
+    const packsIndex = content.indexOf('registerCanonicalPacks');
+    expect(packsIndex).toBeGreaterThan(-1);
 }
 
 describe('Entrypoint pack wiring', () => {
-    it('registers CorePack before registering expansions in the server boot', () => {
+    it('uses registerCanonicalPacks in server boot', () => {
         assertBootWiring(path.join(rootDir, 'packages', 'server', 'src', 'boot.ts'));
     });
 
-    it('registers CorePack before registering expansions in the bot boot', () => {
+    it('uses registerCanonicalPacks in bot boot', () => {
         assertBootWiring(path.join(rootDir, 'packages', 'bot-llm', 'src', 'boot.ts'));
     });
 });

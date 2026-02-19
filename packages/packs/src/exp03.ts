@@ -8,10 +8,9 @@
 
 import { Expansion03 } from '@balance-control/expansion-03/engine';
 import { RULESET_MANIFEST } from '@balance-control/rules';
-import type { EnginePackDefinition, PackManifest } from '../types';
-import { takeMeasure, playMeasure } from '../_shared/measure-moves';
-import { placeCountdownMarker } from './moves';
-import { exp03CountdownAtoms } from '../pack-api';
+import { exp03CountdownAtoms, type EnginePackDefinition, type PackManifest } from '@balance-control/game';
+import { takeMeasure, playMeasure } from './measure-moves';
+import { placeCountdownMarker } from './exp03-moves';
 
 const EXP03_PACK_VERSION = (RULESET_MANIFEST.expansions.exp03Version ?? '0.0.0').replace(/^v/i, '');
 const EXP03_PACK_MANIFEST: PackManifest = {
@@ -41,7 +40,7 @@ export const Exp03Pack: EnginePackDefinition = {
     getMeasureAtoms: Expansion03.getMeasureAtoms,
     setup: Expansion03.onSetup
         ? {
-              preShuffle: (G, ctx) => Expansion03.onSetup?.(G, ctx),
+              preShuffle: (G: any, ctx: any) => Expansion03.onSetup?.(G, ctx),
           }
         : undefined,
     engine: {

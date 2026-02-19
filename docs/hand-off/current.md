@@ -2,11 +2,13 @@
 
 ## Last done
 
-- **Task:** 0134
+- **Task:** 0136
 - **Date:** 2026-02-19
 
 ## Current state (facts)
 
+- `@balance-control/game` no longer depends on `@balance-control/expansion-*`.
+- Pack wrappers (`Exp01Pack` etc.) are implemented in `@balance-control/packs` and import engine definitions from expansion packages.
 - `@balance-control/packs` is the canonical entrypoint for pack exports and registration.
 - `registerCanonicalPacks()` helper handles deterministic registration of all known packs (Core + Exp01..03).
 - EnginePackRegistry is canonical (single registry) and enforces deterministic canonical ordering + duplicate checks.
@@ -16,7 +18,6 @@
 - Config `packs.enabledPacks` is the canonical enablement surface. Runtime no longer reads `cfg.expansions` directly (except normalization).
 - Deprecated exports `CoreZoneNames` / `CoreResources` still exist in `@balance-control/rules`, but are no longer used by engine runtime/tests (migration completed).
 - EnginePackRegistry still exposes deprecated `getMeasureAtoms(...)` API (tests should not use it; deletion is Wave 2).
-- `@balance-control/game` still has hard dependencies on `@balance-control/expansion-01..03` (pack split not started).
 
 ## Decisions
 
@@ -38,13 +39,14 @@
 
 ## Next packet goal
 
-**Pack split Wave 1:** move real-pack tests out of `packages/game` and make engine tests pack-agnostic (Task 0135), then remove the hard dependency `@balance-control/game -> @balance-control/expansion-*` (Task 0136).
+**Pack split Wave 2:** cleanup remaining legacy exports, verify full decoupling, and consider moving `EnginePackRegistry` if it still has coupling (Task 0137+).
 
 ## Mini diff map (likely touched)
 
-- `packages/packs/*` (new)
+- `packages/packs/*`
+- `packages/game/src/index.ts`
+- `packages/game/package.json`
+- `packages/game/src/packs/*` (removed)
+- `packages/bot-llm/src/boot.ts`
 - `packages/server/src/boot.ts`
-- `packages/client-web/src/game.ts`
-- `scripts/verify-packs.mjs`
-- `packages/integration-tests/test/*`
-- `packages/game/test/*` (next task)
+

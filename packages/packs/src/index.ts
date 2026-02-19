@@ -1,12 +1,13 @@
 import {
     CorePack,
-    Exp01Pack,
-    Exp02Pack,
-    Exp03Pack,
     EnginePackRegistry,
     CANONICAL_ENGINE_MODULE_ORDER,
     type EnginePackDefinition
 } from '@balance-control/game';
+
+import { Exp01Pack } from './exp01';
+import { Exp02Pack } from './exp02';
+import { Exp03Pack } from './exp03';
 
 export { CorePack, Exp01Pack, Exp02Pack, Exp03Pack };
 
