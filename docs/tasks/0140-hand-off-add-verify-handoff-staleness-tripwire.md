@@ -98,17 +98,23 @@ We need an automated “tripwire” that fails fast in CI when those mistakes ha
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] `pnpm run verify:handoff` passes
-- [ ] Script fails on intentionally stale capsule content (manual quick test)
-- [ ] Build passes (`pnpm -r build`)
+- [x] `pnpm run verify:handoff` passes
+- [x] Script fails on intentionally stale capsule content (manual quick test)
+- [x] Build passes (`pnpm -r build`)
 
 ## 11) Work Summary (fill after implementation)
 
-- (fill)
+- Created `scripts/verify-handoff.mjs` to enforce protocol integrity and capsule synchronization.
+- Added `verify:handoff` script to `package.json`.
+- Verified script passes on clean state.
+- Verified script fails when `docs/hand-off/task-packet-protocol.md` contains concrete task IDs.
+- Verified script fails when `docs/hand-off/current.md` has mismatched facts between capsule and canonical list.
 
 ## 12) Commands Run (fill after implementation)
 
-- (fill)
+- `pnpm run verify:handoff` (Pass)
+- `pnpm -r build` (Pass)
+- Manual failure tests (Pass)
 
 ## 13) Postflight (fill after implementation)
 
@@ -116,4 +122,4 @@ We need an automated “tripwire” that fails fast in CI when those mistakes ha
 
 ## 14) Patch Notes (fill after implementation)
 
-- (fill)
+- Added `verify:handoff` tripwire to prevent Context Capsule staleness.
