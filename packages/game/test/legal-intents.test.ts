@@ -357,4 +357,52 @@ describe('enumerateLegalIntents', () => {
             expect(hasPolitical).toBe(false);
         });
     });
+
+    describe('Intent Budget Cap', () => {
+        it('deterministically caps massive intent explosions', () => {
+            const ctx = createCtx('politicalAction');
+            const G = SetupGame({ ctx });
+
+            // Create a Grassroots tile with high combinatorial conversion
+            // 5 input slots from many resources -> huge number of combinations
+            const tileId = 'tile_grassroots_explosion';
+            G.zones[CoreZoneName.Board].items.push(tileId);
+            G.grid['0,0'] = tileId;
+            G.tiles[tileId] = {
+                id: tileId,
+                type: TileType.Grassroots,
+                conversion: { inputSlots: 3 }, // 3 slots
+                resort: null // Untyped
+            } as any;
+
+            // Give player control
+            const influenceId = 'inf_control_0';
+            G.objects[influenceId] = { id: influenceId, type: 'Influence', owner: '0' } as any;
+            if (!G.zones[tileId]) G.zones[tileId] = { id: tileId, items: [] } as any;
+            G.zones[tileId].items.push(influenceId);
+
+            // Give player many resources to generate combinations
+            // 20 resources. nCr(20, 3) = 1140.
+            // x3 output resorts = 3420 intents.
+            // Should exceed 2000 cap.
+            const supply = G.zones['PersonalSupply:0'];
+            for (let i = 0; i < 20; i++) {
+                const rid = `res_expl_${i}`;
+                G.objects[rid] = { id: rid, type: 'Resource', owner: '0', resort: 'DOM' } as any;
+                supply.items.push(rid);
+            }
+
+            const intentsA = enumerateLegalIntents(G as any, ctx, '0');
+            const intentsB = enumerateLegalIntents(G as any, ctx, '0');
+
+            expect(intentsA.length).toBe(2000); // verify exact cap
+            expect(intentsA.length).toBeLessThan(4000); // verify we actually generated enough to be capped
+
+            // Determinism check
+            expect(JSON.stringify(intentsA)).toEqual(JSON.stringify(intentsB));
+
+            // Verify they are sorted before cut (first item should be convertResources)
+            expect(intentsA[0].moveType).toBe('convertResources');
+        });
+    });
 });

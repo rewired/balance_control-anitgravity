@@ -107,8 +107,10 @@ export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string):
         }
     }
 
-    return sortIntents(intents);
+    return sortIntents(intents).slice(0, LEGAL_INTENT_BUDGET);
 }
+
+const LEGAL_INTENT_BUDGET = 2000;
 
 function selectDeterministicExtraResourceIds(G: GameState, playerId: string, costSlots: CostSlot[]): string[] | null {
     if (costSlots.length === 0) return [];
