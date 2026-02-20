@@ -117,8 +117,16 @@ This task only covers **PlaceInfluence and MoveInfluence**.
 
 ## 7) Acceptance criteria (frozen)
 
-- [ ] In politicalAction phase, “Place Influence” and “Move Influence” are selectable modes.
-- [ ] PlaceInfluence is **always confirm-gated** (no auto-commit).
-- [ ] MoveInfluence remains confirm-gated; Return Penalty consequences render if present.
-- [ ] PendingChoice continues to block all other actions.
-- [ ] Client tests are green.
+- [x] In politicalAction phase, “Place Influence” and “Move Influence” are selectable modes.
+- [x] PlaceInfluence is **always confirm-gated** (no auto-commit).
+- [x] MoveInfluence remains confirm-gated; Return Penalty consequences render if present.
+- [x] PendingChoice continues to block all other actions.
+- [x] Client tests are green.
+
+## 8) Done
+
+- Replaced `ActionPanel` with `ActionDock`.
+- Added `actionMode` and `moveInfluenceSourceId` to interaction controller.
+- Updated `HexBoard` to highlight targets based on active mode.
+- Standardized confirmation flow for both influence actions.
+- Genericized `MoveConfirmationModal` to handle placeInfluence.

@@ -52,7 +52,7 @@ describe('intent view model', () => {
         expect(vm.political.others.map((i) => i.moveType)).toEqual(['convertResources']);
     });
 
-    it('selects placeInfluence intent for selected tile and excludes all placeInfluence from others', () => {
+    it('excludes placeInfluence and moveInfluence from others', () => {
         const intents: LegalIntent[] = [
             intent('placeInfluence', { targetTileId: 'A' }),
             intent('placeInfluence', { targetTileId: 'B' }),
@@ -67,8 +67,7 @@ describe('intent view model', () => {
             stagedTileId: null
         });
 
-        expect(vm.political.placeInfluenceForSelected?.payload?.targetTileId).toBe('A');
-        // moveInfluence is now handled separately via moveInfluenceFromSelected
+        // influence actions are now handled by modes in ActionDock, so they are excluded from others
         expect(vm.political.others.map((i) => i.moveType)).toEqual([]);
     });
 

@@ -61,8 +61,6 @@ export type IntentViewModel = {
         passTilePlacement: LegalIntent | null;
     };
     political: {
-        placeInfluenceForSelected: LegalIntent | null;
-        moveInfluenceFromSelected: LegalIntent[];
         others: LegalIntent[];
     };
     ghostCoords: string[];
@@ -98,18 +96,6 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
     const placeTile = input.intents.filter((intent) => intent.moveType === 'placeTile');
     const passTilePlacement = input.intents.find((intent) => intent.moveType === 'passTilePlacement') ?? null;
 
-    const placeInfluenceForSelected = input.selectedTileId
-        ? (input.intents.find(
-            (intent) => intent.moveType === 'placeInfluence' && intent.payload?.targetTileId === input.selectedTileId
-        ) ?? null)
-        : null;
-
-    const moveInfluenceFromSelected = input.selectedTileId
-        ? input.intents.filter(
-            (intent) => intent.moveType === 'moveInfluence' && intent.payload?.sourceId === input.selectedTileId
-        )
-        : [];
-
     const baseOthers = input.intents.filter((intent) => {
         if (intent.moveType === 'resolveChoice') return false;
         if (intent.moveType === 'placeTile') return false;
@@ -136,7 +122,7 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         stagedTileId: input.stagedTileId,
         pendingChoice: { resolveChoice },
         drawAndPlace: { placeTile, passTilePlacement },
-        political: { placeInfluenceForSelected, moveInfluenceFromSelected, others: baseOthers },
+        political: { others: baseOthers },
         ghostCoords
     };
 }
