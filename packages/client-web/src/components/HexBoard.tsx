@@ -14,6 +14,7 @@ interface HexBoardProps {
     moveInfluenceIntents?: LegalIntent[];
     placeInfluenceIntents?: LegalIntent[];
     formalizeInfluenceIntents?: LegalIntent[];
+    convertResourcesIntents?: LegalIntent[];
     actionMode?: string;
     moveInfluenceSourceId?: string | null;
     ghostCoords: string[];
@@ -39,6 +40,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     moveInfluenceIntents,
     placeInfluenceIntents,
     formalizeInfluenceIntents,
+    convertResourcesIntents,
     actionMode,
     moveInfluenceSourceId,
     ghostCoords,
@@ -120,6 +122,9 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                         }
                     } else if (actionMode === 'formalizeInfluence') {
                         isValidTarget = formalizeInfluenceIntents?.some(i => i.payload.committeeTileId === tileId) ?? false;
+                        targetIntent = null; // Wizard will handle selection, not direct proposal
+                    } else if (actionMode === 'convertResources') {
+                        isValidTarget = convertResourcesIntents?.some(i => i.payload.grassrootsTileId === tileId) ?? false;
                         targetIntent = null; // Wizard will handle selection, not direct proposal
                     } else {
                         isValidTarget = false;

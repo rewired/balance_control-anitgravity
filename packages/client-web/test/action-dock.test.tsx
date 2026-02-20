@@ -25,6 +25,7 @@ describe('ActionDock', () => {
         render(
             <ActionDock
                 isActive={true}
+                G={{} as any}
                 controller={controller}
             />
         );
@@ -48,6 +49,7 @@ describe('ActionDock', () => {
         render(
             <ActionDock
                 isActive={true}
+                G={{} as any}
                 controller={controller}
             />
         );
@@ -71,6 +73,7 @@ describe('ActionDock', () => {
         render(
             <ActionDock
                 isActive={true}
+                G={{} as any}
                 controller={controller}
             />
         );
@@ -79,9 +82,9 @@ describe('ActionDock', () => {
     });
 
     it('dispatches a secondary action exactly once', () => {
-        const moves = { convertResources: vi.fn() };
+        const moves = { unknownAction: vi.fn() };
         const intents = [
-            { moveType: 'convertResources', payload: { outputResort: 'INF' } },
+            { moveType: 'unknownAction', payload: { foo: 'bar' } },
         ] as any;
         const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
         const controller = {
@@ -95,6 +98,7 @@ describe('ActionDock', () => {
         render(
             <ActionDock
                 isActive={true}
+                G={{} as any}
                 controller={controller}
             />
         );
@@ -102,8 +106,8 @@ describe('ActionDock', () => {
         const summary = screen.getByText('More actions');
         fireEvent.click(summary);
 
-        const moveButton = screen.getByText('Convert → INF');
+        const moveButton = screen.getByText('unknownAction');
         fireEvent.click(moveButton);
-        expect(moves.convertResources).toHaveBeenCalledTimes(1);
+        expect(moves.unknownAction).toHaveBeenCalledTimes(1);
     });
 });

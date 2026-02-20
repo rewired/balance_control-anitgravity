@@ -1,9 +1,12 @@
 import React from 'react';
+import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import type { InteractionController } from '../ui/interaction/types';
+import { MeasureTray } from './MeasureTray';
 
 interface ActionDockProps {
     isActive: boolean;
+    G: GameState;
     controller: InteractionController;
 }
 
@@ -21,6 +24,9 @@ const formatIntentLabel = (intent: LegalIntent) => {
     }
     if (intent.moveType === 'convertResources') {
         return `Convert → ${intent.payload?.outputResort}`;
+    }
+    if (intent.moveType.endsWith('.takeMeasure')) {
+        return `Take Measure ${intent.payload}`;
     }
     if (intent.moveType === 'passTilePlacement') {
         return 'Skip placement';
@@ -40,11 +46,12 @@ const intentSortKey = (intent: LegalIntent) => {
  */
 export const ActionDock: React.FC<ActionDockProps> = ({
     isActive,
+    G,
     controller
 }) => {
     if (!isActive) return null;
 
-    const { vm, dispatchIntent, actionMode, setActionMode, moveInfluenceSourceId } = controller;
+    const { vm, dispatchIntent, proposeIntent, actionMode, setActionMode, moveInfluenceSourceId } = controller;
 
     const stageLabel = vm.stage ? (STAGE_LABELS[vm.stage] ?? vm.stage) : 'Waiting';
     const isDrawAndPlace = vm.stage === 'drawAndPlace';
@@ -55,6 +62,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
     const hasPlaceInfluenceIntents = vm.intents.some(i => i.moveType === 'placeInfluence');
     const hasMoveInfluenceIntents = vm.intents.some(i => i.moveType === 'moveInfluence');
     const hasFormalizeInfluenceIntents = vm.political.formalizeInfluence.length > 0;
+    const hasConvertResourcesIntents = vm.political.convertResources.length > 0;
 
     return (
         <div className="action-panel action-dock" data-testid="action-dock">
@@ -104,6 +112,14 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                         >
                             Formalize Influence
                         </button>
+                        <button
+                            className={actionMode === 'convertResources' ? 'btn-primary' : 'btn-secondary'}
+                            disabled={!hasConvertResourcesIntents}
+                            onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
+                            data-testid="btn-mode-convert-resources"
+                        >
+                            Convert Resources
+                        </button>
                     </div>
                 )}
             </div>
@@ -126,6 +142,20 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                 <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
                     Select a committee tile on the board to formalize.
                 </div>
+            )}
+
+            {isPoliticalAction && actionMode === 'convertResources' && (
+                <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
+                    Select a grassroots tile on the board to convert resources.
+                </div>
+            )}
+
+            {isPoliticalAction && vm.political.measures.length > 0 && (
+                <MeasureTray
+                    G={G}
+                    intents={vm.political.measures}
+                    onSelect={proposeIntent}
+                />
             )}
 
             {showMoreActions && (

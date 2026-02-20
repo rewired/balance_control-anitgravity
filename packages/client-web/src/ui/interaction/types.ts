@@ -1,7 +1,7 @@
 import type { LegalIntent } from '@balance-control/game';
 import type { IntentViewModel } from '../useIntentViewModel';
 
-export type InteractionActionMode = 'none' | 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence';
+export type InteractionActionMode = 'none' | 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources';
 
 export interface InteractionController {
     /** The currently selected tile for inspection. */
@@ -19,7 +19,10 @@ export interface InteractionController {
     moveInfluenceSourceId: string | null;
 
     /** Current active wizard state. */
-    wizard: { kind: 'formalize'; committeeTileId: string } | null;
+    wizard:
+        | { kind: 'formalize'; committeeTileId: string }
+        | { kind: 'convert'; grassrootsTileId: string }
+        | null;
 
     /** Sets the current action mode. */
     setActionMode: (mode: InteractionActionMode) => void;

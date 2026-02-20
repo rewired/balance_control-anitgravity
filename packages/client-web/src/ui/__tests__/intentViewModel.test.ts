@@ -29,7 +29,8 @@ describe('intent view model', () => {
         expect(vm.ghostCoords).toEqual(['0,0', '1,0']);
         expect(vm.drawAndPlace.passTilePlacement?.moveType).toBe('passTilePlacement');
 
-        expect(vm.political.others.map((i) => i.moveType)).toEqual(['convertResources']);
+        expect(vm.political.convertResources.map((i) => i.moveType)).toEqual(['convertResources']);
+        expect(vm.political.others).toHaveLength(0);
     });
 
     it('moves passTilePlacement to trailing actions outside drawAndPlace', () => {
@@ -49,7 +50,8 @@ describe('intent view model', () => {
         expect(vm.stage).toBe('politicalAction');
         // passTilePlacement is specifically handled in drawAndPlace regardless of stage
         expect(vm.drawAndPlace.passTilePlacement?.moveType).toBe('passTilePlacement');
-        expect(vm.political.others.map((i) => i.moveType)).toEqual(['convertResources']);
+        expect(vm.political.convertResources.map((i) => i.moveType)).toEqual(['convertResources']);
+        expect(vm.political.others).toHaveLength(0);
     });
 
     it('excludes placeInfluence and moveInfluence from others', () => {

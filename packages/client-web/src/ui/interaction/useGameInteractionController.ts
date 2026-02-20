@@ -53,6 +53,16 @@ export function useGameInteractionController({
                 setWizard({ kind: 'formalize', committeeTileId: tileId });
             }
         }
+
+        if (actionMode === 'convertResources' && tileId) {
+            const hasIntents = vm.intents.some(i =>
+                i.moveType === 'convertResources' &&
+                i.payload?.grassrootsTileId === tileId
+            );
+            if (hasIntents) {
+                setWizard({ kind: 'convert', grassrootsTileId: tileId });
+            }
+        }
     }, [actionMode, moveInfluenceSourceId, vm.intents]);
 
     const proposeIntent = useCallback((intent: LegalIntent) => {
