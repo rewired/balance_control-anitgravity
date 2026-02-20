@@ -1,0 +1,338 @@
+id: ARCH-06-UI-INTERACTION-CONTRACT
+version: 1.1
+status: normative
+scope:
+  packages:
+    - packages/client-web
+  out_of_scope:
+    - lobby
+    - server
+    - engine rule changes
+    - rules/spec changes (requires Spec Anchor elsewhere)
+
+references:
+  - docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+  - docs/architecture/ARCH-02-STATE-SHAPE.md
+  - docs/architecture/ARCH-04-LLM-BOT-CONTRACT.md
+  - docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md
+  - docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.md
+  - docs/architecture/ARCH-06-UI-INTERACTION-CHECKLIST.md
+
+constraints:
+  no_rule_changes_without_spec_anchor: true
+  no_cross_imports_outside_package_exports: true
+  deterministic_replays_must_hold: true
+  ui_is_presentation_only: true
+
+truth:
+  legal_intents_source:
+    package: "@balance-control/game"
+    api: "enumerateLegalIntents(G, ctx, playerId) -> LegalIntent[]"
+  client_must_not:
+    - construct_moves_ad_hoc
+    - compute_legality
+    - compute_costs_or_majorities
+    - compute_majority_or_validity_outside_legal_intents
+  selection_rule:
+    ui_must_select_exactly_one_legal_intent_for_commit: true
+
+surfaces:
+  BoardSurface:
+    responsibilities:
+      - render_board_state
+      - inspect_selection (read-only state inspection)
+      - guided_parameter_selection (valid targets only)
+      - minimal_preview_overlay (draftReady only)
+    forbidden:
+      - commit_any_move (except pendingChoice.selectTile resolveChoice policy)
+      - compute_legality_or_costs
+  ActionDock:
+    responsibilities:
+      - action_selection (group list)
+      - show_active_action_and_step
+      - show_pinned_params (e.g., source tile)
+      - show_draft_summary_and_consequences
+      - confirm_cancel (dock-only)
+      - edit_draft_params (dock-only)
+    forbidden:
+      - direct_commit (no dispatchIntent / moves.* calls)
+      - parallel_action_sessions (no starting a new action while draftReady)
+  ModalHost:
+    responsibilities:
+      - pending_choice_modal (blocking, when kind != selectTile)
+      - optional_variant_picker_or_wizard (presentation only; no commit; confirm remains in dock)
+    forbidden:
+      - normal_draft_confirmation (no MoveConfirmationModal for non-pendingChoice drafts)
+      - blocking_overlay_for_pendingChoice_selectTile (must not prevent board-driven selection)
+  Inspector:
+    responsibilities:
+      - render_selected_tile_details
+      - render_action_status_block (active action, step, pinned params)
+    forbidden:
+      - mutate_interaction_state
+      - commit_any_move
+
+interaction_state_machine:
+  states:
+    - selectingAction
+    - selectingParams
+    - selectingVariant
+    - draftReady
+    - pendingChoiceHardGate
+  invariants:
+    - if_state_is_pendingChoiceHardGate_then_no_normal_action_session: true
+    - if_state_is_draftReady_then_action_selection_list_hidden: true
+    - draft_parameter_changes_are_dock_only: true
+    - board_clicks_during_draftReady_are_inspect_only: true
+
+commit_policy:
+  normal_moves:
+    require_explicit_confirm: true
+    confirm_surface: ActionDock
+    auto_commit: false
+  pending_choice:
+    hard_gate: true
+    allowed_actions:
+      - resolveChoice
+      - pan_zoom
+    forbidden_actions:
+      - inspect_click
+      - normal_action_selection
+      - normal_draft_building
+    resolveChoice_policy_by_kind:
+      selectTile:
+        interaction: board_driven
+        commit: direct_resolveChoice_on_board_click
+        modal: non_blocking_hint_or_none
+      other:
+        interaction: modal_driven
+        commit: resolveChoice_after_modal_confirm (misclick-safe)
+
+draft_rules:
+  lifecycle:
+    - actionType_selected -> selectingParams
+    - parameters_complete -> draftReady (draftIntent = one LegalIntent)
+    - confirm -> commit (exactly one move)
+    - cancel -> reset_action_session
+  cancel_semantics:
+    cancel_resets_entire_action_session: true
+    selection_preserved: true
+    clears:
+      - activeActionType
+      - step
+      - pinnedParams
+      - selectedVariant
+      - draftIntent
+      - previewOverlay
+  edit_semantics:
+    dock_only: true
+    edit_source:
+      clears: [pinnedSource, draftIntent, previewOverlay]
+      step: selectingParams (chooseSource)
+    edit_destination:
+      clears: [pinnedDestination, draftIntent, previewOverlay]
+      step: selectingParams (chooseDestination)
+    edit_variant:
+      clears: [selectedVariant, draftIntent, previewOverlay]
+      step: selectingVariant
+
+board_interaction_rules:
+  selectingParams:
+    valid_targets:
+      - action_click_advances_flow: true
+      - highlighted: true
+    invalid_tiles:
+      - click_is_inspect_only: true
+      - does_not_change_parameters: true
+  selectingVariant:
+    board_clicks:
+      - inspect_only: true
+  draftReady:
+    board_preview:
+      minimal_only: true
+      must_not_simulate_engine_rules: true
+    board_clicks:
+      - inspect_only: true
+      - must_not_change_draft: true
+
+action_taxonomy:
+  selection_ui:
+    style: group_list
+    show_under_variants:
+      only_after_valid_tile_selection: true
+  groups_order:
+    - core.influence
+    - core.committees
+    - core.economy
+    - core.measures
+    - expansions
+  core_action_types:
+    core.influence:
+      - id: core.placeInfluence
+        moveType: placeInfluence
+        steps: [selectTile]
+      - id: core.moveInfluence
+        moveType: moveInfluence
+        steps: [selectSource, selectDestination]
+    core.committees:
+      - id: core.formalizeInfluence
+        moveType: formalizeInfluence
+        steps: [selectTile, selectVariant]
+    core.economy:
+      - id: core.convertResources
+        moveType: convertResources
+        steps: [selectTile, selectVariant]
+    core.measures:
+      - id: core.takeMeasure
+        moveTypePattern: "*.takeMeasure"
+        steps: [selectVariant]
+    core.drawAndPlace:
+      - id: core.placeTile
+        moveType: placeTile
+        steps: [selectCoord]
+      - id: core.passTilePlacement
+        moveType: passTilePlacement
+        steps: [draftReady]
+  others_fallback:
+    location: expansions.other
+    rule:
+      - legal_intents_not_mapped_to_known_action_types_must_be_listed_here: true
+      - selection_is_always_draft_then_confirm: true
+      - no_direct_commit: true
+
+determinism:
+  sorting:
+    measures:
+      - by: expansion_prefix_then_measure_id
+    variants:
+      - by: stable_grouping_then_canonical_payload
+    expansions_other:
+      - by: moveType_then_canonical_payload
+
+i18n:
+  default_locale: en
+  fallback_locale: en
+  locales: [en, de]
+  namespaces:
+    core: required
+    exp01: optional
+    exp02: optional
+    exp03: optional
+  required_keys:
+    - core:group.influence
+    - core:group.committees
+    - core:group.economy
+    - core:group.measures
+    - core:group.expansions
+    - core:action.placeInfluence
+    - core:action.moveInfluence
+    - core:action.formalize
+    - core:action.convert
+    - core:action.takeMeasure
+    - core:step.chooseAction
+    - core:step.chooseSource
+    - core:step.chooseDestination
+    - core:step.chooseTile
+    - core:step.chooseVariant
+    - core:ui.preview
+    - core:ui.confirm
+    - core:ui.cancel
+    - core:ui.changeSource
+    - core:ui.changeDestination
+    - core:ui.changeVariant
+    - core:draft.moveInfluenceSummary
+    - core:draft.placeInfluenceSummary
+    - core:draft.placeTileSummary
+    - core:draft.formalizeSummary
+    - core:draft.convertSummary
+    - core:inspector.activeAction
+    - core:inspector.step
+    - core:inspector.pinnedSource
+  defaults:
+    en:
+      core:
+        group:
+          influence: "Influence"
+          committees: "Committees"
+          economy: "Economy"
+          measures: "Measures"
+          expansions: "Expansions"
+        action:
+          placeInfluence: "Place influence"
+          moveInfluence: "Move influence"
+          formalize: "Formalize"
+          convert: "Convert"
+          takeMeasure: "Take measure"
+        step:
+          chooseAction: "Select action"
+          chooseSource: "Select source"
+          chooseDestination: "Select destination"
+          chooseTile: "Select tile"
+          chooseVariant: "Select variant"
+        ui:
+          preview: "Preview"
+          confirm: "Confirm"
+          cancel: "Cancel"
+          changeSource: "Edit source"
+          changeDestination: "Edit destination"
+          changeVariant: "Edit variant"
+        draft:
+          moveInfluenceSummary: "{{source}} → {{target}}"
+          placeInfluenceSummary: "target {{target}}"
+          placeTileSummary: "{{tile}} @ {{coord}}"
+          formalizeSummary: "tile {{tile}}"
+          convertSummary: "tile {{tile}}"
+        inspector:
+          activeAction: "Active action"
+          step: "Step"
+          pinnedSource: "Pinned source"
+    de:
+      core:
+        group:
+          influence: "Einfluss"
+          committees: "Komitees"
+          economy: "Wirtschaft"
+          measures: "Maßnahmen"
+          expansions: "Erweiterungen"
+        action:
+          placeInfluence: "Einfluss platzieren"
+          moveInfluence: "Einfluss verschieben"
+          formalize: "Formalisieren"
+          convert: "Umwandeln"
+          takeMeasure: "Maßnahme ziehen"
+        step:
+          chooseAction: "Aktion wählen"
+          chooseSource: "Quelle wählen"
+          chooseDestination: "Ziel wählen"
+          chooseTile: "Feld wählen"
+          chooseVariant: "Variante wählen"
+        ui:
+          preview: "Vorschau"
+          confirm: "Bestätigen"
+          cancel: "Abbrechen"
+          changeSource: "Quelle ändern"
+          changeDestination: "Ziel ändern"
+          changeVariant: "Variante ändern"
+        draft:
+          moveInfluenceSummary: "{{source}} → {{target}}"
+          placeInfluenceSummary: "Ziel {{target}}"
+          placeTileSummary: "{{tile}} @ {{coord}}"
+          formalizeSummary: "Feld {{tile}}"
+          convertSummary: "Feld {{tile}}"
+        inspector:
+          activeAction: "Aktive Aktion"
+          step: "Schritt"
+          pinnedSource: "Fixierte Quelle"
+
+expansions:
+  ui_contributions:
+    allowed:
+      - action_groups_and_labels
+      - variant_selectors (presentation only)
+      - i18n_resources (namespace-prefixed, deterministic merge)
+      - inspector_panels (read-only)
+    forbidden:
+      - client_side_legality_or_cost_computation
+      - direct_engine_move_execution_from_ui
+  import_boundary:
+    - client_web_must_only_consume_pack_contributions_via_package_exports: true
