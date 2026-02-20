@@ -193,6 +193,19 @@ Anchor rules:
 
 No silent interpretation allowed.
 
+### Automated Anchor Compliance
+To ensure no rule drift occurs during refactoring, the repository uses an automated checker:
+- **Checker:** `pnpm run check:spec-anchors`
+- **Registry:** `packages/rules/src/spec-anchors.generated.json`
+- **Enforcement:** This check is part of the `pnpm test` pipeline and CI.
+
+**Workflow for Rule Changes:**
+1. Update normative rules in `/docs/rules/`.
+2. Regenerate the anchor registry: `pnpm run gen:spec-anchors`.
+3. Update code `@rule` tags or comments to match new anchors.
+4. Verify compliance: `pnpm run check:spec-anchors`.
+5. Never invent anchors manually; always use the canonical tokens from the spec.
+
 ---
 
 ## 0.6 No Rule Drift Policy

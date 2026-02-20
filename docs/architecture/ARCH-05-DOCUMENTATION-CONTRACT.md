@@ -47,3 +47,10 @@ To prevent "creative" or ambiguous rule usage:
 
 ## 6. CLIENT BOUNDARY DOCUMENTATION
 - Client modules that read state and could be mistaken as “rule logic” MUST reference `ARCH-01` in `@remarks` and explicitly state "presentation-only".
+
+## 7. TOOLING & ENFORCEMENT
+To prevent manual errors and ensure exact compliance with section 5:
+- **Registry Generation:** `pnpm run gen:spec-anchors` scans normative markdown in `/docs/rules/` and updates `packages/rules/src/spec-anchors.generated.json`.
+- **Compliance Checker:** `pnpm run check:spec-anchors` scans all TypeScript files in `packages/` to ensure every `@rule` or comment-based rule ID exists in the generated registry.
+- **CI Gating:** The checker is run as a dedicated step in CI and as a pre-requisite for the root `pnpm test` command.
+- **Fixing Violations:** If a violation is found, either update the code to use a valid anchor or, if the spec has changed, regenerate the registry. Never manually edit the generated JSON.
