@@ -1,6 +1,6 @@
 # Task 0168 — PG-3: ActionDock IA skeleton (group list + Current Action Panel, draftReady hides list)
 
-Status: DRAFT
+Status: COMPLETE
 
 ## Meta
 - Owner: Codex
@@ -10,14 +10,14 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005, GR-006
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Read ARCH-06 contract + checklist:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Read ARCH-06 contract + checklist:
    - `/docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.v1.yaml`
    - `/docs/architecture/ARCH-06-UI-INTERACTION-CHECKLIST.md`
-3. [ ] Baseline scans (no edits yet):
+3. [x] Baseline scans (no edits yet):
    - `rg -n "More actions|measure-tray|Skip placement" packages/client-web/src/components/ActionDock.tsx`
    - `rg -n "WizardModal|ConvertWizardModal|FormalizeWizardModal" packages/client-web/src/components`
-4. [ ] Baseline tests:
+4. [x] Baseline tests:
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
 ## 1) Goal
@@ -58,7 +58,8 @@ Introduce a contract-compliant **information architecture** for the ActionDock w
 ### 3.3 Files touched
 - `packages/client-web/src/components/ActionDock.tsx`
 - `packages/client-web/test/action-dock.test.tsx`
-- (optional) small UI helper additions local to `ActionDock` only
+- `packages/client-web/test/controls-start-committee.test.tsx`
+- `packages/client-web/test/guided-selection-valid-targets-only.test.tsx`
 
 ## 4) Constraints
 - **No commits from components** (GR-002): ActionDock must call only controller APIs (confirm/cancel/edit) and never `dispatchIntent(...)` or `moves.*`.
@@ -67,15 +68,31 @@ Introduce a contract-compliant **information architecture** for the ActionDock w
 - No i18n infrastructure changes in this task (PG-6).
 
 ## 5) Acceptance Criteria
-- [ ] In `politicalAction`, ActionDock shows the action **group list** and a **Current Action Panel**.
-- [ ] When `interactionState === 'draftReady'`, the group list is hidden and only the Current Action Panel remains.
-- [ ] No new auto-commit paths are introduced.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] In `politicalAction`, ActionDock shows the action **group list** and a **Current Action Panel**.
+- [x] When `interactionState === 'draftReady'`, the group list is hidden and only the Current Action Panel remains.
+- [x] No new auto-commit paths are introduced.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005/006).
-- [ ] No engine/rule/spec changes.
-- [ ] No direct commit shortcuts introduced.
-- [ ] ARCH-06 checklist items 1–4 remain satisfied.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005/006).
+- [x] No engine/rule/spec changes.
+- [x] No direct commit shortcuts introduced.
+- [x] ARCH-06 checklist items 1–4 remain satisfied.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
+
+## Work Summary
+- Refactored `ActionDock` to split into `CurrentActionPanel` and `ActionGroupList`.
+- Implemented `CurrentActionPanel` to show Active Action, Step, and Pinned Params, and Draft controls.
+- Implemented `ActionGroupList` to group actions by Influence, Committees, Economy, Measures, and Expansions.
+- Updated logic to hide `ActionGroupList` when in `draftReady` state.
+- Updated tests to match new UI structure and fixed regressions in `controls-start-committee.test.tsx` and `guided-selection-valid-targets-only.test.tsx`.
+
+## Commands Run
+- `pnpm -C packages/client-web test` (Baseline and Final)
+- `pnpm lint`
+
+## Guardrails
+- GR-002 (Engine-only Rule Execution): Compliant. ActionDock only uses controller methods, no direct moves.
+- GR-005 (No Phantom Moves): Compliant. All actions are derived from `vm.intents` or `vm.political`.
+- GR-006 (Pending Choice Gate): Compliant. Structure respects existing state machine.
