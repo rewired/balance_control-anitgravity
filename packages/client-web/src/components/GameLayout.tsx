@@ -7,6 +7,7 @@ import { ModalHost } from './ModalHost';
 import { PublicNoticeOverlay } from './PublicNoticeOverlay';
 import { ResortIcon } from '../ui/tiles/ResortIcon';
 import { useGameInteractionController } from '../ui/interaction/useGameInteractionController';
+import { InspectorActionStatus } from './InspectorActionStatus';
 
 interface GameLayoutProps {
     G: GameState;
@@ -205,6 +206,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
             <aside className="right-panel glass-panel">
                 <div className="inspector-panel" data-testid="inspector-panel">
                     <h3>Inspector</h3>
+                    <InspectorActionStatus controller={controller} />
                     {!inspectorData && (
                         <div className="inspector-empty" data-testid="inspector-empty">
                             No tile selected

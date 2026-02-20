@@ -1,6 +1,6 @@
 # Task 0171 — PG-3: Inspector shows action status (Active action / Step / Pinned params)
 
-Status: DRAFT
+Status: DONE
 
 ## Meta
 - Owner: Codex
@@ -10,11 +10,11 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-006
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Read ARCH-06 Inspector responsibilities (action status block).
-3. [ ] Baseline scans:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Read ARCH-06 Inspector responsibilities (action status block).
+3. [x] Baseline scans:
    - `rg -n "inspector" packages/client-web/src/components/GameLayout.tsx`
-4. [ ] Baseline tests:
+4. [x] Baseline tests:
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
 ## 1) Goal
@@ -48,19 +48,27 @@ Add a read-only **action status block** to the Inspector:
 - `packages/client-web/src/components/GameLayout.tsx`
 - `packages/client-web/src/components/InspectorActionStatus.tsx` (new)
 - `packages/client-web/test/selection-inspector.test.tsx`
+- `packages/client-web/test/guided-selection-valid-targets-only.test.tsx`
 
 ## 4) Constraints
 - Presentation-only (GR-002): Inspector must not mutate interaction state or commit any move.
 - PendingChoice gate (GR-006): in hard-gate, status should reflect that normal actions are disabled.
 
 ## 5) Acceptance Criteria
-- [ ] Inspector always shows an “Active action” and “Step” line.
-- [ ] When Move Influence is in progress, pinned source is displayed.
-- [ ] No new click handlers or side effects are introduced in Inspector.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Inspector always shows an “Active action” and “Step” line.
+- [x] When Move Influence is in progress, pinned source is displayed.
+- [x] No new click handlers or side effects are introduced in Inspector.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/006).
-- [ ] No engine/rule/spec changes.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/006).
+- [x] No engine/rule/spec changes.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
+
+## 7) Work Summary
+- Created `InspectorActionStatus.tsx` to display active action, step, and pinned parameters based on controller state.
+- Integrated `InspectorActionStatus` into `GameLayout.tsx`'s Inspector panel, ensuring it is always visible.
+- Added tests in `selection-inspector.test.tsx` to verify the component renders and displays correct information for different states (mocked controller).
+- Updated `guided-selection-valid-targets-only.test.tsx` to resolve test failures caused by duplicate "Select source" text (one in prompt, one in inspector).
+- Verified implementation passes lint and tests.

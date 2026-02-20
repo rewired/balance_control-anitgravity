@@ -3,6 +3,7 @@ import React from 'react';
 import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import { TileType } from '@balance-control/rules';
 import { GameLayout } from '../src/components/GameLayout';
+import { InspectorActionStatus } from '../src/components/InspectorActionStatus';
 
 vi.mock('@balance-control/game', async () => {
     const actual = await vi.importActual<any>('@balance-control/game');
@@ -101,5 +102,38 @@ describe('Selection inspector', () => {
 
         fireEvent.keyDown(window, { key: 'Escape' });
         expect(screen.queryByTestId('inspector-empty')).not.toBeNull();
+    });
+
+    it('renders action status block in GameLayout', () => {
+        ensureResizeObserver();
+        const G = createState();
+        render(
+            <GameLayout
+                G={G}
+                ctx={baseCtx}
+                moves={{}}
+                playerID={'0'}
+                isActive={true}
+            />
+        );
+        expect(screen.getByTestId('inspector-action-status')).toBeDefined();
+        expect(screen.getByTestId('inspector-active-action').textContent).toBe('None');
+    });
+
+    it('displays pinned source when moveInfluenceSourceId is set', () => {
+        const mockController: any = {
+            actionMode: 'moveInfluence',
+            interactionState: 'selectingParams',
+            moveInfluenceSourceId: 'tile_123',
+            pinnedCommitteeTileId: null,
+            pinnedGrassrootsTileId: null,
+            vm: { hasPendingChoice: false }
+        };
+
+        render(<InspectorActionStatus controller={mockController} />);
+
+        expect(screen.getByText('Move influence')).toBeDefined();
+        expect(screen.getByText('Pinned source')).toBeDefined();
+        expect(screen.getByText('tile_123')).toBeDefined();
     });
 });
