@@ -192,9 +192,9 @@ CORE-01-04-11 PlaceOrMoveInfluence (Place): move exactly one Influence from Pers
 
 CORE-01-04-11A Place Legality: legal only if active player has ≥1 Influence in PersonalSupply and the chosen Tile is not prohibited by restrictions (incl. Start Committee restrictions).
 
-CORE-01-04-12 PlaceOrMoveInfluence (Move): move exactly one active-player-owned Influence from a source Board Tile to a different adjacent destination Board Tile.
+CORE-01-04-12 PlaceOrMoveInfluence (Move): move exactly one active-player-owned Influence from a source Board Tile to a different MoveAdjacent destination Board Tile.
 Start Committee may not be source or destination (CORE-01-08-06E).
-If the destination Tile is not adjacent to the source Tile, the action is invalid and does not resolve; no state change occurs (CORE-01-06-00-03).
+If `MoveAdjacent(sourceTile, destinationTile)` is not true, the action is invalid and does not resolve; no state change occurs (CORE-01-06-00-03).
 
 CORE-01-04-12A Move Meta-Marker Update: after a successful Move, if the source Tile is a ResortTile, place active player’s Meta-Marker onto the source Tile and set mode = ReturnPenalty (removing it from any prior Tile). Otherwise, do not place the Meta-Marker as part of this move (then CORE-01-04-09A applies).
 
@@ -204,7 +204,7 @@ Let R = Resource count in PersonalSupply[activePlayer]. Let N = min(10, floor(R/
 CORE-01-04-12C PlaceOrMoveInfluence (Move) Meta-Marker Expiry: Reserved. (Persistence/return governed by CORE-01-07-03A/B and CORE-01-04-09A.)
 
 CORE-01-04-12D Move Adjacency Requirement (Canonical):
-A Move is legal only if MoveAdjacent(sourceTile, destinationTile) = true, where:
+A Move is legal only if `MoveAdjacent(sourceTile, destinationTile) = true`, where:
 `MoveAdjacent(A,B)` is true if
 (a) `Adjacent(A,B) = true`, or
 (b) `Adjacent(A, StartCommittee) = true` and `Adjacent(StartCommittee, B) = true`, with `A ≠ StartCommittee`, `B ≠ StartCommittee`, `A ≠ B`.
