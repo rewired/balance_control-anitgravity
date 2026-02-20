@@ -12,12 +12,12 @@ describe('Controls - StartCommittee targeting', () => {
 
         const intents: any[] = [];
         const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: 'tile_start_committee', stagedTileId: null }), intents } as any;
+        const controller = { vm, dispatchIntent: (intent: any) => moves[intent.moveType](intent.payload) } as any;
 
         render(
             <ActionPanel
-                moves={moves}
                 isActive={true}
-                vm={vm}
+                controller={controller}
             />
         );
 

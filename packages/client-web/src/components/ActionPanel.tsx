@@ -1,11 +1,10 @@
 import React from 'react';
 import type { LegalIntent } from '@balance-control/game';
-import type { IntentViewModel } from '../ui/useIntentViewModel';
+import type { InteractionController } from '../ui/interaction/types';
 
 interface ActionPanelProps {
-    moves: any;
     isActive: boolean;
-    vm: IntentViewModel;
+    controller: InteractionController;
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -40,11 +39,12 @@ const intentSortKey = (intent: LegalIntent) => {
  * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
  */
 export const ActionPanel: React.FC<ActionPanelProps> = ({
-    moves,
     isActive,
-    vm
+    controller
 }) => {
     if (!isActive) return null;
+
+    const { vm, dispatchIntent } = controller;
 
     const stageLabel = vm.stage ? (STAGE_LABELS[vm.stage] ?? vm.stage) : 'Waiting';
     const isDrawAndPlace = vm.stage === 'drawAndPlace';
@@ -68,7 +68,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                         {vm.drawAndPlace.passTilePlacement && (
                             <button
                                 className="btn-primary"
-                                onClick={() => moves[vm.drawAndPlace.passTilePlacement!.moveType](vm.drawAndPlace.passTilePlacement!.payload)}
+                                onClick={() => dispatchIntent(vm.drawAndPlace.passTilePlacement!)}
                                 data-testid="btn-skip-placement"
                             >
                                 Skip placement
@@ -83,7 +83,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                             disabled={primaryPlaceInfluenceDisabled}
                             onClick={
                                 placeInfluenceForSelected
-                                    ? () => moves[placeInfluenceForSelected.moveType](placeInfluenceForSelected.payload)
+                                    ? () => dispatchIntent(placeInfluenceForSelected)
                                     : undefined
                             }
                             data-testid="btn-place-influence"
@@ -108,7 +108,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                             <button
                                 key={intentSortKey(intent)}
                                 className="btn-secondary"
-                                onClick={() => moves[intent.moveType](intent.payload)}
+                                onClick={() => dispatchIntent(intent)}
                             >
                                 {formatIntentLabel(intent)}
                             </button>

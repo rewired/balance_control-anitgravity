@@ -3,7 +3,7 @@ import type { LegalIntent } from '@balance-control/game';
 
 interface PendingChoiceModalProps {
     resolveChoiceIntents: LegalIntent[];
-    moves: any;
+    onResolve: (intent: LegalIntent) => void;
 }
 
 const formatChoiceLabel = (intent: LegalIntent) => {
@@ -23,7 +23,7 @@ const intentKey = (intent: LegalIntent) => JSON.stringify(intent.payload ?? {});
  * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
  * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
  */
-export const PendingChoiceModal: React.FC<PendingChoiceModalProps> = ({ resolveChoiceIntents, moves }) => {
+export const PendingChoiceModal: React.FC<PendingChoiceModalProps> = ({ resolveChoiceIntents, onResolve }) => {
     if (resolveChoiceIntents.length === 0) return null;
 
     return (
@@ -36,7 +36,7 @@ export const PendingChoiceModal: React.FC<PendingChoiceModalProps> = ({ resolveC
                             key={`${intentKey(intent)}:${index}`}
                             className="pending-choice-option"
                             type="button"
-                            onClick={() => moves.resolveChoice(intent.payload)}
+                            onClick={() => onResolve(intent)}
                             data-testid={`pending-choice-option-${index}`}
                         >
                             {formatChoiceLabel(intent)}

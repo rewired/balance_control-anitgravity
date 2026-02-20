@@ -10,7 +10,6 @@ import { computeFitTransform } from '../ui/fitToBounds';
 type BoardViewportGameProps = {
     mode?: undefined | 'game';
     G: GameState;
-    moves: any;
     placeTileIntents: LegalIntent[];
     moveInfluenceIntents?: LegalIntent[];
     ghostCoords: string[];
@@ -19,6 +18,7 @@ type BoardViewportGameProps = {
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
     onProposeMove?: (intent: LegalIntent) => void;
+    onDispatchIntent?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
 };
 
@@ -144,7 +144,6 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                     : (
                                         <HexBoard
                                             G={gameProps!.G}
-                                            moves={gameProps!.moves}
                                             placeTileIntents={gameProps!.placeTileIntents}
                                             moveInfluenceIntents={gameProps!.moveInfluenceIntents}
                                             ghostCoords={gameProps!.ghostCoords}
@@ -153,6 +152,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             selectedCoord={gameProps!.selectedCoord}
                                             onSelectTile={gameProps!.onSelectTile}
                                             onProposeMove={gameProps!.onProposeMove}
+                                            onDispatchIntent={gameProps!.onDispatchIntent}
                                             pendingTile={gameProps!.pendingTile}
                                         />
                                     )}

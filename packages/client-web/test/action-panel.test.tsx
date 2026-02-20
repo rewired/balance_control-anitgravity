@@ -13,11 +13,11 @@ describe('ActionPanel', () => {
         const moves = { placeInfluence: vi.fn() };
         const intents = [{ moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } } as any];
         const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: 'tile_alpha', stagedTileId: null }), intents } as any;
+        const controller = { vm, dispatchIntent: (intent: any) => moves[intent.moveType](intent.payload) } as any;
         render(
             <ActionPanel
-                moves={moves}
                 isActive={true}
-                vm={vm}
+                controller={controller}
             />
         );
 
@@ -29,11 +29,11 @@ describe('ActionPanel', () => {
         const moves = { placeInfluence: vi.fn() };
         const intents = [{ moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } } as any];
         const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
+        const controller = { vm, dispatchIntent: (intent: any) => moves[intent.moveType](intent.payload) } as any;
         render(
             <ActionPanel
-                moves={moves}
                 isActive={true}
-                vm={vm}
+                controller={controller}
             />
         );
 
@@ -49,11 +49,11 @@ describe('ActionPanel', () => {
             { moveType: 'convertResources', payload: { outputResort: 'INF' } },
         ] as any;
         const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: 'tile_alpha', stagedTileId: null }), intents } as any;
+        const controller = { vm, dispatchIntent: (intent: any) => moves[intent.moveType](intent.payload) } as any;
         render(
             <ActionPanel
-                moves={moves}
                 isActive={true}
-                vm={vm}
+                controller={controller}
             />
         );
 
