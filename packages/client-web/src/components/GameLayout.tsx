@@ -177,6 +177,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     onSelectTile={selectTile}
                     onProposeMove={proposeIntent}
                     pendingTile={pendingTile}
+                    activePlayerId={ctx.currentPlayer}
                 />
             </main>
 

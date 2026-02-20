@@ -24,6 +24,7 @@ interface HexBoardProps {
     onSelectTile?: (tileId: string, coordStr: string) => void;
     onProposeMove?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
+    activePlayerId?: string;
 }
 
 export const HEX_SIZE = 110;
@@ -48,7 +49,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     selectedCoord,
     onSelectTile,
     onProposeMove,
-    pendingTile
+    pendingTile,
+    activePlayerId
 }) => {
     const [hoveredTileId, setHoveredTileId] = useState<string | null>(null);
     const [hoveredGhostCoord, setHoveredGhostCoord] = useState<string | null>(null);
@@ -94,6 +96,9 @@ export const HexBoard: React.FC<HexBoardProps> = ({
         return seat as SeatId;
     };
 
+    const activeSeat = activePlayerId ? playerIdToSeatId(activePlayerId) : null;
+    const activeSeatColor = activeSeat ? seatColor(activeSeat) : undefined;
+
     return (
         <div className="hex-board" style={{ width, height }} data-testid="hex-board">
             <div className="hex-layer hex-layer-tiles">
@@ -105,6 +110,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
 
                     let isValidTarget = false;
                     let targetIntent: LegalIntent | null = null;
+                    let isDestination = false;
 
                     if (actionMode === 'placeInfluence') {
                         targetIntent = placeInfluenceIntents?.find(i => i.payload.targetTileId === tileId) ?? null;
@@ -117,6 +123,9 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 i => i.payload.sourceId === moveInfluenceSourceId && i.payload.targetId === tileId
                             ) ?? null;
                             isValidTarget = !!targetIntent;
+                            if (isValidTarget) {
+                                isDestination = true;
+                            }
                         }
                     } else if (actionMode === 'formalizeInfluence') {
                         isValidTarget = formalizeInfluenceIntents?.some(i => i.payload.committeeTileId === tileId) ?? false;
@@ -157,6 +166,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 'hex-cell',
                                 isSelected ? 'hex-cell-selected' : null,
                                 isValidTarget ? 'hex-cell-target' : null,
+                                isDestination ? 'hex-cell-target-destination' : null,
                                 isHot ? 'hex-cell-hot' : null
                             ]
                                 .filter(Boolean)
@@ -165,7 +175,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 left: x + offsetX,
                                 top: y + offsetY,
                                 ['--hex-cell-w' as any]: `${cellWidth}px`,
-                                ['--hex-cell-h' as any]: `${cellHeight}px`
+                                ['--hex-cell-h' as any]: `${cellHeight}px`,
+                                ['--active-seat-color' as any]: isDestination ? activeSeatColor : undefined
                             }}
                             data-testid={testId}
                             title={`coord ${coordStr}`}

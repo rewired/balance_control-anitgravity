@@ -10,9 +10,9 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Read `/docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.v1.yaml` and `/docs/architecture/ARCH-06-UI-INTERACTION-CHECKLIST.md`.
-3. [ ] Baseline scan (no edits yet):
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Read `/docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.v1.yaml` and `/docs/architecture/ARCH-06-UI-INTERACTION-CHECKLIST.md`.
+3. [x] Baseline scan (no edits yet):
    - `grep -RIn "hex-cell-target" packages/client-web/src` (should find class usage but no CSS)
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
@@ -59,19 +59,27 @@ No interaction semantics change in this task (purely visual + prop plumbing).
 - Determinism: no time-based animation logic; CSS-only.
 
 ## 5) Acceptance Criteria
-- [ ] Valid targets are visually distinguished on the board (CSS class present + visible effect).
-- [ ] Destination-step bloom uses the active player's seat color.
-- [ ] Existing tests stay green: `pnpm -C packages/client-web test`.
+- [x] Valid targets are visually distinguished on the board (CSS class present + visible effect).
+- [x] Destination-step bloom uses the active player's seat color.
+- [x] Existing tests stay green: `pnpm -C packages/client-web test`.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/GR-005).
-- [ ] No engine/rule/spec changes.
-- [ ] No new commit path introduced.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/GR-005).
+- [x] No engine/rule/spec changes.
+- [x] No new commit path introduced.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 7) Work Summary
-- TBD
+- Updated `HexBoard.tsx` to accept `activePlayerId` and apply `hex-cell-target` and `hex-cell-target-destination` classes.
+- Updated `BoardViewport.tsx` and `GameLayout.tsx` to pass `activePlayerId` down from `ctx.currentPlayer`.
+- Added CSS styles in `index.css` for `.hex-cell-target` (highlight ring) and `.hex-cell-target-destination` (seat-colored bloom).
+- Added `hex-target-highlights.test.tsx` to verify correct class application and CSS variable propagation.
+- Verified visual affordances are purely presentational and do not affect game logic.
 
 ## 8) Commands Run
-- TBD
+- `grep -RIn "hex-cell-target" packages/client-web/src` (Baseline check)
+- `pnpm -C packages/client-web test` (Baseline check)
+- `pnpm -C packages/client-web test test/hex-target-highlights.test.tsx` (Verification)
+- `pnpm -C packages/client-web test` (Regression check)
+- `pnpm lint` (Lint check)

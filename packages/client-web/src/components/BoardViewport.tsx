@@ -24,6 +24,7 @@ type BoardViewportGameProps = {
     onSelectTile?: (tileId: string, coordStr: string) => void;
     onProposeMove?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
+    activePlayerId?: string;
 };
 
 type BoardViewportDevProps = {
@@ -162,6 +163,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             onSelectTile={gameProps!.onSelectTile}
                                             onProposeMove={gameProps!.onProposeMove}
                                             pendingTile={gameProps!.pendingTile}
+                                            activePlayerId={gameProps!.activePlayerId}
                                         />
                                     )}
                             </TransformComponent>
