@@ -279,6 +279,8 @@ describe('enumerateLegalIntents', () => {
             G.zones[CoreZoneName.Board].items.push(sourceId, targetId);
             G.grid['0,0'] = sourceId;
             G.grid['0,1'] = targetId;
+            G.adjacency[sourceId] = [targetId];
+            G.adjacency[targetId] = [sourceId];
 
             G.tiles[sourceId] = { id: sourceId, type: TileType.Resort, resort: 'DOM' } as any;
             G.tiles[targetId] = { id: targetId, type: TileType.Committee } as any;

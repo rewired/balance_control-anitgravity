@@ -2,6 +2,7 @@ import { CoreZoneName, GameState, TileType } from '@balance-control/rules';
 import { allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
 import { computeMajority } from '../mechanics';
 import { coordToString, getNeighbors, stringToCoord } from '../topology';
+import { isMoveAdjacent } from './topology';
 import { EffectResolver } from './resolver';
 import { evaluateTileSelector } from './selectors';
 import { EnginePackRegistry } from '../expansion-registry';
@@ -217,8 +218,10 @@ function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
     for (const sourceId of sources) {
         for (const targetId of boardTiles) {
             if (sourceId === targetId) continue;
-            const targetTile = G.tiles[targetId];
-            if (targetTile && targetTile.type === TileType.StartCommittee) continue;
+
+            // CORE-01-04-12D / CORE-01-08-06E
+            if (!isMoveAdjacent(G, sourceId, targetId)) continue;
+
             if (EffectResolver.isProhibited(G as any, 'influence.move', playerID, targetId)) continue;
 
             // Calculate costs including any penalties
