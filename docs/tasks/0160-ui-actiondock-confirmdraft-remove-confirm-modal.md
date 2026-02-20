@@ -1,6 +1,6 @@
 # Task 0160 — PG-1: Dock-confirm for ALL normal drafts (remove MoveConfirmationModal from normal flow)
 
-Status: DRAFT
+Status: DONE
 
 ## Meta
 - Owner: Codex
@@ -10,9 +10,9 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005, GR-006
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Confirm Task 0159 is merged (single commit path exists).
-3. [ ] Baseline scan (no edits yet):
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Confirm Task 0159 is merged (single commit path exists).
+3. [x] Baseline scan (no edits yet):
    - `rg -n "MoveConfirmationModal" packages/client-web/src`
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
@@ -58,14 +58,14 @@ Align the UI with ARCH-06 “dock-only confirm” semantics for **normal moves**
 - Pending choice gate (GR-006): while pendingChoice exists, normal confirm/cancel controls must not appear.
 
 ## 5) Acceptance Criteria
-- [ ] Normal drafts are confirmed/canceled only from ActionDock (no confirmation modal for normal moves).
-- [ ] `controller.confirmDraft()` is the only normal commit entrypoint.
-- [ ] When pendingChoice exists, ActionDock is not shown (existing behavior) and no normal drafts can be confirmed.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Normal drafts are confirmed/canceled only from ActionDock (no confirmation modal for normal moves).
+- [x] `controller.confirmDraft()` is the only normal commit entrypoint.
+- [x] When pendingChoice exists, ActionDock is not shown (existing behavior) and no normal drafts can be confirmed.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005/006).
-- [ ] No engine/rule/spec changes.
-- [ ] No auto-commit introduced.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005/006).
+- [x] No engine/rule/spec changes.
+- [x] No auto-commit introduced.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.

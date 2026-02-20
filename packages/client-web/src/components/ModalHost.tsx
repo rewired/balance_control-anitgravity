@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import type { GameState } from '@balance-control/rules';
 import { PendingChoiceModal } from './PendingChoiceModal';
-import { MoveConfirmationModal } from './MoveConfirmationModal';
 import { FormalizeWizardModal } from './FormalizeWizardModal';
 import { ConvertWizardModal } from './ConvertWizardModal';
 import type { InteractionController } from '../ui/interaction/types';
@@ -20,9 +19,6 @@ interface ModalHostProps {
 export const ModalHost: React.FC<ModalHostProps> = ({ G, controller }) => {
     const {
         vm,
-        proposedIntent,
-        confirmDraft,
-        cancelDraft,
         resolveChoice,
         wizard,
         closeWizard,
@@ -52,12 +48,6 @@ export const ModalHost: React.FC<ModalHostProps> = ({ G, controller }) => {
             <PendingChoiceModal
                 resolveChoiceIntents={vm.pendingChoice.resolveChoice}
                 onResolve={resolveChoice}
-            />
-            <MoveConfirmationModal
-                G={G}
-                intent={proposedIntent}
-                onConfirm={confirmDraft}
-                onCancel={cancelDraft}
             />
             <FormalizeWizardModal
                 open={wizard?.kind === 'formalize'}
