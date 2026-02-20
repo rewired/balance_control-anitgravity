@@ -78,6 +78,8 @@ export const PoliticalActionMoves = {
      * @rule CORE-01-04-12
      * @rule CORE-01-04-12A
      * @rule CORE-01-04-12B
+     * @rule CORE-01-04-12D
+     * @rule CORE-01-08-06E
      * @deterministic
      * @sideEffects
      */
@@ -179,6 +181,10 @@ export const PoliticalActionMoves = {
      * @rule CORE-01-04-15
      * @rule CORE-01-08-07
      * @rule CORE-01-08-08
+     * @rule CORE-01-08-06A
+     * @rule CORE-01-08-02
+     * @rule CORE-01-08-03
+     * @rule CORE-01-08-01
      * @deterministic
      * @sideEffects
      */
@@ -284,6 +290,7 @@ export const PoliticalActionMoves = {
      * @rule CORE-01-04-22
      * @rule CORE-01-04-22K
      * @rule CORE-01-04-22L
+     * @rule CORE-01-04-22L.1
      * @deterministic
      * @sideEffects
      */

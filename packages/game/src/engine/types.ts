@@ -44,12 +44,12 @@ export type EffectAtom =
     | { kind: 'hotspot.resolve'; tileId: string; context?: any }
     | { kind: 'hotspot.prohibit'; tileId: string; window: ExpiryTrigger; context?: any }
 
-    // --- Regulation Actions (EXP-02) ---
+    // --- Regulation Actions (EXP-02-00) ---
     | { kind: 'regulation.place'; regType: RegulationType; targetTileId: string; context?: any }
     | { kind: 'regulation.move'; regulationId: string; targetTileId: string; context?: any }
     | { kind: 'regulation.remove'; regulationId: string; context?: any }
 
-    // --- Climate/Countdown (EXP-03) ---
+    // --- Climate/Countdown (EXP-03-00) ---
     | { kind: 'countdown.place'; targetTileId: string; amount: number; context?: any }
 
     // --- Measure Actions ---

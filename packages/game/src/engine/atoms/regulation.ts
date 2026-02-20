@@ -5,7 +5,7 @@ import { allocId } from '../resolver/ids';
 
 /**
  * Places a regulation on the board.
- * @expansion EXP-02
+ * @expansion EXP-02-00
  * @deterministic
  * @sideEffects
  * @rule EXP-02-04-A
@@ -29,7 +29,7 @@ function handleRegulationPlace(G: GameState & { engine: EngineState }, atom: any
 
 /**
  * Moves an existing regulation to a new target tile.
- * @expansion EXP-02
+ * @expansion EXP-02-00
  * @deterministic
  * @sideEffects
  * @rule EXP-02-02-F
@@ -48,7 +48,7 @@ function handleRegulationMove(G: GameState & { engine: EngineState }, atom: any)
 
 /**
  * Removes a regulation from the board.
- * @expansion EXP-02
+ * @expansion EXP-02-00
  * @deterministic
  * @sideEffects
  * @rule EXP-02-02-E
@@ -73,9 +73,9 @@ function handleRegulationRemove(G: GameState & { engine: EngineState }, atom: an
 }
 
 /**
- * Atom registrations for Regulations (EXP-02).
- * @expansion EXP-02
- * @requires SPEC-CORE-01
+ * Atom registrations for Regulations (EXP-02-00).
+ * @expansion EXP-02-00
+ * @requires CORE-01-00
  * @deterministic
  * @rule EXP-02-04-A
  */

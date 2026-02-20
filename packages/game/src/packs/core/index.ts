@@ -17,19 +17,19 @@ const CORE_PACK_VERSION = RULESET_MANIFEST.coreVersion.replace(/^v/i, '');
 const CORE_PACK_MANIFEST: PackManifest = {
     id: 'core',
     packVersion: CORE_PACK_VERSION,
-    rulesetAnchor: `CORE-01 ${RULESET_MANIFEST.coreVersion}`,
+    rulesetAnchor: `CORE-01-00 ${RULESET_MANIFEST.coreVersion}`,
     required: true,
 };
 
 /**
- * Core engine pack implementing CORE-01 ruleset.
- * @rule CORE-01
+ * Core engine pack implementing CORE-01-00 ruleset.
+ * @rule CORE-01-00
  * @deterministic
  * @pure
  */
 export const CorePack: EnginePackDefinition = {
     id: 'core',
-    name: 'CORE-01 (v1.1.0)',
+    name: 'CORE-01-00 (v1.1.0)',
     manifest: CORE_PACK_MANIFEST,
     moves: CoreMoves,
     setup: {

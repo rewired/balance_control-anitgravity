@@ -7,12 +7,12 @@ import { EffectResolver } from '../src/engine/resolver';
 import { registerTestPacks } from './_helpers/registerPacks';
 import type { EnginePackDefinition } from '../src/packs/types';
 
-describe('EXP-03 controller grants with no controller', () => {
+describe('EXP-03-00 controller grants with no controller', () => {
     // Minimal dummy pack to satisfy registry
     const DummyExp03Pack: EnginePackDefinition = {
         id: 'exp03',
         name: 'Dummy Exp 03',
-        manifest: { id: 'exp03', packVersion: '0.0.0', rulesetAnchor: 'EXP-03', required: false }
+        manifest: { id: 'exp03', packVersion: '0.0.0', rulesetAnchor: 'EXP-03-00', required: false }
     };
 
     beforeEach(() => {
@@ -23,7 +23,7 @@ describe('EXP-03 controller grants with no controller', () => {
         EnginePackRegistry.clear();
     });
 
-    it('should not throw and should not grant to Noise for uncontrolled EXP-03 effect path', () => {
+    it('should not throw and should not grant to Noise for uncontrolled EXP-03-00 effect path', () => {
         const ctx: any = {
             currentPlayer: '0',
             numPlayers: 2,
@@ -52,7 +52,7 @@ describe('EXP-03 controller grants with no controller', () => {
         board.items.push(targetTileId);
         expect(computeMajority(targetTileId, G).controller).toBeNull();
 
-        // Manually construct the atom that would be produced by EXP-03 M03
+        // Manually construct the atom that would be produced by EXP-03-00 M03
         const grantAtom = {
             kind: 'resource.grant',
             playerId: 'CONTROLLER',
