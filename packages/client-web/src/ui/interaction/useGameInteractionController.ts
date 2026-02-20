@@ -3,7 +3,8 @@ import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import { useIntentViewModel } from '../useIntentViewModel';
 import { dispatchIntent } from './dispatchIntent';
-import type { InteractionController, InteractionActionMode } from './types';
+import type { InteractionController, InteractionActionMode, InteractionStateId, DraftIntentState } from './types';
+import { canonicalJsonStringify } from './utils';
 
 export interface InteractionControllerProps {
     G: GameState;
@@ -157,7 +158,31 @@ export function useGameInteractionController({
         }
     }, []);
 
+    const hasPendingChoice = !!G.engine?.pendingChoice;
+
+    let interactionState: InteractionStateId = 'selectingAction';
+    if (hasPendingChoice) {
+        interactionState = 'pendingChoiceHardGate';
+    } else if (proposedIntent) {
+        interactionState = 'draftReady';
+    } else if (wizard) {
+        interactionState = 'selectingVariant';
+    } else if (actionMode !== 'none') {
+        interactionState = 'selectingParams';
+    }
+
+    const draft: DraftIntentState = {
+        intent: proposedIntent,
+        key: proposedIntent ? canonicalJsonStringify(proposedIntent) : null,
+        isLegalNow: proposedIntent ? vm.intents.some(i =>
+            i.moveType === proposedIntent.moveType &&
+            canonicalJsonStringify(i.payload ?? {}) === canonicalJsonStringify(proposedIntent.payload ?? {})
+        ) : false
+    };
+
     return {
+        interactionState,
+        draft,
         selectedTileId,
         selectedCoord,
         proposedIntent,
@@ -168,6 +193,8 @@ export function useGameInteractionController({
         setActionMode: setActionModeWithSideEffects,
         selectTile,
         proposeIntent,
+        confirmDraft: confirmProposedIntent,
+        cancelDraft: cancelProposedIntent,
         confirmProposedIntent,
         cancelProposedIntent,
         resolveChoice,

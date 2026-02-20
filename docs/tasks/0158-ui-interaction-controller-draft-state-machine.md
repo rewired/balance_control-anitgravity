@@ -1,6 +1,6 @@
 # Task 0158 — PG-1: Interaction Controller v2 (Draft model + explicit state machine scaffolding)
 
-Status: DRAFT
+Status: DONE
 
 ## Meta
 - Owner: Codex
@@ -10,11 +10,11 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005, GR-006
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Confirm the normative UI contract files exist and are unchanged:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Confirm the normative UI contract files exist and are unchanged:
    - `/docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.v1.yaml`
    - `/docs/architecture/ARCH-06-UI-INTERACTION-CHECKLIST.md`
-3. [ ] Baseline scan (no edits yet):
+3. [x] Baseline scan (no edits yet):
    - `rg -n "confirmProposedIntent|dispatchIntentImmediate|onDispatchIntent|dispatchIntent\(" packages/client-web/src`
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
@@ -56,14 +56,14 @@ Introduce the **data model** needed by ARCH-06 without changing visible behavior
 - Deterministic ordering: any “keying” must be stable (use canonical JSON for payload if needed).
 
 ## 5) Acceptance Criteria
-- [ ] Client-web compiles and tests pass: `pnpm -C packages/client-web test`.
-- [ ] `useGameInteractionController` returns `interactionState` and `draft` (even if draft is empty).
-- [ ] When `G.engine.pendingChoice` exists, controller reports `interactionState === 'pendingChoiceHardGate'`.
-- [ ] No changes to visuals/components required in this task.
+- [x] Client-web compiles and tests pass: `pnpm -C packages/client-web test`.
+- [x] `useGameInteractionController` returns `interactionState` and `draft` (even if draft is empty).
+- [x] When `G.engine.pendingChoice` exists, controller reports `interactionState === 'pendingChoiceHardGate'`.
+- [x] No changes to visuals/components required in this task.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005/006).
-- [ ] No engine/rule/spec changes.
-- [ ] No new direct move dispatch paths introduced.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005/006).
+- [x] No engine/rule/spec changes.
+- [x] No new direct move dispatch paths introduced.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
