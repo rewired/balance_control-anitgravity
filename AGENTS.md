@@ -18,6 +18,8 @@ Primary Architecture Contracts:
 * /docs/architecture/ARCH-03-MEASURE-CPU.md
 * /docs/architecture/ARCH-04-LLM-BOT-CONTRACT.md
 * /docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md
+* /docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.md
+* /docs/architecture/TECH-01-BIG-PICTURE.md
 
 ---
 
@@ -29,7 +31,7 @@ The canonical contract index is maintained in:
 
 ## Agent Skills (Reusable Playbooks)
 
-Skill docs live in `/docs/skills/`. Tasks may reference them via a `Skills:` line (or equivalent).  
+Skill docs live in `/docs/skills/`. Tasks may reference them via a `Skills:` line (or equivalent).
 If a task references any skill ID below, you MUST read the corresponding skill document before implementation and follow it.
 
 ### Skill Index
