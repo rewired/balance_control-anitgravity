@@ -54,7 +54,7 @@ function createMetaMarkerPersistenceGame() {
             const marker = G.objects[markerId] as any;
             G.zones[supplyId].items = G.zones[supplyId].items.filter(id => id !== marker.id);
             G.zones['tile_start_committee'].items.push(marker.id);
-            marker.mode = 'PingPong';
+            marker.mode = 'ReturnPenalty';
             return G;
         }
     };

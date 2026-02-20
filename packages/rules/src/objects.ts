@@ -14,5 +14,5 @@ export interface GameObject {
     // EXP-02 attributes
     regType?: RegulationType;
     targetTileId?: string;
-    mode?: 'PingPong' | 'Convert';
+    mode?: 'ReturnPenalty' | 'Convert';
 }

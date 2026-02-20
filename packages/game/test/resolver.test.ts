@@ -89,7 +89,7 @@ describe('EffectResolver cost and production behavior', () => {
         expect(G.zones.Bank.items).toHaveLength(1);
     });
 
-    it('should not reduce production when PingPong marker is on the tile (CORE-01-04-12B is Move-only)', () => {
+    it('should not reduce production when ReturnPenalty marker is on the tile (CORE-01-04-12B is Move-only)', () => {
         const bankIds = Array.from({ length: 20 }, (_, i) => `res_dom_${i}`);
         const G: any = {
             zones: {
@@ -103,7 +103,7 @@ describe('EffectResolver cost and production behavior', () => {
             },
             objects: {
                 inf_p1: { id: 'inf_p1', type: 'Influence', owner: 'p1' },
-                meta_p1: { id: 'meta_p1', type: 'MetaMarker', owner: 'p1', mode: 'PingPong' },
+                meta_p1: { id: 'meta_p1', type: 'MetaMarker', owner: 'p1', mode: 'ReturnPenalty' },
                 ...bankIds.reduce((acc: any, id) => {
                     acc[id] = { id, type: 'Resource', resort: 'DOM' };
                     return acc;
@@ -146,7 +146,7 @@ describe('EffectResolver cost and production behavior', () => {
             objects: {
                 inf_p1: { id: 'inf_p1', type: 'Influence', owner: 'p1' },
                 inf_p2: { id: 'inf_p2', type: 'Influence', owner: 'p2' },
-                meta_p1: { id: 'meta_p1', type: 'MetaMarker', owner: 'p1', mode: 'PingPong' },
+                meta_p1: { id: 'meta_p1', type: 'MetaMarker', owner: 'p1', mode: 'ReturnPenalty' },
                 res_dom_1: { id: 'res_dom_1', type: 'Resource', resort: 'DOM' },
                 res_dom_2: { id: 'res_dom_2', type: 'Resource', resort: 'DOM' },
                 res_dom_3: { id: 'res_dom_3', type: 'Resource', resort: 'DOM' },
@@ -175,11 +175,11 @@ describe('EffectResolver cost and production behavior', () => {
         expect(G.zones.Bank.items).toHaveLength(0);
     });
 
-    it('should apply production modifiers (no PingPong production reduction)', () => {
+    it('should apply production modifiers (no ReturnPenalty production reduction)', () => {
         registerTestPacks([
             makeTestPack({
                 id: 'exp01',
-                name: 'PingPongModExp',
+                name: 'ReturnPenaltyModExp',
                 modifiers: {
                     production: (_tileId, _G, base) => base + 2
                 }
@@ -199,7 +199,7 @@ describe('EffectResolver cost and production behavior', () => {
             },
             objects: {
                 inf_p1: { id: 'inf_p1', type: 'Influence', owner: 'p1' },
-                meta_p1: { id: 'meta_p1', type: 'MetaMarker', owner: 'p1', mode: 'PingPong' },
+                meta_p1: { id: 'meta_p1', type: 'MetaMarker', owner: 'p1', mode: 'ReturnPenalty' },
                 res_dom_1: { id: 'res_dom_1', type: 'Resource', resort: 'DOM' },
                 res_dom_2: { id: 'res_dom_2', type: 'Resource', resort: 'DOM' },
                 res_dom_3: { id: 'res_dom_3', type: 'Resource', resort: 'DOM' },

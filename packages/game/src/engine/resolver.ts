@@ -182,7 +182,7 @@ export class EffectResolver {
         pid: string,
         actionType: string,
         tileId?: string,
-        options?: { includePingPongPenalty?: boolean }
+        options?: { includeReturnPenalty?: boolean }
     ): CostSlot[] {
         return getExtraCostSlotsImpl(G, pid, actionType, tileId, options);
     }
@@ -199,7 +199,7 @@ export class EffectResolver {
         actionType: string,
         tileId?: string,
         extraResourceIds?: string[],
-        options?: { includePingPongPenalty?: boolean }
+        options?: { includeReturnPenalty?: boolean }
     ): boolean {
         return checkAndPayCostsImpl(G, pid, actionType, tileId, extraResourceIds, options);
     }
