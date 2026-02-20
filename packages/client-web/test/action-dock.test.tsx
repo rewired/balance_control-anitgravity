@@ -166,7 +166,7 @@ describe('ActionDock', () => {
                 intents: []
             },
             interactionState: 'draftReady',
-            draft: { intent: draftedIntent },
+            draft: { intent: draftedIntent, isLegalNow: true },
             confirmDraft,
             cancelDraft,
             actionMode: 'none'
@@ -283,7 +283,7 @@ describe('ActionDock', () => {
     });
 
     it('shows edit controls when draft is ready (placeInfluence)', () => {
-        const editDraftParams = vi.fn();
+        const editDraftTarget = vi.fn();
         const draftedIntent = { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } };
 
         const controller = {
@@ -294,7 +294,7 @@ describe('ActionDock', () => {
             },
             interactionState: 'draftReady',
             draft: { intent: draftedIntent },
-            editDraftParams,
+            editDraftTarget,
             actionMode: 'placeInfluence'
         } as any;
 
@@ -308,7 +308,7 @@ describe('ActionDock', () => {
 
         const editButton = screen.getByTestId('btn-edit-target');
         fireEvent.click(editButton);
-        expect(editDraftParams).toHaveBeenCalledTimes(1);
+        expect(editDraftTarget).toHaveBeenCalledTimes(1);
     });
 
     it('shows variant selection panel for formalizeInfluence', () => {

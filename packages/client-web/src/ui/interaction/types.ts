@@ -62,14 +62,26 @@ export interface InteractionController {
     resolveChoice: (intent: LegalIntent) => void;
 
     /**
-     * Drops current draft, keeps current action selection, returns to selectingParams.
-     * Used for "Edit source/destination" in ActionDock.
+     * Clears current draft, keeps action mode, clears source selection.
+     * Returns to selecting source state.
      */
-    editDraftParams: () => void;
+    editDraftSource: () => void;
+
+    /**
+     * Clears current draft, keeps action mode and source selection.
+     * Returns to selecting destination state.
+     */
+    editDraftDestination: () => void;
+
+    /**
+     * Clears current draft, keeps action mode.
+     * Returns to selecting target state.
+     */
+    editDraftTarget: () => void;
 
     /**
      * Re-opens variant selection for wizard actions (if applicable).
-     * used for "Edit variant" in ActionDock.
+     * Returns to selecting variant state.
      */
     editDraftVariant: () => void;
 }

@@ -160,7 +160,9 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
         pinnedGrassrootsTileId,
         confirmDraft,
         cancelDraft,
-        editDraftParams,
+        editDraftSource,
+        editDraftDestination,
+        editDraftTarget,
         editDraftVariant
     } = controller;
 
@@ -198,19 +200,24 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
                 <div className="action-panel-draft" data-testid="action-dock-draft" style={{ marginTop: '12px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
                         {draft.intent.moveType === 'placeTile' && (
-                            <button className="btn-secondary btn-small" onClick={editDraftParams} data-testid="btn-edit-placement">
+                            <button className="btn-secondary btn-small" onClick={editDraftTarget} data-testid="btn-edit-placement">
                                 Change placement
                             </button>
                         )}
                         {draft.intent.moveType === 'placeInfluence' && (
-                            <button className="btn-secondary btn-small" onClick={editDraftParams} data-testid="btn-edit-target">
+                            <button className="btn-secondary btn-small" onClick={editDraftTarget} data-testid="btn-edit-target">
                                 Change target
                             </button>
                         )}
                         {draft.intent.moveType === 'moveInfluence' && (
-                            <button className="btn-secondary btn-small" onClick={editDraftParams} data-testid="btn-edit-target">
-                                Change target
-                            </button>
+                            <>
+                                <button className="btn-secondary btn-small" onClick={editDraftSource} data-testid="btn-edit-source">
+                                    Change source
+                                </button>
+                                <button className="btn-secondary btn-small" onClick={editDraftDestination} data-testid="btn-edit-destination">
+                                    Change destination
+                                </button>
+                            </>
                         )}
                         {(draft.intent.moveType === 'formalizeInfluence' || draft.intent.moveType === 'convertResources') && (
                             <button className="btn-secondary btn-small" onClick={editDraftVariant} data-testid="btn-edit-selection">
@@ -223,6 +230,7 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
                         <button
                             className="btn-primary btn-small"
                             onClick={confirmDraft}
+                            disabled={!draft.isLegalNow}
                             data-testid="btn-confirm-draft"
                         >
                             Confirm
