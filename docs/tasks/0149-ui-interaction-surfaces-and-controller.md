@@ -1,6 +1,7 @@
 # Codex Task 0149 — UI: Define interaction surfaces + central interaction controller (no behavior change)
 
 **Date:** 2026-02-20
+
 **Primary contract:** AGENTS.md (repo root)
 
 ## 0) Metadata (frozen)
