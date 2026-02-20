@@ -20,10 +20,7 @@ export const MeasureTray: React.FC<MeasureTrayProps> = ({ G, intents, onSelect }
     if (groups.length === 0) return null;
 
     return (
-        <div className="measure-tray" style={{ marginTop: '16px', borderTop: 'var(--border-glass)', paddingTop: '16px' }}>
-            <h4 style={{ margin: '0 0 12px 0', fontSize: '0.9em', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>
-                Measures
-            </h4>
+        <div className="measure-tray" style={{ marginTop: '8px' }}>
             <div className="measure-groups" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {groups.map((group) => (
                     <div key={group.expansionId} className="measure-group">

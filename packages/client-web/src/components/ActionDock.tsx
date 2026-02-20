@@ -48,6 +48,7 @@ const getActionLabel = (mode: InteractionActionMode, draftIntent: LegalIntent | 
         case 'moveInfluence': return 'Move Influence';
         case 'formalizeInfluence': return 'Formalize Influence';
         case 'convertResources': return 'Convert Resources';
+        case 'takeMeasure': return 'Take Measure';
         default: return 'Choose action';
     }
 };
@@ -60,6 +61,7 @@ const getStepLabel = (state: string, mode: InteractionActionMode, moveInfluenceS
         if (mode === 'placeInfluence') return 'Select target';
         if (mode === 'formalizeInfluence') return 'Select committee';
         if (mode === 'convertResources') return 'Select grassroots';
+        if (mode === 'takeMeasure') return 'Select measure';
         return 'Select parameters';
     }
     if (state === 'selectingVariant') return 'Select variant';
@@ -297,16 +299,28 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
             </div>
 
             {vm.political.measures.length > 0 && (
-                <MeasureTray
-                    G={G}
-                    intents={vm.political.measures}
-                    onSelect={proposeIntent}
-                />
+                <div className="action-group">
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Measures</h4>
+                    <button
+                        className={actionMode === 'takeMeasure' ? 'btn-primary' : 'btn-secondary'}
+                        onClick={() => setActionMode(actionMode === 'takeMeasure' ? 'none' : 'takeMeasure')}
+                        data-testid="btn-mode-take-measure"
+                    >
+                        Take Measure
+                    </button>
+                    {actionMode === 'takeMeasure' && (
+                        <MeasureTray
+                            G={G}
+                            intents={vm.political.measures}
+                            onSelect={proposeIntent}
+                        />
+                    )}
+                </div>
             )}
 
             {showMoreActions && (
                 <div className="action-group">
-                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Expansions / Other</h4>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Expansions → Other</h4>
                     <div className="action-panel-secondary" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         {vm.political.others.map(intent => (
                             <button

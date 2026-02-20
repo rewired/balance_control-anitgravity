@@ -1,7 +1,7 @@
 import type { LegalIntent } from '@balance-control/game';
 import type { IntentViewModel } from '../useIntentViewModel';
 
-export type InteractionActionMode = 'none' | 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources';
+export type InteractionActionMode = 'none' | 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources' | 'takeMeasure';
 
 export type InteractionStateId =
     | 'selectingAction'
