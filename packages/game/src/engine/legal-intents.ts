@@ -110,6 +110,22 @@ export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string):
     return sortIntents(intents);
 }
 
+function selectDeterministicExtraResourceIds(G: GameState, playerId: string, costSlots: CostSlot[]): string[] | null {
+    if (costSlots.length === 0) return [];
+
+    // validateCost will deterministically pick resources from supply if resourceIds is undefined
+    const validation = EffectResolver.validateCost(G as any, null, {
+        playerId,
+        slots: costSlots,
+        resourceIds: undefined // Explicitly undefined to trigger auto-selection
+    });
+
+    if (validation.ok) {
+        return validation.resourceIds;
+    }
+    return null;
+}
+
 function buildResolveChoiceIntents(G: GameState, ctx: any, pendingChoice: any): LegalIntent[] {
     const selections = getChoiceSelections(G, ctx, pendingChoice);
     return selections.map(selection => ({
@@ -202,8 +218,15 @@ function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
             const targetTile = G.tiles[targetId];
             if (targetTile && targetTile.type === TileType.StartCommittee) continue;
             if (EffectResolver.isProhibited(G as any, 'influence.move', playerID, targetId)) continue;
-            const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.move', targetId);
-            if (!canPayExtraCosts(G, playerID, costSlots)) continue;
+
+            // Calculate costs including any penalties
+            const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.move', targetId, { includePingPongPenalty: true });
+
+            // Try to select deterministic payment
+            const extraResourceIds = selectDeterministicExtraResourceIds(G, playerID, costSlots);
+
+            // If we can't pay (or selector returned null), specific move is illegal
+            if (!extraResourceIds) continue;
 
             const consequences: string[] = [];
             const marker = getPlayerMetaMarker(G, playerID);
@@ -222,7 +245,11 @@ function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
 
             intents.push({
                 moveType: 'moveInfluence',
-                payload: { sourceId, targetId },
+                payload: {
+                    sourceId,
+                    targetId,
+                    extraResourceIds: extraResourceIds.length > 0 ? extraResourceIds : undefined
+                },
                 contextTileId: targetId,
                 consequences: consequences.length > 0 ? consequences : undefined
             });

@@ -119,24 +119,28 @@ This breaks the “bot selects from intents and executes” contract and can als
 
 ## 10) PR Checklist (to be completed before merge)
 
-- [ ] Guardrails complied with (GR-002/003/004/013)
-- [ ] No rules changes; only enumeration correctness
-- [ ] `pnpm -w test` passes
-- [ ] Deterministic ordering preserved
+- [x] Guardrails complied with (GR-002/003/004/013)
+- [x] No rules changes; only enumeration correctness
+- [x] `pnpm -w test` passes
+- [x] Deterministic ordering preserved
 - [ ] Updated docs/hand-off/current.md if any snapshot fact changed
 
 ## 11) Work Summary (fill after implementation)
 
-- 
+- Implemented `selectDeterministicExtraResourceIds` in `legal-intents.ts` to deterministically select resources for cost payments during enumeration.
+- Updated `enumerateMoveInfluence` to correct calculate extra costs (specifically Ping-Pong penalty) and attach the required `extraResourceIds` to the intent payload.
+- Verified usage gating for political actions via new regression tests.
+- Added regression tests in `legal-intents.test.ts` for Ping-Pong penalty execution and usage limit exhaustion.
 
 ## 12) Commands Run (fill after implementation)
 
-- 
+- `pnpm -C packages/game test -- legal-intents.test.ts`
+- `pnpm -w test`
 
 ## 13) Postflight (fill after implementation)
 
--
+- Verified that `moveInfluence` intents are now executable even when penalties apply.
 
 ## 14) Patch Notes (fill after implementation)
 
--
+- Fixed an issue where `moveInfluence` intents could be invalid when Ping-Pong penalty was active.
