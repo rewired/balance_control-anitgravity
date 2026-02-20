@@ -102,4 +102,35 @@ describe('HexBoard', () => {
         expect(onDispatchIntent).toHaveBeenCalledTimes(1);
         expect(onDispatchIntent).toHaveBeenCalledWith(placeTileIntents[0]);
     });
+
+    it('proposes placeInfluence when a valid target is clicked in placeInfluence mode', () => {
+        const onProposeMove = vi.fn();
+        const placeInfluenceIntents = [
+            { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } }
+        ];
+        const G = {
+            grid: { '0,0': 'tile_alpha' },
+            tiles: { tile_alpha: { id: 'tile_alpha', resort: 'DOM', type: 'Resort' } },
+            zones: { tile_alpha: { items: [] } },
+            objects: {},
+            adjacency: {},
+        } as any;
+
+        render(
+            <HexBoard
+                G={G}
+                onProposeMove={onProposeMove}
+                placeTileIntents={[]}
+                placeInfluenceIntents={placeInfluenceIntents as any}
+                actionMode="placeInfluence"
+                ghostCoords={[]}
+                isInteractive={true}
+            />
+        );
+
+        const tile = screen.getByTestId('hex-tile-0_0');
+        fireEvent.click(tile);
+        expect(onProposeMove).toHaveBeenCalledTimes(1);
+        expect(onProposeMove).toHaveBeenCalledWith(placeInfluenceIntents[0]);
+    });
 });

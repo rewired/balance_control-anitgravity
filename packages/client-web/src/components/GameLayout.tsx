@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import type { GameState } from '@balance-control/rules';
 import { Zone } from './Zone';
-import { ActionPanel } from './ActionPanel';
+import { ActionDock } from './ActionDock';
 import { BoardViewport } from './BoardViewport';
 import { ModalHost } from './ModalHost';
 import { PublicNoticeOverlay } from './PublicNoticeOverlay';
@@ -32,7 +32,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     } as const;
 
     const controller = useGameInteractionController({ G, ctx, playerID, moves });
-    const { vm, selectedTileId, selectedCoord, selectTile, proposeIntent, dispatchIntent } = controller;
+    const { vm, selectedTileId, selectedCoord, selectTile, proposeIntent, dispatchIntent, actionMode, moveInfluenceSourceId } = controller;
 
     // Determine player's personal supply
     const myPid = playerID ?? ctx.currentPlayer ?? '0';
@@ -164,7 +164,10 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                 <BoardViewport
                     G={G}
                     placeTileIntents={placementIntents}
-                    moveInfluenceIntents={vm.political.moveInfluenceFromSelected}
+                    moveInfluenceIntents={vm.intents.filter(i => i.moveType === 'moveInfluence')}
+                    placeInfluenceIntents={vm.intents.filter(i => i.moveType === 'placeInfluence')}
+                    actionMode={actionMode}
+                    moveInfluenceSourceId={moveInfluenceSourceId}
                     ghostCoords={placementGhostCoords}
                     isInteractive={isBoardInteractive}
                     selectedTileId={selectedTileId}
@@ -251,7 +254,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
             {/* Bottom Controls */}
             {!vm.hasPendingChoice && (
                 <div className="controls-container glass-panel">
-                    <ActionPanel
+                    <ActionDock
                         isActive={isActive}
                         controller={controller}
                     />

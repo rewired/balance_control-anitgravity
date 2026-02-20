@@ -1,6 +1,8 @@
 import type { LegalIntent } from '@balance-control/game';
 import type { IntentViewModel } from '../useIntentViewModel';
 
+export type InteractionActionMode = 'none' | 'placeInfluence' | 'moveInfluence';
+
 export interface InteractionController {
     /** The currently selected tile for inspection. */
     selectedTileId: string | null;
@@ -11,6 +13,13 @@ export interface InteractionController {
     /** The intent view model for the current state. */
     vm: IntentViewModel;
 
+    /** Current action mode in the ActionDock. */
+    actionMode: InteractionActionMode;
+    /** Source tile for Move Influence mode. */
+    moveInfluenceSourceId: string | null;
+
+    /** Sets the current action mode. */
+    setActionMode: (mode: InteractionActionMode) => void;
     /** Selects a tile by ID and coordinate. */
     selectTile: (tileId: string | null, coord: string | null) => void;
     /** Proposes an intent for confirmation. */

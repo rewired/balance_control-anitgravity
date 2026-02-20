@@ -2,7 +2,7 @@ import React from 'react';
 import type { LegalIntent } from '@balance-control/game';
 import type { InteractionController } from '../ui/interaction/types';
 
-interface ActionPanelProps {
+interface ActionDockProps {
     isActive: boolean;
     controller: InteractionController;
 }
@@ -38,24 +38,25 @@ const intentSortKey = (intent: LegalIntent) => {
  * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
  * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
  */
-export const ActionPanel: React.FC<ActionPanelProps> = ({
+export const ActionDock: React.FC<ActionDockProps> = ({
     isActive,
     controller
 }) => {
     if (!isActive) return null;
 
-    const { vm, dispatchIntent } = controller;
+    const { vm, dispatchIntent, actionMode, setActionMode, moveInfluenceSourceId } = controller;
 
     const stageLabel = vm.stage ? (STAGE_LABELS[vm.stage] ?? vm.stage) : 'Waiting';
     const isDrawAndPlace = vm.stage === 'drawAndPlace';
     const isPoliticalAction = vm.stage === 'politicalAction';
 
-    const placeInfluenceForSelected = vm.political.placeInfluenceForSelected;
-    const primaryPlaceInfluenceDisabled = !placeInfluenceForSelected;
     const showMoreActions = vm.political.others.length > 0;
 
+    const hasPlaceInfluenceIntents = vm.intents.some(i => i.moveType === 'placeInfluence');
+    const hasMoveInfluenceIntents = vm.intents.some(i => i.moveType === 'moveInfluence');
+
     return (
-        <div className="action-panel">
+        <div className="action-panel action-dock" data-testid="action-dock">
             <div className="action-panel-header">
                 <div className="action-panel-title">Actions</div>
                 <div className="action-panel-stage">{stageLabel}</div>
@@ -77,28 +78,40 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                     </>
                 )}
                 {isPoliticalAction && (
-                    <>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <button
-                            className="btn-primary"
-                            disabled={primaryPlaceInfluenceDisabled}
-                            onClick={
-                                placeInfluenceForSelected
-                                    ? () => dispatchIntent(placeInfluenceForSelected)
-                                    : undefined
-                            }
-                            data-testid="btn-place-influence"
+                            className={actionMode === 'placeInfluence' ? 'btn-primary' : 'btn-secondary'}
+                            disabled={!hasPlaceInfluenceIntents}
+                            onClick={() => setActionMode(actionMode === 'placeInfluence' ? 'none' : 'placeInfluence')}
+                            data-testid="btn-mode-place-influence"
                         >
-                            Place influence
+                            Place Influence
                         </button>
-                        {!vm.selectedTileId && (
-                            <div className="action-panel-hint">Select a tile to place influence.</div>
-                        )}
-                        {vm.selectedTileId && primaryPlaceInfluenceDisabled && (
-                            <div className="action-panel-hint">Selected tile is not a legal target.</div>
-                        )}
-                    </>
+                        <button
+                            className={actionMode === 'moveInfluence' ? 'btn-primary' : 'btn-secondary'}
+                            disabled={!hasMoveInfluenceIntents}
+                            onClick={() => setActionMode(actionMode === 'moveInfluence' ? 'none' : 'moveInfluence')}
+                            data-testid="btn-mode-move-influence"
+                        >
+                            Move Influence
+                        </button>
+                    </div>
                 )}
             </div>
+
+            {isPoliticalAction && actionMode === 'placeInfluence' && (
+                <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
+                    Select a target tile on the board to place influence.
+                </div>
+            )}
+
+            {isPoliticalAction && actionMode === 'moveInfluence' && (
+                <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
+                    {!moveInfluenceSourceId
+                        ? 'Select source tile on the board.'
+                        : 'Select target tile on the board.'}
+                </div>
+            )}
 
             {showMoreActions && (
                 <details className="action-panel-more">

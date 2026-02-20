@@ -3,7 +3,7 @@ import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import { useIntentViewModel } from '../useIntentViewModel';
 import { dispatchIntent } from './dispatchIntent';
-import type { InteractionController } from './types';
+import type { InteractionController, InteractionActionMode } from './types';
 
 export interface InteractionControllerProps {
     G: GameState;
@@ -27,6 +27,8 @@ export function useGameInteractionController({
     const [selectedTileId, setSelectedTileId] = useState<string | null>(null);
     const [selectedCoord, setSelectedCoord] = useState<string | null>(null);
     const [proposedIntent, setProposedIntent] = useState<LegalIntent | null>(null);
+    const [actionMode, setActionMode] = useState<InteractionActionMode>('none');
+    const [moveInfluenceSourceId, setMoveInfluenceSourceId] = useState<string | null>(null);
 
     const stagingZoneId = `staging_${myPid}`;
     const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
@@ -36,7 +38,11 @@ export function useGameInteractionController({
     const selectTile = useCallback((tileId: string | null, coord: string | null) => {
         setSelectedTileId(tileId);
         setSelectedCoord(coord);
-    }, []);
+
+        if (actionMode === 'moveInfluence' && !moveInfluenceSourceId && tileId) {
+            setMoveInfluenceSourceId(tileId);
+        }
+    }, [actionMode, moveInfluenceSourceId]);
 
     const proposeIntent = useCallback((intent: LegalIntent) => {
         setProposedIntent(intent);
@@ -48,6 +54,8 @@ export function useGameInteractionController({
             setProposedIntent(null);
             setSelectedTileId(null);
             setSelectedCoord(null);
+            setActionMode('none');
+            setMoveInfluenceSourceId(null);
         }
     }, [proposedIntent, moves]);
 
@@ -63,6 +71,13 @@ export function useGameInteractionController({
         dispatchIntent(moves, intent);
     }, [moves]);
 
+    // Reset action mode when phase changes
+    const stage = vm.stage;
+    useEffect(() => {
+        setActionMode('none');
+        setMoveInfluenceSourceId(null);
+    }, [stage]);
+
     // Handle Escape key to clear selection/proposal
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -70,6 +85,8 @@ export function useGameInteractionController({
                 setSelectedTileId(null);
                 setSelectedCoord(null);
                 setProposedIntent(null);
+                setActionMode('none');
+                setMoveInfluenceSourceId(null);
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -103,11 +120,23 @@ export function useGameInteractionController({
         }
     }, [G.grid, selectedCoord, selectedTileId]);
 
+    const setActionModeWithSideEffects = useCallback((mode: InteractionActionMode) => {
+        setActionMode(mode);
+        setMoveInfluenceSourceId(null);
+        if (mode !== 'none') {
+            setSelectedTileId(null);
+            setSelectedCoord(null);
+        }
+    }, []);
+
     return {
         selectedTileId,
         selectedCoord,
         proposedIntent,
         vm,
+        actionMode,
+        moveInfluenceSourceId,
+        setActionMode: setActionModeWithSideEffects,
         selectTile,
         proposeIntent,
         confirmProposedIntent,

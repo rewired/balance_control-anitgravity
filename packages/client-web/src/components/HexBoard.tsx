@@ -12,6 +12,9 @@ interface HexBoardProps {
     G: GameState;
     placeTileIntents: LegalIntent[];
     moveInfluenceIntents?: LegalIntent[];
+    placeInfluenceIntents?: LegalIntent[];
+    actionMode?: string;
+    moveInfluenceSourceId?: string | null;
     ghostCoords: string[];
     isInteractive: boolean;
     selectedTileId?: string | null;
@@ -33,6 +36,9 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     G,
     placeTileIntents,
     moveInfluenceIntents,
+    placeInfluenceIntents,
+    actionMode,
+    moveInfluenceSourceId,
     ghostCoords,
     isInteractive,
     selectedTileId,
@@ -94,9 +100,28 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     if (!G.tiles[tileId]) return null;
                     const coord = parseCoordString(coordStr);
                     const { x, y } = axialToPixel(coord, HEX_SIZE);
-                    const moveIntent = moveInfluenceIntents?.find(i => i.payload.targetId === tileId);
-                    const isValidTarget = !!moveIntent;
-                    const isSelected = selectedTileId === tileId || selectedCoord === coordStr;
+
+                    let isValidTarget = false;
+                    let targetIntent: LegalIntent | null = null;
+
+                    if (actionMode === 'placeInfluence') {
+                        targetIntent = placeInfluenceIntents?.find(i => i.payload.targetTileId === tileId) ?? null;
+                        isValidTarget = !!targetIntent;
+                    } else if (actionMode === 'moveInfluence') {
+                        if (!moveInfluenceSourceId) {
+                            isValidTarget = moveInfluenceIntents?.some(i => i.payload.sourceId === tileId) ?? false;
+                        } else {
+                            targetIntent = moveInfluenceIntents?.find(
+                                i => i.payload.sourceId === moveInfluenceSourceId && i.payload.targetId === tileId
+                            ) ?? null;
+                            isValidTarget = !!targetIntent;
+                        }
+                    } else {
+                        isValidTarget = false;
+                        targetIntent = null;
+                    }
+
+                    const isSelected = selectedTileId === tileId || selectedCoord === coordStr || moveInfluenceSourceId === tileId;
                     const isHot = isSelected || hoveredTileId === tileId || isValidTarget;
                     const disabled = !isInteractive;
                     const testId = `hex-tile-${coordStr.replace(',', '_')}`;
@@ -141,8 +166,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             onClick={
                                 disabled
                                     ? undefined
-                                    : isValidTarget && onProposeMove
-                                        ? () => onProposeMove(moveIntent!)
+                                    : isValidTarget && targetIntent && onProposeMove
+                                        ? () => onProposeMove(targetIntent!)
                                         : () => onSelectTile && onSelectTile(tileId, coordStr)
                             }
                             role={disabled ? undefined : 'button'}
