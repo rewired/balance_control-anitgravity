@@ -1,6 +1,6 @@
 # Task 0164 — PG-2: Guided selection — only valid targets advance (invalid clicks are inspect-only)
 
-Status: DRAFT
+Status: COMPLETED
 
 ## Meta
 - Owner: Codex
@@ -10,11 +10,11 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Re-check ARCH-06 contract + checklist sections:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Re-check ARCH-06 contract + checklist sections:
    - Guided parameter selection (valid targets only)
    - Invalid tile clicks are inspect-only
-3. [ ] Baseline scan (no edits yet):
+3. [x] Baseline scan (no edits yet):
    - `pnpm -C packages/client-web test`
 
 ## 1) Goal
@@ -66,20 +66,27 @@ Implementation note (expected):
 - Keep changes within UI scope; no engine/rule/spec edits.
 
 ## 5) Acceptance Criteria
-- [ ] Invalid tile clicks during MoveInfluence source selection do not change selection parameters (no source pinned).
-- [ ] Valid source click advances the flow as before.
-- [ ] Inspector still updates on invalid clicks (inspect-only behavior preserved).
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Invalid tile clicks during MoveInfluence source selection do not change selection parameters (no source pinned).
+- [x] Valid source click advances the flow as before.
+- [x] Inspector still updates on invalid clicks (inspect-only behavior preserved).
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/GR-005).
-- [ ] No engine/rule/spec changes.
-- [ ] No new commit path introduced.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/GR-005).
+- [x] No engine/rule/spec changes.
+- [x] No new commit path introduced.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 7) Work Summary
-- TBD
+- Created reproduction test `packages/client-web/test/guided-selection-valid-targets-only.test.tsx` which confirmed the bug (invalid tiles advanced flow).
+- Modified `useGameInteractionController.ts` to remove the automatic side-effect (pinning source) from `selectTile`.
+- Added `selectMoveInfluenceSource` to `InteractionController` interface and implementation.
+- Modified `GameLayout.tsx` to wrap `selectTile` and conditionally call `selectMoveInfluenceSource` only when the clicked tile is a valid source (using existing `vm.intents`).
+- Verified that invalid clicks now only inspect the tile, while valid clicks inspect AND pin the source.
 
 ## 8) Commands Run
-- TBD
+- `pnpm -C packages/client-web test` (Baseline passed)
+- `pnpm -C packages/client-web test test/guided-selection-valid-targets-only.test.tsx` (Reproduction failed initially, then passed)
+- `pnpm lint` (Passed)
+- `pnpm -C packages/client-web test` (All tests passed)

@@ -32,7 +32,23 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     } as const;
 
     const controller = useGameInteractionController({ G, ctx, playerID, moves });
-    const { vm, selectedTileId, selectedCoord, selectTile, proposeIntent, actionMode, moveInfluenceSourceId, interactionState } = controller;
+    const { vm, selectedTileId, selectedCoord, selectTile, selectMoveInfluenceSource, proposeIntent, actionMode, moveInfluenceSourceId, interactionState } = controller;
+
+    // Wrap selectTile to enforce "valid targets only" for parameter selection
+    const handleSelectTile = React.useCallback((tileId: string, coordStr: string) => {
+        // Always allow inspection
+        selectTile(tileId, coordStr);
+
+        // Guided selection: Move Influence source
+        if (actionMode === 'moveInfluence' && !moveInfluenceSourceId) {
+            const isValidSource = vm.intents.some(i =>
+                i.moveType === 'moveInfluence' && i.payload.sourceId === tileId
+            );
+            if (isValidSource) {
+                selectMoveInfluenceSource(tileId);
+            }
+        }
+    }, [selectTile, actionMode, moveInfluenceSourceId, vm.intents, selectMoveInfluenceSource]);
 
     // Determine player's personal supply
     const myPid = playerID ?? ctx.currentPlayer ?? '0';
@@ -174,7 +190,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     isInteractive={isBoardInteractive}
                     selectedTileId={selectedTileId}
                     selectedCoord={selectedCoord}
-                    onSelectTile={selectTile}
+                    onSelectTile={handleSelectTile}
                     onProposeMove={proposeIntent}
                     pendingTile={pendingTile}
                     activePlayerId={ctx.currentPlayer}

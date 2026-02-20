@@ -64,10 +64,6 @@ export function useGameInteractionController({
             return;
         }
 
-        if (actionMode === 'moveInfluence' && !moveInfluenceSourceId && tileId) {
-            setMoveInfluenceSourceId(tileId);
-        }
-
         if (actionMode === 'formalizeInfluence' && tileId) {
             const hasIntents = vm.intents.some(i =>
                 i.moveType === 'formalizeInfluence' &&
@@ -177,6 +173,10 @@ export function useGameInteractionController({
         }
     }, []);
 
+    const selectMoveInfluenceSource = useCallback((tileId: string) => {
+        setMoveInfluenceSourceId(tileId);
+    }, []);
+
     const hasPendingChoice = !!G.engine?.pendingChoice;
 
     let interactionState: InteractionStateId = 'selectingAction';
@@ -211,6 +211,7 @@ export function useGameInteractionController({
         wizard,
         setActionMode: setActionModeWithSideEffects,
         selectTile,
+        selectMoveInfluenceSource,
         proposeIntent,
         confirmDraft,
         cancelDraft,

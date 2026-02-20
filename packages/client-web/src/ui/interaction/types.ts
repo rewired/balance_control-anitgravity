@@ -49,6 +49,8 @@ export interface InteractionController {
     setActionMode: (mode: InteractionActionMode) => void;
     /** Selects a tile by ID and coordinate. */
     selectTile: (tileId: string | null, coord: string | null) => void;
+    /** Sets the source tile for Move Influence mode. */
+    selectMoveInfluenceSource: (tileId: string) => void;
     /** Proposes an intent for confirmation. */
     proposeIntent: (intent: LegalIntent) => void;
 
