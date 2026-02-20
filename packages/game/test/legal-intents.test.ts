@@ -268,85 +268,93 @@ describe('enumerateLegalIntents', () => {
             { expansions: { ex01: false, ex02: false, ex03: true } }
         );
     });
-    it('selects deterministic extraResourceIds for moveInfluence with Ping-Pong penalty', () => {
-        const ctx = createCtx('politicalAction');
-        const G = SetupGame({ ctx });
+    describe('Ping-Pong Penalty', () => {
+        it('selects deterministic extraResourceIds for moveInfluence and executes validly', () => {
+            const ctx = createCtx('politicalAction');
+            const G = SetupGame({ ctx });
 
-        const sourceId = 'tile_resort_0';
-        const targetId = 'tile_committee_1';
+            const sourceId = 'tile_resort_0';
+            const targetId = 'tile_committee_1';
 
-        G.zones[CoreZoneName.Board].items.push(sourceId, targetId);
-        G.grid['0,0'] = sourceId;
-        G.grid['0,1'] = targetId;
+            G.zones[CoreZoneName.Board].items.push(sourceId, targetId);
+            G.grid['0,0'] = sourceId;
+            G.grid['0,1'] = targetId;
 
-        G.tiles[sourceId] = { id: sourceId, type: TileType.Resort, resort: 'DOM' } as any;
-        G.tiles[targetId] = { id: targetId, type: TileType.Committee } as any;
-        G.zones[targetId] = { id: targetId, items: [] } as any; // FIX: Initialize target zone
+            G.tiles[sourceId] = { id: sourceId, type: TileType.Resort, resort: 'DOM' } as any;
+            G.tiles[targetId] = { id: targetId, type: TileType.Committee } as any;
+            G.zones[targetId] = { id: targetId, items: [] } as any; // FIX: Initialize target zone
 
-        // Place Influence on Source
-        const supply = G.zones['PersonalSupply:0'];
-        const influenceId = supply.items.find(id => G.objects[id]?.type === 'Influence') as string;
-        supply.items = supply.items.filter(id => id !== influenceId);
+            // Place Influence on Source
+            const supply = G.zones['PersonalSupply:0'];
+            const influenceId = supply.items.find(id => G.objects[id]?.type === 'Influence') as string;
+            supply.items = supply.items.filter(id => id !== influenceId);
 
-        if (!G.zones[sourceId]) G.zones[sourceId] = { id: sourceId, items: [] } as any;
-        G.zones[sourceId].items.push(influenceId);
+            if (!G.zones[sourceId]) G.zones[sourceId] = { id: sourceId, items: [] } as any;
+            G.zones[sourceId].items.push(influenceId);
 
-        // Set MetaMarker to PingPong on Target
-        // We simulate the marker being on targetId in PingPong mode
-        // Reuse existing marker if present to avoid finding the wrong one
-        let markerId = Object.keys(G.objects).find(id => G.objects[id]?.type === 'MetaMarker' && G.objects[id]?.owner === '0');
-        if (!markerId) {
-            markerId = 'MetaMarker:0';
-            G.objects[markerId] = { id: markerId, type: 'MetaMarker', owner: '0' } as any;
-        }
-        const marker = G.objects[markerId] as any;
-        marker.mode = 'PingPong';
-        marker.tileId = targetId;
+            // Set MetaMarker to PingPong on Target
+            // We simulate the marker being on targetId in PingPong mode
+            // Reuse existing marker if present to avoid finding the wrong one
+            let markerId = Object.keys(G.objects).find(id => G.objects[id]?.type === 'MetaMarker' && G.objects[id]?.owner === '0');
+            if (!markerId) {
+                markerId = 'MetaMarker:0';
+                G.objects[markerId] = { id: markerId, type: 'MetaMarker', owner: '0' } as any;
+            }
+            const marker = G.objects[markerId] as any;
+            marker.mode = 'PingPong';
+            marker.tileId = targetId;
 
-        // Move marker to target zone
-        Object.values(G.zones).forEach((zone: any) => {
-            const idx = zone.items.indexOf(markerId);
-            if (idx >= 0) zone.items.splice(idx, 1);
+            // Move marker to target zone
+            Object.values(G.zones).forEach((zone: any) => {
+                const idx = zone.items.indexOf(markerId);
+                if (idx >= 0) zone.items.splice(idx, 1);
+            });
+            G.zones[targetId].items.push(markerId);
+
+            // Ensure supply has resources for penalty (N=min(10, floor(R/2))). R=3 => N=1.
+            const r1 = 'res_1', r2 = 'res_2', r3 = 'res_3';
+            G.objects[r1] = { id: r1, type: 'Resource', owner: '0', resort: 'DOM' } as any;
+            G.objects[r2] = { id: r2, type: 'Resource', owner: '0', resort: 'DOM' } as any;
+            G.objects[r3] = { id: r3, type: 'Resource', owner: '0', resort: 'DOM' } as any;
+            supply.items.push(r1, r2, r3);
+
+            // Determinism check: call twice
+            const intentsA = enumerateLegalIntents(G as any, ctx, '0');
+            const intentsB = enumerateLegalIntents(G as any, ctx, '0');
+            expect(JSON.stringify(intentsA)).toEqual(JSON.stringify(intentsB));
+
+            const moveIntent = intentsA.find(i =>
+                i.moveType === 'moveInfluence' &&
+                i.payload.sourceId === sourceId &&
+                i.payload.targetId === targetId
+            );
+
+            expect(moveIntent).toBeDefined();
+            // Should have automatically selected 1 resource for penalty
+            expect(moveIntent?.payload.extraResourceIds).toBeDefined();
+            expect(moveIntent?.payload.extraResourceIds.length).toBe(1);
+
+            const events = { endTurn: () => { }, endStage: () => { }, setStage: () => { } };
+            const result = CoreMoves.moveInfluence({ G, ctx, events } as any, moveIntent!.payload);
+            expect(result).not.toBe(INVALID_MOVE);
         });
-        G.zones[targetId].items.push(markerId);
-
-        // Ensure supply has resources for penalty (N=min(10, floor(R/2))). R=3 => N=1.
-        const r1 = 'res_1', r2 = 'res_2', r3 = 'res_3';
-        G.objects[r1] = { id: r1, type: 'Resource', owner: '0', resort: 'DOM' } as any;
-        G.objects[r2] = { id: r2, type: 'Resource', owner: '0', resort: 'DOM' } as any;
-        G.objects[r3] = { id: r3, type: 'Resource', owner: '0', resort: 'DOM' } as any;
-        supply.items.push(r1, r2, r3);
-
-        const intents = enumerateLegalIntents(G as any, ctx, '0');
-        const moveIntent = intents.find(i =>
-            i.moveType === 'moveInfluence' &&
-            i.payload.sourceId === sourceId &&
-            i.payload.targetId === targetId
-        );
-
-        expect(moveIntent).toBeDefined();
-        // Should have automatically selected 1 resource for penalty
-        expect(moveIntent?.payload.extraResourceIds).toBeDefined();
-        expect(moveIntent?.payload.extraResourceIds.length).toBe(1);
-
-        const events = { endTurn: () => { }, endStage: () => { }, setStage: () => { } };
-        const result = CoreMoves.moveInfluence({ G, ctx, events } as any, moveIntent!.payload);
-        expect(result).not.toBe(INVALID_MOVE);
     });
 
-    it('omits political intents when usage limit is exhausted', () => {
-        const ctx = createCtx('politicalAction');
-        const G = SetupGame({ ctx });
+    describe('Usage Gating', () => {
+        it('omits political intents when usage limit is exhausted', () => {
+            const ctx = createCtx('politicalAction');
+            const G = SetupGame({ ctx });
 
-        // Force usage exhausted
-        if (!G.engine.attributes.usage) G.engine.attributes.usage = {};
-        // Default limit is 1. Setting usage to 1 should block further actions.
-        G.engine.attributes.usage['politicalAction:0'] = 1;
+            // Force usage exhausted
+            if (!G.engine.attributes.usage) G.engine.attributes.usage = {};
+            // Default limit is 1. Setting usage to 1 should block further actions.
+            G.engine.attributes.usage['politicalAction:0'] = 1;
 
-        const intents = enumerateLegalIntents(G as any, ctx, '0');
+            const intents = enumerateLegalIntents(G as any, ctx, '0');
 
-        const politicalTypes = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources'];
-        const hasPolitical = intents.some(i => politicalTypes.includes(i.moveType));
-        expect(hasPolitical).toBe(false);
+            const politicalTypes = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources'];
+            const hasPolitical = intents.some(i => politicalTypes.includes(i.moveType));
+            expect(hasPolitical).toBe(false);
+        });
     });
 });
