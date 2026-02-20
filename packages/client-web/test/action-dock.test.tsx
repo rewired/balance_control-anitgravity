@@ -170,4 +170,33 @@ describe('ActionDock', () => {
 
         expect(screen.queryByTestId('btn-mode-place-influence')).toBeNull();
     });
+
+    it('shows edit controls when draft is ready (placeInfluence)', () => {
+        const editDraftParams = vi.fn();
+        const draftedIntent = { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } };
+
+        const controller = {
+            vm: {
+                stage: 'politicalAction',
+                political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
+                intents: []
+            },
+            interactionState: 'draftReady',
+            draft: { intent: draftedIntent },
+            editDraftParams,
+            actionMode: 'placeInfluence'
+        } as any;
+
+        render(
+            <ActionDock
+                isActive={true}
+                G={{} as any}
+                controller={controller}
+            />
+        );
+
+        const editButton = screen.getByTestId('btn-edit-target');
+        fireEvent.click(editButton);
+        expect(editDraftParams).toHaveBeenCalledTimes(1);
+    });
 });

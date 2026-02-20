@@ -10,9 +10,9 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005, GR-006
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Re-check ARCH-06 contract + checklist for the exact state machine expectations.
-3. [ ] Baseline scan (no edits yet):
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Re-check ARCH-06 contract + checklist for the exact state machine expectations.
+3. [x] Baseline scan (no edits yet):
    - `rg -n "interactionState" packages/client-web/src/ui/interaction`
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
@@ -70,14 +70,24 @@ Make the interaction controller behave like a real state machine and enforce “
 - No auto-commit.
 
 ## 5) Acceptance Criteria
-- [ ] Controller `interactionState` matches ARCH-06 definitions.
-- [ ] While in `draftReady`, BoardSurface is inspect-only (no draft changes from board).
-- [ ] User can re-enter selection (edit draft) only from ActionDock.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Controller `interactionState` matches ARCH-06 definitions.
+- [x] While in `draftReady`, BoardSurface is inspect-only (no draft changes from board).
+- [x] User can re-enter selection (edit draft) only from ActionDock.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005/006).
-- [ ] No engine/rule/spec changes.
-- [ ] No new commit shortcut introduced.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005/006).
+- [x] No engine/rule/spec changes.
+- [x] No new commit shortcut introduced.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
+
+## 7) Work Summary
+- Refactored `useGameInteractionController` to strictly implement the interaction state machine.
+- Added `editDraftParams` and `editDraftVariant` helpers to support dock-only editing.
+- Enforced "inspect-only" board state when `draftReady` by blocking side effects in `selectTile` and clearing `actionMode` passed to `HexBoard`.
+- Updated `ActionDock` to show context-aware "Edit" buttons (e.g., "Change target", "Change placement") when `draftReady`.
+- Added unit tests for the interaction state machine and ActionDock edit controls.
+
+## 8) Commands Run
+- `pnpm -C packages/client-web test` -> Passed (21 files, 69 tests)

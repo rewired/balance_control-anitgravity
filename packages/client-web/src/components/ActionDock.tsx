@@ -60,7 +60,9 @@ export const ActionDock: React.FC<ActionDockProps> = ({
         interactionState,
         draft,
         confirmDraft,
-        cancelDraft
+        cancelDraft,
+        editDraftParams,
+        editDraftVariant
     } = controller;
 
     const stageLabel = vm.stage ? (STAGE_LABELS[vm.stage] ?? vm.stage) : 'Waiting';
@@ -86,6 +88,30 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                     <div className="action-panel-draft-summary">
                         {formatIntentLabel(draft.intent)}
                     </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px', marginBottom: '8px' }}>
+                        {draft.intent.moveType === 'placeTile' && (
+                            <button className="btn-secondary btn-small" onClick={editDraftParams} data-testid="btn-edit-placement">
+                                Change placement
+                            </button>
+                        )}
+                        {draft.intent.moveType === 'placeInfluence' && (
+                            <button className="btn-secondary btn-small" onClick={editDraftParams} data-testid="btn-edit-target">
+                                Change target
+                            </button>
+                        )}
+                        {draft.intent.moveType === 'moveInfluence' && (
+                            <button className="btn-secondary btn-small" onClick={editDraftParams} data-testid="btn-edit-target">
+                                Change target
+                            </button>
+                        )}
+                        {(draft.intent.moveType === 'formalizeInfluence' || draft.intent.moveType === 'convertResources') && (
+                            <button className="btn-secondary btn-small" onClick={editDraftVariant} data-testid="btn-edit-selection">
+                                Change selection
+                            </button>
+                        )}
+                    </div>
+
                     <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                         <button
                             className="btn-primary btn-small"

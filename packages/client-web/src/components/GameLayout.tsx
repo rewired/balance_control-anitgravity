@@ -32,7 +32,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     } as const;
 
     const controller = useGameInteractionController({ G, ctx, playerID, moves });
-    const { vm, selectedTileId, selectedCoord, selectTile, proposeIntent, actionMode, moveInfluenceSourceId } = controller;
+    const { vm, selectedTileId, selectedCoord, selectTile, proposeIntent, actionMode, moveInfluenceSourceId, interactionState } = controller;
 
     // Determine player's personal supply
     const myPid = playerID ?? ctx.currentPlayer ?? '0';
@@ -168,7 +168,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     placeInfluenceIntents={vm.intents.filter(i => i.moveType === 'placeInfluence')}
                     formalizeInfluenceIntents={vm.political.formalizeInfluence}
                     convertResourcesIntents={vm.political.convertResources}
-                    actionMode={actionMode}
+                    actionMode={interactionState === 'draftReady' ? 'none' : actionMode}
                     moveInfluenceSourceId={moveInfluenceSourceId}
                     ghostCoords={placementGhostCoords}
                     isInteractive={isBoardInteractive}

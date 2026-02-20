@@ -37,9 +37,32 @@ export function useGameInteractionController({
 
     const vm = useIntentViewModel({ G, ctx, playerID: myPid, selectedTileId, stagedTileId });
 
+    const editDraftParams = useCallback(() => {
+        setProposedIntent(null);
+    }, []);
+
+    const editDraftVariant = useCallback(() => {
+        setProposedIntent(null);
+    }, []);
+
+    const proposeIntent = useCallback((intent: LegalIntent) => {
+        // If we already have a draft, ignore new proposals (must edit first)
+        // This enforces "dock-only edit" once draft is ready
+        if (proposedIntent) {
+            return;
+        }
+        setProposedIntent(intent);
+    }, [proposedIntent]);
+
     const selectTile = useCallback((tileId: string | null, coord: string | null) => {
         setSelectedTileId(tileId);
         setSelectedCoord(coord);
+
+        // If draft is ready, we are in inspect-only mode.
+        // Do not trigger any side effects like setting source or opening wizard.
+        if (proposedIntent) {
+            return;
+        }
 
         if (actionMode === 'moveInfluence' && !moveInfluenceSourceId && tileId) {
             setMoveInfluenceSourceId(tileId);
@@ -64,11 +87,7 @@ export function useGameInteractionController({
                 setWizard({ kind: 'convert', grassrootsTileId: tileId });
             }
         }
-    }, [actionMode, moveInfluenceSourceId, vm.intents]);
-
-    const proposeIntent = useCallback((intent: LegalIntent) => {
-        setProposedIntent(intent);
-    }, []);
+    }, [actionMode, moveInfluenceSourceId, vm.intents, proposedIntent]);
 
     const confirmDraft = useCallback(() => {
         if (proposedIntent) {
@@ -195,6 +214,8 @@ export function useGameInteractionController({
         proposeIntent,
         confirmDraft,
         cancelDraft,
+        editDraftParams,
+        editDraftVariant,
         resolveChoice,
         closeWizard
     };

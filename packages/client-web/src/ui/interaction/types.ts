@@ -61,4 +61,16 @@ export interface InteractionController {
     resolveChoice: (intent: LegalIntent) => void;
     /** Closes the current active wizard. */
     closeWizard: () => void;
+
+    /**
+     * Drops current draft, keeps current action selection, returns to selectingParams.
+     * Used for "Edit source/destination" in ActionDock.
+     */
+    editDraftParams: () => void;
+
+    /**
+     * Re-opens variant selection for wizard actions (if applicable).
+     * used for "Edit variant" in ActionDock.
+     */
+    editDraftVariant: () => void;
 }
