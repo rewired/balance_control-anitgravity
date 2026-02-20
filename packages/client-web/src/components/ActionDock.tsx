@@ -3,6 +3,8 @@ import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import type { InteractionController, InteractionActionMode } from '../ui/interaction/types';
 import { MeasureTray } from './MeasureTray';
+import { groupFormalizeIntents } from '../ui/interaction/formalizeHelpers';
+import { groupConvertIntents } from '../ui/interaction/convertHelpers';
 
 interface ActionDockProps {
     isActive: boolean;
@@ -64,12 +66,96 @@ const getStepLabel = (state: string, mode: InteractionActionMode, moveInfluenceS
     return 'Select action';
 };
 
+const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = ({ controller }) => {
+    const {
+        interactionState,
+        pinnedCommitteeTileId,
+        pinnedGrassrootsTileId,
+        proposeIntent,
+        vm
+    } = controller;
+
+    if (interactionState !== 'selectingVariant') return null;
+
+    if (pinnedCommitteeTileId) {
+        const groupsMap = groupFormalizeIntents(vm.intents);
+        const groups = groupsMap.get(pinnedCommitteeTileId) || [];
+
+        return (
+            <div className="variant-selection-panel" data-testid="variant-selection-panel">
+                <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Select Payment</div>
+                {groups.map(group => (
+                    <div key={group.paymentKey} style={{ marginBottom: '8px' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                            Pay: {group.paymentResourceIds.join(', ') || 'Free'}
+                        </div>
+                        {group.variants.map(variant => (
+                            <button
+                                key={intentSortKey(variant)}
+                                className="btn-secondary btn-small"
+                                onClick={() => proposeIntent(variant)}
+                                style={{ width: '100%', textAlign: 'left', marginBottom: '4px' }}
+                                data-testid={`btn-variant-${variant.payload?.extraResourceIds?.join('-') || 'base'}`}
+                            >
+                                {variant.payload?.extraResourceIds && variant.payload.extraResourceIds.length > 0
+                                    ? `Extra: ${variant.payload.extraResourceIds.join(', ')}`
+                                    : 'Standard'}
+                            </button>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+    if (pinnedGrassrootsTileId) {
+        const groupsMap = groupConvertIntents(vm.intents);
+        const tileGroup = groupsMap.get(pinnedGrassrootsTileId);
+
+        if (!tileGroup) return <div data-testid="no-variants">No variants available</div>;
+
+        return (
+            <div className="variant-selection-panel" data-testid="variant-selection-panel">
+                {tileGroup.outputs.map(outputGroup => (
+                    <div key={outputGroup.outputResort} style={{ marginBottom: '12px' }}>
+                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                            To: {outputGroup.outputResort}
+                        </div>
+                        {outputGroup.combos.map(combo => (
+                            <div key={combo.inputKey} style={{ marginLeft: '8px', marginBottom: '8px' }}>
+                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                                    From: {combo.inputResourceIds.join(', ')}
+                                </div>
+                                {combo.variants.map(variant => (
+                                    <button
+                                        key={intentSortKey(variant)}
+                                        className="btn-secondary btn-small"
+                                        onClick={() => proposeIntent(variant)}
+                                        style={{ width: '100%', textAlign: 'left', marginBottom: '4px' }}
+                                        data-testid={`btn-variant-${variant.payload?.outputResort}-${combo.inputKey}`}
+                                    >
+                                        Select
+                                    </button>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+    return null;
+};
+
 const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ controller }) => {
     const {
         actionMode,
         interactionState,
         draft,
         moveInfluenceSourceId,
+        pinnedCommitteeTileId,
+        pinnedGrassrootsTileId,
         confirmDraft,
         cancelDraft,
         editDraftParams,
@@ -90,6 +176,18 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
                     <div className="pinned-params" style={{ marginTop: '4px', fontSize: '12px' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>Source: </span>
                         {moveInfluenceSourceId}
+                    </div>
+                )}
+                {pinnedCommitteeTileId && (
+                    <div className="pinned-params" style={{ marginTop: '4px', fontSize: '12px' }}>
+                        <span style={{ color: 'var(--text-secondary)' }}>Committee: </span>
+                        {pinnedCommitteeTileId}
+                    </div>
+                )}
+                {pinnedGrassrootsTileId && (
+                    <div className="pinned-params" style={{ marginTop: '4px', fontSize: '12px' }}>
+                        <span style={{ color: 'var(--text-secondary)' }}>Grassroots: </span>
+                        {pinnedGrassrootsTileId}
                     </div>
                 )}
             </div>
@@ -258,10 +356,13 @@ export const ActionDock: React.FC<ActionDockProps> = ({
 
             <CurrentActionPanel controller={controller} />
 
-            {interactionState !== 'draftReady' && (
-                <>
-                    {isDrawAndPlace && (
-                        <div className="action-panel-primary">
+            {interactionState === 'selectingVariant' ? (
+                <VariantSelectionPanel controller={controller} />
+            ) : (
+                interactionState !== 'draftReady' && (
+                    <>
+                        {isDrawAndPlace && (
+                            <div className="action-panel-primary">
                             <div className="action-panel-meta">Staged: {vm.stagedTileId || 'None'}</div>
                             {vm.drawAndPlace.passTilePlacement && (
                                 <button
@@ -278,7 +379,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                         <ActionGroupList G={G} controller={controller} />
                     )}
                 </>
-            )}
+            ))}
         </div>
     );
 };

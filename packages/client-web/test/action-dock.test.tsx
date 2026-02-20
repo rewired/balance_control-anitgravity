@@ -244,4 +244,118 @@ describe('ActionDock', () => {
         fireEvent.click(editButton);
         expect(editDraftParams).toHaveBeenCalledTimes(1);
     });
+
+    it('shows variant selection panel for formalizeInfluence', () => {
+        const intents = [
+            {
+                moveType: 'formalizeInfluence',
+                payload: {
+                    committeeTileId: 'tile-1',
+                    paymentResourceIds: ['res-1'],
+                    extraResourceIds: []
+                }
+            },
+            {
+                moveType: 'formalizeInfluence',
+                payload: {
+                    committeeTileId: 'tile-1',
+                    paymentResourceIds: ['res-1'],
+                    extraResourceIds: ['res-2']
+                }
+            }
+        ];
+
+        // Mock vm manually since buildIntentViewModel might be complex
+        const vm = {
+            stage: 'politicalAction',
+            intents,
+            political: { others: [], formalizeInfluence: intents, convertResources: [], measures: [] }
+        } as any;
+
+        const proposeIntent = vi.fn();
+
+        const controller = {
+            vm,
+            actionMode: 'formalizeInfluence',
+            interactionState: 'selectingVariant',
+            pinnedCommitteeTileId: 'tile-1',
+            proposeIntent,
+            draft: { intent: null }
+        } as any;
+
+        render(
+            <ActionDock
+                isActive={true}
+                G={{} as any}
+                controller={controller}
+            />
+        );
+
+        // Check panel exists
+        expect(screen.getByTestId('variant-selection-panel')).toBeDefined();
+
+        // Check for variants
+        expect(screen.getByText('Select Payment')).toBeDefined();
+        // Check for payment info
+        expect(screen.getByText('Pay: res-1')).toBeDefined();
+
+        // Check for variant buttons
+        const standardBtn = screen.getByTestId('btn-variant-base');
+        expect(standardBtn).toBeDefined();
+        expect(standardBtn.textContent).toContain('Standard');
+
+        const extraBtn = screen.getByTestId('btn-variant-res-2');
+        expect(extraBtn).toBeDefined();
+        expect(extraBtn.textContent).toContain('Extra: res-2');
+
+        // Test interaction
+        fireEvent.click(standardBtn);
+        expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
+    });
+
+    it('shows variant selection panel for convertResources', () => {
+         const intents = [
+            {
+                moveType: 'convertResources',
+                payload: {
+                    grassrootsTileId: 'T1',
+                    outputResort: 'INF',
+                    inputResourceIds: ['r1', 'r2']
+                }
+            }
+        ];
+
+        const vm = {
+            stage: 'politicalAction',
+            intents,
+            political: { others: [], formalizeInfluence: [], convertResources: intents, measures: [] }
+        } as any;
+
+        const proposeIntent = vi.fn();
+
+        const controller = {
+            vm,
+            actionMode: 'convertResources',
+            interactionState: 'selectingVariant',
+            pinnedGrassrootsTileId: 'T1',
+            proposeIntent,
+            draft: { intent: null }
+        } as any;
+
+        render(
+            <ActionDock
+                isActive={true}
+                G={{} as any}
+                controller={controller}
+            />
+        );
+
+        expect(screen.getByTestId('variant-selection-panel')).toBeDefined();
+        expect(screen.getByText('To: INF')).toBeDefined();
+        expect(screen.getByText('From: r1, r2')).toBeDefined();
+
+        const variantBtn = screen.getByTestId('btn-variant-INF-r1|r2');
+        fireEvent.click(variantBtn);
+        expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
+    });
 });

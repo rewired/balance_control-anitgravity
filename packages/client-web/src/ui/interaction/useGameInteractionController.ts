@@ -30,7 +30,8 @@ export function useGameInteractionController({
     const [proposedIntent, setProposedIntent] = useState<LegalIntent | null>(null);
     const [actionMode, setActionMode] = useState<InteractionActionMode>('none');
     const [moveInfluenceSourceId, setMoveInfluenceSourceId] = useState<string | null>(null);
-    const [wizard, setWizard] = useState<InteractionController['wizard']>(null);
+    const [pinnedCommitteeTileId, setPinnedCommitteeTileId] = useState<string | null>(null);
+    const [pinnedGrassrootsTileId, setPinnedGrassrootsTileId] = useState<string | null>(null);
 
     const stagingZoneId = `staging_${myPid}`;
     const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
@@ -70,7 +71,7 @@ export function useGameInteractionController({
                 i.payload?.committeeTileId === tileId
             );
             if (hasIntents) {
-                setWizard({ kind: 'formalize', committeeTileId: tileId });
+                setPinnedCommitteeTileId(tileId);
             }
         }
 
@@ -80,10 +81,10 @@ export function useGameInteractionController({
                 i.payload?.grassrootsTileId === tileId
             );
             if (hasIntents) {
-                setWizard({ kind: 'convert', grassrootsTileId: tileId });
+                setPinnedGrassrootsTileId(tileId);
             }
         }
-    }, [actionMode, moveInfluenceSourceId, vm.intents, proposedIntent]);
+    }, [actionMode, vm.intents, proposedIntent]);
 
     const confirmDraft = useCallback(() => {
         if (proposedIntent) {
@@ -93,6 +94,8 @@ export function useGameInteractionController({
             setSelectedCoord(null);
             setActionMode('none');
             setMoveInfluenceSourceId(null);
+            setPinnedCommitteeTileId(null);
+            setPinnedGrassrootsTileId(null);
         }
     }, [proposedIntent, moves]);
 
@@ -108,16 +111,13 @@ export function useGameInteractionController({
         dispatchIntent(moves, intent);
     }, [moves]);
 
-    const closeWizard = useCallback(() => {
-        setWizard(null);
-    }, []);
-
     // Reset action mode when phase changes
     const stage = vm.stage;
     useEffect(() => {
         setActionMode('none');
         setMoveInfluenceSourceId(null);
-        setWizard(null);
+        setPinnedCommitteeTileId(null);
+        setPinnedGrassrootsTileId(null);
     }, [stage]);
 
     // Handle Escape key to clear selection/proposal
@@ -129,7 +129,8 @@ export function useGameInteractionController({
                 setProposedIntent(null);
                 setActionMode('none');
                 setMoveInfluenceSourceId(null);
-                setWizard(null);
+                setPinnedCommitteeTileId(null);
+                setPinnedGrassrootsTileId(null);
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -166,7 +167,8 @@ export function useGameInteractionController({
     const setActionModeWithSideEffects = useCallback((mode: InteractionActionMode) => {
         setActionMode(mode);
         setMoveInfluenceSourceId(null);
-        setWizard(null);
+        setPinnedCommitteeTileId(null);
+        setPinnedGrassrootsTileId(null);
         if (mode !== 'none') {
             setSelectedTileId(null);
             setSelectedCoord(null);
@@ -184,7 +186,7 @@ export function useGameInteractionController({
         interactionState = 'pendingChoiceHardGate';
     } else if (proposedIntent) {
         interactionState = 'draftReady';
-    } else if (wizard) {
+    } else if (pinnedCommitteeTileId || pinnedGrassrootsTileId) {
         interactionState = 'selectingVariant';
     } else if (actionMode !== 'none') {
         interactionState = 'selectingParams';
@@ -208,7 +210,8 @@ export function useGameInteractionController({
         vm,
         actionMode,
         moveInfluenceSourceId,
-        wizard,
+        pinnedCommitteeTileId,
+        pinnedGrassrootsTileId,
         setActionMode: setActionModeWithSideEffects,
         selectTile,
         selectMoveInfluenceSource,
@@ -217,7 +220,6 @@ export function useGameInteractionController({
         cancelDraft,
         editDraftParams,
         editDraftVariant,
-        resolveChoice,
-        closeWizard
+        resolveChoice
     };
 }

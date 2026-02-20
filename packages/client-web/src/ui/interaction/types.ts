@@ -39,11 +39,10 @@ export interface InteractionController {
     /** Source tile for Move Influence mode. */
     moveInfluenceSourceId: string | null;
 
-    /** Current active wizard state. */
-    wizard:
-        | { kind: 'formalize'; committeeTileId: string }
-        | { kind: 'convert'; grassrootsTileId: string }
-        | null;
+    /** Pinned tile for Formalize Influence mode. */
+    pinnedCommitteeTileId: string | null;
+    /** Pinned tile for Convert Resources mode. */
+    pinnedGrassrootsTileId: string | null;
 
     /** Sets the current action mode. */
     setActionMode: (mode: InteractionActionMode) => void;
@@ -61,8 +60,6 @@ export interface InteractionController {
 
     /** Dispatches a choice resolution. */
     resolveChoice: (intent: LegalIntent) => void;
-    /** Closes the current active wizard. */
-    closeWizard: () => void;
 
     /**
      * Drops current draft, keeps current action selection, returns to selectingParams.
