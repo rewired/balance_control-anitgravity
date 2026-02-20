@@ -61,8 +61,20 @@ After this task, the repo must **fail CI locally** if any of the following happe
 - [ ] `pnpm lint` and `pnpm -C packages/client-web test` pass on a clean tree.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005/006).
-- [ ] No engine/rule/spec changes.
-- [ ] Stable, deterministic boundary test.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005/006).
+- [x] No engine/rule/spec changes.
+- [x] Stable, deterministic boundary test.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
+
+## Work Summary
+- Updated `.eslintrc.cjs` to forbid importing `dispatchIntent` in `client-web` except for the controller.
+- Created `packages/client-web/test/no-direct-commit-shortcuts.test.ts` to enforce:
+  - No imports of `dispatchIntent` outside allowed files.
+  - No usage of `moves.` pattern outside allowed files.
+- Verified restrictions by creating a violation file and ensuring lint/test failure.
+- Verified clean state passes all checks.
+
+## Commands Run
+- `pnpm lint` (Passed)
+- `pnpm -C packages/client-web test` (Passed)
