@@ -6,7 +6,7 @@
       "ex03": false
     }
   },
-  "expectedFinalHash": "bd563664dd7922b0bd889c5ce1b17f933c81b23fb3ca78eecab43097b87c3e77",
+  "expectedFinalHash": "597e44342d2d4aa4911e21c110fb59abfced82f1d5f5e898f333eecca529031f",
   "expectedPublicSurfaceHash": "ac11f9da4045a3512d4a62e99eb0ec23a1b2e386fc388bd8a14171620a9befd4",
   "id": "core_pingpong_meta_marker",
   "moves": [
@@ -122,7 +122,7 @@
     }
   ],
   "notes": {
-    "purpose": "Exercise PingPong meta-marker Move penalty (resources to Noise)",
+    "purpose": "Exercise Return Penalty meta-marker Move penalty (resources to Noise)",
     "updatedFor": "CORE-01 v1.1.0"
   },
   "numPlayers": 2,

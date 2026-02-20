@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Engine: Rename Meta-Marker mode `PingPong` to `ReturnPenalty` (CORE rename and serialization change).
 - Engine: add deterministic measure deck providers for EXP-02/EXP-03 and remove prefix-based measure zone routing from core resolver.
 - Engine: add deterministic `EngineModuleRegistry` for effect-atom dispatch; forbid module overrides and gate EXP-02/EXP-03 handlers by match config flags.
 - Engine: normalize ExpansionRegistry identity/order via canonical expansion ids; enablement now reads from match config snapshot at `G.meta.cfg` (deterministic; no state-slice inference).
@@ -11,8 +12,8 @@
 - Fix: client active-state now derived from `ctx` (no reliance on `state.isActive`); legal-intents fall back when `ctx.activePlayers` is missing and prohibitions are respected.
 - Client: added classic boardgame.io Lobby start screen (list/create/join) and in-game Quit that leaves via Lobby `leaveMatch`.
 - Client: persist last lobby session in `localStorage` with explicit Resume/Leave + Force forget on leave failure.
-- Fix: CORE-01-04-12B Ping-Pong penalty only applies to Move actions (resources to Noise), not production. Removed incorrect production halving.
-- CORE-01-04-12A: Meta-Marker only placed when Move source is ResortTile; mode always PingPong (removed non-spec Shift).
+- Fix: CORE-01-04-12B Return Penalty only applies to Move actions (resources to Noise), not production. Removed incorrect production halving.
+- CORE-01-04-12A: Meta-Marker only placed when Move source is ResortTile; mode always ReturnPenalty (removed non-spec Shift).
 - CORE-01-04-09A: Meta-Marker carryover — return to PersonalSupply and mode=None when Political Action does not place/update it (placeInfluence, formalizeInfluence, moveInfluence from non-Resort).
 - CORE-01-04-09: Removed non-spec political action `pass`; Political Action stage now offers only CORE-01 actions.
 - CORE-01-03-03B: Setup order corrected — Influence assigned after Shuffle (canonical step order).

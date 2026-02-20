@@ -132,7 +132,7 @@ describe('Moves', () => {
         expect(countOwnedInfluence()).toBe(beforeCount);
     });
 
-    it('moveInfluence should set PingPong mode when meta-marker starts on destination', () => {
+    it('moveInfluence should set ReturnPenalty mode when meta-marker starts on destination', () => {
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'meta_p1');
@@ -142,10 +142,10 @@ describe('Moves', () => {
 
         expect(G.zones.board_t1.items).toContain('meta_p1');
         expect(G.zones.board_t2.items).not.toContain('meta_p1');
-        expect(G.objects.meta_p1.mode).toBe('PingPong');
+        expect(G.objects.meta_p1.mode).toBe('ReturnPenalty');
     });
 
-    it('moveInfluence should require and apply PingPong penalty resources to Noise (CORE-01-04-12B)', () => {
+    it('moveInfluence should require and apply Return Penalty resources to Noise (CORE-01-04-12B)', () => {
         G.roundNumber = 1;
         (G.zones as any).Noise = { id: 'Noise', name: 'Noise', items: [] };
 
@@ -153,7 +153,7 @@ describe('Moves', () => {
         G.zones.board_t1.items.push('inf_1');
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'meta_p1');
         G.zones.board_t2.items.push('meta_p1');
-        (G.objects.meta_p1 as any).mode = 'PingPong';
+        (G.objects.meta_p1 as any).mode = 'ReturnPenalty';
 
         const before = JSON.stringify(G);
         const invalid = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
@@ -174,14 +174,14 @@ describe('Moves', () => {
         expect(G.zones.board_t2.items).not.toContain('meta_p1');
     });
 
-    it('moveInfluence should set PingPong mode when source is ResortTile (CORE-01-04-12A)', () => {
+    it('moveInfluence should set ReturnPenalty mode when source is ResortTile (CORE-01-04-12A)', () => {
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
 
         CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
 
         expect(G.zones.board_t1.items).toContain('meta_p1');
-        expect(G.objects.meta_p1.mode).toBe('PingPong');
+        expect(G.objects.meta_p1.mode).toBe('ReturnPenalty');
     });
 
     it('moveInfluence should preserve zone exclusivity', () => {

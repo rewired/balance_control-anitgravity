@@ -2,7 +2,7 @@
 
 # CORE-01 Simulation Specification (Atomic, Deterministic)
 
-**Version:** 01
+**Version:** 02
 **Scope:** Core Rules v1.1.0 only, incl. variants (no expansions)
 
 ---
@@ -125,7 +125,7 @@ CORE-01-02-17A Each player has exactly one Meta-Marker (Cooldown Token).
 CORE-01-02-17B A Meta-Marker is not Influence, not a Resource, and not an Overlay.
 CORE-01-02-17C A Meta-Marker exists either in PersonalSupply[owner] or on exactly one ResortTile or exactly one Grassroots tile in Board.
 CORE-01-02-17D A Meta-Marker may not be placed on the Start Committee.
-CORE-01-02-17E Meta-Marker mode ∈ {None, PingPong, Convert}; at game start, mode = None.
+CORE-01-02-17E Meta-Marker mode ∈ {None, ReturnPenalty, Convert}; at game start, mode = None.
 
 ---
 
@@ -194,9 +194,9 @@ CORE-01-04-11A Place Legality: legal only if active player has ≥1 Influence in
 
 CORE-01-04-12 PlaceOrMoveInfluence (Move): move exactly one active-player-owned Influence from a source Board Tile to a different destination Board Tile. Start Committee may not be source or destination (CORE-01-08-06E).
 
-CORE-01-04-12A Move Meta-Marker Update: after a successful Move, if the source Tile is a ResortTile, place active player’s Meta-Marker onto the source Tile and set mode = PingPong (removing it from any prior Tile). Otherwise, do not place the Meta-Marker as part of this move (then CORE-01-04-09A applies).
+CORE-01-04-12A Move Meta-Marker Update: after a successful Move, if the source Tile is a ResortTile, place active player’s Meta-Marker onto the source Tile and set mode = ReturnPenalty (removing it from any prior Tile). Otherwise, do not place the Meta-Marker as part of this move (then CORE-01-04-09A applies).
 
-CORE-01-04-12B Ping-Pong Penalty (Meta-Marker): If, when Move begins resolution, the active player’s Meta-Marker is on the destination Tile and mode = PingPong, pay penalty before moving:
+CORE-01-04-12B Return Penalty (Meta-Marker): If, when Move begins resolution, the active player’s Meta-Marker is on the destination Tile and mode = ReturnPenalty, pay penalty before moving:
 Let R = Resource count in PersonalSupply[activePlayer]. Let N = min(10, floor(R/2)). If N > 0, choose any N Resources and move them to Noise. This choice is locked before any movement.
 
 CORE-01-04-12C PlaceOrMoveInfluence (Move) Meta-Marker Expiry: Reserved. (Persistence/return governed by CORE-01-07-03A/B and CORE-01-04-09A.)

@@ -114,14 +114,14 @@ export const PoliticalActionMoves = {
         const marker = getPlayerMetaMarker(G, pid);
         const markerZoneId = marker ? findObjectZoneId(G, marker.id) : null;
         let penaltyCount = 0;
-        if (marker && marker.mode === 'PingPong' && markerZoneId === targetId) {
+        if (marker && marker.mode === 'ReturnPenalty' && markerZoneId === targetId) {
             const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
             const supply = G.zones[supplyId];
             const R = supply?.items?.filter((id: string) => G.objects[id]?.type === 'Resource').length ?? 0;
             penaltyCount = Math.min(10, Math.floor(R / 2));
         }
 
-        const extraCostSlots = EffectResolver.getExtraCostSlots(G, pid, 'influence.move', targetId, { includePingPongPenalty: false });
+        const extraCostSlots = EffectResolver.getExtraCostSlots(G, pid, 'influence.move', targetId, { includeReturnPenalty: false });
         const totalSlots = penaltyCount + extraCostSlots.length;
 
         if (totalSlots > 0) {
@@ -149,7 +149,7 @@ export const PoliticalActionMoves = {
         }
 
         if (extraCostSlots.length > 0) {
-            if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.move', targetId, extraCostResourceIds, { includePingPongPenalty: false })) {
+            if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.move', targetId, extraCostResourceIds, { includeReturnPenalty: false })) {
                 return INVALID_MOVE;
             }
         }
@@ -163,9 +163,9 @@ export const PoliticalActionMoves = {
 
         if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
 
-        // CORE-01-04-12A: Only place Meta-Marker when source is ResortTile; set mode = PingPong
+        // CORE-01-04-12A: Only place Meta-Marker when source is ResortTile; set mode = ReturnPenalty
         if (marker && sourceTile?.type === TileType.Resort) {
-            placeMetaMarkerOnTile(G, marker, sourceId, 'PingPong');
+            placeMetaMarkerOnTile(G, marker, sourceId, 'ReturnPenalty');
         } else if (marker) {
             returnMetaMarkerToSupply(G, pid);
         }

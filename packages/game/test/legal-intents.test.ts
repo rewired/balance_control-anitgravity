@@ -268,7 +268,7 @@ describe('enumerateLegalIntents', () => {
             { expansions: { ex01: false, ex02: false, ex03: true } }
         );
     });
-    describe('Ping-Pong Penalty', () => {
+    describe('Return Penalty', () => {
         it('selects deterministic extraResourceIds for moveInfluence and executes validly', () => {
             const ctx = createCtx('politicalAction');
             const G = SetupGame({ ctx });
@@ -292,8 +292,8 @@ describe('enumerateLegalIntents', () => {
             if (!G.zones[sourceId]) G.zones[sourceId] = { id: sourceId, items: [] } as any;
             G.zones[sourceId].items.push(influenceId);
 
-            // Set MetaMarker to PingPong on Target
-            // We simulate the marker being on targetId in PingPong mode
+            // Set MetaMarker to ReturnPenalty on Target
+            // We simulate the marker being on targetId in ReturnPenalty mode
             // Reuse existing marker if present to avoid finding the wrong one
             let markerId = Object.keys(G.objects).find(id => G.objects[id]?.type === 'MetaMarker' && G.objects[id]?.owner === '0');
             if (!markerId) {
@@ -301,7 +301,7 @@ describe('enumerateLegalIntents', () => {
                 G.objects[markerId] = { id: markerId, type: 'MetaMarker', owner: '0' } as any;
             }
             const marker = G.objects[markerId] as any;
-            marker.mode = 'PingPong';
+            marker.mode = 'ReturnPenalty';
             marker.tileId = targetId;
 
             // Move marker to target zone

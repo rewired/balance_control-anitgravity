@@ -110,7 +110,7 @@ export function isCoreResort(resort: string): boolean {
  * @deterministic
  * @sideEffects
  */
-export function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'PingPong' | 'Convert') {
+export function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'ReturnPenalty' | 'Convert') {
     const currentZoneId = findObjectZoneId(G, marker.id);
     if (currentZoneId && currentZoneId !== tileId) {
         const currentZone = G.zones[currentZoneId];

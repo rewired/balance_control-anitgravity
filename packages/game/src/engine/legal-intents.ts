@@ -222,7 +222,7 @@ function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
             if (EffectResolver.isProhibited(G as any, 'influence.move', playerID, targetId)) continue;
 
             // Calculate costs including any penalties
-            const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.move', targetId, { includePingPongPenalty: true });
+            const costSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.move', targetId, { includeReturnPenalty: true });
 
             // Try to select deterministic payment
             const extraResourceIds = selectDeterministicExtraResourceIds(G, playerID, costSlots);
@@ -233,16 +233,16 @@ function enumerateMoveInfluence(G: GameState, playerID: string): LegalIntent[] {
             const consequences: string[] = [];
             const marker = getPlayerMetaMarker(G, playerID);
 
-            // CORE-01-04-12B: PingPong Penalty
+            // CORE-01-04-12B: Return Penalty
             // Only applicable to MoveInfluence, not PlaceInfluence
-            if (marker && marker.tileId === targetId && marker.mode === 'PingPong') {
-                consequences.push('PingPong Penalty applies');
+            if (marker && marker.tileId === targetId && marker.mode === 'ReturnPenalty') {
+                consequences.push('Return Penalty applies');
             }
 
-            // CORE-01-04-12A: Enter PingPong Mode
+            // CORE-01-04-12A: Enter Return Penalty Mode
             const sourceTile = G.tiles[sourceId];
             if (marker && sourceTile?.type === TileType.Resort) {
-                consequences.push('Enter PingPong Mode');
+                consequences.push('Enter Return Penalty Mode');
             }
 
             intents.push({
