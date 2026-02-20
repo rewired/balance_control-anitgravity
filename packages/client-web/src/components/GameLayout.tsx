@@ -113,7 +113,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     return (
         <div className="game-layout">
             <PublicNoticeOverlay G={G} />
-            <ModalHost controller={controller} />
+            <ModalHost G={G} controller={controller} />
 
             {/* Left Panel: Bank & Supply */}
             <aside className="left-panel glass-panel">
@@ -166,6 +166,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     placeTileIntents={placementIntents}
                     moveInfluenceIntents={vm.intents.filter(i => i.moveType === 'moveInfluence')}
                     placeInfluenceIntents={vm.intents.filter(i => i.moveType === 'placeInfluence')}
+                    formalizeInfluenceIntents={vm.political.formalizeInfluence}
                     actionMode={actionMode}
                     moveInfluenceSourceId={moveInfluenceSourceId}
                     ghostCoords={placementGhostCoords}

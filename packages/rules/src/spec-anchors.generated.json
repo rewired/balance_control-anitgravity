@@ -10,112 +10,112 @@
     {
       "id": "ADD56-01-01-01",
       "source": "docs/rules/000-core.md",
-      "line": 444
+      "line": 454
     },
     {
       "id": "ADD56-01-01-02",
       "source": "docs/rules/000-core.md",
-      "line": 446
+      "line": 456
     },
     {
       "id": "ADD56-01-01-03",
       "source": "docs/rules/000-core.md",
-      "line": 447
+      "line": 457
     },
     {
       "id": "ADD56-01-01-04",
       "source": "docs/rules/000-core.md",
-      "line": 448
+      "line": 458
     },
     {
       "id": "ADD56-01-01-05",
       "source": "docs/rules/000-core.md",
-      "line": 450
+      "line": 460
     },
     {
       "id": "ADD56-01-01-06",
       "source": "docs/rules/000-core.md",
-      "line": 451
+      "line": 461
     },
     {
       "id": "ADD56-01-01-07",
       "source": "docs/rules/000-core.md",
-      "line": 452
+      "line": 462
     },
     {
       "id": "ADD56-01-01-08",
       "source": "docs/rules/000-core.md",
-      "line": 454
+      "line": 464
     },
     {
       "id": "ADD56-01-01-09",
       "source": "docs/rules/000-core.md",
-      "line": 455
+      "line": 465
     },
     {
       "id": "ADD56-01-01-10",
       "source": "docs/rules/000-core.md",
-      "line": 456
+      "line": 466
     },
     {
       "id": "ADD56-01-01-11",
       "source": "docs/rules/000-core.md",
-      "line": 458
+      "line": 468
     },
     {
       "id": "ADD56-01-01-12",
       "source": "docs/rules/000-core.md",
-      "line": 459
+      "line": 469
     },
     {
       "id": "ADD56-01-01-13",
       "source": "docs/rules/000-core.md",
-      "line": 460
+      "line": 470
     },
     {
       "id": "ADD56-01-01-13A",
       "source": "docs/rules/000-core.md",
-      "line": 461
+      "line": 471
     },
     {
       "id": "ADD56-01-01-14",
       "source": "docs/rules/000-core.md",
-      "line": 463
+      "line": 473
     },
     {
       "id": "ADD56-01-01-15",
       "source": "docs/rules/000-core.md",
-      "line": 464
+      "line": 474
     },
     {
       "id": "ADD56-01-01-16",
       "source": "docs/rules/000-core.md",
-      "line": 465
+      "line": 475
     },
     {
       "id": "ADD56-01-01-16A",
       "source": "docs/rules/000-core.md",
-      "line": 466
+      "line": 476
     },
     {
       "id": "ADD56-01-02-01",
       "source": "docs/rules/000-core.md",
-      "line": 437
+      "line": 447
     },
     {
       "id": "ADD56-01-02-02",
       "source": "docs/rules/000-core.md",
-      "line": 438
+      "line": 448
     },
     {
       "id": "ADD56-01-03-00-01",
       "source": "docs/rules/000-core.md",
-      "line": 471
+      "line": 481
     },
     {
       "id": "ADD56-01-03-01",
       "source": "docs/rules/000-core.md",
-      "line": 472
+      "line": 482
     },
     {
       "id": "CORE-01-00",
@@ -595,152 +595,157 @@
     {
       "id": "CORE-01-04-12A",
       "source": "docs/rules/000-core.md",
-      "line": 197
+      "line": 199
     },
     {
       "id": "CORE-01-04-12B",
       "source": "docs/rules/000-core.md",
-      "line": 199
+      "line": 201
     },
     {
       "id": "CORE-01-04-12C",
       "source": "docs/rules/000-core.md",
-      "line": 202
+      "line": 204
     },
     {
-      "id": "CORE-01-04-13",
+      "id": "CORE-01-04-12D",
       "source": "docs/rules/000-core.md",
       "line": 206
     },
     {
-      "id": "CORE-01-04-14",
-      "source": "docs/rules/000-core.md",
-      "line": 207
-    },
-    {
-      "id": "CORE-01-04-14A",
-      "source": "docs/rules/000-core.md",
-      "line": 209
-    },
-    {
-      "id": "CORE-01-04-14B",
-      "source": "docs/rules/000-core.md",
-      "line": 211
-    },
-    {
-      "id": "CORE-01-04-15",
-      "source": "docs/rules/000-core.md",
-      "line": 209
-    },
-    {
-      "id": "CORE-01-04-15A",
+      "id": "CORE-01-04-13",
       "source": "docs/rules/000-core.md",
       "line": 215
     },
     {
-      "id": "CORE-01-04-16",
+      "id": "CORE-01-04-14",
       "source": "docs/rules/000-core.md",
-      "line": 217
+      "line": 216
     },
     {
-      "id": "CORE-01-04-17",
+      "id": "CORE-01-04-14A",
       "source": "docs/rules/000-core.md",
       "line": 218
     },
     {
-      "id": "CORE-01-04-17A",
+      "id": "CORE-01-04-14B",
       "source": "docs/rules/000-core.md",
       "line": 220
     },
     {
-      "id": "CORE-01-04-18",
+      "id": "CORE-01-04-15",
       "source": "docs/rules/000-core.md",
-      "line": 222
+      "line": 218
     },
     {
-      "id": "CORE-01-04-19",
+      "id": "CORE-01-04-15A",
       "source": "docs/rules/000-core.md",
-      "line": 209
+      "line": 224
     },
     {
-      "id": "CORE-01-04-20",
+      "id": "CORE-01-04-16",
+      "source": "docs/rules/000-core.md",
+      "line": 226
+    },
+    {
+      "id": "CORE-01-04-17",
       "source": "docs/rules/000-core.md",
       "line": 227
     },
     {
-      "id": "CORE-01-04-21",
-      "source": "docs/rules/000-core.md",
-      "line": 228
-    },
-    {
-      "id": "CORE-01-04-22",
+      "id": "CORE-01-04-17A",
       "source": "docs/rules/000-core.md",
       "line": 229
     },
     {
-      "id": "CORE-01-04-22A",
+      "id": "CORE-01-04-18",
       "source": "docs/rules/000-core.md",
       "line": 231
     },
     {
-      "id": "CORE-01-04-22B",
+      "id": "CORE-01-04-19",
       "source": "docs/rules/000-core.md",
-      "line": 233
+      "line": 218
     },
     {
-      "id": "CORE-01-04-22C",
+      "id": "CORE-01-04-20",
       "source": "docs/rules/000-core.md",
-      "line": 235
+      "line": 236
     },
     {
-      "id": "CORE-01-04-22D",
+      "id": "CORE-01-04-21",
       "source": "docs/rules/000-core.md",
       "line": 237
     },
     {
+      "id": "CORE-01-04-22",
+      "source": "docs/rules/000-core.md",
+      "line": 238
+    },
+    {
+      "id": "CORE-01-04-22A",
+      "source": "docs/rules/000-core.md",
+      "line": 240
+    },
+    {
+      "id": "CORE-01-04-22B",
+      "source": "docs/rules/000-core.md",
+      "line": 242
+    },
+    {
+      "id": "CORE-01-04-22C",
+      "source": "docs/rules/000-core.md",
+      "line": 244
+    },
+    {
+      "id": "CORE-01-04-22D",
+      "source": "docs/rules/000-core.md",
+      "line": 246
+    },
+    {
       "id": "CORE-01-04-22E",
       "source": "docs/rules/000-core.md",
-      "line": 239
+      "line": 248
     },
     {
       "id": "CORE-01-04-22F",
       "source": "docs/rules/000-core.md",
-      "line": 241
+      "line": 250
     },
     {
       "id": "CORE-01-04-22G",
       "source": "docs/rules/000-core.md",
-      "line": 243
+      "line": 252
     },
     {
       "id": "CORE-01-04-22H",
       "source": "docs/rules/000-core.md",
-      "line": 245
+      "line": 254
     },
     {
       "id": "CORE-01-04-22I",
       "source": "docs/rules/000-core.md",
-      "line": 247
+      "line": 256
     },
     {
       "id": "CORE-01-04-22J",
       "source": "docs/rules/000-core.md",
-      "line": 249
+      "line": 258
     },
     {
       "id": "CORE-01-04-22K",
       "source": "docs/rules/000-core.md",
-      "line": 247
+      "line": 256
     },
     {
       "id": "CORE-01-04-22L",
       "source": "docs/rules/000-core.md",
-      "line": 247
+      "line": 256
     },
     {
       "id": "CORE-01-04-22L.1",
       "source": "docs/rules/000-core.md",
-      "line": 262
+      "line": 271
     },
     {
       "id": "CORE-01-05",
@@ -750,47 +755,47 @@
     {
       "id": "CORE-01-05-01",
       "source": "docs/rules/000-core.md",
-      "line": 268
+      "line": 277
     },
     {
       "id": "CORE-01-05-02",
       "source": "docs/rules/000-core.md",
-      "line": 269
+      "line": 278
     },
     {
       "id": "CORE-01-05-03",
       "source": "docs/rules/000-core.md",
-      "line": 270
+      "line": 279
     },
     {
       "id": "CORE-01-05-03A",
       "source": "docs/rules/000-core.md",
-      "line": 268
+      "line": 277
     },
     {
       "id": "CORE-01-05-04",
       "source": "docs/rules/000-core.md",
-      "line": 279
+      "line": 288
     },
     {
       "id": "CORE-01-05-04A",
       "source": "docs/rules/000-core.md",
-      "line": 280
+      "line": 289
     },
     {
       "id": "CORE-01-05-04B",
       "source": "docs/rules/000-core.md",
-      "line": 275
+      "line": 284
     },
     {
       "id": "CORE-01-05-05",
       "source": "docs/rules/000-core.md",
-      "line": 282
+      "line": 291
     },
     {
       "id": "CORE-01-05-06",
       "source": "docs/rules/000-core.md",
-      "line": 283
+      "line": 292
     },
     {
       "id": "CORE-01-06",
@@ -800,137 +805,137 @@
     {
       "id": "CORE-01-06-00-01",
       "source": "docs/rules/000-core.md",
-      "line": 289
+      "line": 298
     },
     {
       "id": "CORE-01-06-00-02",
       "source": "docs/rules/000-core.md",
-      "line": 290
+      "line": 299
     },
     {
       "id": "CORE-01-06-00-03",
       "source": "docs/rules/000-core.md",
-      "line": 211
+      "line": 197
     },
     {
       "id": "CORE-01-06-00-04",
       "source": "docs/rules/000-core.md",
-      "line": 293
+      "line": 302
     },
     {
       "id": "CORE-01-06-00-05",
       "source": "docs/rules/000-core.md",
-      "line": 294
+      "line": 303
     },
     {
       "id": "CORE-01-06-00-06",
       "source": "docs/rules/000-core.md",
-      "line": 302
+      "line": 311
     },
     {
       "id": "CORE-01-06-01",
       "source": "docs/rules/000-core.md",
-      "line": 306
+      "line": 315
     },
     {
       "id": "CORE-01-06-02",
       "source": "docs/rules/000-core.md",
-      "line": 307
+      "line": 316
     },
     {
       "id": "CORE-01-06-03",
       "source": "docs/rules/000-core.md",
-      "line": 308
+      "line": 317
     },
     {
       "id": "CORE-01-06-03A",
       "source": "docs/rules/000-core.md",
-      "line": 310
+      "line": 319
     },
     {
       "id": "CORE-01-06-03B",
       "source": "docs/rules/000-core.md",
-      "line": 312
+      "line": 321
     },
     {
       "id": "CORE-01-06-04",
       "source": "docs/rules/000-core.md",
-      "line": 314
+      "line": 323
     },
     {
       "id": "CORE-01-06-05",
       "source": "docs/rules/000-core.md",
-      "line": 318
+      "line": 327
     },
     {
       "id": "CORE-01-06-06",
       "source": "docs/rules/000-core.md",
-      "line": 321
+      "line": 330
     },
     {
       "id": "CORE-01-06-07",
       "source": "docs/rules/000-core.md",
-      "line": 322
+      "line": 331
     },
     {
       "id": "CORE-01-06-08",
       "source": "docs/rules/000-core.md",
-      "line": 323
+      "line": 332
     },
     {
       "id": "CORE-01-06-09",
       "source": "docs/rules/000-core.md",
-      "line": 327
+      "line": 336
     },
     {
       "id": "CORE-01-06-10",
       "source": "docs/rules/000-core.md",
-      "line": 328
+      "line": 337
     },
     {
       "id": "CORE-01-06-11",
       "source": "docs/rules/000-core.md",
-      "line": 329
+      "line": 338
     },
     {
       "id": "CORE-01-06-12",
       "source": "docs/rules/000-core.md",
-      "line": 330
+      "line": 339
     },
     {
       "id": "CORE-01-06-13",
       "source": "docs/rules/000-core.md",
-      "line": 331
+      "line": 340
     },
     {
       "id": "CORE-01-06-13A",
       "source": "docs/rules/000-core.md",
-      "line": 332
+      "line": 341
     },
     {
       "id": "CORE-01-06-14",
       "source": "docs/rules/000-core.md",
-      "line": 333
+      "line": 342
     },
     {
       "id": "CORE-01-06-15",
       "source": "docs/rules/000-core.md",
-      "line": 334
+      "line": 343
     },
     {
       "id": "CORE-01-06-16",
       "source": "docs/rules/000-core.md",
-      "line": 329
+      "line": 338
     },
     {
       "id": "CORE-01-06-16-00",
       "source": "docs/rules/000-core.md",
-      "line": 337
+      "line": 346
     },
     {
       "id": "CORE-01-06-17",
       "source": "docs/rules/000-core.md",
-      "line": 350
+      "line": 359
     },
     {
       "id": "CORE-01-07",
@@ -940,37 +945,37 @@
     {
       "id": "CORE-01-07-01",
       "source": "docs/rules/000-core.md",
-      "line": 356
+      "line": 365
     },
     {
       "id": "CORE-01-07-02",
       "source": "docs/rules/000-core.md",
-      "line": 357
+      "line": 366
     },
     {
       "id": "CORE-01-07-03",
       "source": "docs/rules/000-core.md",
-      "line": 358
+      "line": 367
     },
     {
       "id": "CORE-01-07-03A",
       "source": "docs/rules/000-core.md",
-      "line": 202
+      "line": 204
     },
     {
       "id": "CORE-01-07-03B",
       "source": "docs/rules/000-core.md",
-      "line": 361
+      "line": 370
     },
     {
       "id": "CORE-01-07-03C",
       "source": "docs/rules/000-core.md",
-      "line": 362
+      "line": 371
     },
     {
       "id": "CORE-01-07-03D",
       "source": "docs/rules/000-core.md",
-      "line": 363
+      "line": 372
     },
     {
       "id": "CORE-01-08",
@@ -980,97 +985,97 @@
     {
       "id": "CORE-01-08-01",
       "source": "docs/rules/000-core.md",
-      "line": 369
+      "line": 378
     },
     {
       "id": "CORE-01-08-02",
       "source": "docs/rules/000-core.md",
-      "line": 211
+      "line": 220
     },
     {
       "id": "CORE-01-08-03",
       "source": "docs/rules/000-core.md",
-      "line": 372
+      "line": 381
     },
     {
       "id": "CORE-01-08-04",
       "source": "docs/rules/000-core.md",
-      "line": 374
+      "line": 383
     },
     {
       "id": "CORE-01-08-05",
       "source": "docs/rules/000-core.md",
-      "line": 375
+      "line": 384
     },
     {
       "id": "CORE-01-08-06",
       "source": "docs/rules/000-core.md",
-      "line": 376
+      "line": 385
     },
     {
       "id": "CORE-01-08-06A",
       "source": "docs/rules/000-core.md",
-      "line": 378
+      "line": 387
     },
     {
       "id": "CORE-01-08-06B",
       "source": "docs/rules/000-core.md",
-      "line": 379
+      "line": 388
     },
     {
       "id": "CORE-01-08-06C",
       "source": "docs/rules/000-core.md",
-      "line": 381
+      "line": 390
     },
     {
       "id": "CORE-01-08-06C.1",
       "source": "docs/rules/000-core.md",
-      "line": 382
+      "line": 391
     },
     {
       "id": "CORE-01-08-06D",
       "source": "docs/rules/000-core.md",
-      "line": 383
+      "line": 211
     },
     {
       "id": "CORE-01-08-06E",
       "source": "docs/rules/000-core.md",
-      "line": 195
+      "line": 196
     },
     {
       "id": "CORE-01-08-06F",
       "source": "docs/rules/000-core.md",
-      "line": 386
+      "line": 396
     },
     {
       "id": "CORE-01-08-07",
       "source": "docs/rules/000-core.md",
-      "line": 209
+      "line": 218
     },
     {
       "id": "CORE-01-08-08",
       "source": "docs/rules/000-core.md",
-      "line": 211
+      "line": 220
     },
     {
       "id": "CORE-01-08-08A",
       "source": "docs/rules/000-core.md",
-      "line": 390
+      "line": 400
     },
     {
       "id": "CORE-01-08-09",
       "source": "docs/rules/000-core.md",
-      "line": 391
+      "line": 401
     },
     {
       "id": "CORE-01-08-10",
       "source": "docs/rules/000-core.md",
-      "line": 392
+      "line": 402
     },
     {
       "id": "CORE-01-08-10A",
       "source": "docs/rules/000-core.md",
-      "line": 209
+      "line": 218
     },
     {
       "id": "CORE-01-09",
@@ -1080,27 +1085,27 @@
     {
       "id": "CORE-01-09-01",
       "source": "docs/rules/000-core.md",
-      "line": 399
+      "line": 409
     },
     {
       "id": "CORE-01-09-01A",
       "source": "docs/rules/000-core.md",
-      "line": 401
+      "line": 411
     },
     {
       "id": "CORE-01-09-02",
       "source": "docs/rules/000-core.md",
-      "line": 401
+      "line": 411
     },
     {
       "id": "CORE-01-09-03",
       "source": "docs/rules/000-core.md",
-      "line": 405
+      "line": 415
     },
     {
       "id": "CORE-01-09-04",
       "source": "docs/rules/000-core.md",
-      "line": 406
+      "line": 416
     },
     {
       "id": "CORE-01-10",
@@ -1110,22 +1115,22 @@
     {
       "id": "CORE-01-10-01",
       "source": "docs/rules/000-core.md",
-      "line": 412
+      "line": 422
     },
     {
       "id": "CORE-01-10-02",
       "source": "docs/rules/000-core.md",
-      "line": 413
+      "line": 423
     },
     {
       "id": "CORE-01-10-03",
       "source": "docs/rules/000-core.md",
-      "line": 414
+      "line": 424
     },
     {
       "id": "CORE-01-10-04",
       "source": "docs/rules/000-core.md",
-      "line": 415
+      "line": 425
     },
     {
       "id": "EXP-01-00",
@@ -2600,22 +2605,22 @@
     {
       "id": "VAR-01-01-01",
       "source": "docs/rules/000-core.md",
-      "line": 421
+      "line": 431
     },
     {
       "id": "VAR-01-01-02",
       "source": "docs/rules/000-core.md",
-      "line": 422
+      "line": 432
     },
     {
       "id": "VAR-01-01-03",
       "source": "docs/rules/000-core.md",
-      "line": 423
+      "line": 433
     },
     {
       "id": "VAR-01-01-04",
       "source": "docs/rules/000-core.md",
-      "line": 424
+      "line": 434
     },
     {
       "id": "VAR-01-01-05",
@@ -2625,22 +2630,22 @@
     {
       "id": "VAR-01-01-06",
       "source": "docs/rules/000-core.md",
-      "line": 426
+      "line": 436
     },
     {
       "id": "VAR-01-01-07",
       "source": "docs/rules/000-core.md",
-      "line": 427
+      "line": 437
     },
     {
       "id": "VAR-01-01-08",
       "source": "docs/rules/000-core.md",
-      "line": 429
+      "line": 439
     },
     {
       "id": "VAR-01-02-01",
       "source": "docs/rules/000-core.md",
-      "line": 431
+      "line": 441
     },
     {
       "id": "VAR-01-02-02",
@@ -2650,32 +2655,32 @@
     {
       "id": "VAR-01-02-03",
       "source": "docs/rules/000-core.md",
-      "line": 433
+      "line": 443
     },
     {
       "id": "VAR-01-02-04",
       "source": "docs/rules/000-core.md",
-      "line": 434
+      "line": 444
     },
     {
       "id": "VAR-01-02-05",
       "source": "docs/rules/000-core.md",
-      "line": 435
+      "line": 445
     },
     {
       "id": "VAR-01-02-06",
       "source": "docs/rules/000-core.md",
-      "line": 436
+      "line": 446
     },
     {
       "id": "VAR-01-02-07",
       "source": "docs/rules/000-core.md",
-      "line": 437
+      "line": 447
     },
     {
       "id": "VAR-01-02-08",
       "source": "docs/rules/000-core.md",
-      "line": 438
+      "line": 448
     }
   ]
 }

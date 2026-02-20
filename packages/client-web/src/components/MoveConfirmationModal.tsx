@@ -13,7 +13,12 @@ export const MoveConfirmationModal: React.FC<Props> = ({ intent, onConfirm, onCa
     const consequences = intent.consequences || [];
     const description = intent.description;
 
-    const title = intent.moveType === 'placeInfluence' ? 'Confirm Place Influence' : 'Confirm Move Influence';
+    const titleMap: Record<string, string> = {
+        placeInfluence: 'Confirm Place Influence',
+        moveInfluence: 'Confirm Move Influence',
+        formalizeInfluence: 'Confirm Formalize Influence'
+    };
+    const title = titleMap[intent.moveType] ?? `Confirm ${intent.moveType}`;
 
     return (
         <div className="pending-choice-overlay" data-testid="move-confirmation-modal">
@@ -28,6 +33,11 @@ export const MoveConfirmationModal: React.FC<Props> = ({ intent, onConfirm, onCa
                     {intent.moveType === 'moveInfluence' && (
                         <p style={{ margin: '0 0 12px 0' }}>
                             From <strong>{intent.payload.sourceId}</strong> to <strong>{intent.payload.targetId}</strong>
+                        </p>
+                    )}
+                    {intent.moveType === 'formalizeInfluence' && (
+                        <p style={{ margin: '0 0 12px 0' }}>
+                            Committee: <strong>{intent.payload.committeeTileId}</strong>
                         </p>
                     )}
 

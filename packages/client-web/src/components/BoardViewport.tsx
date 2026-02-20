@@ -13,6 +13,7 @@ type BoardViewportGameProps = {
     placeTileIntents: LegalIntent[];
     moveInfluenceIntents?: LegalIntent[];
     placeInfluenceIntents?: LegalIntent[];
+    formalizeInfluenceIntents?: LegalIntent[];
     actionMode?: string;
     moveInfluenceSourceId?: string | null;
     ghostCoords: string[];
@@ -150,6 +151,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             placeTileIntents={gameProps!.placeTileIntents}
                                             moveInfluenceIntents={gameProps!.moveInfluenceIntents}
                                             placeInfluenceIntents={gameProps!.placeInfluenceIntents}
+                                            formalizeInfluenceIntents={gameProps!.formalizeInfluenceIntents}
                                             actionMode={gameProps!.actionMode}
                                             moveInfluenceSourceId={gameProps!.moveInfluenceSourceId}
                                             ghostCoords={gameProps!.ghostCoords}

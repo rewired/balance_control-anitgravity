@@ -1,7 +1,7 @@
 import type { LegalIntent } from '@balance-control/game';
 import type { IntentViewModel } from '../useIntentViewModel';
 
-export type InteractionActionMode = 'none' | 'placeInfluence' | 'moveInfluence';
+export type InteractionActionMode = 'none' | 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence';
 
 export interface InteractionController {
     /** The currently selected tile for inspection. */
@@ -18,6 +18,9 @@ export interface InteractionController {
     /** Source tile for Move Influence mode. */
     moveInfluenceSourceId: string | null;
 
+    /** Current active wizard state. */
+    wizard: { kind: 'formalize'; committeeTileId: string } | null;
+
     /** Sets the current action mode. */
     setActionMode: (mode: InteractionActionMode) => void;
     /** Selects a tile by ID and coordinate. */
@@ -32,4 +35,6 @@ export interface InteractionController {
     resolveChoice: (intent: LegalIntent) => void;
     /** Dispatches an intent immediately without confirmation. */
     dispatchIntent: (intent: LegalIntent) => void;
+    /** Closes the current active wizard. */
+    closeWizard: () => void;
 }

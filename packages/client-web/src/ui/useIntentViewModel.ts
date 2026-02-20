@@ -62,6 +62,7 @@ export type IntentViewModel = {
     };
     political: {
         others: LegalIntent[];
+        formalizeInfluence: LegalIntent[];
     };
     ghostCoords: string[];
 };
@@ -95,6 +96,7 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
 
     const placeTile = input.intents.filter((intent) => intent.moveType === 'placeTile');
     const passTilePlacement = input.intents.find((intent) => intent.moveType === 'passTilePlacement') ?? null;
+    const formalizeInfluence = input.intents.filter((intent) => intent.moveType === 'formalizeInfluence');
 
     const baseOthers = input.intents.filter((intent) => {
         if (intent.moveType === 'resolveChoice') return false;
@@ -102,6 +104,7 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         if (intent.moveType === 'placeInfluence') return false;
         if (intent.moveType === 'moveInfluence') return false;
         if (intent.moveType === 'passTilePlacement') return false;
+        if (intent.moveType === 'formalizeInfluence') return false;
         return true;
     });
 
@@ -122,7 +125,10 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         stagedTileId: input.stagedTileId,
         pendingChoice: { resolveChoice },
         drawAndPlace: { placeTile, passTilePlacement },
-        political: { others: baseOthers },
+        political: {
+            others: baseOthers,
+            formalizeInfluence
+        },
         ghostCoords
     };
 }
