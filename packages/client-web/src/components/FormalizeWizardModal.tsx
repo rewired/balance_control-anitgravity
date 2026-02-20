@@ -2,6 +2,7 @@ import React from 'react';
 import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import type { FormalizeGroup } from '../ui/interaction/formalizeHelpers';
+import { getObjectLabel } from '../ui/interaction/labelHelpers';
 
 interface FormalizeWizardModalProps {
     open: boolean;
@@ -11,19 +12,6 @@ interface FormalizeWizardModalProps {
     onSelectIntent: (intent: LegalIntent) => void;
     onClose: () => void;
 }
-
-/**
- * Helper to get a human-readable label for a resource ID.
- * @remarks Presentation-only.
- */
-const getResourceLabel = (G: GameState, resourceId: string): string => {
-    const obj = G.objects[resourceId];
-    if (!obj) return resourceId;
-    if (obj.type === 'Resource') {
-        return obj.resort || resourceId;
-    }
-    return resourceId;
-};
 
 /**
  * Wizard for selecting FormalizeInfluence parameters.
@@ -72,7 +60,7 @@ export const FormalizeWizardModal: React.FC<FormalizeWizardModalProps> = ({
 
                     <div className="payment-options" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {groups.map((group) => {
-                            const paymentLabels = group.paymentResourceIds.map((id) => getResourceLabel(G, id).toUpperCase());
+                            const paymentLabels = group.paymentResourceIds.map((id) => getObjectLabel(G, id).toUpperCase());
 
                             return (
                                 <div key={group.paymentKey} className="payment-group" style={{ border: 'var(--border-glass)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
@@ -82,7 +70,7 @@ export const FormalizeWizardModal: React.FC<FormalizeWizardModalProps> = ({
                                     <div className="variants" style={{ display: 'flex', flexDirection: 'column' }}>
                                         {group.variants.map((intent, idx) => {
                                             const extra = (intent.payload?.extraResourceIds as string[]) ?? [];
-                                            const extraLabels = extra.map((id) => getResourceLabel(G, id).toUpperCase());
+                                            const extraLabels = extra.map((id) => getObjectLabel(G, id).toUpperCase());
                                             const label = extra.length > 0
                                                 ? `Include extra: ${extraLabels.join(', ')}`
                                                 : 'Standard payment (no extras)';

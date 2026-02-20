@@ -1,13 +1,16 @@
 import React from 'react';
 import { LegalIntent } from '@balance-control/game';
+import type { GameState } from '@balance-control/rules';
+import { getObjectLabel } from '../ui/interaction/labelHelpers';
 
 interface Props {
+    G: GameState;
     intent: LegalIntent | null;
     onConfirm: () => void;
     onCancel: () => void;
 }
 
-export const MoveConfirmationModal: React.FC<Props> = ({ intent, onConfirm, onCancel }) => {
+export const MoveConfirmationModal: React.FC<Props> = ({ G, intent, onConfirm, onCancel }) => {
     if (!intent) return null;
 
     const consequences = intent.consequences || [];
@@ -16,9 +19,16 @@ export const MoveConfirmationModal: React.FC<Props> = ({ intent, onConfirm, onCa
     const titleMap: Record<string, string> = {
         placeInfluence: 'Confirm Place Influence',
         moveInfluence: 'Confirm Move Influence',
-        formalizeInfluence: 'Confirm Formalize Influence'
+        formalizeInfluence: 'Confirm Formalize Influence',
+        convertResources: 'Confirm Convert Resources'
     };
-    const title = titleMap[intent.moveType] ?? `Confirm ${intent.moveType}`;
+    let title = titleMap[intent.moveType];
+    if (!title && intent.moveType.endsWith('.takeMeasure')) {
+        title = 'Confirm Take Measure';
+    }
+    if (!title) {
+        title = `Confirm ${intent.moveType}`;
+    }
 
     return (
         <div className="pending-choice-overlay" data-testid="move-confirmation-modal">
@@ -38,6 +48,16 @@ export const MoveConfirmationModal: React.FC<Props> = ({ intent, onConfirm, onCa
                     {intent.moveType === 'formalizeInfluence' && (
                         <p style={{ margin: '0 0 12px 0' }}>
                             Committee: <strong>{intent.payload.committeeTileId}</strong>
+                        </p>
+                    )}
+                    {intent.moveType === 'convertResources' && (
+                        <p style={{ margin: '0 0 12px 0' }}>
+                            Grassroots: <strong>{intent.payload.grassrootsTileId}</strong> &rarr; Output: <strong>{intent.payload.outputResort}</strong>
+                        </p>
+                    )}
+                    {intent.moveType.endsWith('.takeMeasure') && (
+                        <p style={{ margin: '0 0 12px 0' }}>
+                            Measure: <strong>{getObjectLabel(G, intent.payload)}</strong>
                         </p>
                     )}
 

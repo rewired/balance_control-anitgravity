@@ -167,6 +167,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     moveInfluenceIntents={vm.intents.filter(i => i.moveType === 'moveInfluence')}
                     placeInfluenceIntents={vm.intents.filter(i => i.moveType === 'placeInfluence')}
                     formalizeInfluenceIntents={vm.political.formalizeInfluence}
+                    convertResourcesIntents={vm.political.convertResources}
                     actionMode={actionMode}
                     moveInfluenceSourceId={moveInfluenceSourceId}
                     ghostCoords={placementGhostCoords}
@@ -257,6 +258,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                 <div className="controls-container glass-panel">
                     <ActionDock
                         isActive={isActive}
+                        G={G}
                         controller={controller}
                     />
                 </div>

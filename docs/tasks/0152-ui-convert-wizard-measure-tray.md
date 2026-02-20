@@ -98,8 +98,8 @@ Additionally, expansions can introduce new move types, so we keep a safe fallbac
 
 ## 7) Acceptance criteria (frozen)
 
-- [ ] ConvertResources playable via wizard; no flat explosion list required.
-- [ ] Measures are visible and selectable via tray when present.
-- [ ] Unknown intents remain accessible via fallback list.
-- [ ] PendingChoice still blocks everything else.
-- [ ] Tests green.
+- [x] ConvertResources playable via wizard; no flat explosion list required.
+- [x] Measures are visible and selectable via tray when present.
+- [x] Unknown intents remain accessible via fallback list.
+- [x] PendingChoice still blocks everything else.
+- [x] Tests green.
