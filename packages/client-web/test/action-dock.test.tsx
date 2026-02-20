@@ -19,7 +19,9 @@ describe('ActionDock', () => {
             vm,
             actionMode: 'none',
             setActionMode: vi.fn(),
-            intents: intents
+            intents: intents,
+            draft: { intent: null },
+            interactionState: 'selectingAction'
         } as any;
 
         render(
@@ -43,7 +45,9 @@ describe('ActionDock', () => {
             vm,
             actionMode: 'placeInfluence',
             setActionMode: vi.fn(),
-            intents: intents
+            intents: intents,
+            draft: { intent: null },
+            interactionState: 'selectingParams'
         } as any;
 
         render(
@@ -58,7 +62,7 @@ describe('ActionDock', () => {
         expect(button.className).toContain('btn-primary');
     });
 
-    it('shows hint when in placeInfluence mode', () => {
+    it('shows Current Action Panel with step label when in placeInfluence mode', () => {
         const intents = [
             { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } }
         ] as any;
@@ -67,7 +71,9 @@ describe('ActionDock', () => {
             vm,
             actionMode: 'placeInfluence',
             setActionMode: vi.fn(),
-            intents: intents
+            intents: intents,
+            draft: { intent: null },
+            interactionState: 'selectingParams'
         } as any;
 
         render(
@@ -78,7 +84,43 @@ describe('ActionDock', () => {
             />
         );
 
-        expect(screen.getByText('Select a target tile on the board to place influence.')).toBeDefined();
+        // Check for Current Action Panel elements
+        expect(screen.getByText('Active Action')).toBeDefined();
+
+        const currentPanel = screen.getByTestId('current-action-panel');
+        // Use within to find text specifically inside the current panel
+        expect(screen.getByTestId('current-action-panel')).toBeDefined();
+        // Since getByText searches globally, verify that we can find the text somewhere,
+        // but to avoid ambiguity error we can check if it's contained in the panel
+        expect(currentPanel.textContent).toContain('Place Influence');
+
+        expect(screen.getByText('Step')).toBeDefined();
+        expect(screen.getByText('Select target')).toBeDefined();
+    });
+
+    it('shows group headers', () => {
+        const intents = [] as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
+        const controller = {
+            vm,
+            actionMode: 'none',
+            setActionMode: vi.fn(),
+            intents: intents,
+            draft: { intent: null },
+            interactionState: 'selectingAction'
+        } as any;
+
+        render(
+            <ActionDock
+                isActive={true}
+                G={{} as any}
+                controller={controller}
+            />
+        );
+
+        expect(screen.getByText('Influence')).toBeDefined();
+        expect(screen.getByText('Committees')).toBeDefined();
+        expect(screen.getByText('Economy')).toBeDefined();
     });
 
     it('proposes a secondary action exactly once', () => {
@@ -92,7 +134,9 @@ describe('ActionDock', () => {
             proposeIntent,
             actionMode: 'none',
             setActionMode: vi.fn(),
-            intents: intents
+            intents: intents,
+            draft: { intent: null },
+            interactionState: 'selectingAction'
         } as any;
 
         render(
@@ -103,16 +147,14 @@ describe('ActionDock', () => {
             />
         );
 
-        const summary = screen.getByText('More actions');
-        fireEvent.click(summary);
-
+        expect(screen.getByText('Expansions / Other')).toBeDefined();
         const moveButton = screen.getByText('unknownAction');
         fireEvent.click(moveButton);
         expect(proposeIntent).toHaveBeenCalledTimes(1);
         expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
     });
 
-    it('shows confirmation UI when interactionState is draftReady', () => {
+    it('shows confirmation UI in Current Action Panel when interactionState is draftReady', () => {
         const confirmDraft = vi.fn();
         const cancelDraft = vi.fn();
         const draftedIntent = { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } };
@@ -140,6 +182,7 @@ describe('ActionDock', () => {
 
         expect(screen.getByTestId('action-dock-draft')).toBeDefined();
         expect(screen.getByText('placeInfluence')).toBeDefined();
+        expect(screen.getByText('Preview')).toBeDefined(); // Step label
 
         fireEvent.click(screen.getByTestId('btn-confirm-draft'));
         expect(confirmDraft).toHaveBeenCalledTimes(1);
@@ -148,7 +191,7 @@ describe('ActionDock', () => {
         expect(cancelDraft).toHaveBeenCalledTimes(1);
     });
 
-    it('hides normal action buttons when interactionState is draftReady', () => {
+    it('hides normal action buttons (group list) when interactionState is draftReady', () => {
         const controller = {
             vm: {
                 stage: 'politicalAction',
@@ -169,6 +212,8 @@ describe('ActionDock', () => {
         );
 
         expect(screen.queryByTestId('btn-mode-place-influence')).toBeNull();
+        expect(screen.queryByText('Influence')).toBeNull();
+        expect(screen.queryByText('Committees')).toBeNull();
     });
 
     it('shows edit controls when draft is ready (placeInfluence)', () => {

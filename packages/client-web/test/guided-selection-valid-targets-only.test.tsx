@@ -83,16 +83,16 @@ describe('Guided selection - valid targets only', () => {
         fireEvent.click(moveInfluenceBtn);
 
         // Check initial hint
-        expect(screen.getByText(/Select source tile on the board/)).toBeTruthy();
+        expect(screen.getByText(/Select source/)).toBeTruthy();
 
         // 2. Click INVALID tile (tile_gamma)
         const tileGamma = screen.getByTestId('hex-tile-1_0');
         fireEvent.click(tileGamma);
 
         // Expect:
-        // - Hint still says "Select source tile" (meaning moveInfluenceSourceId is still null)
+        // - Hint still says "Select source" (meaning moveInfluenceSourceId is still null)
         // - Inspector shows tile_gamma (meaning inspection still works)
-        expect(screen.getByText(/Select source tile on the board/)).toBeTruthy();
+        expect(screen.getByText(/Select source/)).toBeTruthy();
         expect(screen.getByTestId('inspector-coord').textContent).toBe('1,0');
 
         // 3. Click VALID source tile (tile_alpha)
@@ -100,8 +100,8 @@ describe('Guided selection - valid targets only', () => {
         fireEvent.click(tileAlpha);
 
         // Expect:
-        // - Hint changes to "Select target tile" (meaning moveInfluenceSourceId is set)
-        expect(screen.getByText(/Select target tile on the board/)).toBeTruthy();
+        // - Hint changes to "Select destination" (meaning moveInfluenceSourceId is set)
+        expect(screen.getByText(/Select destination/)).toBeTruthy();
         expect(screen.getByTestId('inspector-coord').textContent).toBe('0,0');
     });
 });

@@ -12,7 +12,9 @@ describe('Controls - StartCommittee targeting', () => {
             vm,
             actionMode: 'none',
             setActionMode: vi.fn(),
-            intents: intents
+            intents: intents,
+            draft: { intent: null },
+            interactionState: 'selectingAction'
         } as any;
 
         render(
