@@ -52,6 +52,9 @@ jobs:
       - name: Run hand-off verification
         run: pnpm run verify:handoff
 
+      - name: Check spec-anchor compliance
+        run: pnpm run check:spec-anchors
+
       - name: Run test suite
         run: pnpm -w test
 

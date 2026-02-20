@@ -1,18 +1,18 @@
 # Task 0157 — Gate CI on Spec-Anchor Compliance + Document Workflow
 
-Status: TODO
+Status: DONE
 
 ## Meta
 - Owner: Codex
 - Area: CI / workflow hardening
 - Packages: repo tooling + docs
 - Skills: S01, S03, S08
-- affected_guardrails: GR-TBD (MUST be replaced after reading `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`)
+- affected_guardrails: NONE
 
 ## 0) Preflight (mandatory)
-1. Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. Replace `affected_guardrails: GR-TBD` above with the correct GR-xxx list (or `NONE`).
-3. Ensure Tasks 0154–0156 are complete or the repo is currently clean:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Replace `affected_guardrails: GR-TBD` above with the correct GR-xxx list (or `NONE`).
+3. [x] Ensure Tasks 0154–0156 are complete or the repo is currently clean:
    - `pnpm check:spec-anchors` should pass locally.
 
 ## 1) Goal
@@ -62,8 +62,8 @@ Make spec-anchor compliance non-optional by:
 - Docs clearly state: anchors are canonical; no invented rule IDs.
 
 ## 9) PR Checklist (must complete in-task)
-- [ ] Updated this task file in `docs/tasks/` and checked boxes.
-- [ ] Guardrails listed accurately (GR-xxx or `NONE`).
+- [x] Updated this task file in `docs/tasks/` and checked boxes.
+- [x] Guardrails listed accurately (GR-xxx or `NONE`).
 - [ ] Exactly one commit with correct message format.
 - [ ] Postflight appended to commit message (git status/diff/tests).
 - [ ] No dirty working tree after postflight amend.

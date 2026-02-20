@@ -31,6 +31,8 @@ and prevent “creative reinterpretation” during refactors.
      - `@remarks infrastructure; no direct SPEC binding`
 4. **Enforce exact spelling**
    - Match casing and punctuation exactly (no aliases).
+5. **Verify with Tooling**
+   - Run `pnpm run check:spec-anchors` to ensure all new/modified rule references are valid.
 
 ## Guardrails
 - Never invent anchors.
