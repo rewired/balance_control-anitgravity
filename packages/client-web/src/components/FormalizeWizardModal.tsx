@@ -16,7 +16,9 @@ interface FormalizeWizardModalProps {
 /**
  * Wizard for selecting FormalizeInfluence parameters.
  * @remarks Presentation-only (ARCH-01).
- * @see CORE-01-04-13..15
+ * @see CORE-01-04-13
+ * @see CORE-01-04-14
+ * @see CORE-01-04-15
  */
 export const FormalizeWizardModal: React.FC<FormalizeWizardModalProps> = ({
     open,

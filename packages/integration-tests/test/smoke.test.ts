@@ -87,6 +87,6 @@ describe('Integration: Real Pack Combinations', () => {
          const decks = EnginePackRegistry.getMeasureDeckDescriptors(state);
 
          // We expect decks from enabled expansions (if they have any)
-         // EXP-02 and EXP-03 usually have measure decks.
+         // EXP-02-00 and EXP-03-00 usually have measure decks.
     });
 });

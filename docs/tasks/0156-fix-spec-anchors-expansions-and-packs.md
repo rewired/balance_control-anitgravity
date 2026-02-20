@@ -1,19 +1,19 @@
 # Task 0156 — Fix Spec-Anchor Violations in `packages/expansion-*` and `@balance-control/packs`
 
-Status: TODO
+Status: DONE
 
 ## Meta
 - Owner: Codex
 - Area: Rule traceability / expansions hygiene
 - Packages: `packages/expansion-01`, `packages/expansion-02`, `packages/expansion-03`, `packages/packs` (or current pack entrypoint package)
 - Skills: S01, S03, S04, S06, S08
-- affected_guardrails: GR-TBD (MUST be replaced after reading `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`)
+- affected_guardrails: GR-002, GR-008, GR-012
 
 ## 0) Preflight (mandatory)
-1. Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. Replace `affected_guardrails: GR-TBD` above with the correct GR-xxx list (or `NONE`).
-3. Ensure Task 0154 is complete (the checker exists).
-4. Baseline:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Replace `affected_guardrails: GR-TBD` above with the correct GR-xxx list (or `NONE`).
+3. [x] Ensure Task 0154 is complete (the checker exists).
+4. [x] Baseline:
    - `pnpm check:spec-anchors` (record output for Postflight).
 
 ## 1) Goal
@@ -61,11 +61,11 @@ Bring expansion packages and pack wrappers into compliance with canonical spec a
 - No new dependency edges from `@balance-control/game` to `@balance-control/expansion-*`.
 
 ## 9) PR Checklist (must complete in-task)
-- [ ] Updated this task file in `docs/tasks/` and checked boxes.
-- [ ] Guardrails listed accurately (GR-xxx or `NONE`).
-- [ ] Exactly one commit with correct message format.
-- [ ] Postflight appended to commit message (git status/diff/tests).
-- [ ] No dirty working tree after postflight amend.
+- [x] Updated this task file in `docs/tasks/` and checked boxes.
+- [x] Guardrails listed accurately (GR-xxx or `NONE`).
+- [x] Exactly one commit with correct message format.
+- [x] Postflight appended to commit message (git status/diff/tests).
+- [x] No dirty working tree after postflight amend.
 
 ## 10) Notes
 - If expansions legitimately reference CORE anchors, that is fine; they still must be canonical.

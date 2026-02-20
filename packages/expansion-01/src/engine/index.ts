@@ -8,6 +8,10 @@ const CORE_ZONES = {
     Board: 'Board'
 } as const;
 
+/**
+ * Canonical measure IDs for EXP-01-00.
+ * @expansion EXP-01-00
+ */
 export const MEASURE_IDS = [
     'M01', 'M02', 'M03', 'M04', 'M05',
     'M06', 'M07', 'M08', 'M09', 'M10'
@@ -26,6 +30,13 @@ const MEASURE_DETAILS: Record<string, { name: string, cost: Record<string, numbe
     'M10': { name: 'Supplemental Budget', cost: { ECO: 1 } },
 };
 
+/**
+ * Individual atom builders for EXP-01-00 measures.
+ * @expansion EXP-01-00
+ * @deterministic
+ * @pure
+ * @rule EXP-01-08
+ */
 export const MEASURE_ATOM_BUILDERS: Record<string, (G: GameState, payload: any) => any[] | null> = {
     'M01': (G, payload) => [
         { kind: 'resource.pay', playerId: payload.playerId, amount: 3, resorts: ['DOM', 'ECO', 'INF'] },
@@ -150,6 +161,10 @@ function buildM04M05(G: GameState, measureId: string, payload: any): any[] | nul
 }
 
 
+/**
+ * Expansion Definition for EXP-01-00: Economy & Labor.
+ * @expansion EXP-01-00
+ */
 export const Expansion01: ExpansionDefinition = {
     id: 'exp01',
     name: EXP_01_NAME,
@@ -173,6 +188,13 @@ export const Expansion01: ExpansionDefinition = {
         }
     ],
 
+    /**
+     * EXP-01-00 Setup logic.
+     * @expansion EXP-01-00
+     * @deterministic
+     * @sideEffects
+     * @rule EXP-01-03
+     */
     onSetup: (G: GameState, ctx: any) => {
         if (G.secret) G.secret.playedMeasureThisRound = {};
 
@@ -259,11 +281,22 @@ export const Expansion01: ExpansionDefinition = {
         // Porting to engine atoms soon...
     },
 
+    /**
+     * Dispatches to specific measure atom builders.
+     * @expansion EXP-01-00
+     * @deterministic
+     * @pure
+     * @rule EXP-01-07
+     */
     getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
         const builder = MEASURE_ATOM_BUILDERS[measureId];
         return builder ? builder(G, payload) : null;
     },
 
+    /**
+     * Specialized effect handlers for EXP-01-00 triggers.
+     * @expansion EXP-01-00
+     */
     effectHandlers: {
         'CONVERT': (G: GameState, ctx: any, effect: any, utils: any) => {
             const { playerId, resourceIds } = effect.payload;
