@@ -4,8 +4,10 @@ import { EffectResolver, lookupMeasureDeckForObjectId } from '@balance-control/g
 /**
  * Standard Expansion Move: Take a measure from the open display.
  * Logic is generic and depends on zone naming conventions.
- * @expansion EXP-01|02|03
- * @requires SPEC-CORE-01
+ * @expansion EXP-01-00
+ * @expansion EXP-02-00
+ * @expansion EXP-03-00
+ * @requires CORE-01-00
  * @deterministic
  * @sideEffects
  * @rule EXP-01-06
@@ -45,8 +47,10 @@ export const takeMeasure = ({ G, ctx, events }: any, measureObjectId: string) =>
 
 /**
  * Standard Expansion Move: Play a measure from hand.
- * @expansion EXP-01|02|03
- * @requires SPEC-CORE-01
+ * @expansion EXP-01-00
+ * @expansion EXP-02-00
+ * @expansion EXP-03-00
+ * @requires CORE-01-00
  * @deterministic
  * @sideEffects
  * @rule EXP-01-06

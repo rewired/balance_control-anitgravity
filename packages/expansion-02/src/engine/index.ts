@@ -1,8 +1,16 @@
 import { ExpansionDefinition, GameState, TileType, GameObject, RegulationType, CoreZoneName } from '@balance-control/rules';
 
 const EXP_02_NAME = 'EXP-02 Security & Order';
+/**
+ * Inner Order Hotspot Tile ID for EXP-02-00.
+ * @expansion EXP-02-00
+ */
 export const EXP02_TILE_INNER_ORDER_ID = 'tile_inner_order' as const;
 
+/**
+ * Canonical measure IDs for EXP-02-00.
+ * @expansion EXP-02-00
+ */
 export const MEASURE_IDS = [
     'M01', 'M02', 'M03', 'M04', 'M05',
     'M06', 'M07', 'M08', 'M09', 'M10',
@@ -27,6 +35,13 @@ const MEASURE_DETAILS: Record<string, { name: string, cost: Record<string, numbe
     'M15': { name: 'Situation Assessment', cost: { SEC: 1 } },
 };
 
+/**
+ * Individual atom builders for EXP-02-00 measures.
+ * @expansion EXP-02-00
+ * @deterministic
+ * @pure
+ * @rule EXP-02-08
+ */
 export const MEASURE_ATOM_BUILDERS: Record<string, (G: GameState, payload: any) => any[] | null> = {
     'M01': (G, payload) => [
         { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['SEC', 'INF'] },
@@ -130,6 +145,10 @@ function buildM03M04(G: GameState, payload: any): any[] | null {
     ];
 }
 
+/**
+ * Expansion Definition for EXP-02-00: Security & Order.
+ * @expansion EXP-02-00
+ */
 export const Expansion02: ExpansionDefinition = {
     id: 'exp02',
     name: EXP_02_NAME,
@@ -155,6 +174,13 @@ export const Expansion02: ExpansionDefinition = {
         }
     ],
 
+    /**
+     * EXP-02-00 Setup logic.
+     * @expansion EXP-02-00
+     * @deterministic
+     * @sideEffects
+     * @rule EXP-02-03
+     */
     onSetup: (G: GameState, ctx: any) => {
         // 1. Initialize Zones
         G.zones.RegulationSupply = { id: 'RegulationSupply', name: 'Regulation Supply', items: [] };
@@ -227,11 +253,22 @@ export const Expansion02: ExpansionDefinition = {
         console.log('EXP-02 Setup Complete.');
     },
 
+    /**
+     * Dispatches to specific measure atom builders.
+     * @expansion EXP-02-00
+     * @deterministic
+     * @pure
+     * @rule EXP-02-07
+     */
     getMeasureAtoms: (G: GameState, measureId: string, payload: any): any[] | null => {
         const builder = MEASURE_ATOM_BUILDERS[measureId];
         return builder ? builder(G, payload) : null;
     },
 
+    /**
+     * Specialized effect handlers for EXP-02-00 triggers.
+     * @expansion EXP-02-00
+     */
     effectHandlers: {
         'HOTSPOT_RESOLUTION': (G: GameState, ctx: any, effect: any, utils: any) => {
             if (effect.payload.tileId === EXP02_TILE_INNER_ORDER_ID) {

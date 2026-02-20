@@ -1,7 +1,7 @@
 /**
- * Expansion Pack: Economy & Labor (EXP-01).
- * @expansion EXP-01
- * @requires SPEC-CORE-01
+ * Expansion Pack: Economy & Labor (EXP-01-00).
+ * @expansion EXP-01-00
+ * @requires CORE-01-00
  * @deterministic
  * @rule EXP-01-07
  */
@@ -20,7 +20,7 @@ const EXP01_PACK_MANIFEST: PackManifest = {
 };
 
 /**
- * Engine Pack Definition for EXP-01.
+ * Engine Pack Definition for EXP-01-00.
  */
 export const Exp01Pack: EnginePackDefinition = {
     id: 'exp01',

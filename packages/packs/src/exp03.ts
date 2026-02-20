@@ -1,7 +1,7 @@
 /**
- * Expansion Pack: Climate & Future (EXP-03).
- * @expansion EXP-03
- * @requires SPEC-CORE-01
+ * Expansion Pack: Climate & Future (EXP-03-00).
+ * @expansion EXP-03-00
+ * @requires CORE-01-00
  * @deterministic
  * @rule EXP-03-10
  */
@@ -21,7 +21,7 @@ const EXP03_PACK_MANIFEST: PackManifest = {
 };
 
 /**
- * Engine Pack Definition for EXP-03.
+ * Engine Pack Definition for EXP-03-00.
  */
 export const Exp03Pack: EnginePackDefinition = {
     id: 'exp03',

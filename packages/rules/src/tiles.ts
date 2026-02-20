@@ -24,6 +24,6 @@ export interface Tile {
     weight?: number;
     name?: string;
     conversion?: GrassrootsConversionMetadata;
-    // EXP-01 attributes
+    // EXP-01-00 attributes
     isHotspot?: boolean;
 }

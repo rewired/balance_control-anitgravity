@@ -9,7 +9,9 @@ export interface FormalizeGroup {
 /**
  * Groups formalizeInfluence intents by committee tile and then by payment combo.
  * @remarks Presentation-only.
- * @see CORE-01-04-13..15
+ * @see CORE-01-04-13
+ * @see CORE-01-04-14
+ * @see CORE-01-04-15
  */
 export function groupFormalizeIntents(intents: LegalIntent[]): Map<string, FormalizeGroup[]> {
     const formalizeIntents = intents.filter((i) => i.moveType === 'formalizeInfluence');

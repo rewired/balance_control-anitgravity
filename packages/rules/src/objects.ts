@@ -11,7 +11,7 @@ export interface GameObject {
     // Expansion attributes
     measureId?: string;
     playCount?: number;
-    // EXP-02 attributes
+    // EXP-02-00 attributes
     regType?: RegulationType;
     targetTileId?: string;
     mode?: 'ReturnPenalty' | 'Convert';

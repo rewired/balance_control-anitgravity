@@ -1,7 +1,7 @@
 /**
- * Expansion Pack: Security & Order (EXP-02).
- * @expansion EXP-02
- * @requires SPEC-CORE-01
+ * Expansion Pack: Security & Order (EXP-02-00).
+ * @expansion EXP-02-00
+ * @requires CORE-01-00
  * @deterministic
  * @rule EXP-02-04-B
  */
@@ -20,7 +20,7 @@ const EXP02_PACK_MANIFEST: PackManifest = {
 };
 
 /**
- * Engine Pack Definition for EXP-02.
+ * Engine Pack Definition for EXP-02-00.
  */
 export const Exp02Pack: EnginePackDefinition = {
     id: 'exp02',

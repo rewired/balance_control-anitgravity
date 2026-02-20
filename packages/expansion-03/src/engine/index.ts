@@ -2,6 +2,10 @@ import { ExpansionDefinition, GameState, TileType, CoreZoneName } from '@balance
 
 const EXP_03_NAME = 'EXP-03 Climate & Future';
 
+/**
+ * Canonical measure IDs for EXP-03-00.
+ * @expansion EXP-03-00
+ */
 export const MEASURE_IDS = [
     'M01', 'M02', 'M03', 'M04', 'M05',
     'M06', 'M07', 'M08', 'M09', 'M10',
@@ -26,6 +30,13 @@ const MEASURE_DETAILS: Record<string, { name: string, cost: Record<string, numbe
     'M15': { name: 'Future Committee', cost: { CLM: 1, INF: 1, ECO: 1 } },
 };
 
+/**
+ * Individual atom builders for EXP-03-00 measures.
+ * @expansion EXP-03-00
+ * @deterministic
+ * @pure
+ * @rule EXP-03-09
+ */
 export const MEASURE_ATOM_BUILDERS: Record<string, (G: GameState, payload: any) => any[] | null> = {
     'M01': (G, payload) => [
         { kind: 'resource.pay', playerId: payload.playerId, amount: 2, resorts: ['CLM'] },
@@ -168,6 +179,10 @@ export const MEASURE_ATOM_BUILDERS: Record<string, (G: GameState, payload: any) 
     ],
 };
 
+/**
+ * Expansion Definition for EXP-03-00: Climate & Future.
+ * @expansion EXP-03-00
+ */
 export const Expansion03: ExpansionDefinition = {
     id: 'exp03',
     name: EXP_03_NAME,
@@ -192,6 +207,13 @@ export const Expansion03: ExpansionDefinition = {
         }
     ],
 
+    /**
+     * EXP-03-00 Setup logic.
+     * @expansion EXP-03-00
+     * @deterministic
+     * @sideEffects
+     * @rule EXP-03-03
+     */
     onSetup: (GValue: GameState, ctxValue: any) => {
         const G = GValue as any;
         const ctx = ctxValue as any;
@@ -254,11 +276,22 @@ export const Expansion03: ExpansionDefinition = {
         }
     },
 
+    /**
+     * Dispatches to specific measure atom builders.
+     * @expansion EXP-03-00
+     * @deterministic
+     * @pure
+     * @rule EXP-03-08
+     */
     getMeasureAtoms(G: GameState, measureId: string, payload: any): any[] | null {
         const builder = MEASURE_ATOM_BUILDERS[measureId];
         return builder ? builder(G, payload) : null;
     },
 
+    /**
+     * Specialized effect handlers for EXP-03-00 triggers.
+     * @expansion EXP-03-00
+     */
     effectHandlers: {
         'TAKE_MEASURE_EXP03': (G: GameState, ctx: any, effect: any) => {
             const { playerId, measureObjectId } = effect.payload;
