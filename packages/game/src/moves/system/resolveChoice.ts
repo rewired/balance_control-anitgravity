@@ -6,7 +6,7 @@ import { resolveChoicePayloadSchema, validateMovePayload } from '../../move-cont
 export const SystemMoves = {
     /**
      * Resolves a pending choice for a player.
-     * @remarks infrastructure; no direct SPEC binding
+     * @rule CORE-01-04-07
      * @deterministic
      * @sideEffects
      */

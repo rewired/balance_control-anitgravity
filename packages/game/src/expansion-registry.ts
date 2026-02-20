@@ -266,7 +266,7 @@ class EnginePackRegistryImpl {
 
     /**
      * Retrieves atoms for a measure from a specific expansion pack.
-     * @expansion EXP-01|02|03
+     * @expansion EXP-01-00|EXP-02-00|EXP-03-00
      * @deterministic
      * @pure
      */
@@ -290,7 +290,7 @@ class EnginePackRegistryImpl {
 
     /**
      * Retrieves all measure deck descriptors from enabled packs.
-     * @expansion EXP-01|02|03
+     * @expansion EXP-01-00|EXP-02-00|EXP-03-00
      * @deterministic
      * @pure
      */
@@ -315,7 +315,7 @@ class EnginePackRegistryImpl {
 
     /**
      * Dispatches an effect to the appropriate expansion-specific effect handler.
-     * @expansion EXP-01|02|03
+     * @expansion EXP-01-00|EXP-02-00|EXP-03-00
      * @sideEffects
      */
     public applyEffect(G: GameState, ctx: any, effect: any, contextTileId?: string, utils?: any, config?: GameConfig) {
@@ -332,8 +332,8 @@ class EnginePackRegistryImpl {
 
     /**
      * Applies production modifiers from all enabled packs.
-     * @remarks Expansion order: EXP-01 doubling first, then Climate modifications [EXP-03-10-04].
-     * @expansion EXP-01|03
+     * @remarks Expansion order: EXP-01-00 doubling first, then Climate modifications [EXP-03-10-04].
+     * @expansion EXP-01-00|EXP-03-00
      * @deterministic
      * @pure
      * @rule EXP-03-10-04

@@ -172,7 +172,7 @@ export function commitCost(
 /**
  * Calculates extra cost slots based on regulations and climate effects.
  * @remarks Climate cost increases stack additively with Regulation cost increases [EXP-03-10-02].
- * @expansion EXP-02|03
+ * @expansion EXP-02-00|EXP-03-00
  * @deterministic
  * @pure
  * @rule EXP-03-06-03

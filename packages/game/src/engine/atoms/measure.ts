@@ -6,7 +6,7 @@ import { lookupMeasureDeckForObjectId } from '../measure-deck-provider';
 
 /**
  * Executes the play of a measure.
- * @expansion EXP-01
+ * @expansion EXP-01-00
  * @deterministic
  * @sideEffects
  * @rule EXP-01-07
@@ -47,7 +47,7 @@ function handleMeasurePlay(G: GameState & { engine: EngineState }, atom: any): v
 
 /**
  * Shuffles the recycle pile into the draw pile when needed.
- * @expansion EXP-01
+ * @expansion EXP-01-00
  * @usesRNG
  * @rule CORE-01-03-02A
  * @deterministic
@@ -67,7 +67,7 @@ function handleMeasureRecycle(G: GameState & { engine: EngineState }, ctx: any, 
 
 /**
  * Handles taking a measure from the open display.
- * @expansion EXP-01
+ * @expansion EXP-01-00
  * @usesRNG
  * @rule CORE-01-03-02A
  * @deterministic
@@ -106,9 +106,9 @@ function handleMeasureTake(G: GameState & { engine: EngineState }, ctx: any, ato
 }
 
 /**
- * Atom registrations for measure lifecycle (EXP-01).
- * @expansion EXP-01
- * @requires SPEC-CORE-01
+ * Atom registrations for measure lifecycle (EXP-01-00).
+ * @expansion EXP-01-00
+ * @requires CORE-01-00
  * @deterministic
  * @rule EXP-01-07
  */

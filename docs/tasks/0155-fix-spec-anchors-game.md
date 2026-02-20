@@ -1,13 +1,13 @@
 # Task 0155 — Fix Spec-Anchor Violations in `packages/game` (CORE engine)
 
-Status: TODO
+Status: COMPLETED
 
 ## Meta
 - Owner: Codex
 - Area: Rule traceability / CORE engine hygiene
 - Packages: `packages/game`
 - Skills: S01, S03, S04, S05, S08
-- affected_guardrails: GR-TBD (MUST be replaced after reading `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`)
+- affected_guardrails: GR-002, GR-003, GR-004, GR-007, GR-008, GR-011
 
 ## 0) Preflight (mandatory)
 1. Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
@@ -67,11 +67,11 @@ Make `packages/game` pass the spec-anchor checker by:
 - TSDoc tags comply with ARCH-05 minimum set on touched exported rule-resolvers.
 
 ## 9) PR Checklist (must complete in-task)
-- [ ] Updated this task file in `docs/tasks/` and checked boxes.
-- [ ] Guardrails listed accurately (GR-xxx or `NONE`).
-- [ ] Exactly one commit with correct message format.
-- [ ] Postflight appended to commit message (git status/diff/tests).
-- [ ] No dirty working tree after postflight amend.
+- [x] Updated this task file in `docs/tasks/` and checked boxes.
+- [x] Guardrails listed accurately (GR-xxx or `NONE`).
+- [x] Exactly one commit with correct message format.
+- [x] Postflight appended to commit message (git status/diff/tests).
+- [x] No dirty working tree after postflight amend.
 
 ## 10) Notes
 - If you discover a genuine spec ambiguity (no matching anchor exists), STOP and create a DD doc per AGENTS 0.6.

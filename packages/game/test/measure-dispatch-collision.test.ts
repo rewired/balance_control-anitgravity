@@ -55,7 +55,7 @@ describe('Measure Dispatch Collision', () => {
     });
 
     it('should dispatch M01 to the correct expansion based on object ID prefix', () => {
-        // Register Pack A (simulating EXP-01)
+        // Register Pack A (simulating EXP-01-00)
         const packA = makeTestPack({
             id: 'exp01',
             measureDecks: [{
@@ -70,14 +70,14 @@ describe('Measure Dispatch Collision', () => {
             }],
             getMeasureAtoms: (G, measureId, payload) => {
                 if (measureId === 'M01') {
-                    return [{ kind: 'test.effect', source: 'EXP-01' }];
+                    return [{ kind: 'test.effect', source: 'EXP-01-00' }];
                 }
                 return null;
             }
         });
         EnginePackRegistry.registerPack(packA);
 
-        // Register Pack B (simulating EXP-02)
+        // Register Pack B (simulating EXP-02-00)
         const packB = makeTestPack({
             id: 'exp02',
             measureDecks: [{
@@ -92,7 +92,7 @@ describe('Measure Dispatch Collision', () => {
             }],
             getMeasureAtoms: (G, measureId, payload) => {
                 if (measureId === 'M01') {
-                    return [{ kind: 'test.effect', source: 'EXP-02' }];
+                    return [{ kind: 'test.effect', source: 'EXP-02-00' }];
                 }
                 return null;
             }
@@ -110,7 +110,7 @@ describe('Measure Dispatch Collision', () => {
         handler(G, {}, { kind: 'measure.play', playerId: 'p1', measureObjectId: 'obj_A_100' });
 
         expect(effectQueue.length).toBe(1);
-        expect(effectQueue[0]).toEqual({ kind: 'test.effect', source: 'EXP-01' });
+        expect(effectQueue[0]).toEqual({ kind: 'test.effect', source: 'EXP-01-00' });
 
         // Clear queue
         effectQueue.length = 0;
@@ -119,7 +119,7 @@ describe('Measure Dispatch Collision', () => {
         handler(G, {}, { kind: 'measure.play', playerId: 'p1', measureObjectId: 'obj_B_200' });
 
         expect(effectQueue.length).toBe(1);
-        expect(effectQueue[0]).toEqual({ kind: 'test.effect', source: 'EXP-02' });
+        expect(effectQueue[0]).toEqual({ kind: 'test.effect', source: 'EXP-02-00' });
     });
 
     it('should throw deterministic error if measure ID is unknown to the target expansion', () => {

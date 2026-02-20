@@ -29,7 +29,7 @@ export class EffectResolver {
     /**
      * Triggers a hook and resolves the resulting effects.
      * @remarks Stacking order follows priority; Regulations resolve in order: Blockade (1), Costs (2), Output (3).
-     * @expansion EXP-02
+     * @expansion EXP-02-00
      * @deterministic
      * @sideEffects
      * @rule EXP-02-04-B

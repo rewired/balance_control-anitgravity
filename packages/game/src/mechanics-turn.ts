@@ -80,13 +80,13 @@ export function returnMetaMarkerToSupply(G: GameState, playerId: string): void {
 }
 
 /**
- * Draws a measure (EXP-01/02 stub).
+ * Draws a measure (EXP-01-00/02 stub).
  * @remarks infrastructure; no direct SPEC binding
  * @deterministic
  * @sideEffects
  */
 export function drawMeasure(G: GameState, ctx: any) {
-    // Basic drawMeasure for EXP-01/02
+    // Basic drawMeasure for EXP-01-00/02
     // ... logic would go here, or just stub for now if not used yet
 }
 
