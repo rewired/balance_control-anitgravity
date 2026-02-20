@@ -2,7 +2,7 @@
 
 # CORE-01 Simulation Specification (Atomic, Deterministic)
 
-**Version:** 02
+**Version:** 03
 **Scope:** Core Rules v1.1.0 only, incl. variants (no expansions)
 
 ---
@@ -192,7 +192,9 @@ CORE-01-04-11 PlaceOrMoveInfluence (Place): move exactly one Influence from Pers
 
 CORE-01-04-11A Place Legality: legal only if active player has ≥1 Influence in PersonalSupply and the chosen Tile is not prohibited by restrictions (incl. Start Committee restrictions).
 
-CORE-01-04-12 PlaceOrMoveInfluence (Move): move exactly one active-player-owned Influence from a source Board Tile to a different destination Board Tile. Start Committee may not be source or destination (CORE-01-08-06E).
+CORE-01-04-12 PlaceOrMoveInfluence (Move): move exactly one active-player-owned Influence from a source Board Tile to a different adjacent destination Board Tile.
+Start Committee may not be source or destination (CORE-01-08-06E).
+If the destination Tile is not adjacent to the source Tile, the action is invalid and does not resolve; no state change occurs (CORE-01-06-00-03).
 
 CORE-01-04-12A Move Meta-Marker Update: after a successful Move, if the source Tile is a ResortTile, place active player’s Meta-Marker onto the source Tile and set mode = ReturnPenalty (removing it from any prior Tile). Otherwise, do not place the Meta-Marker as part of this move (then CORE-01-04-09A applies).
 
@@ -200,6 +202,9 @@ CORE-01-04-12B Return Penalty (Meta-Marker): If, when Move begins resolution, th
 Let R = Resource count in PersonalSupply[activePlayer]. Let N = min(10, floor(R/2)). If N > 0, choose any N Resources and move them to Noise. This choice is locked before any movement.
 
 CORE-01-04-12C PlaceOrMoveInfluence (Move) Meta-Marker Expiry: Reserved. (Persistence/return governed by CORE-01-07-03A/B and CORE-01-04-09A.)
+
+CORE-01-04-12D Move Adjacency Requirement (Canonical):
+A Move is legal only if Adjacent(sourceTile, destinationTile) = true using the current topology’s adjacency definition (CORE-01-00-T01..T03).
 
 ## FormalizeInfluence
 
@@ -380,7 +385,8 @@ CORE-01-08-06B Immunity does not override CORE-01-08-02 and does not allow placi
 
 CORE-01-08-06C Start Committee Connectivity Clarification: Start Committee may be used as connector for adjacency-derived connectivity/paths. This does not allow Influence to enter/remain/be placed on Start Committee.
 CORE-01-08-06C.1 Path/Connectivity definitions: A Path is a finite sequence of Tiles where consecutive pairs are Adjacent = true. Two Tiles are connected iff at least one Path exists between them.
-CORE-01-08-06D Start Committee “Pass-Through” Prohibition for Influence: If a path includes Start Committee, treat it as connector node only; Influence does not move onto/off of it as intermediate step.
+CORE-01-08-06D Start Committee “Pass-Through” for Influence (Canonical):
+The Start Committee may appear as an intermediate connector node in any adjacency-derived Path/Connectivity evaluation (CORE-01-08-06C.1). Influence is never placed on, moved onto, or remains on the Start Committee. If a rule permits movement/connectivity “through” the Start Committee, treat the Start Committee as transparent: the Influence changes only its source/destination Tile; no intermediate occupancy occurs.
 
 CORE-01-08-06E Targeting Restriction: Start Committee may not be destination of PlaceOrMoveInfluence (Place) and may not be source/destination of PlaceOrMoveInfluence (Move). Meta-Marker placement governed by CORE-01-02-17C/17D.
 CORE-01-08-06F Immunity Interpretation: Immunity applies to effects targeting/modifying Start Committee; it does not prohibit actions via Start Committee as explicitly defined (CORE-01-04-14A / CORE-01-08-07..10A).
