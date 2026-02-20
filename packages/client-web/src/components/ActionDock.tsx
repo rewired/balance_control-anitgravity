@@ -54,6 +54,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
 
     const hasPlaceInfluenceIntents = vm.intents.some(i => i.moveType === 'placeInfluence');
     const hasMoveInfluenceIntents = vm.intents.some(i => i.moveType === 'moveInfluence');
+    const hasFormalizeInfluenceIntents = vm.political.formalizeInfluence.length > 0;
 
     return (
         <div className="action-panel action-dock" data-testid="action-dock">
@@ -95,6 +96,14 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                         >
                             Move Influence
                         </button>
+                        <button
+                            className={actionMode === 'formalizeInfluence' ? 'btn-primary' : 'btn-secondary'}
+                            disabled={!hasFormalizeInfluenceIntents}
+                            onClick={() => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence')}
+                            data-testid="btn-mode-formalize-influence"
+                        >
+                            Formalize Influence
+                        </button>
                     </div>
                 )}
             </div>
@@ -110,6 +119,12 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                     {!moveInfluenceSourceId
                         ? 'Select source tile on the board.'
                         : 'Select target tile on the board.'}
+                </div>
+            )}
+
+            {isPoliticalAction && actionMode === 'formalizeInfluence' && (
+                <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
+                    Select a committee tile on the board to formalize.
                 </div>
             )}
 

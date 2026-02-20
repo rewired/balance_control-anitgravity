@@ -29,6 +29,7 @@ export function useGameInteractionController({
     const [proposedIntent, setProposedIntent] = useState<LegalIntent | null>(null);
     const [actionMode, setActionMode] = useState<InteractionActionMode>('none');
     const [moveInfluenceSourceId, setMoveInfluenceSourceId] = useState<string | null>(null);
+    const [wizard, setWizard] = useState<InteractionController['wizard']>(null);
 
     const stagingZoneId = `staging_${myPid}`;
     const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
@@ -42,7 +43,17 @@ export function useGameInteractionController({
         if (actionMode === 'moveInfluence' && !moveInfluenceSourceId && tileId) {
             setMoveInfluenceSourceId(tileId);
         }
-    }, [actionMode, moveInfluenceSourceId]);
+
+        if (actionMode === 'formalizeInfluence' && tileId) {
+            const hasIntents = vm.intents.some(i =>
+                i.moveType === 'formalizeInfluence' &&
+                i.payload?.committeeTileId === tileId
+            );
+            if (hasIntents) {
+                setWizard({ kind: 'formalize', committeeTileId: tileId });
+            }
+        }
+    }, [actionMode, moveInfluenceSourceId, vm.intents]);
 
     const proposeIntent = useCallback((intent: LegalIntent) => {
         setProposedIntent(intent);
@@ -71,11 +82,16 @@ export function useGameInteractionController({
         dispatchIntent(moves, intent);
     }, [moves]);
 
+    const closeWizard = useCallback(() => {
+        setWizard(null);
+    }, []);
+
     // Reset action mode when phase changes
     const stage = vm.stage;
     useEffect(() => {
         setActionMode('none');
         setMoveInfluenceSourceId(null);
+        setWizard(null);
     }, [stage]);
 
     // Handle Escape key to clear selection/proposal
@@ -87,6 +103,7 @@ export function useGameInteractionController({
                 setProposedIntent(null);
                 setActionMode('none');
                 setMoveInfluenceSourceId(null);
+                setWizard(null);
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -123,6 +140,7 @@ export function useGameInteractionController({
     const setActionModeWithSideEffects = useCallback((mode: InteractionActionMode) => {
         setActionMode(mode);
         setMoveInfluenceSourceId(null);
+        setWizard(null);
         if (mode !== 'none') {
             setSelectedTileId(null);
             setSelectedCoord(null);
@@ -136,12 +154,14 @@ export function useGameInteractionController({
         vm,
         actionMode,
         moveInfluenceSourceId,
+        wizard,
         setActionMode: setActionModeWithSideEffects,
         selectTile,
         proposeIntent,
         confirmProposedIntent,
         cancelProposedIntent,
         resolveChoice,
-        dispatchIntent: dispatchIntentImmediate
+        dispatchIntent: dispatchIntentImmediate,
+        closeWizard
     };
 }
