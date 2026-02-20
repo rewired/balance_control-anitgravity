@@ -21,6 +21,30 @@ Primary Architecture Contracts:
 
 ---
 
+### Machine-readable contract index
+The canonical contract index is maintained in:
+- /docs/architecture/TECH-01-BIG-PICTURE.md (Appendix A)
+
+---
+
+## Agent Skills (Reusable Playbooks)
+
+Skill docs live in `/docs/skills/`. Tasks may reference them via a `Skills:` line (or equivalent).  
+If a task references any skill ID below, you MUST read the corresponding skill document before implementation and follow it.
+
+### Skill Index
+
+- **S01 — Repo Scan & Ground Truth** — `/docs/skills/S01-repo-scan.md`
+- **S02 — Dependency Cut Map** — `/docs/skills/S02-dependency-cut-map.md`
+- **S03 — Spec Anchor Tracer (@rule hygiene)** — `/docs/skills/S03-spec-anchor-tracer.md`
+- **S04 — Determinism & Canonical Order Guard** — `/docs/skills/S04-determinism-check.md`
+- **S05 — Engine/Client Boundary Check** — `/docs/skills/S05-boundary-check.md`
+- **S06 — Pack Registry & Duplicate Detection Check** — `/docs/skills/S06-pack-registry.md`
+- **S07 — Golden Tests (Deterministic Fixtures)** — `/docs/skills/S07-golden-tests.md`
+- **S08 — PR Hygiene & Proof Protocol** — `/docs/skills/S08-pr-hygiene.md`
+
+---
+
 ## Execution Protocol (Non-Negotiable)
 
 You must execute this task end-to-end. You are NOT DONE until every item below is completed.
