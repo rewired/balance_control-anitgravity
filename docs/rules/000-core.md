@@ -204,7 +204,11 @@ Let R = Resource count in PersonalSupply[activePlayer]. Let N = min(10, floor(R/
 CORE-01-04-12C PlaceOrMoveInfluence (Move) Meta-Marker Expiry: Reserved. (Persistence/return governed by CORE-01-07-03A/B and CORE-01-04-09A.)
 
 CORE-01-04-12D Move Adjacency Requirement (Canonical):
-A Move is legal only if Adjacent(sourceTile, destinationTile) = true using the current topology’s adjacency definition (CORE-01-00-T01..T03).
+A Move is legal only if MoveAdjacent(sourceTile, destinationTile) = true, where:
+`MoveAdjacent(A,B)` is true if
+(a) `Adjacent(A,B) = true`, or
+(b) `Adjacent(A, StartCommittee) = true` and `Adjacent(StartCommittee, B) = true`, with `A ≠ StartCommittee`, `B ≠ StartCommittee`, `A ≠ B`.
+In case (b), the Start Committee is treated as transparent per CORE-01-08-06D.
 
 ## FormalizeInfluence
 
