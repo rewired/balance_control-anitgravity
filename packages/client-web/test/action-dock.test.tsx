@@ -111,4 +111,63 @@ describe('ActionDock', () => {
         expect(proposeIntent).toHaveBeenCalledTimes(1);
         expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
     });
+
+    it('shows confirmation UI when interactionState is draftReady', () => {
+        const confirmDraft = vi.fn();
+        const cancelDraft = vi.fn();
+        const draftedIntent = { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } };
+
+        const controller = {
+            vm: {
+                stage: 'politicalAction',
+                political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
+                intents: []
+            },
+            interactionState: 'draftReady',
+            draft: { intent: draftedIntent },
+            confirmDraft,
+            cancelDraft,
+            actionMode: 'none'
+        } as any;
+
+        render(
+            <ActionDock
+                isActive={true}
+                G={{} as any}
+                controller={controller}
+            />
+        );
+
+        expect(screen.getByTestId('action-dock-draft')).toBeDefined();
+        expect(screen.getByText('placeInfluence')).toBeDefined();
+
+        fireEvent.click(screen.getByTestId('btn-confirm-draft'));
+        expect(confirmDraft).toHaveBeenCalledTimes(1);
+
+        fireEvent.click(screen.getByTestId('btn-cancel-draft'));
+        expect(cancelDraft).toHaveBeenCalledTimes(1);
+    });
+
+    it('hides normal action buttons when interactionState is draftReady', () => {
+        const controller = {
+            vm: {
+                stage: 'politicalAction',
+                political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
+                intents: []
+            },
+            interactionState: 'draftReady',
+            draft: { intent: { moveType: 'foo' } },
+            actionMode: 'none'
+        } as any;
+
+        render(
+            <ActionDock
+                isActive={true}
+                G={{} as any}
+                controller={controller}
+            />
+        );
+
+        expect(screen.queryByTestId('btn-mode-place-influence')).toBeNull();
+    });
 });

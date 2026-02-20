@@ -51,7 +51,17 @@ export const ActionDock: React.FC<ActionDockProps> = ({
 }) => {
     if (!isActive) return null;
 
-    const { vm, proposeIntent, actionMode, setActionMode, moveInfluenceSourceId } = controller;
+    const {
+        vm,
+        proposeIntent,
+        actionMode,
+        setActionMode,
+        moveInfluenceSourceId,
+        interactionState,
+        draft,
+        confirmDraft,
+        cancelDraft
+    } = controller;
 
     const stageLabel = vm.stage ? (STAGE_LABELS[vm.stage] ?? vm.stage) : 'Waiting';
     const isDrawAndPlace = vm.stage === 'drawAndPlace';
@@ -71,108 +81,136 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                 <div className="action-panel-stage">{stageLabel}</div>
             </div>
 
-            <div className="action-panel-primary">
-                {isDrawAndPlace && (
-                    <>
-                        <div className="action-panel-meta">Staged: {vm.stagedTileId || 'None'}</div>
-                        {vm.drawAndPlace.passTilePlacement && (
-                            <button
-                                className="btn-primary"
-                                onClick={() => proposeIntent(vm.drawAndPlace.passTilePlacement!)}
-                                data-testid="btn-skip-placement"
-                            >
-                                Skip placement
-                            </button>
+            {interactionState === 'draftReady' && draft.intent && (
+                <div className="action-panel-draft" data-testid="action-dock-draft">
+                    <div className="action-panel-draft-summary">
+                        {formatIntentLabel(draft.intent)}
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                        <button
+                            className="btn-primary btn-small"
+                            onClick={confirmDraft}
+                            data-testid="btn-confirm-draft"
+                        >
+                            Confirm
+                        </button>
+                        <button
+                            className="btn-secondary btn-small"
+                            onClick={cancelDraft}
+                            data-testid="btn-cancel-draft"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {interactionState !== 'draftReady' && (
+                <>
+                    <div className="action-panel-primary">
+                        {isDrawAndPlace && (
+                            <>
+                                <div className="action-panel-meta">Staged: {vm.stagedTileId || 'None'}</div>
+                                {vm.drawAndPlace.passTilePlacement && (
+                                    <button
+                                        className="btn-primary"
+                                        onClick={() => proposeIntent(vm.drawAndPlace.passTilePlacement!)}
+                                        data-testid="btn-skip-placement"
+                                    >
+                                        Skip placement
+                                    </button>
+                                )}
+                            </>
                         )}
-                    </>
-                )}
-                {isPoliticalAction && (
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        <button
-                            className={actionMode === 'placeInfluence' ? 'btn-primary' : 'btn-secondary'}
-                            disabled={!hasPlaceInfluenceIntents}
-                            onClick={() => setActionMode(actionMode === 'placeInfluence' ? 'none' : 'placeInfluence')}
-                            data-testid="btn-mode-place-influence"
-                        >
-                            Place Influence
-                        </button>
-                        <button
-                            className={actionMode === 'moveInfluence' ? 'btn-primary' : 'btn-secondary'}
-                            disabled={!hasMoveInfluenceIntents}
-                            onClick={() => setActionMode(actionMode === 'moveInfluence' ? 'none' : 'moveInfluence')}
-                            data-testid="btn-mode-move-influence"
-                        >
-                            Move Influence
-                        </button>
-                        <button
-                            className={actionMode === 'formalizeInfluence' ? 'btn-primary' : 'btn-secondary'}
-                            disabled={!hasFormalizeInfluenceIntents}
-                            onClick={() => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence')}
-                            data-testid="btn-mode-formalize-influence"
-                        >
-                            Formalize Influence
-                        </button>
-                        <button
-                            className={actionMode === 'convertResources' ? 'btn-primary' : 'btn-secondary'}
-                            disabled={!hasConvertResourcesIntents}
-                            onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
-                            data-testid="btn-mode-convert-resources"
-                        >
-                            Convert Resources
-                        </button>
+                        {isPoliticalAction && (
+                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                <button
+                                    className={actionMode === 'placeInfluence' ? 'btn-primary' : 'btn-secondary'}
+                                    disabled={!hasPlaceInfluenceIntents}
+                                    onClick={() => setActionMode(actionMode === 'placeInfluence' ? 'none' : 'placeInfluence')}
+                                    data-testid="btn-mode-place-influence"
+                                >
+                                    Place Influence
+                                </button>
+                                <button
+                                    className={actionMode === 'moveInfluence' ? 'btn-primary' : 'btn-secondary'}
+                                    disabled={!hasMoveInfluenceIntents}
+                                    onClick={() => setActionMode(actionMode === 'moveInfluence' ? 'none' : 'moveInfluence')}
+                                    data-testid="btn-mode-move-influence"
+                                >
+                                    Move Influence
+                                </button>
+                                <button
+                                    className={actionMode === 'formalizeInfluence' ? 'btn-primary' : 'btn-secondary'}
+                                    disabled={!hasFormalizeInfluenceIntents}
+                                    onClick={() => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence')}
+                                    data-testid="btn-mode-formalize-influence"
+                                >
+                                    Formalize Influence
+                                </button>
+                                <button
+                                    className={actionMode === 'convertResources' ? 'btn-primary' : 'btn-secondary'}
+                                    disabled={!hasConvertResourcesIntents}
+                                    onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
+                                    data-testid="btn-mode-convert-resources"
+                                >
+                                    Convert Resources
+                                </button>
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
 
-            {isPoliticalAction && actionMode === 'placeInfluence' && (
-                <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
-                    Select a target tile on the board to place influence.
-                </div>
-            )}
+                    {isPoliticalAction && actionMode === 'placeInfluence' && (
+                        <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
+                            Select a target tile on the board to place influence.
+                        </div>
+                    )}
 
-            {isPoliticalAction && actionMode === 'moveInfluence' && (
-                <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
-                    {!moveInfluenceSourceId
-                        ? 'Select source tile on the board.'
-                        : 'Select target tile on the board.'}
-                </div>
-            )}
+                    {isPoliticalAction && actionMode === 'moveInfluence' && (
+                        <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
+                            {!moveInfluenceSourceId
+                                ? 'Select source tile on the board.'
+                                : 'Select target tile on the board.'}
+                        </div>
+                    )}
 
-            {isPoliticalAction && actionMode === 'formalizeInfluence' && (
-                <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
-                    Select a committee tile on the board to formalize.
-                </div>
-            )}
+                    {isPoliticalAction && actionMode === 'formalizeInfluence' && (
+                        <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
+                            Select a committee tile on the board to formalize.
+                        </div>
+                    )}
 
-            {isPoliticalAction && actionMode === 'convertResources' && (
-                <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
-                    Select a grassroots tile on the board to convert resources.
-                </div>
-            )}
+                    {isPoliticalAction && actionMode === 'convertResources' && (
+                        <div className="action-panel-hint" style={{ marginTop: '8px', color: 'var(--accent-eco)' }}>
+                            Select a grassroots tile on the board to convert resources.
+                        </div>
+                    )}
 
-            {isPoliticalAction && vm.political.measures.length > 0 && (
-                <MeasureTray
-                    G={G}
-                    intents={vm.political.measures}
-                    onSelect={proposeIntent}
-                />
-            )}
+                    {isPoliticalAction && vm.political.measures.length > 0 && (
+                        <MeasureTray
+                            G={G}
+                            intents={vm.political.measures}
+                            onSelect={proposeIntent}
+                        />
+                    )}
 
-            {showMoreActions && (
-                <details className="action-panel-more">
-                    <summary>More actions</summary>
-                    <div className="action-panel-secondary">
-                        {vm.political.others.map(intent => (
-                            <button
-                                key={intentSortKey(intent)}
-                                className="btn-secondary"
-                                onClick={() => proposeIntent(intent)}
-                            >
-                                {formatIntentLabel(intent)}
-                            </button>
-                        ))}
-                    </div>
-                </details>
+                    {showMoreActions && (
+                        <details className="action-panel-more">
+                            <summary>More actions</summary>
+                            <div className="action-panel-secondary">
+                                {vm.political.others.map(intent => (
+                                    <button
+                                        key={intentSortKey(intent)}
+                                        className="btn-secondary"
+                                        onClick={() => proposeIntent(intent)}
+                                    >
+                                        {formatIntentLabel(intent)}
+                                    </button>
+                                ))}
+                            </div>
+                        </details>
+                    )}
+                </>
             )}
         </div>
     );
