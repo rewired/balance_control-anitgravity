@@ -1,5 +1,6 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneName, TileType } from '@balance-control/rules';
+import { isMoveAdjacent } from '../../engine/topology';
 import { computeMajority } from '../../mechanics';
 import {
     allStartingInfluencePlaced,
@@ -94,16 +95,13 @@ export const PoliticalActionMoves = {
 
         if (!isBoardTile(G, sourceId) || !isBoardTile(G, targetId)) return INVALID_MOVE;
 
+        // CORE-01-04-12D / CORE-01-08-06E
+        if (!isMoveAdjacent(G, sourceId, targetId)) return INVALID_MOVE;
+
         const srcZone = G.zones[sourceId];
         if (!srcZone) return INVALID_MOVE;
 
-        // CORE-01-08-06E
         const sourceTile = G.tiles[sourceId];
-        if (sourceTile && sourceTile.type === TileType.StartCommittee) return INVALID_MOVE;
-
-        // CORE-01-08-04: No Influence may be placed on the Start Committee
-        const targetTile = G.tiles[targetId];
-        if (targetTile && targetTile.type === TileType.StartCommittee) return INVALID_MOVE;
 
         const hasInf = srcZone.items.some((id: string) => G.objects[id]?.owner === pid && G.objects[id].type === 'Influence');
         if (!hasInf) return INVALID_MOVE;

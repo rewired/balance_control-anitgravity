@@ -69,7 +69,12 @@ describe('Moves', () => {
                 res_inf: { id: 'res_inf', type: 'Resource', owner: 'p1', resort: 'INF' },
                 res_inf_bank: { id: 'res_inf_bank', type: 'Resource', resort: 'INF' }
             },
-            adjacency: {},
+            adjacency: {
+                board_t1: ['board_t2', 'board_gr', 'board_start'],
+                board_t2: ['board_t1', 'board_gr', 'board_start'],
+                board_gr: ['board_t1', 'board_t2', 'board_start'],
+                board_start: ['board_t1', 'board_t2', 'board_gr']
+            },
             grid: {},
             engine: {
                 idSeq: 0,
@@ -208,6 +213,24 @@ describe('Moves', () => {
         const resultTarget = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_start' });
         expect(resultTarget).toBe(INVALID_MOVE);
         expect(JSON.stringify(G)).toBe(beforeTarget);
+    });
+
+    it('moveInfluence should allow Start-Bridge move (A -> Start -> B) (CORE-01-04-12D)', () => {
+        // Setup: board_t1 and board_t2 are NOT directly adjacent, but both adjacent to board_start
+        G.adjacency = {
+            board_t1: ['board_start'],
+            board_t2: ['board_start'],
+            board_start: ['board_t1', 'board_t2']
+        };
+
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones.board_t1.items.push('inf_1');
+
+        const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+
+        expect(result).not.toBe(INVALID_MOVE);
+        expect(G.zones.board_t2.items).toContain('inf_1');
+        expect(G.zones.board_t1.items).not.toContain('inf_1');
     });
 
     it('placeInfluence should remain legal at cap because it uses existing supply marker', () => {
