@@ -10,12 +10,12 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005, GR-006
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Re-check ARCH-06 action taxonomy + determinism rules.
-3. [ ] Baseline scans:
-   - `rg -n "More actions" packages/client-web/src/components/ActionDock.tsx`
-   - `rg -n "MeasureTray" packages/client-web/src/components/ActionDock.tsx`
-4. [ ] Baseline tests:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Re-check ARCH-06 action taxonomy + determinism rules.
+3. [x] Baseline scans:
+   - `rg -n "More actions" packages/client-web/src/components/ActionDock.tsx` (Done, none found, already "Expansions / Other")
+   - `rg -n "MeasureTray" packages/client-web/src/components/ActionDock.tsx` (Found usage)
+4. [x] Baseline tests:
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
 ## 1) Goal
@@ -66,14 +66,32 @@ Align Measures + “Other actions” UI with the contract taxonomy:
 - PendingChoice gate (GR-006): Measures/Other must be disabled while hard-gated.
 
 ## 5) Acceptance Criteria
-- [ ] “More actions” no longer exists; “Expansions → Other” exists.
-- [ ] Measures appear only under the Measures group/session (not always-on).
-- [ ] All unmapped legal intents appear under Expansions → Other, and selecting them creates a draft.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] “More actions” no longer exists; “Expansions → Other” exists.
+- [x] Measures appear only under the Measures group/session (not always-on).
+- [x] All unmapped legal intents appear under Expansions → Other, and selecting them creates a draft.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005/006).
-- [ ] No engine/rule/spec changes.
-- [ ] ARCH-06 checklist items 1–5 remain satisfied.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005/006).
+- [x] No engine/rule/spec changes.
+- [x] ARCH-06 checklist items 1–5 remain satisfied.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
+
+## 7) Work Summary
+- Replaced "More actions" fallback with "Expansions → Other" group.
+- Added "Measures" action group to ActionDock.
+- Added "Take Measure" button to toggle MeasureTray visibility.
+- Updated MeasureTray to be rendered conditionally based on `actionMode`.
+- Updated tests to verify new behavior and ensure no regressions.
+
+## 8) Commands Run
+- `rg -n "More actions" packages/client-web/src/components/ActionDock.tsx`
+- `pnpm -C packages/client-web test`
+- `git status -sb`
+- `git diff --stat`
+
+## 9) Guardrails
+- GR-002: Engine-only Rule Execution (Compliant: UI only triggers intents)
+- GR-005: No Phantom Moves (Compliant: "Other" only lists existing legal intents)
+- GR-006: Pending Choice Gate (Compliant: ActionDock respects interaction state)

@@ -147,7 +147,7 @@ describe('ActionDock', () => {
             />
         );
 
-        expect(screen.getByText('Expansions / Other')).toBeDefined();
+        expect(screen.getByText('Expansions → Other')).toBeDefined();
         const moveButton = screen.getByText('unknownAction');
         fireEvent.click(moveButton);
         expect(proposeIntent).toHaveBeenCalledTimes(1);
@@ -189,6 +189,72 @@ describe('ActionDock', () => {
 
         fireEvent.click(screen.getByTestId('btn-cancel-draft'));
         expect(cancelDraft).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows Measures group and toggles MeasureTray', () => {
+        const intents = [
+            { moveType: 'exp01.takeMeasure', payload: 'm1' }
+        ] as any;
+        const G = {
+            objects: {
+                'm1': { type: 'Measure', measureId: 'Measure A' }
+            }
+        } as any;
+
+        // Setup controller
+        const setActionMode = vi.fn();
+        const controller = {
+            vm: {
+                stage: 'politicalAction',
+                political: {
+                    others: [],
+                    formalizeInfluence: [],
+                    convertResources: [],
+                    measures: intents
+                },
+                intents: intents,
+                drawAndPlace: {}
+            },
+            actionMode: 'none',
+            setActionMode,
+            proposeIntent: vi.fn(),
+            intents: intents,
+            draft: { intent: null },
+            interactionState: 'selectingAction'
+        } as any;
+
+        const { rerender } = render(
+            <ActionDock
+                isActive={true}
+                G={G}
+                controller={controller}
+            />
+        );
+
+        // Check for Measures group and button
+        expect(screen.getByText('Measures')).toBeDefined();
+        const button = screen.getByTestId('btn-mode-take-measure');
+        expect(button).toBeDefined();
+
+        // MeasureTray content should NOT be visible initially
+        expect(screen.queryByText('Measure A')).toBeNull();
+
+        // Click to toggle
+        fireEvent.click(button);
+        expect(setActionMode).toHaveBeenCalledWith('takeMeasure');
+
+        // Re-render with active mode to simulate state update
+        const activeController = { ...controller, actionMode: 'takeMeasure' };
+        rerender(
+            <ActionDock
+                isActive={true}
+                G={G}
+                controller={activeController}
+            />
+        );
+
+        // Now MeasureTray content should be visible
+        expect(screen.getByText('Measure A')).toBeDefined();
     });
 
     it('hides normal action buttons (group list) when interactionState is draftReady', () => {
