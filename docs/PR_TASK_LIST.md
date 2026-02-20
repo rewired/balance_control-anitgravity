@@ -52,3 +52,4 @@
 - [x] Task 0049 - Client-Web: Fix Active State + Legal Intents Fallback
 - [x] Task 0054 - DrawPile Privacy (Closed Bag) + UI: Draw Count Widget + DiscardFaceUp
 - [x] Task 0055 - Unplaceable Draw Handling: Public Notice + Forced Confirm + Redraw Loop
+- [x] Task 0149 - UI: Interaction Surfaces + Central Interaction Controller

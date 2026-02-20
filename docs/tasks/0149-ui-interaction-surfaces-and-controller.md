@@ -1,6 +1,7 @@
 # Codex Task 0149 — UI: Define interaction surfaces + central interaction controller (no behavior change)
 
-**Date:** 2026-02-20  
+**Date:** 2026-02-20
+
 **Primary contract:** AGENTS.md (repo root)
 
 ## 0) Metadata (frozen)
@@ -127,8 +128,66 @@ This task creates **structure and contracts** only — behavior remains the same
 
 ## 7) Acceptance criteria (frozen)
 
-- [ ] New doc exists: `/docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.md`.
-- [ ] `GameLayout` renders and behaves as before (manual smoke: place tile, move influence confirm, pending choice).
-- [ ] No new rule logic is introduced in client-web (no legality/cost/majority computation beyond filtering already-enumerated intents).
-- [ ] `pnpm -w test` is green.
-- [ ] No changes in `packages/game/**` in this task.
+- [x] New doc exists: `/docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.md`.
+- [x] `GameLayout` renders and behaves as before (manual smoke: place tile, move influence confirm, pending choice).
+- [x] No new rule logic is introduced in client-web (no legality/cost/majority/modifiers computation beyond filtering already-enumerated intents).
+- [x] `pnpm -w test` is green.
+- [x] No changes in `packages/game/**` in this task.
+
+## 10) PR Checklist (Repo Artifact)
+
+This section MUST be completed in this task file before declaring done.
+
+- [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+- [x] Normative anchors cited for all changes
+- [x] No implicit rules introduced
+- [x] No phantom moves introduced
+- [x] Expansion isolation preserved (if touched)
+- [x] `pnpm lint` passes
+- [x] `pnpm test` (or `pnpm vitest run`) passes
+- [x] Determinism verified (golden replay/state hash)
+- [x] No temporary files committed
+- [x] `/docs/changelog.md` updated if required
+
+## 11) Work Summary (3–7 bullets)
+
+* Created `ARCH-06 — UI Interaction Contract` to define stable interaction surfaces and command paths.
+* Implemented `useGameInteractionController` to centralize UI state (selection, proposed intents) and dispatch logic.
+* Introduced `ModalHost` to orchestrate blocking interaction layers.
+* Refactored `GameLayout`, `ActionPanel`, and `HexBoard` to use the central controller, improving decoupling.
+* Updated existing tests to be compatible with the new controller-based architecture.
+
+## 12) Commands Run (with outcomes)
+
+Paste exact commands and short outcomes.
+
+* `pnpm install` → ok
+* `pnpm -C packages/client-web test` → ok (all 50 tests pass)
+
+## 13) Postflight Proof (recorded in commit message)
+
+Do NOT paste command outputs into this task file (it would dirty the tree after committing and cause an amend loop). Instead, capture postflight proof AFTER the final commit and append it to the latest commit message under a `Postflight:` section via ONE amend that edits the commit message only (no file changes).
+
+Required commands:
+
+* `git status -sb`
+* `git diff --stat`
+* tests (e.g. `pnpm test` or `pnpm vitest run`)
+
+Rule:
+
+* After the postflight amend, do not modify any tracked files. The working tree must remain clean.
+
+### 13.1 Recorded
+
+Recorded in final commit message (Postflight: block).
+
+## 14) Commit Proof (recorded in commit message)
+
+After creating exactly ONE commit, include `git show -1 --stat` output inside the same `Postflight:` block in the commit message (amend message only, no file changes).
+
+### 14.1 Recorded
+
+Recorded in final commit message (Postflight: block).
+
+## 15) Amendments (append-only)

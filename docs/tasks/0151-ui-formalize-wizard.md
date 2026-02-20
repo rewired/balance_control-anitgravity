@@ -1,6 +1,6 @@
 # Codex Task 0151 — UI: FormalizeInfluence wizard (select committee → choose payment combo → confirm)
 
-**Date:** 2026-02-20  
+**Date:** 2026-02-20
 **Primary contract:** AGENTS.md (repo root)
 
 ## 0) Metadata (frozen)

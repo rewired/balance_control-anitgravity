@@ -75,7 +75,7 @@ describe('Token', () => {
 
 describe('HexBoard', () => {
     it('dispatches placeTile when a ghost is clicked', () => {
-        const moves = { placeTile: vi.fn() };
+        const onDispatchIntent = vi.fn();
         const placeTileIntents = [
             { moveType: 'placeTile', payload: { targetCoord: '0,1' } }
         ];
@@ -90,7 +90,7 @@ describe('HexBoard', () => {
         render(
             <HexBoard
                 G={G}
-                moves={moves}
+                onDispatchIntent={onDispatchIntent}
                 placeTileIntents={placeTileIntents as any}
                 ghostCoords={['0,1']}
                 isInteractive={true}
@@ -99,7 +99,7 @@ describe('HexBoard', () => {
 
         const ghost = screen.getByTestId('hex-ghost-0_1');
         fireEvent.click(ghost);
-        expect(moves.placeTile).toHaveBeenCalledTimes(1);
-        expect(moves.placeTile).toHaveBeenCalledWith({ targetCoord: '0,1' });
+        expect(onDispatchIntent).toHaveBeenCalledTimes(1);
+        expect(onDispatchIntent).toHaveBeenCalledWith(placeTileIntents[0]);
     });
 });

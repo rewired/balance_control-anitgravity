@@ -1,6 +1,6 @@
 # Codex Task 0152 — UI: ConvertResources wizard + TakeMeasure tray + unknown-intent fallback
 
-**Date:** 2026-02-20  
+**Date:** 2026-02-20
 **Primary contract:** AGENTS.md (repo root)
 
 ## 0) Metadata (frozen)

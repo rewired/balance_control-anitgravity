@@ -10,7 +10,6 @@ import type { SeatId } from '../ui/tiles/types';
 
 interface HexBoardProps {
     G: GameState;
-    moves: any;
     placeTileIntents: LegalIntent[];
     moveInfluenceIntents?: LegalIntent[];
     ghostCoords: string[];
@@ -19,6 +18,7 @@ interface HexBoardProps {
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
     onProposeMove?: (intent: LegalIntent) => void;
+    onDispatchIntent?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
 }
 
@@ -31,7 +31,6 @@ export const HEX_SIZE = 110;
  */
 export const HexBoard: React.FC<HexBoardProps> = ({
     G,
-    moves,
     placeTileIntents,
     moveInfluenceIntents,
     ghostCoords,
@@ -40,6 +39,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     selectedCoord,
     onSelectTile,
     onProposeMove,
+    onDispatchIntent,
     pendingTile
 }) => {
     const [hoveredTileId, setHoveredTileId] = useState<string | null>(null);
@@ -181,7 +181,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 isInteractive ? 'hex-ghost-active' : null
                             ].filter(Boolean).join(' ')}
                             disabled={!isInteractive}
-                            onClick={!isInteractive ? undefined : () => moves[intent.moveType](intent.payload)}
+                            onClick={!isInteractive ? undefined : () => onDispatchIntent?.(intent)}
                             onMouseEnter={() => setHoveredGhostCoord(coordStr)}
                             onMouseLeave={() => setHoveredGhostCoord((prev) => (prev === coordStr ? null : prev))}
                             data-testid={testId}

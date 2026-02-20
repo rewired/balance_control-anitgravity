@@ -1,6 +1,6 @@
 # Codex Task 0150 — UI: ActionDock + consistent “draft → confirm → commit” for Place/Move Influence
 
-**Date:** 2026-02-20  
+**Date:** 2026-02-20
 **Primary contract:** AGENTS.md (repo root)
 
 ## 0) Metadata (frozen)

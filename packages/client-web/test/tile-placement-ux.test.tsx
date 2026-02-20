@@ -6,7 +6,7 @@ import { HexBoard } from '../src/components/HexBoard';
 
 describe('HexBoard UX', () => {
     it('handles resolveChoice intents with spatial selection', () => {
-        const moves = { resolveChoice: vi.fn() };
+        const onDispatchIntent = vi.fn();
         // Intent is resolveChoice but payload has selection as coord string
         const intents = [
             { moveType: 'resolveChoice', payload: { choiceId: 'c1', selection: '1,0' } }
@@ -22,7 +22,7 @@ describe('HexBoard UX', () => {
         render(
             <HexBoard
                 G={G}
-                moves={moves}
+                onDispatchIntent={onDispatchIntent}
                 placeTileIntents={intents as any}
                 ghostCoords={['1,0']}
                 isInteractive={true}
@@ -33,12 +33,11 @@ describe('HexBoard UX', () => {
         expect(ghost).toBeDefined();
 
         fireEvent.click(ghost);
-        expect(moves.resolveChoice).toHaveBeenCalledTimes(1);
-        expect(moves.resolveChoice).toHaveBeenCalledWith({ choiceId: 'c1', selection: '1,0' });
+        expect(onDispatchIntent).toHaveBeenCalledTimes(1);
+        expect(onDispatchIntent).toHaveBeenCalledWith(intents[0]);
     });
 
     it('renders ghost preview on hover when pendingTile is provided', () => {
-        const moves = { placeTile: vi.fn() };
         const intents = [
             { moveType: 'placeTile', payload: { targetCoord: '0,1' } }
         ];
@@ -54,7 +53,6 @@ describe('HexBoard UX', () => {
         const { container } = render(
             <HexBoard
                 G={G}
-                moves={moves}
                 placeTileIntents={intents as any}
                 ghostCoords={['0,1']}
                 isInteractive={true}
