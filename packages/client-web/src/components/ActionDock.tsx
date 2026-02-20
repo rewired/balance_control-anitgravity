@@ -51,7 +51,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
 }) => {
     if (!isActive) return null;
 
-    const { vm, dispatchIntent, proposeIntent, actionMode, setActionMode, moveInfluenceSourceId } = controller;
+    const { vm, proposeIntent, actionMode, setActionMode, moveInfluenceSourceId } = controller;
 
     const stageLabel = vm.stage ? (STAGE_LABELS[vm.stage] ?? vm.stage) : 'Waiting';
     const isDrawAndPlace = vm.stage === 'drawAndPlace';
@@ -78,7 +78,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                         {vm.drawAndPlace.passTilePlacement && (
                             <button
                                 className="btn-primary"
-                                onClick={() => dispatchIntent(vm.drawAndPlace.passTilePlacement!)}
+                                onClick={() => proposeIntent(vm.drawAndPlace.passTilePlacement!)}
                                 data-testid="btn-skip-placement"
                             >
                                 Skip placement
@@ -166,7 +166,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                             <button
                                 key={intentSortKey(intent)}
                                 className="btn-secondary"
-                                onClick={() => dispatchIntent(intent)}
+                                onClick={() => proposeIntent(intent)}
                             >
                                 {formatIntentLabel(intent)}
                             </button>

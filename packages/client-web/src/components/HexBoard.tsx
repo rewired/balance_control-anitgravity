@@ -23,7 +23,6 @@ interface HexBoardProps {
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
     onProposeMove?: (intent: LegalIntent) => void;
-    onDispatchIntent?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
 }
 
@@ -49,7 +48,6 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     selectedCoord,
     onSelectTile,
     onProposeMove,
-    onDispatchIntent,
     pendingTile
 }) => {
     const [hoveredTileId, setHoveredTileId] = useState<string | null>(null);
@@ -216,7 +214,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 isInteractive ? 'hex-ghost-active' : null
                             ].filter(Boolean).join(' ')}
                             disabled={!isInteractive}
-                            onClick={!isInteractive ? undefined : () => onDispatchIntent?.(intent)}
+                            onClick={!isInteractive ? undefined : () => onProposeMove?.(intent)}
                             onMouseEnter={() => setHoveredGhostCoord(coordStr)}
                             onMouseLeave={() => setHoveredGhostCoord((prev) => (prev === coordStr ? null : prev))}
                             data-testid={testId}

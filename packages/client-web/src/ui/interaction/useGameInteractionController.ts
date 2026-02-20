@@ -70,7 +70,7 @@ export function useGameInteractionController({
         setProposedIntent(intent);
     }, []);
 
-    const confirmProposedIntent = useCallback(() => {
+    const confirmDraft = useCallback(() => {
         if (proposedIntent) {
             dispatchIntent(moves, proposedIntent);
             setProposedIntent(null);
@@ -81,15 +81,15 @@ export function useGameInteractionController({
         }
     }, [proposedIntent, moves]);
 
-    const cancelProposedIntent = useCallback(() => {
+    const cancelDraft = useCallback(() => {
         setProposedIntent(null);
     }, []);
 
     const resolveChoice = useCallback((intent: LegalIntent) => {
-        dispatchIntent(moves, intent);
-    }, [moves]);
-
-    const dispatchIntentImmediate = useCallback((intent: LegalIntent) => {
+        if (intent.moveType !== 'resolveChoice') {
+            console.error(`[resolveChoice] Attempted to dispatch non-choice intent: ${intent.moveType}`);
+            return;
+        }
         dispatchIntent(moves, intent);
     }, [moves]);
 
@@ -193,12 +193,9 @@ export function useGameInteractionController({
         setActionMode: setActionModeWithSideEffects,
         selectTile,
         proposeIntent,
-        confirmDraft: confirmProposedIntent,
-        cancelDraft: cancelProposedIntent,
-        confirmProposedIntent,
-        cancelProposedIntent,
+        confirmDraft,
+        cancelDraft,
         resolveChoice,
-        dispatchIntent: dispatchIntentImmediate,
         closeWizard
     };
 }

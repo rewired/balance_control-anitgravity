@@ -23,7 +23,6 @@ type BoardViewportGameProps = {
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
     onProposeMove?: (intent: LegalIntent) => void;
-    onDispatchIntent?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
 };
 
@@ -162,7 +161,6 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             selectedCoord={gameProps!.selectedCoord}
                                             onSelectTile={gameProps!.onSelectTile}
                                             onProposeMove={gameProps!.onProposeMove}
-                                            onDispatchIntent={gameProps!.onDispatchIntent}
                                             pendingTile={gameProps!.pendingTile}
                                         />
                                     )}
