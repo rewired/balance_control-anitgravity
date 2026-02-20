@@ -3,7 +3,28 @@ import type { IntentViewModel } from '../useIntentViewModel';
 
 export type InteractionActionMode = 'none' | 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources';
 
+export type InteractionStateId =
+    | 'selectingAction'
+    | 'selectingParams'
+    | 'selectingVariant'
+    | 'draftReady'
+    | 'pendingChoiceHardGate';
+
+export interface DraftIntentState {
+    /** The legal intent being drafted. */
+    intent: LegalIntent | null;
+    /** A stable, unique key for the intent. */
+    key: string | null;
+    /** Whether the intent is still legal in the current game state. */
+    isLegalNow: boolean;
+}
+
 export interface InteractionController {
+    /** Current state machine ID. */
+    interactionState: InteractionStateId;
+    /** Current draft state. */
+    draft: DraftIntentState;
+
     /** The currently selected tile for inspection. */
     selectedTileId: string | null;
     /** The coordinate string of the selected tile. */
@@ -30,6 +51,12 @@ export interface InteractionController {
     selectTile: (tileId: string | null, coord: string | null) => void;
     /** Proposes an intent for confirmation. */
     proposeIntent: (intent: LegalIntent) => void;
+
+    /** Confirms the current draft and dispatches it. */
+    confirmDraft: () => void;
+    /** Cancels the current draft and resets action session. */
+    cancelDraft: () => void;
+
     /** Confirms the currently proposed intent and dispatches it. */
     confirmProposedIntent: () => void;
     /** Cancels the currently proposed intent. */

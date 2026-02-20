@@ -1,43 +1,9 @@
 import { useMemo } from 'react';
 import { enumerateLegalIntents, type LegalIntent } from '@balance-control/game';
 import { stableSortCoords } from './hexLayout';
+import { canonicalJsonStringify } from './interaction/utils';
 
 export type IntentStage = string | null;
-
-type JsonLike =
-    | null
-    | boolean
-    | number
-    | string
-    | JsonLike[]
-    | { [key: string]: JsonLike | undefined };
-
-function canonicalize(value: JsonLike): JsonLike {
-    if (value === null || typeof value !== 'object') {
-        return value;
-    }
-
-    if (Array.isArray(value)) {
-        return value.map((entry) => canonicalize(entry as JsonLike));
-    }
-
-    const input = value as { [key: string]: JsonLike | undefined };
-    const ordered: { [key: string]: JsonLike } = {};
-    const keys = Object.keys(input).sort();
-
-    for (const key of keys) {
-        const entry = input[key];
-        if (entry !== undefined) {
-            ordered[key] = canonicalize(entry);
-        }
-    }
-
-    return ordered;
-}
-
-function canonicalJsonStringify(value: JsonLike): string {
-    return JSON.stringify(canonicalize(value));
-}
 
 export type IntentViewModelInput = {
     G: any;
