@@ -38,12 +38,31 @@ export function useGameInteractionController({
 
     const vm = useIntentViewModel({ G, ctx, playerID: myPid, selectedTileId, stagedTileId });
 
-    const editDraftParams = useCallback(() => {
+    const editDraftSource = useCallback(() => {
         setProposedIntent(null);
+        setMoveInfluenceSourceId(null);
+        setPinnedCommitteeTileId(null);
+        setPinnedGrassrootsTileId(null);
+        setSelectedTileId(null);
+        setSelectedCoord(null);
+    }, []);
+
+    const editDraftDestination = useCallback(() => {
+        setProposedIntent(null);
+        setSelectedTileId(null);
+        setSelectedCoord(null);
+    }, []);
+
+    const editDraftTarget = useCallback(() => {
+        setProposedIntent(null);
+        setSelectedTileId(null);
+        setSelectedCoord(null);
     }, []);
 
     const editDraftVariant = useCallback(() => {
         setProposedIntent(null);
+        setSelectedTileId(null);
+        setSelectedCoord(null);
     }, []);
 
     const proposeIntent = useCallback((intent: LegalIntent) => {
@@ -101,6 +120,11 @@ export function useGameInteractionController({
 
     const cancelDraft = useCallback(() => {
         setProposedIntent(null);
+        setActionMode('none');
+        setMoveInfluenceSourceId(null);
+        setPinnedCommitteeTileId(null);
+        setPinnedGrassrootsTileId(null);
+        // Preserves inspector selection (selectedTileId/selectedCoord) per contract
     }, []);
 
     const resolveChoice = useCallback((intent: LegalIntent) => {
@@ -218,7 +242,9 @@ export function useGameInteractionController({
         proposeIntent,
         confirmDraft,
         cancelDraft,
-        editDraftParams,
+        editDraftSource,
+        editDraftDestination,
+        editDraftTarget,
         editDraftVariant,
         resolveChoice
     };

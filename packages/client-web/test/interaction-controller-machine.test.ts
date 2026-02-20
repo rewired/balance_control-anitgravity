@@ -77,7 +77,7 @@ describe('useGameInteractionController State Machine', () => {
         expect(result.current.proposedIntent?.payload).toEqual({ id: 1 });
     });
 
-    it('editDraftParams clears draft and returns to selectingParams', () => {
+    it('editDraftTarget clears draft and returns to selectingParams', () => {
         const { result } = renderHook(() => useGameInteractionController({
             G: { zones: {}, grid: {}, tiles: {}, objects: {} } as any,
             ctx: { currentPlayer: '0' },
@@ -92,7 +92,7 @@ describe('useGameInteractionController State Machine', () => {
         expect(result.current.interactionState).toBe('draftReady');
 
         act(() => {
-            result.current.editDraftParams();
+            result.current.editDraftTarget();
         });
 
         expect(result.current.interactionState).toBe('selectingParams');
