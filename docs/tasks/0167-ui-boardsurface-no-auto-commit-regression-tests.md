@@ -1,6 +1,6 @@
 # Task 0167 — PG-2: BoardSurface no-auto-commit regression tests (ghost placement + skip placement)
 
-Status: DRAFT
+Status: COMPLETE
 
 ## Meta
 - Owner: Codex
@@ -10,11 +10,11 @@ Status: DRAFT
 - affected_guardrails: GR-005
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Re-check ARCH-06 checklist:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Re-check ARCH-06 checklist:
    - No Auto-Commit
    - Single Commit Path
-3. [ ] Baseline tests:
+3. [x] Baseline tests:
    - `pnpm -C packages/client-web test`
 
 ## 1) Goal
@@ -53,16 +53,22 @@ Optional (if easy):
 - Stable ordering in mocks and assertions.
 
 ## 5) Acceptance Criteria
-- [ ] Tests fail if ghost placement or skip placement ever auto-commit.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Tests fail if ghost placement or skip placement ever auto-commit.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-005).
-- [ ] No engine/rule/spec changes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-005).
+- [x] No engine/rule/spec changes.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 7) Work Summary
-- TBD
+- Created `packages/client-web/test/no-auto-commit-board-surface.test.tsx`.
+- Mocked `@balance-control/game` to control `enumerateLegalIntents` for testing.
+- Implemented test case for Ghost placement ensuring it requires confirmation.
+- Implemented test case for Skip placement ensuring it requires confirmation.
+- Implemented test case for `draftReady` stability (inspect-only mode when draft is ready).
+- Polyfilled `ResizeObserver` to support `react-zoom-pan-pinch` in test environment.
 
 ## 8) Commands Run
-- TBD
+- `pnpm -C packages/client-web test` (baseline)
+- `pnpm -C packages/client-web test test/no-auto-commit-board-surface.test.tsx` (verification)
