@@ -914,3 +914,63 @@ button.btn-primary:hover {
     background: rgba(6, 182, 212, 0.25);
     box-shadow: 0 0 16px rgba(6, 182, 212, 0.4);
 }
+
+.hex-cell-drafted {
+    z-index: 4;
+}
+
+.hex-ghost-drafted {
+    border-color: var(--accent-control);
+    background: rgba(6, 182, 212, 0.2);
+    box-shadow: 0 0 16px rgba(6, 182, 212, 0.4);
+    opacity: 1 !important;
+}
+
+.hex-preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hex-preview-marker {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.hex-preview-marker.influence {
+    background: var(--accent-influence);
+}
+
+.hex-preview-marker.source {
+    background: transparent;
+    border: 2px dashed var(--accent-influence);
+    width: 48px;
+    height: 48px;
+}
+
+.hex-preview-marker.destination {
+    background: var(--accent-influence);
+    opacity: 0.8;
+}
+
+.hex-preview-highlight {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: 2px solid var(--accent-balance);
+    box-shadow: 0 0 12px var(--accent-balance);
+    opacity: 0.6;
+}

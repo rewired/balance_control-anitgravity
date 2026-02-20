@@ -32,7 +32,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     } as const;
 
     const controller = useGameInteractionController({ G, ctx, playerID, moves });
-    const { vm, selectedTileId, selectedCoord, selectTile, selectMoveInfluenceSource, proposeIntent, actionMode, moveInfluenceSourceId, interactionState } = controller;
+    const { vm, selectedTileId, selectedCoord, selectTile, selectMoveInfluenceSource, proposeIntent, actionMode, moveInfluenceSourceId, interactionState, draft } = controller;
 
     // Wrap selectTile to enforce "valid targets only" for parameter selection
     const handleSelectTile = React.useCallback((tileId: string, coordStr: string) => {
@@ -194,6 +194,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     onProposeMove={proposeIntent}
                     pendingTile={pendingTile}
                     activePlayerId={ctx.currentPlayer}
+                    draftIntent={draft.intent}
                 />
             </main>
 

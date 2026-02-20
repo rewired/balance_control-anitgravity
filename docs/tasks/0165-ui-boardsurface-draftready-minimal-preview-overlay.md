@@ -75,14 +75,20 @@ Board freeze enforcement (draftReady):
 - [ ] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/GR-005).
-- [ ] No engine/rule/spec changes.
-- [ ] No new commit path introduced.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/GR-005).
+- [x] No engine/rule/spec changes.
+- [x] No new commit path introduced.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 7) Work Summary
-- TBD
+- Extended `HexBoard` props to accept `draftIntent`.
+- Implemented visual preview overlay in `HexBoard` for `placeTile` (ghost), `placeInfluence`, `moveInfluence`, `formalizeInfluence`, and `convertResources`.
+- Implemented interaction freeze: when `draftIntent` exists, board clicks are inspect-only (select) and cannot propose new moves.
+- Updated `BoardViewport` and `GameLayout` to propagate `draftIntent` from the interaction controller.
+- Added CSS classes for preview markers (`.hex-preview-overlay`, `.hex-preview-marker`, etc.).
+- Added comprehensive unit tests in `packages/client-web/test/board-preview-overlay.test.tsx`.
 
 ## 8) Commands Run
-- TBD
+- `pnpm -C packages/client-web test` (baseline & verification)
+- `pnpm lint`

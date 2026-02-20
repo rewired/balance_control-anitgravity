@@ -25,6 +25,7 @@ interface HexBoardProps {
     onProposeMove?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
     activePlayerId?: string;
+    draftIntent?: LegalIntent | null;
 }
 
 export const HEX_SIZE = 110;
@@ -50,7 +51,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     onSelectTile,
     onProposeMove,
     pendingTile,
-    activePlayerId
+    activePlayerId,
+    draftIntent
 }) => {
     const [hoveredTileId, setHoveredTileId] = useState<string | null>(null);
     const [hoveredGhostCoord, setHoveredGhostCoord] = useState<string | null>(null);
@@ -112,34 +114,45 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     let targetIntent: LegalIntent | null = null;
                     let isDestination = false;
 
-                    if (actionMode === 'placeInfluence') {
-                        targetIntent = placeInfluenceIntents?.find(i => i.payload.targetTileId === tileId) ?? null;
-                        isValidTarget = !!targetIntent;
-                    } else if (actionMode === 'moveInfluence') {
-                        if (!moveInfluenceSourceId) {
-                            isValidTarget = moveInfluenceIntents?.some(i => i.payload.sourceId === tileId) ?? false;
-                        } else {
-                            targetIntent = moveInfluenceIntents?.find(
-                                i => i.payload.sourceId === moveInfluenceSourceId && i.payload.targetId === tileId
-                            ) ?? null;
+                    const isDraftSource = draftIntent?.moveType === 'moveInfluence' && draftIntent.payload.sourceId === tileId;
+                    const isDraftTarget = (
+                        (draftIntent?.moveType === 'placeInfluence' && draftIntent.payload.targetTileId === tileId) ||
+                        (draftIntent?.moveType === 'moveInfluence' && draftIntent.payload.targetId === tileId) ||
+                        (draftIntent?.moveType === 'formalizeInfluence' && draftIntent.payload.committeeTileId === tileId) ||
+                        (draftIntent?.moveType === 'convertResources' && draftIntent.payload.grassrootsTileId === tileId)
+                    );
+                    const isDrafted = isDraftSource || isDraftTarget;
+
+                    if (!draftIntent) {
+                        if (actionMode === 'placeInfluence') {
+                            targetIntent = placeInfluenceIntents?.find(i => i.payload.targetTileId === tileId) ?? null;
                             isValidTarget = !!targetIntent;
-                            if (isValidTarget) {
-                                isDestination = true;
+                        } else if (actionMode === 'moveInfluence') {
+                            if (!moveInfluenceSourceId) {
+                                isValidTarget = moveInfluenceIntents?.some(i => i.payload.sourceId === tileId) ?? false;
+                            } else {
+                                targetIntent = moveInfluenceIntents?.find(
+                                    i => i.payload.sourceId === moveInfluenceSourceId && i.payload.targetId === tileId
+                                ) ?? null;
+                                isValidTarget = !!targetIntent;
+                                if (isValidTarget) {
+                                    isDestination = true;
+                                }
                             }
+                        } else if (actionMode === 'formalizeInfluence') {
+                            isValidTarget = formalizeInfluenceIntents?.some(i => i.payload.committeeTileId === tileId) ?? false;
+                            targetIntent = null; // Wizard will handle selection, not direct proposal
+                        } else if (actionMode === 'convertResources') {
+                            isValidTarget = convertResourcesIntents?.some(i => i.payload.grassrootsTileId === tileId) ?? false;
+                            targetIntent = null; // Wizard will handle selection, not direct proposal
+                        } else {
+                            isValidTarget = false;
+                            targetIntent = null;
                         }
-                    } else if (actionMode === 'formalizeInfluence') {
-                        isValidTarget = formalizeInfluenceIntents?.some(i => i.payload.committeeTileId === tileId) ?? false;
-                        targetIntent = null; // Wizard will handle selection, not direct proposal
-                    } else if (actionMode === 'convertResources') {
-                        isValidTarget = convertResourcesIntents?.some(i => i.payload.grassrootsTileId === tileId) ?? false;
-                        targetIntent = null; // Wizard will handle selection, not direct proposal
-                    } else {
-                        isValidTarget = false;
-                        targetIntent = null;
                     }
 
                     const isSelected = selectedTileId === tileId || selectedCoord === coordStr || moveInfluenceSourceId === tileId;
-                    const isHot = isSelected || hoveredTileId === tileId || isValidTarget;
+                    const isHot = isSelected || hoveredTileId === tileId || isValidTarget || isDrafted;
                     const disabled = !isInteractive;
                     const testId = `hex-tile-${coordStr.replace(',', '_')}`;
 
@@ -167,7 +180,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 isSelected ? 'hex-cell-selected' : null,
                                 isValidTarget ? 'hex-cell-target' : null,
                                 isDestination ? 'hex-cell-target-destination' : null,
-                                isHot ? 'hex-cell-hot' : null
+                                isHot ? 'hex-cell-hot' : null,
+                                isDrafted ? 'hex-cell-drafted' : null
                             ]
                                 .filter(Boolean)
                                 .join(' ')}
@@ -185,7 +199,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             onClick={
                                 disabled
                                     ? undefined
-                                    : isValidTarget && targetIntent && onProposeMove
+                                    : (!draftIntent && isValidTarget && targetIntent && onProposeMove)
                                         ? () => onProposeMove(targetIntent!)
                                         : () => onSelectTile && onSelectTile(tileId, coordStr)
                             }
@@ -204,6 +218,22 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 valueW={typeof tile.weight === 'number' ? tile.weight : undefined}
                                 className="hex-tile-visual"
                             />
+                            {isDrafted && (
+                                <div className="hex-preview-overlay">
+                                    {isDraftTarget && draftIntent?.moveType === 'placeInfluence' && (
+                                        <div className="hex-preview-marker influence" />
+                                    )}
+                                    {isDraftSource && (
+                                        <div className="hex-preview-marker source" />
+                                    )}
+                                    {isDraftTarget && draftIntent?.moveType === 'moveInfluence' && (
+                                        <div className="hex-preview-marker destination" />
+                                    )}
+                                    {isDraftTarget && (draftIntent?.moveType === 'formalizeInfluence' || draftIntent?.moveType === 'convertResources') && (
+                                        <div className="hex-preview-highlight" />
+                                    )}
+                                </div>
+                            )}
                         </div>
                     );
                 })}
@@ -211,21 +241,28 @@ export const HexBoard: React.FC<HexBoardProps> = ({
             <div className="hex-layer hex-layer-ghosts">
                 {ghostCoords.map((coordStr) => {
                     const intent = placeTileByCoord.get(coordStr);
-                    if (!intent) return null;
+                    if (!intent && !draftIntent) return null;
+
+                    const isDraftedGhost = draftIntent?.moveType === 'placeTile' && draftIntent.payload.targetCoord === coordStr;
+                    if (!intent && !isDraftedGhost) return null;
+
                     const coord = parseCoordString(coordStr);
                     const { x, y } = axialToPixel(coord, HEX_SIZE);
                     const testId = `hex-ghost-${coordStr.replace(',', '_')}`;
                     const isGhostHovered = hoveredGhostCoord === coordStr;
+                    const canPropose = !draftIntent && isInteractive;
+
                     return (
                         <button
                             key={`ghost-${coordStr}`}
                             className={[
                                 'hex-cell',
                                 'hex-ghost',
-                                isInteractive ? 'hex-ghost-active' : null
+                                canPropose ? 'hex-ghost-active' : null,
+                                isDraftedGhost ? 'hex-ghost-drafted' : null
                             ].filter(Boolean).join(' ')}
-                            disabled={!isInteractive}
-                            onClick={!isInteractive ? undefined : () => onProposeMove?.(intent)}
+                            disabled={!canPropose && !isDraftedGhost}
+                            onClick={canPropose ? () => onProposeMove?.(intent!) : undefined}
                             onMouseEnter={() => setHoveredGhostCoord(coordStr)}
                             onMouseLeave={() => setHoveredGhostCoord((prev) => (prev === coordStr ? null : prev))}
                             data-testid={testId}
@@ -237,8 +274,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             }}
                             title={`Place at ${coordStr}`}
                         >
-                            {pendingTile && isGhostHovered && (
-                                <div className="ghost-preview" style={{ opacity: 0.6, pointerEvents: 'none' }}>
+                            {((pendingTile && isGhostHovered) || (isDraftedGhost && pendingTile)) && (
+                                <div className="ghost-preview" style={{ opacity: isDraftedGhost ? 0.9 : 0.6, pointerEvents: 'none' }}>
                                     <HexTileVisual
                                         majoritySeat={null}
                                         seatColor={seatColor}
@@ -247,8 +284,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                         influenceBySeat={{}}
                                         metaIconsBySeat={{}}
                                         badges={[]}
-                                        resortIcon={<ResortIcon resort={pendingTile.resort} />}
-                                        valueW={typeof pendingTile.weight === 'number' ? pendingTile.weight : undefined}
+                                        resortIcon={<ResortIcon resort={pendingTile!.resort} />}
+                                        valueW={typeof pendingTile!.weight === 'number' ? pendingTile!.weight : undefined}
                                         className="hex-tile-visual"
                                     />
                                 </div>

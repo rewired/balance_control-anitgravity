@@ -25,6 +25,7 @@ type BoardViewportGameProps = {
     onProposeMove?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
     activePlayerId?: string;
+    draftIntent?: LegalIntent | null;
 };
 
 type BoardViewportDevProps = {
@@ -164,6 +165,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             onProposeMove={gameProps!.onProposeMove}
                                             pendingTile={gameProps!.pendingTile}
                                             activePlayerId={gameProps!.activePlayerId}
+                                            draftIntent={gameProps!.draftIntent}
                                         />
                                     )}
                             </TransformComponent>
