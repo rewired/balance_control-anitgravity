@@ -116,4 +116,63 @@ describe('PendingChoiceModal', () => {
         expect(resolveChoice).toHaveBeenCalledTimes(1);
         expect(resolveChoice).toHaveBeenCalledWith({ choiceId: 'choice-1', selection: 'a' });
     });
+
+    it('does NOT render modal when pendingChoice.kind === "selectTile"', () => {
+        ensureResizeObserver();
+        const state = createState();
+        state.engine.pendingChoice = {
+            kind: 'selectTile',
+            resolveChoice: [
+                { moveType: 'resolveChoice', payload: { choiceId: 'choice-1', selection: 'tile_alpha' } }
+            ]
+        };
+
+        mockEnumerateLegalIntents.mockReturnValue(state.engine.pendingChoice.resolveChoice);
+
+        render(
+            <GameLayout
+                G={state}
+                ctx={baseCtx}
+                moves={{ resolveChoice: vi.fn() }}
+                playerID={'0'}
+                isActive={true}
+            />
+        );
+
+        expect(screen.queryByTestId('pending-choice-overlay')).toBeNull();
+    });
+
+    it('allows board interaction when pendingChoice.kind === "selectTile"', () => {
+        ensureResizeObserver();
+        const resolveChoice = vi.fn();
+        const state = createState();
+        state.engine.pendingChoice = {
+            kind: 'selectTile',
+            resolveChoice: [
+                { moveType: 'resolveChoice', payload: { choiceId: 'choice-1', selection: 'tile_alpha' } }
+            ]
+        };
+
+        mockEnumerateLegalIntents.mockReturnValue(state.engine.pendingChoice.resolveChoice);
+
+        render(
+            <GameLayout
+                G={state}
+                ctx={baseCtx}
+                moves={{ resolveChoice }}
+                playerID={'0'}
+                isActive={true}
+            />
+        );
+
+        // Find the tile on the board
+        const tile = screen.getByTestId('hex-tile-0_0');
+
+        // It should have highlight class (we need to implement this)
+        // For now just check click dispatch
+        fireEvent.click(tile);
+
+        expect(resolveChoice).toHaveBeenCalledTimes(1);
+        expect(resolveChoice).toHaveBeenCalledWith({ choiceId: 'choice-1', selection: 'tile_alpha' });
+    });
 });

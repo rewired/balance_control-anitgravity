@@ -20,6 +20,7 @@ export type IntentViewModel = {
     selectedTileId: string | null;
     stagedTileId: string | null;
     pendingChoice: {
+        kind: string | null;
         resolveChoice: LegalIntent[];
     };
     drawAndPlace: {
@@ -41,6 +42,7 @@ type BuildIntentViewModelInput = {
     intents: LegalIntent[];
     selectedTileId: string | null;
     stagedTileId: string | null;
+    pendingChoiceKind: string | null;
 };
 
 function inferStageBestEffort(ctx: any, playerID: string): IntentStage {
@@ -95,7 +97,10 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         hasPendingChoice,
         selectedTileId: input.selectedTileId,
         stagedTileId: input.stagedTileId,
-        pendingChoice: { resolveChoice },
+        pendingChoice: {
+            kind: input.pendingChoiceKind,
+            resolveChoice
+        },
         drawAndPlace: { placeTile, passTilePlacement },
         political: {
             others: baseOthers,
@@ -117,14 +122,17 @@ export function useIntentViewModel({ G, ctx, playerID, selectedTileId, stagedTil
     const intents = useMemo(() => enumerateLegalIntents(G, ctx, pid), [G, ctx, pid]);
 
     const vmWithoutIntents = useMemo(() => {
+        const pendingChoice = G?.engine?.pendingChoice;
+        const pendingChoiceKind = pendingChoice?.kind ?? null;
         return buildIntentViewModel({
             ctx,
             playerID: pid,
             intents,
             selectedTileId,
-            stagedTileId
+            stagedTileId,
+            pendingChoiceKind
         });
-    }, [ctx, intents, pid, selectedTileId, stagedTileId]);
+    }, [ctx, intents, pid, selectedTileId, stagedTileId, G?.engine?.pendingChoice?.kind]);
 
     return useMemo(() => {
         return {

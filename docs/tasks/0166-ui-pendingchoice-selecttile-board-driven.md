@@ -10,11 +10,11 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-006
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Re-check ARCH-06 pendingChoice section:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Re-check ARCH-06 pendingChoice section:
    - Hard-gate semantics
    - `selectTile` is board-driven and must not be blocked by a modal
-3. [ ] Baseline tests:
+3. [x] Baseline tests:
    - `pnpm -C packages/client-web test`
 
 ## 1) Goal
@@ -70,20 +70,25 @@ For all other pendingChoice kinds:
 - No engine/rule/spec changes.
 
 ## 5) Acceptance Criteria
-- [ ] `pendingChoice.kind === 'selectTile'` can be resolved via board click (no modal blocker).
-- [ ] `resolveChoice` dispatches exactly one move.
-- [ ] Other pendingChoice kinds still use modal overlay as before.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] `pendingChoice.kind === 'selectTile'` can be resolved via board click (no modal blocker).
+- [x] `resolveChoice` dispatches exactly one move.
+- [x] Other pendingChoice kinds still use modal overlay as before.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/GR-006).
-- [ ] No engine/rule/spec changes.
-- [ ] No additional move commit paths added.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/GR-006).
+- [x] No engine/rule/spec changes.
+- [x] No additional move commit paths added.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 7) Work Summary
-- TBD
+- Updated `IntentViewModel` to expose `pendingChoice.kind`.
+- Modified `ModalHost` to skip `PendingChoiceModal` when `kind === 'selectTile'`.
+- Updated `GameLayout`, `BoardViewport`, and `HexBoard` to propagate `resolveChoiceIntents` and `onResolveChoice` callback.
+- Implemented highlighting and click handling in `HexBoard` for `resolveChoice` intents.
+- Added comprehensive tests in `pending-choice-modal.test.tsx` and updated `intentViewModel.test.ts`.
 
 ## 8) Commands Run
-- TBD
+- `pnpm -C packages/client-web test`
+- `pnpm lint`

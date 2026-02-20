@@ -15,6 +15,7 @@ interface HexBoardProps {
     placeInfluenceIntents?: LegalIntent[];
     formalizeInfluenceIntents?: LegalIntent[];
     convertResourcesIntents?: LegalIntent[];
+    resolveChoiceIntents?: LegalIntent[];
     actionMode?: string;
     moveInfluenceSourceId?: string | null;
     ghostCoords: string[];
@@ -23,6 +24,7 @@ interface HexBoardProps {
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
     onProposeMove?: (intent: LegalIntent) => void;
+    onResolveChoice?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
     activePlayerId?: string;
     draftIntent?: LegalIntent | null;
@@ -42,6 +44,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     placeInfluenceIntents,
     formalizeInfluenceIntents,
     convertResourcesIntents,
+    resolveChoiceIntents,
     actionMode,
     moveInfluenceSourceId,
     ghostCoords,
@@ -50,6 +53,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     selectedCoord,
     onSelectTile,
     onProposeMove,
+    onResolveChoice,
     pendingTile,
     activePlayerId,
     draftIntent
@@ -113,6 +117,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     let isValidTarget = false;
                     let targetIntent: LegalIntent | null = null;
                     let isDestination = false;
+                    let isResolveChoice = false;
 
                     const isDraftSource = draftIntent?.moveType === 'moveInfluence' && draftIntent.payload.sourceId === tileId;
                     const isDraftTarget = (
@@ -124,7 +129,14 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     const isDrafted = isDraftSource || isDraftTarget;
 
                     if (!draftIntent) {
-                        if (actionMode === 'placeInfluence') {
+                        if (resolveChoiceIntents && resolveChoiceIntents.length > 0) {
+                            targetIntent = resolveChoiceIntents.find(i => {
+                                const sel = (i.payload as any).selection;
+                                return sel === tileId || sel === coordStr;
+                            }) ?? null;
+                            isValidTarget = !!targetIntent;
+                            isResolveChoice = isValidTarget;
+                        } else if (actionMode === 'placeInfluence') {
                             targetIntent = placeInfluenceIntents?.find(i => i.payload.targetTileId === tileId) ?? null;
                             isValidTarget = !!targetIntent;
                         } else if (actionMode === 'moveInfluence') {
@@ -199,9 +211,11 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             onClick={
                                 disabled
                                     ? undefined
-                                    : (!draftIntent && isValidTarget && targetIntent && onProposeMove)
-                                        ? () => onProposeMove(targetIntent!)
-                                        : () => onSelectTile && onSelectTile(tileId, coordStr)
+                                    : (isResolveChoice && targetIntent && onResolveChoice)
+                                        ? () => onResolveChoice(targetIntent!)
+                                        : (!draftIntent && isValidTarget && targetIntent && onProposeMove)
+                                            ? () => onProposeMove(targetIntent!)
+                                            : () => onSelectTile && onSelectTile(tileId, coordStr)
                             }
                             role={disabled ? undefined : 'button'}
                             tabIndex={disabled ? undefined : 0}

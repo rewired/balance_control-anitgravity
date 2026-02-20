@@ -32,7 +32,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     } as const;
 
     const controller = useGameInteractionController({ G, ctx, playerID, moves });
-    const { vm, selectedTileId, selectedCoord, selectTile, selectMoveInfluenceSource, proposeIntent, actionMode, moveInfluenceSourceId, interactionState, draft } = controller;
+    const { vm, selectedTileId, selectedCoord, selectTile, selectMoveInfluenceSource, proposeIntent, actionMode, moveInfluenceSourceId, interactionState, draft, resolveChoice } = controller;
 
     // Wrap selectTile to enforce "valid targets only" for parameter selection
     const handleSelectTile = React.useCallback((tileId: string, coordStr: string) => {
@@ -124,7 +124,8 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
         return vm.ghostCoords;
     }, [vm.hasPendingChoice, placementIntents, vm.ghostCoords]);
 
-    const isBoardInteractive = isActive && (!vm.hasPendingChoice || placementIntents.length > 0);
+    const isSelectTilePending = vm.pendingChoice.kind === 'selectTile';
+    const isBoardInteractive = isActive && (!vm.hasPendingChoice || placementIntents.length > 0 || isSelectTilePending);
 
     return (
         <div className="game-layout">
@@ -184,6 +185,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     placeInfluenceIntents={vm.intents.filter(i => i.moveType === 'placeInfluence')}
                     formalizeInfluenceIntents={vm.political.formalizeInfluence}
                     convertResourcesIntents={vm.political.convertResources}
+                    resolveChoiceIntents={isSelectTilePending ? vm.pendingChoice.resolveChoice : undefined}
                     actionMode={interactionState === 'draftReady' ? 'none' : actionMode}
                     moveInfluenceSourceId={moveInfluenceSourceId}
                     ghostCoords={placementGhostCoords}
@@ -192,6 +194,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     selectedCoord={selectedCoord}
                     onSelectTile={handleSelectTile}
                     onProposeMove={proposeIntent}
+                    onResolveChoice={isSelectTilePending ? resolveChoice : undefined}
                     pendingTile={pendingTile}
                     activePlayerId={ctx.currentPlayer}
                     draftIntent={draft.intent}

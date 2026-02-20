@@ -20,7 +20,8 @@ describe('intent view model', () => {
             playerID: '0',
             intents,
             selectedTileId: null,
-            stagedTileId: 'T1'
+            stagedTileId: 'T1',
+            pendingChoiceKind: null
         });
 
         expect(vm.stage).toBe('drawAndPlace');
@@ -44,7 +45,8 @@ describe('intent view model', () => {
             playerID: '0',
             intents,
             selectedTileId: null,
-            stagedTileId: null
+            stagedTileId: null,
+            pendingChoiceKind: null
         });
 
         expect(vm.stage).toBe('politicalAction');
@@ -66,7 +68,8 @@ describe('intent view model', () => {
             playerID: '0',
             intents,
             selectedTileId: 'A',
-            stagedTileId: null
+            stagedTileId: null,
+            pendingChoiceKind: null
         });
 
         // influence actions are now handled by modes in ActionDock, so they are excluded from others
@@ -84,10 +87,12 @@ describe('intent view model', () => {
             playerID: '0',
             intents,
             selectedTileId: null,
-            stagedTileId: null
+            stagedTileId: null,
+            pendingChoiceKind: 'selectTile'
         });
 
         expect(vm.hasPendingChoice).toBe(true);
+        expect(vm.pendingChoice.kind).toBe('selectTile');
         expect(vm.pendingChoice.resolveChoice).toHaveLength(2);
         expect(vm.political.others.map((i) => i.moveType)).toEqual([]);
     });

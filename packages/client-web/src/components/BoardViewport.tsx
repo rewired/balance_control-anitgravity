@@ -15,6 +15,7 @@ type BoardViewportGameProps = {
     placeInfluenceIntents?: LegalIntent[];
     formalizeInfluenceIntents?: LegalIntent[];
     convertResourcesIntents?: LegalIntent[];
+    resolveChoiceIntents?: LegalIntent[];
     actionMode?: string;
     moveInfluenceSourceId?: string | null;
     ghostCoords: string[];
@@ -23,6 +24,7 @@ type BoardViewportGameProps = {
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
     onProposeMove?: (intent: LegalIntent) => void;
+    onResolveChoice?: (intent: LegalIntent) => void;
     pendingTile?: Tile | null;
     activePlayerId?: string;
     draftIntent?: LegalIntent | null;
@@ -155,6 +157,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             placeInfluenceIntents={gameProps!.placeInfluenceIntents}
                                             formalizeInfluenceIntents={gameProps!.formalizeInfluenceIntents}
                                             convertResourcesIntents={gameProps!.convertResourcesIntents}
+                                            resolveChoiceIntents={gameProps!.resolveChoiceIntents}
                                             actionMode={gameProps!.actionMode}
                                             moveInfluenceSourceId={gameProps!.moveInfluenceSourceId}
                                             ghostCoords={gameProps!.ghostCoords}
@@ -163,6 +166,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             selectedCoord={gameProps!.selectedCoord}
                                             onSelectTile={gameProps!.onSelectTile}
                                             onProposeMove={gameProps!.onProposeMove}
+                                            onResolveChoice={gameProps!.onResolveChoice}
                                             pendingTile={gameProps!.pendingTile}
                                             activePlayerId={gameProps!.activePlayerId}
                                             draftIntent={gameProps!.draftIntent}

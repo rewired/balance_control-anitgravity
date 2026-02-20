@@ -45,10 +45,12 @@ export const ModalHost: React.FC<ModalHostProps> = ({ G, controller }) => {
 
     return (
         <>
-            <PendingChoiceModal
-                resolveChoiceIntents={vm.pendingChoice.resolveChoice}
-                onResolve={resolveChoice}
-            />
+            {vm.pendingChoice.kind !== 'selectTile' && (
+                <PendingChoiceModal
+                    resolveChoiceIntents={vm.pendingChoice.resolveChoice}
+                    onResolve={resolveChoice}
+                />
+            )}
             <FormalizeWizardModal
                 open={wizard?.kind === 'formalize'}
                 G={G}
