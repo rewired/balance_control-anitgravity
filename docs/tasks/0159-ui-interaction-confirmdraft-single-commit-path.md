@@ -1,6 +1,6 @@
 # Task 0159 — PG-1: Single normal commit path (confirmDraft → dispatchIntent) + remove UI-side direct dispatch access
 
-Status: DRAFT
+Status: DONE
 
 ## Meta
 - Owner: Codex
@@ -10,11 +10,11 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005, GR-006
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Re-read ARCH-06 contract + checklist:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Re-read ARCH-06 contract + checklist:
    - `/docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.v1.yaml`
    - `/docs/architecture/ARCH-06-UI-INTERACTION-CHECKLIST.md`
-3. [ ] Baseline scan (no edits yet):
+3. [x] Baseline scan (no edits yet):
    - `rg -n "\bdispatchIntent\b|dispatchIntentImmediate|confirmProposedIntent|onDispatchIntent" packages/client-web/src`
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
@@ -83,14 +83,14 @@ After this task:
 - Determinism: all derived sorting (e.g., intent keying) must be stable.
 
 ## 5) Acceptance Criteria
-- [ ] No component in `packages/client-web/src/components/**` calls `moves[moveType](...)` or `dispatchIntent(...)` directly.
-- [ ] `MoveConfirmationModal` (if still used) calls `controller.confirmDraft()` and `controller.cancelDraft()`.
-- [ ] In normal play (no pendingChoice), there is no path to commit a move other than `confirmDraft()`.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] No component in `packages/client-web/src/components/**` calls `moves[moveType](...)` or `dispatchIntent(...)` directly.
+- [x] `MoveConfirmationModal` (if still used) calls `controller.confirmDraft()` and `controller.cancelDraft()`.
+- [x] In normal play (no pendingChoice), there is no path to commit a move other than `confirmDraft()`.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005/006).
-- [ ] No engine/rule/spec changes.
-- [ ] No new commit shortcut functions exported from UI.
-- [ ] `pnpm lint` passes.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005/006).
+- [x] No engine/rule/spec changes.
+- [x] No new commit shortcut functions exported from UI.
+- [x] `pnpm lint` passes.
+- [x] `pnpm -C packages/client-web test` passes.

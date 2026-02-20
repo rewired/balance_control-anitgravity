@@ -6,7 +6,7 @@ import { HexBoard } from '../src/components/HexBoard';
 
 describe('HexBoard UX', () => {
     it('handles resolveChoice intents with spatial selection', () => {
-        const onDispatchIntent = vi.fn();
+        const onProposeMove = vi.fn();
         // Intent is resolveChoice but payload has selection as coord string
         const intents = [
             { moveType: 'resolveChoice', payload: { choiceId: 'c1', selection: '1,0' } }
@@ -22,7 +22,7 @@ describe('HexBoard UX', () => {
         render(
             <HexBoard
                 G={G}
-                onDispatchIntent={onDispatchIntent}
+                onProposeMove={onProposeMove}
                 placeTileIntents={intents as any}
                 ghostCoords={['1,0']}
                 isInteractive={true}
@@ -33,8 +33,8 @@ describe('HexBoard UX', () => {
         expect(ghost).toBeDefined();
 
         fireEvent.click(ghost);
-        expect(onDispatchIntent).toHaveBeenCalledTimes(1);
-        expect(onDispatchIntent).toHaveBeenCalledWith(intents[0]);
+        expect(onProposeMove).toHaveBeenCalledTimes(1);
+        expect(onProposeMove).toHaveBeenCalledWith(intents[0]);
     });
 
     it('renders ghost preview on hover when pendingTile is provided', () => {

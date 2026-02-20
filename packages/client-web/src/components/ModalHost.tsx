@@ -21,8 +21,8 @@ export const ModalHost: React.FC<ModalHostProps> = ({ G, controller }) => {
     const {
         vm,
         proposedIntent,
-        confirmProposedIntent,
-        cancelProposedIntent,
+        confirmDraft,
+        cancelDraft,
         resolveChoice,
         wizard,
         closeWizard,
@@ -56,8 +56,8 @@ export const ModalHost: React.FC<ModalHostProps> = ({ G, controller }) => {
             <MoveConfirmationModal
                 G={G}
                 intent={proposedIntent}
-                onConfirm={confirmProposedIntent}
-                onCancel={cancelProposedIntent}
+                onConfirm={confirmDraft}
+                onCancel={cancelDraft}
             />
             <FormalizeWizardModal
                 open={wizard?.kind === 'formalize'}

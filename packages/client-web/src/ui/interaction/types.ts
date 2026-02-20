@@ -57,14 +57,8 @@ export interface InteractionController {
     /** Cancels the current draft and resets action session. */
     cancelDraft: () => void;
 
-    /** Confirms the currently proposed intent and dispatches it. */
-    confirmProposedIntent: () => void;
-    /** Cancels the currently proposed intent. */
-    cancelProposedIntent: () => void;
     /** Dispatches a choice resolution. */
     resolveChoice: (intent: LegalIntent) => void;
-    /** Dispatches an intent immediately without confirmation. */
-    dispatchIntent: (intent: LegalIntent) => void;
     /** Closes the current active wizard. */
     closeWizard: () => void;
 }

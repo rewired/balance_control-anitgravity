@@ -5,7 +5,7 @@ import { Tile } from './Tile';
 
 interface BoardGridProps {
     G: GameState;
-    moves: any;
+    onProposeIntent?: (intent: LegalIntent) => void;
     intents: LegalIntent[];
     isInteractive: boolean;
     selectedTileId?: string | null;
@@ -20,7 +20,7 @@ interface BoardGridProps {
  */
 export const BoardGrid: React.FC<BoardGridProps> = ({
     G,
-    moves,
+    onProposeIntent,
     intents,
     isInteractive,
     selectedTileId,
@@ -71,7 +71,7 @@ export const BoardGrid: React.FC<BoardGridProps> = ({
                         key={`ghost-${coordStr}`}
                         className="ghost-cell"
                         disabled={!isInteractive}
-                        onClick={!isInteractive ? undefined : () => moves[intent.moveType](intent.payload)}
+                        onClick={!isInteractive ? undefined : () => onProposeIntent?.(intent)}
                         data-testid={`ghost-${coordStr}`}
                         title={`Place at ${coordStr}`}
                     >

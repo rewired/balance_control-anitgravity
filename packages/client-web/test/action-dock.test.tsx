@@ -81,15 +81,15 @@ describe('ActionDock', () => {
         expect(screen.getByText('Select a target tile on the board to place influence.')).toBeDefined();
     });
 
-    it('dispatches a secondary action exactly once', () => {
-        const moves = { unknownAction: vi.fn() };
+    it('proposes a secondary action exactly once', () => {
+        const proposeIntent = vi.fn();
         const intents = [
             { moveType: 'unknownAction', payload: { foo: 'bar' } },
         ] as any;
         const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
         const controller = {
             vm,
-            dispatchIntent: (intent: any) => moves[intent.moveType](intent.payload),
+            proposeIntent,
             actionMode: 'none',
             setActionMode: vi.fn(),
             intents: intents
@@ -108,6 +108,7 @@ describe('ActionDock', () => {
 
         const moveButton = screen.getByText('unknownAction');
         fireEvent.click(moveButton);
-        expect(moves.unknownAction).toHaveBeenCalledTimes(1);
+        expect(proposeIntent).toHaveBeenCalledTimes(1);
+        expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
     });
 });
