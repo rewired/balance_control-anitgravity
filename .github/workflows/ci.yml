@@ -49,9 +49,6 @@ jobs:
       - name: Run documentation verification
         run: pnpm run verify:docs
 
-      - name: Run hand-off verification
-        run: pnpm run verify:handoff
-
       - name: Check spec-anchor compliance
         run: pnpm run check:spec-anchors
 

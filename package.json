@@ -19,7 +19,6 @@
     "check:spec-anchors": "node scripts/check-spec-anchors.mjs",
     "verify:docs": "node scripts/verify-docs.mjs",
     "verify:task": "node scripts/verify-task.mjs",
-    "verify:handoff": "node scripts/verify-handoff.mjs",
     "verify:ui-interaction": "node scripts/verify-ui-interaction.mjs"
   },
   "devDependencies": {

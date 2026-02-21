@@ -601,14 +601,4 @@ No code-only PRs.
 
 ---
 
-## 6.3 Hand-off Protocol
-
-To prevent context loss between sessions, we use a strict hand-off protocol.
-
-* **Source of Truth:** `/docs/hand-off/current.md` (must be updated after every task packet).
-* **Protocol:** Follow `/docs/hand-off/task-packet-protocol.md`.
-* **Chat Context:** Use the "Context Capsule" from the protocol to prime new sessions.
-
----
-
 END OF AGENTS.md
