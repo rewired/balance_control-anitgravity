@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** VERIFYING
 
 ## Task State Machine (Loop-Breaker)
 
@@ -26,8 +26,8 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * GR-002: Tooling-only; no runtime changes to game logic or legality.
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 
 ---
 
@@ -109,23 +109,23 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Implement `scripts/verify-ui-interaction.mjs` with a deterministic directory walk.
-* [ ] Step 2: Print violations with file/line info (simple line/column scan is sufficient).
-* [ ] Step 3: Add `verify:ui-interaction` script to root `package.json`.
-* [ ] Step 4: If hooking into `pnpm test`, ensure it runs before package tests.
+* [x] Step 1: Implement `scripts/verify-ui-interaction.mjs` with a deterministic directory walk.
+* [x] Step 2: Print violations with file/line info (simple line/column scan is sufficient).
+* [x] Step 3: Add `verify:ui-interaction` script to root `package.json`.
+* [x] Step 4: If hooking into `pnpm test`, ensure it runs before package tests.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] `pnpm run verify:ui-interaction` passes on mainline.
-* [ ] Introducing a deliberate violation (e.g. `dispatchIntent(...)` in `ActionDock.tsx`) fails with a clear message and points to the offending file/line.
+* [x] `pnpm run verify:ui-interaction` passes on mainline.
+* [x] Introducing a deliberate violation (e.g. `dispatchIntent(...)` in `ActionDock.tsx`) fails with a clear message and points to the offending file/line.
 
 ---
 
 ## 10) PR Checklist
 
-* [ ] Guardrails listed accurately (GR-002).
-* [ ] Normative anchors cited.
-* [ ] `pnpm run verify:ui-interaction` passes.
-* [ ] If hooked into `pnpm test`, `pnpm test` passes.
+* [x] Guardrails listed accurately (GR-002).
+* [x] Normative anchors cited.
+* [x] `pnpm run verify:ui-interaction` passes.
+* [x] If hooked into `pnpm test`, `pnpm test` passes.
