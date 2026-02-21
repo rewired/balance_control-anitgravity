@@ -3,6 +3,7 @@ import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import { groupMeasureIntents } from '../ui/interaction/measureHelpers';
 import { getObjectLabel } from '../ui/interaction/labelHelpers';
+import { canonicalJsonStringify } from '../ui/interaction/utils';
 
 interface MeasureTrayProps {
     G: GameState;
@@ -28,13 +29,13 @@ export const MeasureTray: React.FC<MeasureTrayProps> = ({ G, intents, onSelect }
                             {group.expansionId}
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            {group.intents.map((intent, idx) => {
+                            {group.intents.map((intent) => {
                                 const objectId = intent.payload as string;
                                 const label = getObjectLabel(G, objectId);
 
                                 return (
                                     <button
-                                        key={idx}
+                                        key={canonicalJsonStringify(intent.payload)}
                                         className="btn-secondary"
                                         style={{ textAlign: 'left', padding: '6px 10px', fontSize: '13px', width: '100%' }}
                                         onClick={() => onSelect(intent)}

@@ -96,4 +96,35 @@ describe('intent view model', () => {
         expect(vm.pendingChoice.resolveChoice).toHaveLength(2);
         expect(vm.political.others.map((i) => i.moveType)).toEqual([]);
     });
+
+    it('sorts others deterministically by moveType and canonical payload', () => {
+        const intents: LegalIntent[] = [
+            intent('z.move', { b: 1, a: 2 }),
+            intent('a.move', { y: 2 }),
+            intent('a.move', { x: 1 }),
+        ];
+
+        const vm = buildIntentViewModel({
+            ctx: { activePlayers: { '0': 'politicalAction' } },
+            playerID: '0',
+            intents,
+            selectedTileId: null,
+            stagedTileId: null,
+            pendingChoiceKind: null
+        });
+
+        // Expected order:
+        // 1. a.move {x:1} (canonical: {"x":1})
+        // 2. a.move {y:2} (canonical: {"y":2}) - "x" < "y" ? No.
+        // Wait, canonicalJsonStringify({"x":1}) is '{"x":1}'
+        // canonicalJsonStringify({"y":2}) is '{"y":2}'
+        // '{"x":1}' < '{"y":2}' because "x" < "y".
+
+        // 3. z.move {a:2, b:1} (canonical: {"a":2,"b":1})
+
+        expect(vm.political.others).toHaveLength(3);
+        expect(vm.political.others[0]).toEqual(intent('a.move', { x: 1 }));
+        expect(vm.political.others[1]).toEqual(intent('a.move', { y: 2 }));
+        expect(vm.political.others[2]).toEqual(intent('z.move', { a: 2, b: 1 }));
+    });
 });
