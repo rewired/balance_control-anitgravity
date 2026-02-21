@@ -9,6 +9,7 @@ Scope: Implementation reference (no rules, only contracts)
 - ARCH-03 = /docs/architecture/ARCH-03-MEASURE-CPU.md
 - ARCH-04 = /docs/architecture/ARCH-04-LLM-BOT-CONTRACT.md
 - ARCH-05 = /docs/architecture/ARCH-05-DOCUMENTATION-CONTRACT.md
+- ARCH-06 = /docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.md
 
 ## Referenced specifications (normative)
 - SPEC-CORE-01 = /docs/rules/000-core.md
