@@ -23,7 +23,7 @@ describe('ActionDock', () => {
             { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } },
             { moveType: 'moveInfluence', payload: { sourceId: 'tile_alpha', targetId: 'tile_beta' } }
         ] as any;
-        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null, pendingChoiceKind: null }), intents } as any;
         const controller = {
             vm,
             actionMode: 'none',
@@ -52,7 +52,7 @@ describe('ActionDock', () => {
         const intents = [
             { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } }
         ] as any;
-        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null, pendingChoiceKind: null }), intents } as any;
         const controller = {
             vm,
             actionMode: 'placeInfluence',
@@ -78,7 +78,7 @@ describe('ActionDock', () => {
         const intents = [
             { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } }
         ] as any;
-        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents, G: { objects: {} } } as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null, pendingChoiceKind: null }), intents, G: { objects: {} } } as any;
         const controller = {
             vm,
             actionMode: 'placeInfluence',
@@ -109,7 +109,7 @@ describe('ActionDock', () => {
 
     it('shows group headers', () => {
         const intents = [] as any;
-        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null, pendingChoiceKind: null }), intents, political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] } } as any;
         const controller = {
             vm,
             actionMode: 'none',
@@ -128,8 +128,8 @@ describe('ActionDock', () => {
         );
 
         expect(screen.getByText('Influence')).toBeDefined();
-        expect(screen.getByText('Committees')).toBeDefined();
-        expect(screen.getByText('Economy')).toBeDefined();
+        expect(screen.queryByText('Committees')).toBeNull();
+        expect(screen.queryByText('Economy')).toBeNull();
     });
 
     it('proposes a secondary action exactly once', () => {
@@ -138,7 +138,7 @@ describe('ActionDock', () => {
             { moveType: 'unknownAction', payload: { foo: 'bar' } },
         ] as any;
         const G = { objects: {} } as any;
-        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents, G } as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null, pendingChoiceKind: null }), intents, G } as any;
         const controller = {
             vm,
             proposeIntent,
@@ -417,7 +417,7 @@ describe('ActionDock', () => {
     });
 
     it('shows variant selection panel for convertResources', () => {
-         const intents = [
+        const intents = [
             {
                 moveType: 'convertResources',
                 payload: {
@@ -539,7 +539,7 @@ describe('ActionDock', () => {
             editPinnedTile,
             actionMode: 'formalizeInfluence',
             draft: { intent: null },
-             // Mock other required props
+            // Mock other required props
             confirmDraft: vi.fn(),
             cancelDraft: vi.fn(),
             editDraftSource: vi.fn(),
@@ -575,7 +575,7 @@ describe('ActionDock', () => {
         window.location = { ...originalLocation, search: '?lang=de' };
 
         const intents = [] as any;
-        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null, pendingChoiceKind: null }), intents } as any;
         const controller = {
             vm,
             actionMode: 'none',

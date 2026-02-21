@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** FROZEN
+**Task State:** DONE
 
 ## 0) Masterplan Guardrails (MUST)
 
@@ -86,6 +86,6 @@ Note: Do not add engine mocks that bypass the real intent enumeration surface un
 
 ## 8) Acceptance Criteria
 
-* [ ] When no Formalize intents are legal, Formalize is not selectable (hidden or disabled).
-* [ ] When Formalize is legal, it remains selectable and functions normally.
-* [ ] `pnpm lint`, `pnpm test` (and `pnpm e2e` if in baseline) are green.
+* [x] When no Formalize intents are legal, Formalize is not selectable (hidden or disabled).
+* [x] When Formalize is legal, it remains selectable and functions normally.
+* [x] `pnpm lint`, `pnpm test` (and `pnpm e2e` if in baseline) are green.

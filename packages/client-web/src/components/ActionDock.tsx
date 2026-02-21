@@ -320,29 +320,33 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
                 </div>
             </div>
 
-            <div className="action-group">
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.committees')}</h4>
-                <button
-                    className={actionMode === 'formalizeInfluence' ? 'btn-primary' : 'btn-secondary'}
-                    disabled={!hasFormalizeInfluenceIntents}
-                    onClick={() => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence')}
-                    data-testid="btn-mode-formalize-influence"
-                >
-                    {t('core:action.formalize')}
-                </button>
-            </div>
+            {hasFormalizeInfluenceIntents && (
+                <div className="action-group">
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.committees')}</h4>
+                    <button
+                        className={actionMode === 'formalizeInfluence' ? 'btn-primary' : 'btn-secondary'}
+                        disabled={!hasFormalizeInfluenceIntents}
+                        onClick={() => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence')}
+                        data-testid="btn-mode-formalize-influence"
+                    >
+                        {t('core:action.formalize')}
+                    </button>
+                </div>
+            )}
 
-            <div className="action-group">
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.economy')}</h4>
-                <button
-                    className={actionMode === 'convertResources' ? 'btn-primary' : 'btn-secondary'}
-                    disabled={!hasConvertResourcesIntents}
-                    onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
-                    data-testid="btn-mode-convert-resources"
-                >
-                    {t('core:action.convert')}
-                </button>
-            </div>
+            {hasConvertResourcesIntents && (
+                <div className="action-group">
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.economy')}</h4>
+                    <button
+                        className={actionMode === 'convertResources' ? 'btn-primary' : 'btn-secondary'}
+                        disabled={!hasConvertResourcesIntents}
+                        onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
+                        data-testid="btn-mode-convert-resources"
+                    >
+                        {t('core:action.convert')}
+                    </button>
+                </div>
+            )}
 
             {vm.political.measures.length > 0 && (
                 <div className="action-group">
@@ -441,23 +445,23 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                     <>
                         {isDrawAndPlace && (
                             <div className="action-panel-primary">
-                            <div className="action-panel-meta">{t('core:ui.staged', { tile: vm.stagedTileId || t('core:inspector.none') })}</div>
-                            {vm.drawAndPlace.passTilePlacement && (
-                                <button
-                                    className="btn-primary"
-                                    onClick={() => proposeIntent(vm.drawAndPlace.passTilePlacement!)}
-                                    data-testid="btn-skip-placement"
-                                >
-                                    {t('core:ui.skipPlacement')}
-                                </button>
-                            )}
-                        </div>
-                    )}
-                    {isPoliticalAction && (
-                        <ActionGroupList G={G} controller={controller} />
-                    )}
-                </>
-            ))}
+                                <div className="action-panel-meta">{t('core:ui.staged', { tile: vm.stagedTileId || t('core:inspector.none') })}</div>
+                                {vm.drawAndPlace.passTilePlacement && (
+                                    <button
+                                        className="btn-primary"
+                                        onClick={() => proposeIntent(vm.drawAndPlace.passTilePlacement!)}
+                                        data-testid="btn-skip-placement"
+                                    >
+                                        {t('core:ui.skipPlacement')}
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                        {isPoliticalAction && (
+                            <ActionGroupList G={G} controller={controller} />
+                        )}
+                    </>
+                ))}
         </div>
     );
 };
