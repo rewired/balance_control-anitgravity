@@ -30,6 +30,7 @@
             "changeVariant": "Variante ändern",
             "changeTile": "Feld ändern",
             "changePlacement": "Platzierung ändern",
+            "changeTarget": "Ziel ändern",
             "actions": "Aktionen",
             "waiting": "Warten",
             "drawAndPlace": "Ziehen & Platzieren",
@@ -42,7 +43,12 @@
             "from": "Von: {{from}}",
             "to": "Zu: {{to}}",
             "skipPlacement": "Platzierung überspringen",
-            "staged": "Bereit: {{tile}}"
+            "staged": "Bereit: {{tile}}",
+            "noVariants": "Keine Varianten verfügbar",
+            "selectPayment": "Zahlung wählen",
+            "source": "Quelle",
+            "committee": "Komitee",
+            "grassroots": "Basis"
         },
         "draft": {
             "moveInfluenceSummary": "{{source}} → {{target}}",

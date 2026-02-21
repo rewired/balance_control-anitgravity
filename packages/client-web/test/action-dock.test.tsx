@@ -3,10 +3,19 @@ import React from 'react';
 import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import { ActionDock } from '../src/components/ActionDock';
 import { buildIntentViewModel } from '../src/ui/useIntentViewModel';
+import { I18nProvider } from '../src/ui/i18n';
 
 afterEach(() => {
     cleanup();
 });
+
+const renderWithI18n = (ui: React.ReactElement) => {
+    return render(
+        <I18nProvider>
+            {ui}
+        </I18nProvider>
+    );
+};
 
 describe('ActionDock', () => {
     it('shows Place Influence and Move Influence buttons in politicalAction', () => {
@@ -24,7 +33,7 @@ describe('ActionDock', () => {
             interactionState: 'selectingAction'
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
                 G={{} as any}
@@ -34,6 +43,9 @@ describe('ActionDock', () => {
 
         expect(screen.getByTestId('btn-mode-place-influence')).toBeDefined();
         expect(screen.getByTestId('btn-mode-move-influence')).toBeDefined();
+
+        // Assertion for group header translation
+        expect(screen.getByText('Influence')).toBeDefined();
     });
 
     it('highlights active mode button', () => {
@@ -50,7 +62,7 @@ describe('ActionDock', () => {
             interactionState: 'selectingParams'
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
                 G={{} as any}
@@ -66,7 +78,7 @@ describe('ActionDock', () => {
         const intents = [
             { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } }
         ] as any;
-        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents, G: { objects: {} } } as any;
         const controller = {
             vm,
             actionMode: 'placeInfluence',
@@ -76,26 +88,23 @@ describe('ActionDock', () => {
             interactionState: 'selectingParams'
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
-                G={{} as any}
+                G={vm.G}
                 controller={controller}
             />
         );
 
-        // Check for Current Action Panel elements
-        expect(screen.getByText('Active Action')).toBeDefined();
+        // Check for Current Action Panel elements (translated)
+        expect(screen.getByText('Active action')).toBeDefined();
 
         const currentPanel = screen.getByTestId('current-action-panel');
-        // Use within to find text specifically inside the current panel
         expect(screen.getByTestId('current-action-panel')).toBeDefined();
-        // Since getByText searches globally, verify that we can find the text somewhere,
-        // but to avoid ambiguity error we can check if it's contained in the panel
-        expect(currentPanel.textContent).toContain('Place Influence');
+        expect(currentPanel.textContent).toContain('Place influence');
 
         expect(screen.getByText('Step')).toBeDefined();
-        expect(screen.getByText('Select target')).toBeDefined();
+        expect(screen.getByText('Select tile')).toBeDefined();
     });
 
     it('shows group headers', () => {
@@ -110,7 +119,7 @@ describe('ActionDock', () => {
             interactionState: 'selectingAction'
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
                 G={{} as any}
@@ -128,7 +137,8 @@ describe('ActionDock', () => {
         const intents = [
             { moveType: 'unknownAction', payload: { foo: 'bar' } },
         ] as any;
-        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
+        const G = { objects: {} } as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents, G } as any;
         const controller = {
             vm,
             proposeIntent,
@@ -139,10 +149,10 @@ describe('ActionDock', () => {
             interactionState: 'selectingAction'
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
-                G={{} as any}
+                G={G}
                 controller={controller}
             />
         );
@@ -150,7 +160,7 @@ describe('ActionDock', () => {
         // Check for collapsible summary with count
         const summary = screen.getByTestId('summary-expansions-other');
         expect(summary).toBeDefined();
-        expect(summary.textContent).toContain('Expansions → Other (1)');
+        expect(summary.textContent).toContain('Expansions (1)');
 
         // Open the details panel
         fireEvent.click(summary);
@@ -167,12 +177,14 @@ describe('ActionDock', () => {
         const confirmDraft = vi.fn();
         const cancelDraft = vi.fn();
         const draftedIntent = { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } };
+        const G = { objects: {} } as any;
 
         const controller = {
             vm: {
                 stage: 'politicalAction',
                 political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
-                intents: []
+                intents: [],
+                G
             },
             interactionState: 'draftReady',
             draft: { intent: draftedIntent, isLegalNow: true },
@@ -181,16 +193,17 @@ describe('ActionDock', () => {
             actionMode: 'none'
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
-                G={{} as any}
+                G={G}
                 controller={controller}
             />
         );
 
         expect(screen.getByTestId('action-dock-draft')).toBeDefined();
-        expect(screen.getByText('placeInfluence')).toBeDefined();
+        // Translated summary for placeInfluence
+        expect(screen.getByText('target tile_alpha')).toBeDefined();
         expect(screen.getByText('Preview')).toBeDefined(); // Step label
 
         fireEvent.click(screen.getByTestId('btn-confirm-draft'));
@@ -222,7 +235,8 @@ describe('ActionDock', () => {
                     measures: intents
                 },
                 intents: intents,
-                drawAndPlace: {}
+                drawAndPlace: {},
+                G
             },
             actionMode: 'none',
             setActionMode,
@@ -232,7 +246,7 @@ describe('ActionDock', () => {
             interactionState: 'selectingAction'
         } as any;
 
-        const { rerender } = render(
+        const { rerender } = renderWithI18n(
             <ActionDock
                 isActive={true}
                 G={G}
@@ -255,11 +269,13 @@ describe('ActionDock', () => {
         // Re-render with active mode to simulate state update
         const activeController = { ...controller, actionMode: 'takeMeasure' };
         rerender(
-            <ActionDock
-                isActive={true}
-                G={G}
-                controller={activeController}
-            />
+            <I18nProvider>
+                <ActionDock
+                    isActive={true}
+                    G={G}
+                    controller={activeController}
+                />
+            </I18nProvider>
         );
 
         // Now MeasureTray content should be visible
@@ -267,21 +283,23 @@ describe('ActionDock', () => {
     });
 
     it('hides normal action buttons (group list) when interactionState is draftReady', () => {
+        const G = { objects: {} } as any;
         const controller = {
             vm: {
                 stage: 'politicalAction',
                 political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
-                intents: []
+                intents: [],
+                G
             },
             interactionState: 'draftReady',
             draft: { intent: { moveType: 'foo' } },
             actionMode: 'none'
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
-                G={{} as any}
+                G={G}
                 controller={controller}
             />
         );
@@ -294,12 +312,14 @@ describe('ActionDock', () => {
     it('shows edit controls when draft is ready (placeInfluence)', () => {
         const editDraftTarget = vi.fn();
         const draftedIntent = { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } };
+        const G = { objects: {} } as any;
 
         const controller = {
             vm: {
                 stage: 'politicalAction',
                 political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
-                intents: []
+                intents: [],
+                G
             },
             interactionState: 'draftReady',
             draft: { intent: draftedIntent },
@@ -307,10 +327,10 @@ describe('ActionDock', () => {
             actionMode: 'placeInfluence'
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
-                G={{} as any}
+                G={G}
                 controller={controller}
             />
         );
@@ -318,6 +338,7 @@ describe('ActionDock', () => {
         const editButton = screen.getByTestId('btn-edit-target');
         fireEvent.click(editButton);
         expect(editDraftTarget).toHaveBeenCalledTimes(1);
+        expect(editButton.textContent).toBe('Change target');
     });
 
     it('shows variant selection panel for formalizeInfluence', () => {
@@ -340,11 +361,14 @@ describe('ActionDock', () => {
             }
         ];
 
+        const G = { objects: {} } as any;
+
         // Mock vm manually since buildIntentViewModel might be complex
         const vm = {
             stage: 'politicalAction',
             intents,
-            political: { others: [], formalizeInfluence: intents, convertResources: [], measures: [] }
+            political: { others: [], formalizeInfluence: intents, convertResources: [], measures: [] },
+            G
         } as any;
 
         const proposeIntent = vi.fn();
@@ -358,10 +382,10 @@ describe('ActionDock', () => {
             draft: { intent: null }
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
-                G={{} as any}
+                G={G}
                 controller={controller}
             />
         );
@@ -370,7 +394,7 @@ describe('ActionDock', () => {
         expect(screen.getByTestId('variant-selection-panel')).toBeDefined();
 
         // Check for variants
-        expect(screen.getByText('Select Payment')).toBeDefined();
+        expect(screen.getByText('Select payment')).toBeDefined();
         // Check for payment info
         expect(screen.getByText('Pay: res-1')).toBeDefined();
 
@@ -400,10 +424,13 @@ describe('ActionDock', () => {
             }
         ];
 
+        const G = { objects: {} } as any;
+
         const vm = {
             stage: 'politicalAction',
             intents,
-            political: { others: [], formalizeInfluence: [], convertResources: intents, measures: [] }
+            political: { others: [], formalizeInfluence: [], convertResources: intents, measures: [] },
+            G
         } as any;
 
         const proposeIntent = vi.fn();
@@ -417,10 +444,10 @@ describe('ActionDock', () => {
             draft: { intent: null }
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
-                G={{} as any}
+                G={G}
                 controller={controller}
             />
         );
@@ -441,11 +468,18 @@ describe('ActionDock', () => {
             payload: 'measure-123'
         };
 
+        const G = {
+            objects: {
+                'measure-123': { type: 'Measure', measureId: 'Measure A' }
+            }
+        } as any;
+
         const controller = {
             vm: {
                 stage: 'politicalAction',
                 political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
-                intents: []
+                intents: [],
+                G
             },
             interactionState: 'draftReady',
             draft: { intent: draftedIntent, isLegalNow: true },
@@ -463,12 +497,7 @@ describe('ActionDock', () => {
             setActionMode: vi.fn(),
         } as any;
 
-        // Mock G
-        const G = {
-            objects: {}
-        } as any;
-
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
                 G={G}
@@ -480,12 +509,12 @@ describe('ActionDock', () => {
         expect(screen.getByTestId('action-dock-draft')).toBeDefined();
 
         // Verify intent label is shown
-        expect(screen.getByText('Take Measure measure-123')).toBeDefined();
+        expect(screen.getByText('Take measure Measure A')).toBeDefined();
 
         // Verify "Change selection" button exists and works
         const editButton = screen.getByTestId('btn-edit-selection');
         expect(editButton).toBeDefined();
-        expect(editButton.textContent).toBe('Change selection');
+        expect(editButton.textContent).toBe('Edit variant');
 
         fireEvent.click(editButton);
         expect(editDraftVariant).toHaveBeenCalledTimes(1);
@@ -493,11 +522,13 @@ describe('ActionDock', () => {
 
     it('shows "Change tile" button when in selectingVariant', () => {
         const editPinnedTile = vi.fn();
+        const G = { objects: {} } as any;
         const controller = {
             vm: {
                 stage: 'politicalAction',
                 political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
-                intents: []
+                intents: [],
+                G
             },
             interactionState: 'selectingVariant',
             pinnedCommitteeTileId: 'tile1',
@@ -516,10 +547,10 @@ describe('ActionDock', () => {
             setActionMode: vi.fn(),
         } as any;
 
-        render(
+        renderWithI18n(
             <ActionDock
                 isActive={true}
-                G={{} as any}
+                G={G}
                 controller={controller}
             />
         );

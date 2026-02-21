@@ -30,6 +30,7 @@
             "changeVariant": "Edit variant",
             "changeTile": "Change tile",
             "changePlacement": "Change placement",
+            "changeTarget": "Change target",
             "actions": "Actions",
             "waiting": "Waiting",
             "drawAndPlace": "Draw & Place",
@@ -42,7 +43,12 @@
             "from": "From: {{from}}",
             "to": "To: {{to}}",
             "skipPlacement": "Skip placement",
-            "staged": "Staged: {{tile}}"
+            "staged": "Staged: {{tile}}",
+            "noVariants": "No variants available",
+            "selectPayment": "Select payment",
+            "source": "Source",
+            "committee": "Committee",
+            "grassroots": "Grassroots"
         },
         "draft": {
             "moveInfluenceSummary": "{{source}} → {{target}}",

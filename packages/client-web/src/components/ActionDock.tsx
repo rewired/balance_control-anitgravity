@@ -5,6 +5,8 @@ import type { InteractionController, InteractionActionMode } from '../ui/interac
 import { MeasureTray } from './MeasureTray';
 import { groupFormalizeIntents } from '../ui/interaction/formalizeHelpers';
 import { groupConvertIntents } from '../ui/interaction/convertHelpers';
+import { useT } from '../ui/i18n';
+import { getObjectLabel } from '../ui/interaction/labelHelpers';
 
 interface ActionDockProps {
     isActive: boolean;
@@ -12,26 +14,39 @@ interface ActionDockProps {
     controller: InteractionController;
 }
 
-const STAGE_LABELS: Record<string, string> = {
-    drawAndPlace: 'Draw & Place',
-    politicalAction: 'Political Action'
-};
-
-const formatIntentLabel = (intent: LegalIntent) => {
+const formatIntentLabel = (intent: LegalIntent, t: (key: string, vars?: any) => string, G: GameState) => {
     if (intent.moveType === 'moveInfluence') {
-        return `Move Influence ${intent.payload?.sourceId} → ${intent.payload?.targetId}`;
+        return t('core:draft.moveInfluenceSummary', {
+            source: getObjectLabel(G, intent.payload?.sourceId),
+            target: getObjectLabel(G, intent.payload?.targetId)
+        });
+    }
+    if (intent.moveType === 'placeInfluence') {
+        return t('core:draft.placeInfluenceSummary', {
+            target: getObjectLabel(G, intent.payload?.targetTileId)
+        });
+    }
+    if (intent.moveType === 'placeTile') {
+        return t('core:draft.placeTileSummary', {
+            tile: intent.payload?.tileId,
+            coord: intent.payload?.coord
+        });
     }
     if (intent.moveType === 'formalizeInfluence') {
-        return `Formalize ${intent.payload?.tileId}`;
+        return t('core:draft.formalizeSummary', {
+            tile: getObjectLabel(G, intent.payload?.tileId || intent.payload?.committeeTileId)
+        });
     }
     if (intent.moveType === 'convertResources') {
-        return `Convert → ${intent.payload?.outputResort}`;
+        return t('core:draft.convertSummary', {
+            tile: getObjectLabel(G, intent.payload?.tileId || intent.payload?.grassrootsTileId)
+        });
     }
     if (intent.moveType.endsWith('.takeMeasure')) {
-        return `Take Measure ${intent.payload}`;
+        return t('core:action.takeMeasure') + ' ' + getObjectLabel(G, intent.payload);
     }
     if (intent.moveType === 'passTilePlacement') {
-        return 'Skip placement';
+        return t('core:ui.skipPlacement');
     }
     return intent.moveType;
 };
@@ -43,34 +58,35 @@ const intentSortKey = (intent: LegalIntent) => {
     return `${intent.moveType}:${payloadKey}`;
 };
 
-const getActionLabel = (mode: InteractionActionMode, draftIntent: LegalIntent | null) => {
-    if (draftIntent) return formatIntentLabel(draftIntent);
+const getActionLabel = (mode: InteractionActionMode, draftIntent: LegalIntent | null, t: (key: string, vars?: any) => string, G: GameState) => {
+    if (draftIntent) return formatIntentLabel(draftIntent, t, G);
     switch (mode) {
-        case 'placeInfluence': return 'Place Influence';
-        case 'moveInfluence': return 'Move Influence';
-        case 'formalizeInfluence': return 'Formalize Influence';
-        case 'convertResources': return 'Convert Resources';
-        case 'takeMeasure': return 'Take Measure';
-        default: return 'Choose action';
+        case 'placeInfluence': return t('core:action.placeInfluence');
+        case 'moveInfluence': return t('core:action.moveInfluence');
+        case 'formalizeInfluence': return t('core:action.formalize');
+        case 'convertResources': return t('core:action.convert');
+        case 'takeMeasure': return t('core:action.takeMeasure');
+        default: return t('core:step.chooseAction');
     }
 };
 
-const getStepLabel = (state: string, mode: InteractionActionMode, moveInfluenceSourceId: string | null) => {
-    if (state === 'draftReady') return 'Preview';
+const getStepLabel = (state: string, mode: InteractionActionMode, moveInfluenceSourceId: string | null, t: (key: string, vars?: any) => string) => {
+    if (state === 'draftReady') return t('core:ui.preview');
     if (state === 'selectingParams') {
-        if (mode === 'moveInfluence' && !moveInfluenceSourceId) return 'Select source';
-        if (mode === 'moveInfluence' && moveInfluenceSourceId) return 'Select destination';
-        if (mode === 'placeInfluence') return 'Select target';
-        if (mode === 'formalizeInfluence') return 'Select committee';
-        if (mode === 'convertResources') return 'Select grassroots';
-        if (mode === 'takeMeasure') return 'Select measure';
-        return 'Select parameters';
+        if (mode === 'moveInfluence' && !moveInfluenceSourceId) return t('core:step.chooseSource');
+        if (mode === 'moveInfluence' && moveInfluenceSourceId) return t('core:step.chooseDestination');
+        if (mode === 'placeInfluence') return t('core:step.chooseTile');
+        if (mode === 'formalizeInfluence') return t('core:step.chooseTile');
+        if (mode === 'convertResources') return t('core:step.chooseTile');
+        if (mode === 'takeMeasure') return t('core:step.chooseVariant');
+        return t('core:step.chooseVariant');
     }
-    if (state === 'selectingVariant') return 'Select variant';
-    return 'Select action';
+    if (state === 'selectingVariant') return t('core:step.chooseVariant');
+    return t('core:step.chooseAction');
 };
 
 const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = ({ controller }) => {
+    const t = useT();
     const {
         interactionState,
         pinnedCommitteeTileId,
@@ -87,11 +103,13 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
 
         return (
             <div className="variant-selection-panel" data-testid="variant-selection-panel">
-                <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Select Payment</div>
+                <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>{t('core:ui.selectPayment')}</div>
                 {groups.map(group => (
                     <div key={group.paymentKey} style={{ marginBottom: '8px' }}>
                         <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                            Pay: {group.paymentResourceIds.join(', ') || 'Free'}
+                            {group.paymentResourceIds.length > 0
+                                ? t('core:ui.pay', { pay: group.paymentResourceIds.join(', ') })
+                                : t('core:ui.free')}
                         </div>
                         {group.variants.map(variant => (
                             <button
@@ -102,8 +120,8 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
                                 data-testid={`btn-variant-${variant.payload?.extraResourceIds?.join('-') || 'base'}`}
                             >
                                 {variant.payload?.extraResourceIds && variant.payload.extraResourceIds.length > 0
-                                    ? `Extra: ${variant.payload.extraResourceIds.join(', ')}`
-                                    : 'Standard'}
+                                    ? t('core:ui.extra', { extra: variant.payload.extraResourceIds.join(', ') })
+                                    : t('core:ui.standard')}
                             </button>
                         ))}
                     </div>
@@ -116,19 +134,19 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
         const groupsMap = groupConvertIntents(vm.intents);
         const tileGroup = groupsMap.get(pinnedGrassrootsTileId);
 
-        if (!tileGroup) return <div data-testid="no-variants">No variants available</div>;
+        if (!tileGroup) return <div data-testid="no-variants">{t('core:ui.noVariants')}</div>;
 
         return (
             <div className="variant-selection-panel" data-testid="variant-selection-panel">
                 {tileGroup.outputs.map(outputGroup => (
                     <div key={outputGroup.outputResort} style={{ marginBottom: '12px' }}>
                         <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                            To: {outputGroup.outputResort}
+                            {t('core:ui.to', { to: outputGroup.outputResort })}
                         </div>
                         {outputGroup.combos.map(combo => (
                             <div key={combo.inputKey} style={{ marginLeft: '8px', marginBottom: '8px' }}>
                                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                    From: {combo.inputResourceIds.join(', ')}
+                                    {t('core:ui.from', { from: combo.inputResourceIds.join(', ') })}
                                 </div>
                                 {combo.variants.map(variant => (
                                     <button
@@ -138,7 +156,7 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
                                         style={{ width: '100%', textAlign: 'left', marginBottom: '4px' }}
                                         data-testid={`btn-variant-${variant.payload?.outputResort}-${combo.inputKey}`}
                                     >
-                                        Select
+                                        {t('core:ui.select')}
                                     </button>
                                 ))}
                             </div>
@@ -153,6 +171,7 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
 };
 
 const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ controller }) => {
+    const t = useT();
     const {
         actionMode,
         interactionState,
@@ -166,35 +185,36 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
         editDraftDestination,
         editDraftTarget,
         editDraftVariant,
-        editPinnedTile
+        editPinnedTile,
+        vm
     } = controller;
 
-    const actionLabel = getActionLabel(actionMode, draft.intent);
-    const stepLabel = getStepLabel(interactionState, actionMode, moveInfluenceSourceId);
+    const actionLabel = getActionLabel(actionMode, draft.intent, t, vm.G);
+    const stepLabel = getStepLabel(interactionState, actionMode, moveInfluenceSourceId, t);
 
     return (
         <div className="current-action-panel" data-testid="current-action-panel" style={{ padding: '8px', borderBottom: '1px solid var(--border-color)', marginBottom: '8px' }}>
             <div className="action-status-block">
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Active Action</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{t('core:inspector.activeAction')}</div>
                 <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{actionLabel}</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Step</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{t('core:inspector.step')}</div>
                 <div style={{ fontWeight: 'bold' }}>{stepLabel}</div>
                 {moveInfluenceSourceId && (
                     <div className="pinned-params" style={{ marginTop: '4px', fontSize: '12px' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>Source: </span>
-                        {moveInfluenceSourceId}
+                        <span style={{ color: 'var(--text-secondary)' }}>{t('core:ui.source')}: </span>
+                        {getObjectLabel(vm.G, moveInfluenceSourceId)}
                     </div>
                 )}
                 {pinnedCommitteeTileId && (
                     <div className="pinned-params" style={{ marginTop: '4px', fontSize: '12px' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>Committee: </span>
-                        {pinnedCommitteeTileId}
+                        <span style={{ color: 'var(--text-secondary)' }}>{t('core:ui.committee')}: </span>
+                        {getObjectLabel(vm.G, pinnedCommitteeTileId)}
                     </div>
                 )}
                 {pinnedGrassrootsTileId && (
                     <div className="pinned-params" style={{ marginTop: '4px', fontSize: '12px' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>Grassroots: </span>
-                        {pinnedGrassrootsTileId}
+                        <span style={{ color: 'var(--text-secondary)' }}>{t('core:ui.grassroots')}: </span>
+                        {getObjectLabel(vm.G, pinnedGrassrootsTileId)}
                     </div>
                 )}
             </div>
@@ -206,7 +226,7 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
                         onClick={editPinnedTile}
                         data-testid="btn-change-tile"
                     >
-                        Change tile
+                        {t('core:ui.changeTile')}
                     </button>
                 </div>
             )}
@@ -216,27 +236,27 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
                         {draft.intent.moveType === 'placeTile' && (
                             <button className="btn-secondary btn-small" onClick={editDraftTarget} data-testid="btn-edit-placement">
-                                Change placement
+                                {t('core:ui.changePlacement')}
                             </button>
                         )}
                         {draft.intent.moveType === 'placeInfluence' && (
                             <button className="btn-secondary btn-small" onClick={editDraftTarget} data-testid="btn-edit-target">
-                                Change target
+                                {t('core:ui.changeTarget')}
                             </button>
                         )}
                         {draft.intent.moveType === 'moveInfluence' && (
                             <>
                                 <button className="btn-secondary btn-small" onClick={editDraftSource} data-testid="btn-edit-source">
-                                    Change source
+                                    {t('core:ui.changeSource')}
                                 </button>
                                 <button className="btn-secondary btn-small" onClick={editDraftDestination} data-testid="btn-edit-destination">
-                                    Change destination
+                                    {t('core:ui.changeDestination')}
                                 </button>
                             </>
                         )}
                         {(draft.intent.moveType === 'formalizeInfluence' || draft.intent.moveType === 'convertResources' || draft.intent.moveType.endsWith('.takeMeasure')) && (
                             <button className="btn-secondary btn-small" onClick={editDraftVariant} data-testid="btn-edit-selection">
-                                Change selection
+                                {t('core:ui.changeVariant')}
                             </button>
                         )}
                     </div>
@@ -248,14 +268,14 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
                             disabled={!draft.isLegalNow}
                             data-testid="btn-confirm-draft"
                         >
-                            Confirm
+                            {t('core:ui.confirm')}
                         </button>
                         <button
                             className="btn-secondary btn-small"
                             onClick={cancelDraft}
                             data-testid="btn-cancel-draft"
                         >
-                            Cancel
+                            {t('core:ui.cancel')}
                         </button>
                     </div>
                 </div>
@@ -265,6 +285,7 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
 };
 
 const ActionGroupList: React.FC<{ G: GameState; controller: InteractionController }> = ({ G, controller }) => {
+    const t = useT();
     const { vm, actionMode, setActionMode, proposeIntent } = controller;
 
     const hasPlaceInfluenceIntents = vm.intents.some(i => i.moveType === 'placeInfluence');
@@ -276,7 +297,7 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
     return (
         <div className="action-group-list" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div className="action-group">
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Influence</h4>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.influence')}</h4>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     <button
                         className={actionMode === 'placeInfluence' ? 'btn-primary' : 'btn-secondary'}
@@ -284,7 +305,7 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
                         onClick={() => setActionMode(actionMode === 'placeInfluence' ? 'none' : 'placeInfluence')}
                         data-testid="btn-mode-place-influence"
                     >
-                        Place Influence
+                        {t('core:action.placeInfluence')}
                     </button>
                     <button
                         className={actionMode === 'moveInfluence' ? 'btn-primary' : 'btn-secondary'}
@@ -292,44 +313,44 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
                         onClick={() => setActionMode(actionMode === 'moveInfluence' ? 'none' : 'moveInfluence')}
                         data-testid="btn-mode-move-influence"
                     >
-                        Move Influence
+                        {t('core:action.moveInfluence')}
                     </button>
                 </div>
             </div>
 
             <div className="action-group">
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Committees</h4>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.committees')}</h4>
                 <button
                     className={actionMode === 'formalizeInfluence' ? 'btn-primary' : 'btn-secondary'}
                     disabled={!hasFormalizeInfluenceIntents}
                     onClick={() => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence')}
                     data-testid="btn-mode-formalize-influence"
                 >
-                    Formalize Influence
+                    {t('core:action.formalize')}
                 </button>
             </div>
 
             <div className="action-group">
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Economy</h4>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.economy')}</h4>
                 <button
                     className={actionMode === 'convertResources' ? 'btn-primary' : 'btn-secondary'}
                     disabled={!hasConvertResourcesIntents}
                     onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
                     data-testid="btn-mode-convert-resources"
                 >
-                    Convert Resources
+                    {t('core:action.convert')}
                 </button>
             </div>
 
             {vm.political.measures.length > 0 && (
                 <div className="action-group">
-                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Measures</h4>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.measures')}</h4>
                     <button
                         className={actionMode === 'takeMeasure' ? 'btn-primary' : 'btn-secondary'}
                         onClick={() => setActionMode(actionMode === 'takeMeasure' ? 'none' : 'takeMeasure')}
                         data-testid="btn-mode-take-measure"
                     >
-                        Take Measure
+                        {t('core:action.takeMeasure')}
                     </button>
                     {actionMode === 'takeMeasure' && (
                         <MeasureTray
@@ -355,7 +376,7 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
                                 userSelect: 'none'
                             }}
                         >
-                            Expansions → Other ({vm.political.others.length})
+                            {t('core:group.expansions')} ({vm.political.others.length})
                         </summary>
                         <div className="action-panel-secondary" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
                             {vm.political.others.map(intent => (
@@ -366,7 +387,7 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
                                     style={{ textAlign: 'left' }}
                                     data-testid={`btn-other-${intent.moveType}`}
                                 >
-                                    {formatIntentLabel(intent)}
+                                    {formatIntentLabel(intent, t, G)}
                                 </button>
                             ))}
                         </div>
@@ -387,6 +408,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
     G,
     controller
 }) => {
+    const t = useT();
     if (!isActive) return null;
 
     const {
@@ -395,14 +417,16 @@ export const ActionDock: React.FC<ActionDockProps> = ({
         interactionState
     } = controller;
 
-    const stageLabel = vm.stage ? (STAGE_LABELS[vm.stage] ?? vm.stage) : 'Waiting';
+    const stageLabel = vm.stage
+        ? (t(`core:ui.${vm.stage}`) !== `core:ui.${vm.stage}` ? t(`core:ui.${vm.stage}`) : vm.stage)
+        : t('core:ui.waiting');
     const isDrawAndPlace = vm.stage === 'drawAndPlace';
     const isPoliticalAction = vm.stage === 'politicalAction';
 
     return (
         <div className="action-panel action-dock" data-testid="action-dock">
             <div className="action-panel-header">
-                <div className="action-panel-title">Actions</div>
+                <div className="action-panel-title">{t('core:ui.actions')}</div>
                 <div className="action-panel-stage">{stageLabel}</div>
             </div>
 
@@ -415,14 +439,14 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                     <>
                         {isDrawAndPlace && (
                             <div className="action-panel-primary">
-                            <div className="action-panel-meta">Staged: {vm.stagedTileId || 'None'}</div>
+                            <div className="action-panel-meta">{t('core:ui.staged', { tile: vm.stagedTileId || t('core:inspector.none') })}</div>
                             {vm.drawAndPlace.passTilePlacement && (
                                 <button
                                     className="btn-primary"
                                     onClick={() => proposeIntent(vm.drawAndPlace.passTilePlacement!)}
                                     data-testid="btn-skip-placement"
                                 >
-                                    Skip placement
+                                    {t('core:ui.skipPlacement')}
                                 </button>
                             )}
                         </div>
