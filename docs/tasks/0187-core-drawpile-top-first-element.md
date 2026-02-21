@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -26,8 +26,8 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * GR-003: Align runtime DrawPile behavior with the canonical ordered-zone convention; determinism preserved (seeded RNG only).
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 
 ---
 
@@ -110,22 +110,22 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Change CORE DrawPile draw operation from `pop()` to `shift()` in `drawTileToStaging`.
-* [ ] Step 2: Update `unplaceable-draw-redraw.test.ts` to treat `drawPile.items[0]` as the top.
-* [ ] Step 3: Update `stackDrawPileByType` prelude helpers to move chosen tiles to the **front** of DrawPile.
-* [ ] Step 4: Run golden regenerator:
+* [x] Step 1: Change CORE DrawPile draw operation from `pop()` to `shift()` in `drawTileToStaging`.
+* [x] Step 2: Update `unplaceable-draw-redraw.test.ts` to treat `drawPile.items[0]` as the top.
+* [x] Step 3: Update `stackDrawPileByType` prelude helpers to move chosen tiles to the **front** of DrawPile.
+* [x] Step 4: Run golden regenerator:
   * `pnpm -C packages/integration-tests run update:golden -- --write`
-* [ ] Step 5: Run full tests:
+* [x] Step 5: Run full tests:
   * `pnpm test`
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] `drawTileToStaging` draws `DrawPile.items[0]` (top=first) and remains deterministic.
-* [ ] `packages/game/test/unplaceable-draw-redraw.test.ts` passes without relying on “top=last”.
-* [ ] Golden fixtures updated via script (no hand-editing) and `packages/integration-tests/test/golden-replay.test.ts` passes.
-* [ ] `/docs/changelog.md` includes a clear entry referencing CORE-01-00-05A.
+* [x] `drawTileToStaging` draws `DrawPile.items[0]` (top=first) and remains deterministic.
+* [x] `packages/game/test/unplaceable-draw-redraw.test.ts` passes without relying on “top=last”.
+* [x] Golden fixtures updated via script (no hand-editing) and `packages/integration-tests/test/golden-replay.test.ts` passes.
+* [x] `/docs/changelog.md` includes a clear entry referencing CORE-01-00-05A.
 
 ---
 
