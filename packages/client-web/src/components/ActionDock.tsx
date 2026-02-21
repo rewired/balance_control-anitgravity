@@ -83,7 +83,10 @@ const getStepLabel = (state: string, mode: InteractionActionMode, moveInfluenceS
         if (mode === 'takeMeasure') return t('core:step.chooseVariant');
         return t('core:step.chooseVariant');
     }
-    if (state === 'selectingVariant') return t('core:step.chooseVariant');
+    if (state === 'selectingVariant') {
+        if (mode === 'convertResources') return t('core:ui.selectOutput');
+        return t('core:step.chooseVariant');
+    }
     return t('core:step.chooseAction');
 };
 
@@ -138,31 +141,73 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
 
         if (!tileGroup) return <div data-testid="no-variants">{t('core:ui.noVariants')}</div>;
 
+        const { selectedConvertFamily, setSelectedConvertFamily } = controller;
+
+        if (!selectedConvertFamily) {
+            return (
+                <div className="variant-selection-panel" data-testid="variant-selection-panel">
+                    <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>{t('core:ui.selectOutput')}</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {tileGroup.outputs.map(outputGroup => (
+                            <button
+                                key={outputGroup.outputResort}
+                                className="btn-secondary"
+                                onClick={() => setSelectedConvertFamily(outputGroup.outputResort)}
+                                data-testid={`btn-family-${outputGroup.outputResort}`}
+                                style={{ textAlign: 'left' }}
+                            >
+                                {t('core:ui.to', { to: outputGroup.outputResort })}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        const outputGroup = tileGroup.outputs.find(o => o.outputResort === selectedConvertFamily);
+        if (!outputGroup) {
+            setSelectedConvertFamily(null); // Safety reset
+            return null;
+        }
+
         return (
             <div className="variant-selection-panel" data-testid="variant-selection-panel">
-                {tileGroup.outputs.map(outputGroup => (
-                    <div key={outputGroup.outputResort} style={{ marginBottom: '12px' }}>
-                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                            {t('core:ui.to', { to: outputGroup.outputResort })}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                    <button
+                        className="btn-secondary btn-small"
+                        onClick={() => setSelectedConvertFamily(null)}
+                        data-testid="btn-back-to-families"
+                    >
+                        &larr; {t('core:ui.back')}
+                    </button>
+                    <div style={{ fontWeight: 'bold' }}>{t('core:ui.to', { to: outputGroup.outputResort })}</div>
+                </div>
+
+                {outputGroup.combos.map(combo => (
+                    <div key={combo.inputKey} style={{ marginBottom: '12px', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '8px' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase' }}>
+                            {t('core:ui.from', { from: combo.inputResourceIds.join(', ') })}
                         </div>
-                        {outputGroup.combos.map(combo => (
-                            <div key={combo.inputKey} style={{ marginLeft: '8px', marginBottom: '8px' }}>
-                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                    {t('core:ui.from', { from: combo.inputResourceIds.join(', ') })}
-                                </div>
-                                {combo.variants.map(variant => (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {combo.variants.map(variant => {
+                                const extra = (variant.payload?.extraResourceIds as string[]) ?? [];
+                                const label = extra.length > 0
+                                    ? t('core:ui.extra', { extra: extra.join(', ') })
+                                    : t('core:ui.standard');
+
+                                return (
                                     <button
                                         key={intentSortKey(variant)}
                                         className="btn-secondary btn-small"
                                         onClick={() => proposeIntent(variant)}
-                                        style={{ width: '100%', textAlign: 'left', marginBottom: '4px' }}
-                                        data-testid={`btn-variant-${variant.payload?.outputResort}-${combo.inputKey}`}
+                                        style={{ textAlign: 'left' }}
+                                        data-testid={`btn-variant-${combo.inputKey}-${extra.join('-') || 'base'}`}
                                     >
-                                        {t('core:ui.select')}
+                                        {label}
                                     </button>
-                                ))}
-                            </div>
-                        ))}
+                                );
+                            })}
+                        </div>
                     </div>
                 ))}
             </div>

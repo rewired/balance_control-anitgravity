@@ -32,6 +32,7 @@ export function useGameInteractionController({
     const [moveInfluenceSourceId, setMoveInfluenceSourceId] = useState<string | null>(null);
     const [pinnedCommitteeTileId, setPinnedCommitteeTileId] = useState<string | null>(null);
     const [pinnedGrassrootsTileId, setPinnedGrassrootsTileId] = useState<string | null>(null);
+    const [selectedConvertFamily, setSelectedConvertFamily] = useState<string | null>(null);
 
     const stagingZoneId = `staging_${myPid}`;
     const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
@@ -51,6 +52,7 @@ export function useGameInteractionController({
             setMoveInfluenceSourceId(null);
             setPinnedCommitteeTileId(null);
             setPinnedGrassrootsTileId(null);
+            setSelectedConvertFamily(null);
             setSelectedTileId(null);
             setSelectedCoord(null);
         }
@@ -61,6 +63,7 @@ export function useGameInteractionController({
         setMoveInfluenceSourceId(null);
         setPinnedCommitteeTileId(null);
         setPinnedGrassrootsTileId(null);
+        setSelectedConvertFamily(null);
         setSelectedTileId(null);
         setSelectedCoord(null);
     }, []);
@@ -79,6 +82,7 @@ export function useGameInteractionController({
 
     const editDraftVariant = useCallback(() => {
         setProposedIntent(null);
+        setSelectedConvertFamily(null);
         setSelectedTileId(null);
         setSelectedCoord(null);
     }, []);
@@ -86,6 +90,7 @@ export function useGameInteractionController({
     const editPinnedTile = useCallback(() => {
         setPinnedCommitteeTileId(null);
         setPinnedGrassrootsTileId(null);
+        setSelectedConvertFamily(null);
         // Returns to selectingParams state, but clears selection
         setSelectedTileId(null);
         setSelectedCoord(null);
@@ -162,6 +167,7 @@ export function useGameInteractionController({
             setMoveInfluenceSourceId(null);
             setPinnedCommitteeTileId(null);
             setPinnedGrassrootsTileId(null);
+            setSelectedConvertFamily(null);
         }
     }, [proposedIntent, moves]);
 
@@ -171,6 +177,7 @@ export function useGameInteractionController({
         setMoveInfluenceSourceId(null);
         setPinnedCommitteeTileId(null);
         setPinnedGrassrootsTileId(null);
+        setSelectedConvertFamily(null);
         // Preserves inspector selection (selectedTileId/selectedCoord) per contract
     }, []);
 
@@ -189,6 +196,7 @@ export function useGameInteractionController({
         setMoveInfluenceSourceId(null);
         setPinnedCommitteeTileId(null);
         setPinnedGrassrootsTileId(null);
+        setSelectedConvertFamily(null);
     }, [stage]);
 
     // Handle Escape key to clear selection/proposal
@@ -202,6 +210,7 @@ export function useGameInteractionController({
                 setMoveInfluenceSourceId(null);
                 setPinnedCommitteeTileId(null);
                 setPinnedGrassrootsTileId(null);
+                setSelectedConvertFamily(null);
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -245,6 +254,7 @@ export function useGameInteractionController({
         setMoveInfluenceSourceId(null);
         setPinnedCommitteeTileId(null);
         setPinnedGrassrootsTileId(null);
+        setSelectedConvertFamily(null);
         if (mode !== 'none') {
             setSelectedTileId(null);
             setSelectedCoord(null);
@@ -286,6 +296,7 @@ export function useGameInteractionController({
         moveInfluenceSourceId,
         pinnedCommitteeTileId,
         pinnedGrassrootsTileId,
+        selectedConvertFamily,
         setActionMode: setActionModeWithSideEffects,
         selectTile,
         selectMoveInfluenceSource,
@@ -297,6 +308,7 @@ export function useGameInteractionController({
         editDraftTarget,
         editDraftVariant,
         editPinnedTile,
+        setSelectedConvertFamily,
         resolveChoice
     };
 }

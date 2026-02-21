@@ -49,7 +49,9 @@
             "selectPayment": "Select payment",
             "source": "Source",
             "committee": "Committee",
-            "grassroots": "Grassroots"
+            "grassroots": "Grassroots",
+            "selectOutput": "Select output",
+            "back": "Back"
         },
         "draft": {
             "moveInfluenceSummary": "{{source}} → {{target}}",

@@ -49,7 +49,9 @@
             "selectPayment": "Zahlung wählen",
             "source": "Quelle",
             "committee": "Komitee",
-            "grassroots": "Basis"
+            "grassroots": "Basis",
+            "selectOutput": "Ziel-Resort wählen",
+            "back": "Zurück"
         },
         "draft": {
             "moveInfluenceSummary": "{{source}} → {{target}}",

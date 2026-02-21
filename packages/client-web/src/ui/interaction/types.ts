@@ -43,6 +43,8 @@ export interface InteractionController {
     pinnedCommitteeTileId: string | null;
     /** Pinned tile for Convert Resources mode. */
     pinnedGrassrootsTileId: string | null;
+    /** Selected family for Convert Resources mode. */
+    selectedConvertFamily: string | null;
 
     /** Sets the current action mode. */
     setActionMode: (mode: InteractionActionMode) => void;
@@ -90,4 +92,7 @@ export interface InteractionController {
      * Returns to selecting params state.
      */
     editPinnedTile: () => void;
+
+    /** Sets the selected family for Convert Resources mode. */
+    setSelectedConvertFamily: (family: string | null) => void;
 }

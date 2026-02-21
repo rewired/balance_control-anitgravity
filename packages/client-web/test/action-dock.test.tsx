@@ -416,7 +416,58 @@ describe('ActionDock', () => {
         expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
     });
 
-    it('shows variant selection panel for convertResources', () => {
+    it('shows guided family selection for convertResources', () => {
+        const intents = [
+            {
+                moveType: 'convertResources',
+                payload: {
+                    grassrootsTileId: 'T1',
+                    outputResort: 'INF',
+                    inputResourceIds: ['r1', 'r2']
+                }
+            }
+        ];
+
+        const G = { objects: {} } as any;
+
+        const vm = {
+            stage: 'politicalAction',
+            intents,
+            political: { others: [], formalizeInfluence: [], convertResources: intents, measures: [] },
+            G
+        } as any;
+
+        const setSelectedConvertFamily = vi.fn();
+
+        const controller = {
+            vm,
+            actionMode: 'convertResources',
+            interactionState: 'selectingVariant',
+            pinnedGrassrootsTileId: 'T1',
+            selectedConvertFamily: null,
+            setSelectedConvertFamily,
+            draft: { intent: null }
+        } as any;
+
+        renderWithI18n(
+            <ActionDock
+                isActive={true}
+                G={G}
+                controller={controller}
+            />
+        );
+
+        expect(screen.getByTestId('variant-selection-panel')).toBeDefined();
+        expect(screen.getAllByText('Select output').length).toBeGreaterThan(0);
+
+        const familyBtn = screen.getByTestId('btn-family-INF');
+        expect(familyBtn.textContent).toContain('To: INF');
+
+        fireEvent.click(familyBtn);
+        expect(setSelectedConvertFamily).toHaveBeenCalledWith('INF');
+    });
+
+    it('shows variants when family is selected for convertResources', () => {
         const intents = [
             {
                 moveType: 'convertResources',
@@ -438,12 +489,15 @@ describe('ActionDock', () => {
         } as any;
 
         const proposeIntent = vi.fn();
+        const setSelectedConvertFamily = vi.fn();
 
         const controller = {
             vm,
             actionMode: 'convertResources',
             interactionState: 'selectingVariant',
             pinnedGrassrootsTileId: 'T1',
+            selectedConvertFamily: 'INF',
+            setSelectedConvertFamily,
             proposeIntent,
             draft: { intent: null }
         } as any;
@@ -456,13 +510,16 @@ describe('ActionDock', () => {
             />
         );
 
-        expect(screen.getByTestId('variant-selection-panel')).toBeDefined();
         expect(screen.getByText('To: INF')).toBeDefined();
         expect(screen.getByText('From: r1, r2')).toBeDefined();
 
-        const variantBtn = screen.getByTestId('btn-variant-INF-r1|r2');
+        const variantBtn = screen.getByTestId('btn-variant-r1|r2-base');
         fireEvent.click(variantBtn);
         expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
+
+        const backBtn = screen.getByTestId('btn-back-to-families');
+        fireEvent.click(backBtn);
+        expect(setSelectedConvertFamily).toHaveBeenCalledWith(null);
     });
 
     it('shows "Change selection" button when a measure is drafted', () => {
