@@ -202,6 +202,17 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     activePlayerId={ctx.currentPlayer}
                     draftIntent={draft.intent}
                 />
+
+                {/* Bottom Controls */}
+                {!vm.hasPendingChoice && (
+                    <div className="controls-container">
+                        <ActionDock
+                            isActive={isActive}
+                            G={G}
+                            controller={controller}
+                        />
+                    </div>
+                )}
             </main>
 
             {/* Right Panel: Opponents / Deck / Info */}
@@ -277,16 +288,6 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                 <Zone zoneId={zoneNames.Noise} G={G} title="Noise" />
             </aside>
 
-            {/* Bottom Controls */}
-            {!vm.hasPendingChoice && (
-                <div className="controls-container glass-panel">
-                    <ActionDock
-                        isActive={isActive}
-                        G={G}
-                        controller={controller}
-                    />
-                </div>
-            )}
         </div>
     );
 };

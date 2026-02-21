@@ -460,11 +460,10 @@ body {
 }
 
 .controls-container {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
+    position: relative;
+    width: 100%;
+    margin-top: auto;
+    z-index: 10;
 }
 
 .controls-bar {
@@ -479,6 +478,10 @@ body {
     gap: var(--space-sm);
     padding: var(--space-md) var(--space-lg);
     max-width: min(560px, 90vw);
+}
+
+.action-dock {
+    max-width: none;
 }
 
 .action-panel-header {
@@ -973,4 +976,13 @@ button.btn-primary:hover {
     border: 2px solid var(--accent-balance);
     box-shadow: 0 0 12px var(--accent-balance);
     opacity: 0.6;
+}
+
+.ghost-preview {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
 }
