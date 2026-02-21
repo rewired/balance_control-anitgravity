@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** FROZEN
+**Task State:** COMPLETED
 
 ## 0) Masterplan Guardrails (MUST)
 
@@ -103,9 +103,9 @@ Note: keep the assertion resilient (substring checks), because browsers may norm
 
 ## 7) Acceptance Criteria
 
-* [ ] `--hex-clip` exists and is pointy-top.
-* [ ] `.hex-ghost` uses `clip-path: var(--hex-clip)` and no longer uses a flat-top polygon.
-* [ ] The new e2e test passes.
-* [ ] `pnpm lint`, `pnpm test`, `pnpm e2e` are green.
+* [x] `--hex-clip` exists and is pointy-top.
+* [x] `.hex-ghost` uses `clip-path: var(--hex-clip)` and no longer uses a flat-top polygon.
+* [x] The new e2e test passes.
+* [x] `pnpm lint`, `pnpm test`, `pnpm e2e` are green.
 
 ---

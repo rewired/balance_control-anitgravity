@@ -49,7 +49,7 @@
     --seat-5: #ef4444;
     --seat-6: #38bdf8;
     /* Shapes */
-    --hex-shape: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+    --hex-clip: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
 }
 
 body {
@@ -437,7 +437,7 @@ body {
     width: var(--hex-cell-w);
     height: var(--hex-cell-h);
     transform: translate(-50%, -50%);
-    clip-path: var(--hex-shape);
+    clip-path: var(--hex-clip);
     border: 3px dotted rgba(6, 182, 212, 0.95);
     background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 75%);
     filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.45));
@@ -457,8 +457,7 @@ body {
     border: 1px dashed rgba(6, 182, 212, 0.45);
     background: rgba(6, 182, 212, 0.08);
     color: var(--text-secondary);
-    border-radius: 12px;
-    clip-path: var(--hex-shape);
+    clip-path: var(--hex-clip);
     transition: all 0.2s ease;
 }
 
