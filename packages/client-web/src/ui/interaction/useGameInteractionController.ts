@@ -38,6 +38,24 @@ export function useGameInteractionController({
 
     const vm = useIntentViewModel({ G, ctx, playerID: myPid, selectedTileId, stagedTileId });
 
+    // ARCH-06: PendingChoice Hard-Gate
+    // When a pending choice exists, the controller enters a restrictive mode.
+    // We derive this from the ViewModel to ensure UI consistency.
+    const isHardGate = vm.hasPendingChoice;
+
+    // Effect: Clear all transient action state immediately upon entering hard-gate.
+    useEffect(() => {
+        if (isHardGate) {
+            setProposedIntent(null);
+            setActionMode('none');
+            setMoveInfluenceSourceId(null);
+            setPinnedCommitteeTileId(null);
+            setPinnedGrassrootsTileId(null);
+            setSelectedTileId(null);
+            setSelectedCoord(null);
+        }
+    }, [isHardGate]);
+
     const editDraftSource = useCallback(() => {
         setProposedIntent(null);
         setMoveInfluenceSourceId(null);
@@ -66,6 +84,11 @@ export function useGameInteractionController({
     }, []);
 
     const proposeIntent = useCallback((intent: LegalIntent) => {
+        // Hard-gate: no new proposals when pending choice exists
+        if (isHardGate) {
+            return;
+        }
+
         // If we already have a draft, ignore new proposals (must edit first)
         // This enforces "dock-only edit" once draft is ready
         if (proposedIntent) {
@@ -75,6 +98,11 @@ export function useGameInteractionController({
     }, [proposedIntent]);
 
     const selectTile = useCallback((tileId: string | null, coord: string | null) => {
+        // Hard-gate: no tile selection (inspection disabled) when pending choice exists
+        if (isHardGate) {
+            return;
+        }
+
         setSelectedTileId(tileId);
         setSelectedCoord(coord);
 
@@ -106,6 +134,11 @@ export function useGameInteractionController({
     }, [actionMode, vm.intents, proposedIntent]);
 
     const confirmDraft = useCallback(() => {
+        // Hard-gate: no confirmation allowed if pending choice exists
+        if (isHardGate) {
+            return;
+        }
+
         if (proposedIntent) {
             dispatchIntent(moves, proposedIntent);
             setProposedIntent(null);
@@ -189,6 +222,11 @@ export function useGameInteractionController({
     }, [G.grid, selectedCoord, selectedTileId]);
 
     const setActionModeWithSideEffects = useCallback((mode: InteractionActionMode) => {
+        // Hard-gate: no mode switching allowed if pending choice exists
+        if (isHardGate) {
+            return;
+        }
+
         setActionMode(mode);
         setMoveInfluenceSourceId(null);
         setPinnedCommitteeTileId(null);
@@ -203,10 +241,8 @@ export function useGameInteractionController({
         setMoveInfluenceSourceId(tileId);
     }, []);
 
-    const hasPendingChoice = !!G.engine?.pendingChoice;
-
     let interactionState: InteractionStateId = 'selectingAction';
-    if (hasPendingChoice) {
+    if (isHardGate) {
         interactionState = 'pendingChoiceHardGate';
     } else if (proposedIntent) {
         interactionState = 'draftReady';

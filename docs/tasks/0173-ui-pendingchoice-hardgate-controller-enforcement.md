@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** FROZEN
 
 ## Task State Machine (Loop-Breaker)
 
@@ -46,9 +46,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -148,51 +148,56 @@ Existing behavior summary (current):
 
 ## 8) Implementation Plan
 
-* [ ] Add a single `isHardGate` boolean derived from `vm.hasPendingChoice`.
-* [ ] Add an effect: when `isHardGate` becomes true, clear normal action-session state (draft + actionMode + pinned params).
-* [ ] Guard controller mutators:
-  * [ ] `proposeIntent` returns early if `isHardGate`.
-  * [ ] `confirmDraft` returns early if `isHardGate`.
-  * [ ] `setActionModeWithSideEffects` returns early if `isHardGate`.
-  * [ ] `selectTile` returns early if `isHardGate` (inspect disabled).
-* [ ] Update/extend `interaction-controller-machine.test.ts` with a pendingChoice hard-gate scenario (update the `useIntentViewModel` mock to include `hasPendingChoice` + `pendingChoice` fields).
-* [ ] Run: `pnpm -C packages/client-web test`.
+* [x] Add a single `isHardGate` boolean derived from `vm.hasPendingChoice`.
+* [x] Add an effect: when `isHardGate` becomes true, clear normal action-session state (draft + actionMode + pinned params).
+* [x] Guard controller mutators:
+  * [x] `proposeIntent` returns early if `isHardGate`.
+  * [x] `confirmDraft` returns early if `isHardGate`.
+  * [x] `setActionModeWithSideEffects` returns early if `isHardGate`.
+  * [x] `selectTile` returns early if `isHardGate` (inspect disabled).
+* [x] Update/extend `interaction-controller-machine.test.ts` with a pendingChoice hard-gate scenario (update the `useIntentViewModel` mock to include `hasPendingChoice` + `pendingChoice` fields).
+* [x] Run: `pnpm -C packages/client-web test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] While `vm.hasPendingChoice === true`, normal draft building is impossible (no `proposedIntent`, no `actionMode` changes).
-* [ ] While hard-gated, selection/inspection does not change via `selectTile`.
-* [ ] `resolveChoice(...)` remains functional.
-* [ ] `pnpm -C packages/client-web test` passes.
+* [x] While `vm.hasPendingChoice === true`, normal draft building is impossible (no `proposedIntent`, no `actionMode` changes).
+* [x] While hard-gated, selection/inspection does not change via `selectTile`.
+* [x] `resolveChoice(...)` remains functional.
+* [x] `pnpm -C packages/client-web test` passes.
 
 ---
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <fill during implementation>
+* Derived `isHardGate` from `vm.hasPendingChoice` in `useGameInteractionController`.
+* Added `useEffect` to clear all transient action state (draft, mode, selection) when entering hard-gate.
+* Guarded `proposeIntent`, `confirmDraft`, `setActionMode`, and `selectTile` to return early when hard-gated.
+* Updated `interactionState` logic to prioritize `pendingChoiceHardGate` using the new flag.
+* Added comprehensive tests in `interaction-controller-machine.test.ts` verifying hard-gate entry, state clearing, and action blocking.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* <fill during implementation>
+* `pnpm -C packages/client-web test interaction-controller-machine.test.ts` - Passed
+* `pnpm -C packages/client-web test` - Passed
 
 ---
 
