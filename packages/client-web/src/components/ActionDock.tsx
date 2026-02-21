@@ -221,7 +221,7 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
                                 </button>
                             </>
                         )}
-                        {(draft.intent.moveType === 'formalizeInfluence' || draft.intent.moveType === 'convertResources') && (
+                        {(draft.intent.moveType === 'formalizeInfluence' || draft.intent.moveType === 'convertResources' || draft.intent.moveType.endsWith('.takeMeasure')) && (
                             <button className="btn-secondary btn-small" onClick={editDraftVariant} data-testid="btn-edit-selection">
                                 Change selection
                             </button>

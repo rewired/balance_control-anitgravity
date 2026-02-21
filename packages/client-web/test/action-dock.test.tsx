@@ -158,7 +158,7 @@ describe('ActionDock', () => {
         // Click the action button
         const moveButton = screen.getByTestId('btn-other-unknownAction');
         fireEvent.click(moveButton);
-        
+
         expect(proposeIntent).toHaveBeenCalledTimes(1);
         expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
     });
@@ -432,5 +432,62 @@ describe('ActionDock', () => {
         const variantBtn = screen.getByTestId('btn-variant-INF-r1|r2');
         fireEvent.click(variantBtn);
         expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
+    });
+
+    it('shows "Change selection" button when a measure is drafted', () => {
+        const editDraftVariant = vi.fn();
+        const draftedIntent = {
+            moveType: 'exp01.takeMeasure',
+            payload: 'measure-123'
+        };
+
+        const controller = {
+            vm: {
+                stage: 'politicalAction',
+                political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
+                intents: []
+            },
+            interactionState: 'draftReady',
+            draft: { intent: draftedIntent, isLegalNow: true },
+            editDraftVariant: editDraftVariant,
+            actionMode: 'takeMeasure',
+            // Mock other required props
+            confirmDraft: vi.fn(),
+            cancelDraft: vi.fn(),
+            editDraftSource: vi.fn(),
+            editDraftDestination: vi.fn(),
+            editDraftTarget: vi.fn(),
+            moveInfluenceSourceId: null,
+            pinnedCommitteeTileId: null,
+            pinnedGrassrootsTileId: null,
+            setActionMode: vi.fn(),
+        } as any;
+
+        // Mock G
+        const G = {
+            objects: {}
+        } as any;
+
+        render(
+            <ActionDock
+                isActive={true}
+                G={G}
+                controller={controller}
+            />
+        );
+
+        // Verify draft panel is shown
+        expect(screen.getByTestId('action-dock-draft')).toBeDefined();
+
+        // Verify intent label is shown
+        expect(screen.getByText('Take Measure measure-123')).toBeDefined();
+
+        // Verify "Change selection" button exists and works
+        const editButton = screen.getByTestId('btn-edit-selection');
+        expect(editButton).toBeDefined();
+        expect(editButton.textContent).toBe('Change selection');
+
+        fireEvent.click(editButton);
+        expect(editDraftVariant).toHaveBeenCalledTimes(1);
     });
 });
