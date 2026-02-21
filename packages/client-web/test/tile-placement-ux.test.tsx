@@ -71,5 +71,6 @@ describe('HexBoard UX', () => {
         // Should have preview
         const preview = container.querySelector('.ghost-preview');
         expect(preview).not.toBeNull();
+        expect(preview?.querySelector('[data-component="HexTileVisual"]')).not.toBeNull();
     });
 });

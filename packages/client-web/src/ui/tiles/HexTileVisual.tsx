@@ -48,18 +48,22 @@ export function HexTileVisual({
   const [cx, cy] = CENTER_ABS;
   const resortIconScale = RESORT_ICON_SIZE / DEFAULT_ICON_VIEWBOX_SIZE;
 
+  const hasBoth = resortIcon && valueW !== undefined;
+  const iconOffset = hasBoth ? -110 : -60;
+  const valueOffset = hasBoth ? 75 : -10;
+
   const contentLayer =
     resortIcon || valueW !== undefined ? (
       <g style={{ color: CONTENT_COLOR }}>
         {resortIcon ? (
-          <g transform={`translate(${cx} ${cy - 60}) scale(${resortIconScale}) translate(${-DEFAULT_ICON_VIEWBOX_SIZE / 2} ${-DEFAULT_ICON_VIEWBOX_SIZE / 2})`}>
+          <g transform={`translate(${cx} ${cy + iconOffset}) scale(${resortIconScale}) translate(${-DEFAULT_ICON_VIEWBOX_SIZE / 2} ${-DEFAULT_ICON_VIEWBOX_SIZE / 2})`}>
             {resortIcon}
           </g>
         ) : null}
         {valueW !== undefined ? (
           <text
             x={cx}
-            y={cy - 10}
+            y={cy + valueOffset}
             textAnchor="middle"
             dominantBaseline="middle"
             fill={CONTENT_COLOR}
