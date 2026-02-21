@@ -1,0 +1,69 @@
+{
+    "core": {
+        "group": {
+            "influence": "Einfluss",
+            "committees": "Komitees",
+            "economy": "Wirtschaft",
+            "measures": "Maßnahmen",
+            "expansions": "Erweiterungen"
+        },
+        "action": {
+            "placeInfluence": "Einfluss platzieren",
+            "moveInfluence": "Einfluss verschieben",
+            "formalize": "Formalisieren",
+            "convert": "Umwandeln",
+            "takeMeasure": "Maßnahme ziehen"
+        },
+        "step": {
+            "chooseAction": "Aktion wählen",
+            "chooseSource": "Quelle wählen",
+            "chooseDestination": "Ziel wählen",
+            "chooseTile": "Feld wählen",
+            "chooseVariant": "Variante wählen"
+        },
+        "ui": {
+            "preview": "Vorschau",
+            "confirm": "Bestätigen",
+            "cancel": "Abbrechen",
+            "changeSource": "Quelle ändern",
+            "changeDestination": "Ziel ändern",
+            "changeVariant": "Variante ändern",
+            "changeTile": "Feld ändern",
+            "changePlacement": "Platzierung ändern",
+            "actions": "Aktionen",
+            "waiting": "Warten",
+            "drawAndPlace": "Ziehen & Platzieren",
+            "politicalAction": "Politische Aktion",
+            "select": "Auswählen",
+            "standard": "Standard",
+            "extra": "Extra: {{extra}}",
+            "pay": "Kosten: {{pay}}",
+            "free": "Kostenlos",
+            "from": "Von: {{from}}",
+            "to": "Zu: {{to}}",
+            "skipPlacement": "Platzierung überspringen",
+            "staged": "Bereit: {{tile}}"
+        },
+        "draft": {
+            "moveInfluenceSummary": "{{source}} → {{target}}",
+            "placeInfluenceSummary": "Ziel {{target}}",
+            "placeTileSummary": "{{tile}} @ {{coord}}",
+            "formalizeSummary": "Feld {{tile}}",
+            "convertSummary": "Feld {{tile}}"
+        },
+        "inspector": {
+            "activeAction": "Aktive Aktion",
+            "step": "Schritt",
+            "pinnedSource": "Fixierte Quelle",
+            "title": "Inspektor",
+            "empty": "Kein Feld ausgewählt",
+            "coord": "Koord",
+            "type": "Typ",
+            "resort": "Resort",
+            "weight": "Gewicht",
+            "influence": "Einfluss",
+            "resources": "Ressourcen",
+            "none": "Keine"
+        }
+    }
+}
