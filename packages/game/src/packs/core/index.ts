@@ -82,7 +82,9 @@ export const CorePack: EnginePackDefinition = {
                 // ADD56-01-02-01/02: 5-6 players get 2 Influence each
                 else if (ctx.numPlayers === 5 || ctx.numPlayers === 6) influenceCount = 2;
 
-                if (cfg.firstPlayerHandicap && pid === String(ctx.currentPlayer ?? '0')) {
+                // CORE-01-03-02 / VAR-01-02-02: Apply FirstPlayerHandicap to starting player
+                const startingPlayerIndex = G.engine.attributes.startingPlayerIndex ?? 0;
+                if (cfg.firstPlayerHandicap && pid === String(startingPlayerIndex)) {
                     influenceCount = Math.max(0, influenceCount - 1);
                 }
 

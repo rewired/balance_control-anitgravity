@@ -121,9 +121,11 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
         );
     }
 
+    // CORE-01-03-02 / CORE-01-03-02A.2: Determine starting player (canonical RNG call)
     if ((normalizedCtx as any)?.random?.Die) {
         const seatCount = Math.max(1, normalizedCtx.numPlayers ?? 1);
-        (normalizedCtx as any).random.Die(seatCount);
+        const k = (normalizedCtx as any).random.Die(seatCount) - 1; // 0..numPlayers-1
+        G.engine.attributes.startingPlayerIndex = k;
     }
 
     packAssembly.applySetupPostShuffle(G, normalizedCtx);

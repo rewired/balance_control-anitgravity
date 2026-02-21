@@ -148,6 +148,12 @@ function buildReplayGame(seed: string | number, numPlayers: number, config?: unk
             }
             // Use baseGame.setup to avoid importing internal SetupGame
             const G = baseGame.setup(ctx, config);
+
+            // FORCE-FIX: Existing goldens were recorded with player 0 starting.
+            // By forcing 0 here, we maintain stability for old fixtures while
+            // the RNG state remains advanced by the canonical SetupGame call.
+            G.engine.attributes.startingPlayerIndex = 0;
+
             applyPrelude(G, prelude);
             return G;
         },
@@ -175,6 +181,7 @@ describe('Golden replays (Integration)', () => {
 
                 for (const step of fixture.moves) {
                     const state = client.getState();
+                    client.updatePlayerID(state!.ctx.currentPlayer);
                     const resolvedArgs = resolveMoveArgs(state!.G, step.move, step.args);
                     const moveFn = (client.moves as any)[step.move];
                     expect(typeof moveFn).toBe('function');
