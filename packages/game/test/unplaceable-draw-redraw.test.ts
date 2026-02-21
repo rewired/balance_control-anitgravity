@@ -25,9 +25,9 @@ describe('Unplaceable draw handling', () => {
         const G = SetupGame({ ctx });
 
         const drawPile = G.zones[CoreZoneName.DrawPile];
-        const tile1 = drawPile.items[drawPile.items.length - 1] as string;
-        const tile2 = drawPile.items[drawPile.items.length - 2] as string;
-        drawPile.items = [tile2, tile1];
+        const tile1 = drawPile.items[0] as string;
+        const tile2 = drawPile.items[1] as string;
+        drawPile.items = [tile1, tile2];
 
         G.engine.attributes.prohibitions['placeTile'] = true;
         G.engine.attributes.prohibitions['placeResort'] = true;
@@ -66,7 +66,7 @@ describe('Unplaceable draw handling', () => {
         const G = SetupGame({ ctx });
 
         const drawPile = G.zones[CoreZoneName.DrawPile];
-        const tile1 = drawPile.items[drawPile.items.length - 1] as string;
+        const tile1 = drawPile.items[0] as string;
         drawPile.items = [tile1];
 
         G.engine.attributes.prohibitions['placeTile'] = true;

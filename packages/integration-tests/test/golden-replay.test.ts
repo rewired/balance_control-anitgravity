@@ -72,7 +72,7 @@ function applyPrelude(G: any, prelude?: PreludeAction[]): void {
                 });
                 if (idx === -1) break;
                 const [tileId] = drawPile.items.splice(idx, 1);
-                drawPile.items.push(tileId);
+                drawPile.items.unshift(tileId);
             }
             continue;
         }

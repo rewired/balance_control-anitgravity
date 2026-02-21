@@ -116,7 +116,7 @@ export function drawTileToStaging(G: GameState, ctx: any): void {
         delete G.engine.attributes.drawPileEmptyAtTurnStart;
     }
 
-    const tileId = drawPile.items.pop();
+    const tileId = drawPile.items.shift();
     if (!tileId) {
         markDrawPileEmptyForFinalSettlement(G);
         return;

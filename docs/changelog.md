@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-21: task(0187) Align DrawPile behavior with CORE-01-00-05A: Top = first element (index 0).
 - 2026-02-20: task(0148) Rename Meta-Marker mode `PingPong` to `ReturnPenalty` (CORE rename and serialization change).
 - 2026-02-19: task(0138) Remove deprecated `CoreZoneNames` and `CoreResources` exports from `@balance-control/rules` (API cleanup).
 - 2026-02-18: task(0112) Migrate `packages/client-web` to `type: module` and configure TS paths for source resolution (IDE support).
