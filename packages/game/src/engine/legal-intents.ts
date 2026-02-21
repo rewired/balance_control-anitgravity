@@ -1,5 +1,5 @@
 import { CoreZoneName, GameState, TileType } from '@balance-control/rules';
-import { allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap } from '../mechanics-turn';
+import { allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap, hasInfluenceInSupply } from '../mechanics-turn';
 import { computeMajority } from '../mechanics';
 import { coordToString, getNeighbors, stringToCoord } from '../topology';
 import { isMoveAdjacent } from './topology';
@@ -189,6 +189,8 @@ function getChoiceSelections(G: GameState, ctx: any, pendingChoice: any): any[] 
 
 function enumeratePlaceInfluence(G: GameState, playerID: string): LegalIntent[] {
     const intents: LegalIntent[] = [];
+    if (!hasInfluenceInSupply(G, playerID)) return intents;
+
     const boardTiles = getBoardTileIds(G);
 
     for (const tileId of boardTiles) {

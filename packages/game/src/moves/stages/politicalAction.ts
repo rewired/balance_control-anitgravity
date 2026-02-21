@@ -6,6 +6,7 @@ import {
     allStartingInfluencePlaced,
     countPlayerInfluence,
     getInfluenceCap,
+    hasInfluenceInSupply,
     returnMetaMarkerToSupply
 } from '../../mechanics-turn';
 import { EffectResolver } from '../../engine/resolver';
@@ -53,6 +54,9 @@ export const PoliticalActionMoves = {
 
         // Generic Prohibition check
         if (EffectResolver.isProhibited(G, 'influence.place', pid, targetTileId)) return INVALID_MOVE;
+
+        // CORE-01-04-11A: Must have influence in supply
+        if (!hasInfluenceInSupply(G, pid)) return INVALID_MOVE;
 
         // Decoupled Extra Costs
         if (!EffectResolver.checkAndPayCosts(G, pid, 'influence.place', targetTileId, extraResourceIds)) return INVALID_MOVE;

@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -30,8 +30,8 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * GR-010: Preserve Start Committee targeting restrictions.
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 
 ---
 
@@ -95,7 +95,7 @@ Suggested locations:
 
 ### 5.3 Docs
 
-* [ ] `/docs/changelog.md` updated.
+* [x] `/docs/changelog.md` updated.
 * [ ] DD doc — N/A
 * [ ] ERRATA — N/A
 
@@ -117,25 +117,25 @@ Suggested locations:
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Implement `hasInfluenceInSupply(pid)` check (simple scan of `PersonalSupply:${pid}` for object.type === 'Influence').
-* [ ] Step 2: In `placeInfluence`, enforce the check **before** `checkAndPayCosts(...)`.
-* [ ] Step 3: In `enumeratePlaceInfluence`, short-circuit to empty list if supply has no Influence.
-* [ ] Step 4: Add tests (move + enumeration).
-* [ ] Step 5: Run `pnpm test`.
+* [x] Step 1: Implement `hasInfluenceInSupply(pid)` check (simple scan of `PersonalSupply:${pid}` for object.type === 'Influence').
+* [x] Step 2: In `placeInfluence`, enforce the check **before** `checkAndPayCosts(...)`.
+* [x] Step 3: In `enumeratePlaceInfluence`, short-circuit to empty list if supply has no Influence.
+* [x] Step 4: Add tests (move + enumeration).
+* [x] Step 5: Run `pnpm test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] `placeInfluence` is rejected when supply has no Influence; no costs are paid; no usage increments.
-* [ ] `enumerateLegalIntents` does not offer `placeInfluence` when supply has no Influence.
-* [ ] All tests pass.
+* [x] `placeInfluence` is rejected when supply has no Influence; no costs are paid; no usage increments.
+* [x] `enumerateLegalIntents` does not offer `placeInfluence` when supply has no Influence.
+* [x] All tests pass.
 
 ---
 
 ## 10) PR Checklist
 
-* [ ] Guardrails listed accurately.
-* [ ] Normative anchors cited.
-* [ ] `pnpm test` passes.
-* [ ] Working tree clean after postflight amend.
+* [x] Guardrails listed accurately.
+* [x] Normative anchors cited.
+* [x] `pnpm test` passes.
+* [x] Working tree clean after postflight amend.

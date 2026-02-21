@@ -438,4 +438,13 @@ describe('Moves', () => {
         expect(result).toBe(INVALID_MOVE);
         expect(JSON.stringify(G)).toBe(before);
     });
+
+    it('placeInfluence should be rejected when PersonalSupply has no Influence', () => {
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => G.objects[id]?.type !== 'Influence');
+        const before = JSON.stringify(G);
+        const result = CoreMoves.placeInfluence({ G, ctx, events }, { targetTileId: 'board_t1' });
+
+        expect(result).toBe(INVALID_MOVE);
+        expect(JSON.stringify(G)).toBe(before);
+    });
 });

@@ -29,6 +29,22 @@ export function countPlayerInfluence(G: any, pid: string): number {
 }
 
 /**
+ * Checks if the player has at least one Influence in their PersonalSupply.
+ * @rule CORE-01-04-11A
+ * @deterministic
+ * @pure
+ */
+export function hasInfluenceInSupply(G: any, pid: string): boolean {
+    const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
+    const supply = G.zones[supplyId];
+    if (!supply) return false;
+    return supply.items.some((itemId: string) => {
+        const obj = G.objects[itemId];
+        return obj && obj.type === 'Influence';
+    });
+}
+
+/**
  * Checks if all starting influence has been placed by all players.
  * @rule CORE-01-08-02
  * @deterministic

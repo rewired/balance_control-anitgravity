@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-21: task(0190) Ensure `placeInfluence` is illegal if PersonalSupply has no Influence (CORE-01-04-11A); validate before costs.
 - 2026-02-21: task(0189) Ensure `placeTile` atomicity: validate legality (CORE-01-04-05) before cost payment (CORE-01-06-00-03, ARCH-03:RESOLUTION_ORDER).
 - 2026-02-21: task(0187) Align DrawPile behavior with CORE-01-00-05A: Top = first element (index 0).
 - 2026-02-20: task(0148) Rename Meta-Marker mode `PingPong` to `ReturnPenalty` (CORE rename and serialization change).

@@ -206,6 +206,19 @@ describe('enumerateLegalIntents', () => {
         expect(intents).toHaveLength(0);
     });
 
+    it('omits placeInfluence intents when supply has no influence', () => {
+        const ctx = createCtx('politicalAction');
+        const G = SetupGame({ ctx });
+
+        // Remove all influence from supply
+        const supply = G.zones['PersonalSupply:0'];
+        supply.items = supply.items.filter(id => G.objects[id]?.type !== 'Influence');
+
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        const hasPlace = intents.some(i => i.moveType === 'placeInfluence');
+        expect(hasPlace).toBe(false);
+    });
+
 
     function createMeasureDummyPack(id: string) {
         const zones = {
