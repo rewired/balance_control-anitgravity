@@ -265,6 +265,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     const testId = `hex-ghost-${coordStr.replace(',', '_')}`;
                     const isGhostHovered = hoveredGhostCoord === coordStr;
                     const canPropose = !draftIntent && isInteractive;
+                    const isResolveChoice = intent!.moveType === 'resolveChoice';
 
                     return (
                         <button
@@ -276,7 +277,13 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 isDraftedGhost ? 'hex-ghost-drafted' : null
                             ].filter(Boolean).join(' ')}
                             disabled={!canPropose && !isDraftedGhost}
-                            onClick={canPropose ? () => onProposeMove?.(intent!) : undefined}
+                            onClick={
+                                canPropose
+                                    ? (isResolveChoice && onResolveChoice)
+                                        ? () => onResolveChoice(intent!)
+                                        : () => onProposeMove?.(intent!)
+                                    : undefined
+                            }
                             onMouseEnter={() => setHoveredGhostCoord(coordStr)}
                             onMouseLeave={() => setHoveredGhostCoord((prev) => (prev === coordStr ? null : prev))}
                             data-testid={testId}

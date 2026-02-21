@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** FROZEN
 
 ## Task State Machine (Loop-Breaker)
 
@@ -44,9 +44,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -169,28 +169,33 @@ Existing behavior summary (current):
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <fill during implementation>
+* Implemented `pendingChoice.kind === 'selectTile'` hard-gate in `GameLayout.tsx` by explicitly disabling `onSelectTile` and `onProposeMove` callbacks.
+* Updated `HexBoard.tsx` to support `resolveChoice` intents for ghost tiles (coordinate-based selection).
+* Extended `pending-choice-modal.test.tsx` to verify that non-target clicks do not dispatch actions or update the inspector.
+* Confirmed that `useGameInteractionController` also blocks selection internally, but UI-level disablement ensures correct visual feedback (no pointer events).
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* <fill during implementation>
+* `pnpm test packages/client-web/test/pending-choice-select-tile.test.tsx` - Verified implementation with isolated tests.
+* `pnpm test packages/client-web/test/pending-choice-modal.test.tsx` - Verified full suite passes with new tests.
+* `pnpm lint packages/client-web` - Verified no lint errors.
 
 ---
 

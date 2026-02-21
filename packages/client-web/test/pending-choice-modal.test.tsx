@@ -36,18 +36,20 @@ const createState = () => {
         zones: {
             'PersonalSupply:0': { id: 'PersonalSupply:0', name: 'PS', items: [] },
             Bank: { id: 'Bank', name: 'Bank', items: [] },
-            Board: { id: 'Board', name: 'Board', items: ['tile_alpha'] },
+            Board: { id: 'Board', name: 'Board', items: ['tile_alpha', 'tile_beta'] },
             DrawPile: { id: 'DrawPile', name: 'DrawPile', items: [] },
             Noise: { id: 'Noise', name: 'Noise', items: [] },
-            tile_alpha: { id: 'tile_alpha', name: 'Tile', items: [] },
+            tile_alpha: { id: 'tile_alpha', name: 'Tile Alpha', items: [] },
+            tile_beta: { id: 'tile_beta', name: 'Tile Beta', items: [] },
             staging_0: { id: 'staging_0', name: 'Staging', items: [] }
         },
         tiles: {
-            tile_alpha: { id: 'tile_alpha', type: TileType.Resort, resort: 'FOR', weight: 2 }
+            tile_alpha: { id: 'tile_alpha', type: TileType.Resort, resort: 'FOR', weight: 2 },
+            tile_beta: { id: 'tile_beta', type: TileType.Resort, resort: 'DOM', weight: 1 }
         },
         objects: {},
         adjacency: {},
-        grid: { '0,0': 'tile_alpha' },
+        grid: { '0,0': 'tile_alpha', '1,0': 'tile_beta' },
         engine: { idSeq: 0, effectQueue: [], activeModifiers: [], history: [], attributes: {} }
     } as any;
 };
@@ -186,5 +188,79 @@ describe('PendingChoiceModal', () => {
 
         expect(resolveChoice).toHaveBeenCalledTimes(1);
         expect(resolveChoice).toHaveBeenCalledWith({ choiceId: 'choice-1', selection: 'tile_alpha' });
+    });
+
+    it('restricts board interaction to valid targets only (no inspect)', () => {
+        ensureResizeObserver();
+        const resolveChoice = vi.fn();
+        const state = createState();
+
+        // Setup pending choice targeting only tile_alpha
+        state.engine.pendingChoice = {
+            kind: 'selectTile',
+            resolveChoice: [
+                { moveType: 'resolveChoice', payload: { choiceId: 'choice-1', selection: 'tile_alpha' } }
+            ]
+        };
+
+        mockEnumerateLegalIntents.mockReturnValue(state.engine.pendingChoice.resolveChoice);
+
+        render(
+            <GameLayout
+                G={state}
+                ctx={baseCtx}
+                moves={{ resolveChoice }}
+                playerID={'0'}
+                isActive={true}
+            />
+        );
+
+        // 1. Click non-target tile (tile_beta at 1,0)
+        const tileBeta = screen.getByTestId('hex-tile-1_0');
+        fireEvent.click(tileBeta);
+
+        // Expect: No resolveChoice dispatch
+        expect(resolveChoice).not.toHaveBeenCalled();
+
+        // Expect: No inspector update (remains empty)
+        expect(screen.getByTestId('inspector-empty')).not.toBeNull();
+        expect(screen.queryByTestId('inspector-coord')).toBeNull();
+    });
+
+    it('supports coordinate-based selection via ghosts', () => {
+        ensureResizeObserver();
+        const resolveChoice = vi.fn();
+        const state = createState();
+
+        // Setup pending choice targeting a coordinate (ghost)
+        state.engine.pendingChoice = {
+            kind: 'selectTile',
+            resolveChoice: [
+                { moveType: 'resolveChoice', payload: { choiceId: 'choice-2', selection: '0,1' } }
+            ]
+        };
+
+        mockEnumerateLegalIntents.mockReturnValue(state.engine.pendingChoice.resolveChoice);
+
+        render(
+            <GameLayout
+                G={state}
+                ctx={baseCtx}
+                moves={{ resolveChoice }}
+                playerID={'0'}
+                isActive={true}
+            />
+        );
+
+        // Verify ghost exists at 0,1
+        const ghost = screen.getByTestId('hex-ghost-0_1');
+        expect(ghost).not.toBeNull();
+
+        // Click ghost
+        fireEvent.click(ghost);
+
+        // Expect: resolveChoice dispatch
+        expect(resolveChoice).toHaveBeenCalledTimes(1);
+        expect(resolveChoice).toHaveBeenCalledWith({ choiceId: 'choice-2', selection: '0,1' });
     });
 });
