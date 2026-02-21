@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** FROZEN
+**Task State:** DONE
 
 ## 0) Masterplan Guardrails (MUST)
 
@@ -123,9 +123,10 @@ Approach:
 
 ## 7) Acceptance Criteria
 
-* [ ] Selection and target overlays are hex-shaped (not square) and pointy-top.
-* [ ] Overlays size from `--hex-cell-w`/`--hex-cell-h` (no fixed 136px boxes).
-* [ ] New e2e tests pass.
-* [ ] `pnpm lint`, `pnpm test`, `pnpm e2e` are green.
+* [x] Selection and target overlays are hex-shaped (not square) and pointy-top.
+* [x] Overlays size from `--hex-cell-w`/`--hex-cell-h` (no fixed 136px boxes).
+* [x] New e2e tests pass.
+* [x] `pnpm lint`, `pnpm test`, `pnpm e2e` are green.
 
 ---
+

@@ -379,11 +379,11 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 124px;
-    height: 124px;
+    width: var(--hex-cell-w);
+    height: var(--hex-cell-h);
     transform: translate(-50%, -50%);
-    border-radius: 12px;
-    border: 2px dashed rgba(255, 255, 255, 0.3);
+    clip-path: var(--hex-clip);
+    border: 2px dashed rgba(255, 255, 255, 0.35);
     pointer-events: none;
     animation: pulse-target 2s infinite;
 }
@@ -397,14 +397,14 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 136px;
-    height: 136px;
+    width: var(--hex-cell-w);
+    height: var(--hex-cell-h);
     transform: translate(-50%, -50%);
-    border-radius: 14px;
-    border: 1px solid var(--active-seat-color, rgba(255, 255, 255, 0.3));
-    box-shadow: 0 0 24px var(--active-seat-color, rgba(255, 255, 255, 0.2));
-    background: radial-gradient(circle, var(--active-seat-color, rgba(255, 255, 255, 0.1)) 0%, transparent 70%);
-    opacity: 0.6;
+    clip-path: var(--hex-clip);
+    border: 2px dashed var(--active-seat-color, rgba(255, 255, 255, 0.5));
+    background: radial-gradient(circle, var(--active-seat-color, rgba(255, 255, 255, 0.15)) 0%, transparent 75%);
+    filter: drop-shadow(0 0 8px var(--active-seat-color, rgba(255, 255, 255, 0.3)));
+    opacity: 0.8;
     pointer-events: none;
 }
 
@@ -438,7 +438,7 @@ body {
     height: var(--hex-cell-h);
     transform: translate(-50%, -50%);
     clip-path: var(--hex-clip);
-    border: 3px dotted rgba(6, 182, 212, 0.95);
+    border: 2px dashed rgba(6, 182, 212, 0.8);
     background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 75%);
     filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.45));
     pointer-events: none;

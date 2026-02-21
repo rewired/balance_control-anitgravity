@@ -47,8 +47,8 @@ test('hex selection outline has hex clip-path, bloom filter, and dotted border',
     expect(styles!.filter).not.toBe('none');
     expect(styles!.filter).toContain('drop-shadow');
 
-    // border-style should be dotted (as updated)
-    expect(styles!.borderStyle).toBe('dotted');
+    // border-style should be dashed (as updated)
+    expect(styles!.borderStyle).toBe('dashed');
 
     // z-index should be 2 (as updated)
     expect(styles!.zIndex).toBe('2');
