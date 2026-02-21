@@ -93,7 +93,7 @@ describe('PendingChoiceModal', () => {
         expect(screen.queryByTestId('btn-place-influence')).toBeNull();
     });
 
-    it('dispatches resolveChoice with deterministic ordering', () => {
+    it('dispatches resolveChoice only after confirmation', () => {
         ensureResizeObserver();
         const resolveChoice = vi.fn();
         mockEnumerateLegalIntents.mockReturnValue([
@@ -111,8 +111,20 @@ describe('PendingChoiceModal', () => {
         );
 
         const firstOption = screen.getByTestId('pending-choice-option-0');
+        const confirmButton = screen.getByTestId('pending-choice-confirm') as HTMLButtonElement;
+
+        // Initial state: Confirm disabled
+        expect(confirmButton.disabled).toBe(true);
+
         expect(firstOption.textContent).toBe('a');
         fireEvent.click(firstOption);
+
+        // Not dispatched yet
+        expect(resolveChoice).not.toHaveBeenCalled();
+        expect(confirmButton.disabled).toBe(false);
+
+        // Confirm
+        fireEvent.click(confirmButton);
         expect(resolveChoice).toHaveBeenCalledTimes(1);
         expect(resolveChoice).toHaveBeenCalledWith({ choiceId: 'choice-1', selection: 'a' });
     });

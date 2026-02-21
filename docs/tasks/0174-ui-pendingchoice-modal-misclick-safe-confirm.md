@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** COMMIT_READY
 
 ## Task State Machine (Loop-Breaker)
 
@@ -44,9 +44,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -139,50 +139,56 @@ Existing behavior summary (current):
 
 ## 8) Implementation Plan
 
-* [ ] Adjust `ModalHost` rendering condition to include `vm.hasPendingChoice`.
-* [ ] Refactor `PendingChoiceModal`:
-  * [ ] keep deterministic ordering of options (already handled by view model sorting)
-  * [ ] add selection state
-  * [ ] add Confirm button + disabled state
-  * [ ] ensure overlay background does not capture pointer events (pan/zoom passthrough)
-* [ ] Update `pending-choice-modal.test.tsx` accordingly.
-* [ ] Run: `pnpm -C packages/client-web test`.
+* [x] Adjust `ModalHost` rendering condition to include `vm.hasPendingChoice`.
+* [x] Refactor `PendingChoiceModal`:
+  * [x] keep deterministic ordering of options (already handled by view model sorting)
+  * [x] add selection state
+  * [x] add Confirm button + disabled state
+  * [x] ensure overlay background does not capture pointer events (pan/zoom passthrough)
+* [x] Update `pending-choice-modal.test.tsx` accordingly.
+* [x] Run: `pnpm -C packages/client-web test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] For non-selectTile pendingChoice, clicking an option does not dispatch until Confirm.
-* [ ] Confirm dispatches exactly one `resolveChoice` move with the selected payload.
-* [ ] Pan/zoom remains operable while the modal is open.
-* [ ] `pnpm -C packages/client-web test` passes.
+* [x] For non-selectTile pendingChoice, clicking an option does not dispatch until Confirm.
+* [x] Confirm dispatches exactly one `resolveChoice` move with the selected payload.
+* [x] Pan/zoom remains operable while the modal is open.
+* [x] `pnpm -C packages/client-web test` passes.
 
 ---
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <fill during implementation>
+* Updated `ModalHost.tsx` to strictly check `vm.hasPendingChoice` before rendering the modal.
+* Refactored `PendingChoiceModal.tsx` to implement a selection-first, confirm-later flow.
+* Added a "Confirm" button that remains disabled until an option is selected.
+* Updated `PendingChoiceModal` styles to allow pointer events pass-through on the overlay (for pan/zoom) while capturing events on the modal itself.
+* Updated tests to verify that option clicks do not dispatch immediately and that the confirm button works as expected.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* <fill during implementation>
+* `pnpm -C packages/client-web test pending-choice-modal.test.tsx` - Passed
+* `pnpm -C packages/client-web test` - Passed (24 files, 92 tests)
+* `pnpm lint` - Passed
 
 ---
 
@@ -203,4 +209,3 @@ Recorded in final commit message (Postflight: block).
 ---
 
 ## 15) Amendments (append-only)
-

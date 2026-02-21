@@ -20,7 +20,7 @@ export const ModalHost: React.FC<ModalHostProps> = ({ G, controller }) => {
 
     return (
         <>
-            {vm.pendingChoice.kind !== 'selectTile' && (
+            {vm.hasPendingChoice && vm.pendingChoice.kind !== 'selectTile' && (
                 <PendingChoiceModal
                     resolveChoiceIntents={vm.pendingChoice.resolveChoice}
                     onResolve={resolveChoice}
