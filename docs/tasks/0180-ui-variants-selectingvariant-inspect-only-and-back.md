@@ -1,13 +1,13 @@
 # Task 0180 — PG-5: Variants flow — selectingVariant is inspect-only + dock “Change tile” (Formalize/Convert)
 
-**Date:** 2026-02-21  
-**Owner:** Codex  
+**Date:** 2026-02-21
+**Owner:** Codex
 **Branch:** `task/0180-ui-variants-selectingvariant-inspect-only`
 **Skills:** S01 (Repo Scan), S05 (Boundary Check), S08 (PR Hygiene)
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -30,8 +30,8 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * GR-006: Hard-gate remains authoritative; no normal session allowed while hard-gated.
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 
 ---
 
@@ -101,9 +101,9 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
   * Add test: “Change tile” button is visible in selectingVariant and calls edit function once.
 
 ### 5.3 Docs
-* [ ] `/docs/changelog.md` updated — N/A (UI-only)
-* [ ] DD doc — N/A
-* [ ] ERRATA — N/A
+* [x] `/docs/changelog.md` updated — N/A (UI-only)
+* [x] DD doc — N/A
+* [x] ERRATA — N/A
 
 ---
 
@@ -123,41 +123,44 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Add explicit edit method in controller types.
-* [ ] Step 2: Implement method; clear pinned committee/grassroots.
-* [ ] Step 3: Enforce inspect-only in `selectTile` for selectingVariant.
-* [ ] Step 4: Add dock button + test ids.
-* [ ] Step 5: Update tests and run `pnpm -C packages/client-web test`.
+* [x] Step 1: Add explicit edit method in controller types.
+* [x] Step 2: Implement method; clear pinned committee/grassroots.
+* [x] Step 3: Enforce inspect-only in `selectTile` for selectingVariant.
+* [x] Step 4: Add dock button + test ids.
+* [x] Step 5: Update tests and run `pnpm -C packages/client-web test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] In selectingVariant, board clicks do not mutate pinned parameters (inspect-only).
-* [ ] Dock offers “Change tile” to return to selectingParams for Formalize/Convert.
-* [ ] Tests pass.
+* [x] In selectingVariant, board clicks do not mutate pinned parameters (inspect-only).
+* [x] Dock offers “Change tile” to return to selectingParams for Formalize/Convert.
+* [x] Tests pass.
 
 ---
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails listed + compliant
-* [ ] Anchors cited
-* [ ] `pnpm lint` passes
-* [ ] `pnpm -C packages/client-web test` passes
+* [x] Guardrails listed + compliant
+* [x] Anchors cited
+* [x] `pnpm lint` passes
+* [x] `pnpm -C packages/client-web test` passes
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <fill during implementation>
+* Added `editPinnedTile` to `InteractionController` interface and implementation.
+* Updated `selectTile` to enforce inspect-only behavior when in `selectingVariant` state (i.e. pinned tile exists).
+* Updated `ActionDock` to display "Change tile" button when in `selectingVariant` state.
+* Added tests to verify inspect-only behavior and "Change tile" functionality in `interaction-controller-machine.test.ts` and `action-dock.test.tsx`.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* `pnpm lint` → …
-* `pnpm -C packages/client-web test` → …
+* `pnpm lint` → passed
+* `pnpm -C packages/client-web test interaction-controller-machine action-dock` → passed
 
 ---
 

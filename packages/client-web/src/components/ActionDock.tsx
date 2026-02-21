@@ -165,7 +165,8 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
         editDraftSource,
         editDraftDestination,
         editDraftTarget,
-        editDraftVariant
+        editDraftVariant,
+        editPinnedTile
     } = controller;
 
     const actionLabel = getActionLabel(actionMode, draft.intent);
@@ -197,6 +198,18 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
                     </div>
                 )}
             </div>
+
+            {interactionState === 'selectingVariant' && (
+                <div className="action-panel-draft" data-testid="action-dock-variant-select" style={{ marginTop: '12px' }}>
+                    <button
+                        className="btn-secondary btn-small"
+                        onClick={editPinnedTile}
+                        data-testid="btn-change-tile"
+                    >
+                        Change tile
+                    </button>
+                </div>
+            )}
 
             {interactionState === 'draftReady' && draft.intent && (
                 <div className="action-panel-draft" data-testid="action-dock-draft" style={{ marginTop: '12px' }}>

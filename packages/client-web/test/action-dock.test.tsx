@@ -490,4 +490,45 @@ describe('ActionDock', () => {
         fireEvent.click(editButton);
         expect(editDraftVariant).toHaveBeenCalledTimes(1);
     });
+
+    it('shows "Change tile" button when in selectingVariant', () => {
+        const editPinnedTile = vi.fn();
+        const controller = {
+            vm: {
+                stage: 'politicalAction',
+                political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] },
+                intents: []
+            },
+            interactionState: 'selectingVariant',
+            pinnedCommitteeTileId: 'tile1',
+            editPinnedTile,
+            actionMode: 'formalizeInfluence',
+            draft: { intent: null },
+             // Mock other required props
+            confirmDraft: vi.fn(),
+            cancelDraft: vi.fn(),
+            editDraftSource: vi.fn(),
+            editDraftDestination: vi.fn(),
+            editDraftTarget: vi.fn(),
+            editDraftVariant: vi.fn(),
+            moveInfluenceSourceId: null,
+            pinnedGrassrootsTileId: null,
+            setActionMode: vi.fn(),
+        } as any;
+
+        render(
+            <ActionDock
+                isActive={true}
+                G={{} as any}
+                controller={controller}
+            />
+        );
+
+        const changeTileBtn = screen.getByTestId('btn-change-tile');
+        expect(changeTileBtn).toBeDefined();
+        expect(changeTileBtn.textContent).toBe('Change tile');
+
+        fireEvent.click(changeTileBtn);
+        expect(editPinnedTile).toHaveBeenCalledTimes(1);
+    });
 });

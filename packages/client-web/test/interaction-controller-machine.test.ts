@@ -131,6 +131,107 @@ describe('useGameInteractionController State Machine', () => {
         expect(result.current.selectedTileId).toBe('tile1'); // Inspect only
     });
 
+    describe('selectingVariant', () => {
+        it('is inspect-only: selectTile does not change pinned tile', () => {
+            const { result, rerender } = renderHook(() => useGameInteractionController({
+                G: { 
+                    zones: {}, 
+                    grid: { '0,0': 'tile1', '0,1': 'tile2' }, 
+                    tiles: { 'tile1': { id: 'tile1' }, 'tile2': { id: 'tile2' } }, 
+                    objects: {} 
+                } as any,
+                ctx: { currentPlayer: '0' },
+                playerID: '0',
+                moves: {}
+            }));
+
+            // Set up selectingVariant state
+            act(() => {
+                result.current.setActionMode('formalizeInfluence');
+            });
+            
+            // Mock VM to say we have intents for this tile
+            vi.mocked(useIntentViewModel).mockReturnValue({
+                ...mockDefaultVM,
+                intents: [{ 
+                    moveType: 'formalizeInfluence', 
+                    payload: { committeeTileId: 'tile1' } 
+                } as any]
+            });
+            
+            rerender();
+
+            // Select tile to pin it
+            act(() => {
+                result.current.selectTile('tile1', '0,0');
+            });
+
+            expect(result.current.interactionState).toBe('selectingVariant');
+            expect(result.current.pinnedCommitteeTileId).toBe('tile1');
+
+            // Select another tile (that might also have intents)
+            vi.mocked(useIntentViewModel).mockReturnValue({
+                ...mockDefaultVM,
+                intents: [{ 
+                    moveType: 'formalizeInfluence', 
+                    payload: { committeeTileId: 'tile1' } 
+                }, {
+                    moveType: 'formalizeInfluence', 
+                    payload: { committeeTileId: 'tile2' } 
+                } as any]
+            });
+            
+            rerender();
+
+            act(() => {
+                result.current.selectTile('tile2', '0,1');
+            });
+
+            // Should still be pinned to tile1
+            expect(result.current.pinnedCommitteeTileId).toBe('tile1');
+            // But inspection should update
+            expect(result.current.selectedTileId).toBe('tile2');
+        });
+
+        it('editPinnedTile clears pinned tile and returns to selectingParams', () => {
+            const { result, rerender } = renderHook(() => useGameInteractionController({
+                G: { zones: {}, grid: {}, tiles: {}, objects: {} } as any,
+                ctx: { currentPlayer: '0' },
+                playerID: '0',
+                moves: {}
+            }));
+
+            // Set up selectingVariant state
+            act(() => {
+                result.current.setActionMode('formalizeInfluence');
+            });
+
+             vi.mocked(useIntentViewModel).mockReturnValue({
+                ...mockDefaultVM,
+                intents: [{ 
+                    moveType: 'formalizeInfluence', 
+                    payload: { committeeTileId: 'tile1' } 
+                } as any]
+            });
+            
+            rerender();
+
+            act(() => {
+                result.current.selectTile('tile1', '0,0');
+            });
+
+            expect(result.current.interactionState).toBe('selectingVariant');
+
+            act(() => {
+                result.current.editPinnedTile();
+            });
+
+            expect(result.current.pinnedCommitteeTileId).toBeNull();
+            expect(result.current.interactionState).toBe('selectingParams');
+            expect(result.current.actionMode).toBe('formalizeInfluence');
+        });
+    });
+
     describe('PendingChoice Hard-Gate', () => {
         it('enters pendingChoiceHardGate when hasPendingChoice is true', () => {
             vi.mocked(useIntentViewModel).mockReturnValue({

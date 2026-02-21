@@ -83,6 +83,14 @@ export function useGameInteractionController({
         setSelectedCoord(null);
     }, []);
 
+    const editPinnedTile = useCallback(() => {
+        setPinnedCommitteeTileId(null);
+        setPinnedGrassrootsTileId(null);
+        // Returns to selectingParams state, but clears selection
+        setSelectedTileId(null);
+        setSelectedCoord(null);
+    }, []);
+
     const proposeIntent = useCallback((intent: LegalIntent) => {
         // Hard-gate: no new proposals when pending choice exists
         if (isHardGate) {
@@ -109,6 +117,12 @@ export function useGameInteractionController({
         // If draft is ready, we are in inspect-only mode.
         // Do not trigger any side effects like setting source or opening wizard.
         if (proposedIntent) {
+            return;
+        }
+
+        // If pinned tile exists (selectingVariant), we are in inspect-only mode for the parameter.
+        // Board clicks should not overwrite the pinned tile.
+        if (pinnedCommitteeTileId || pinnedGrassrootsTileId) {
             return;
         }
 
@@ -282,6 +296,7 @@ export function useGameInteractionController({
         editDraftDestination,
         editDraftTarget,
         editDraftVariant,
+        editPinnedTile,
         resolveChoice
     };
 }

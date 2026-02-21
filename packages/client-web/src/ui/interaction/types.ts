@@ -84,4 +84,10 @@ export interface InteractionController {
      * Returns to selecting variant state.
      */
     editDraftVariant: () => void;
+
+    /**
+     * Clears pinned committee/grassroots tile.
+     * Returns to selecting params state.
+     */
+    editPinnedTile: () => void;
 }
