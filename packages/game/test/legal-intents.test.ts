@@ -420,4 +420,78 @@ describe('enumerateLegalIntents', () => {
             expect(intentsA[0].moveType).toBe('convertResources');
         });
     });
+
+    describe('Grassroots Conversion Variants', () => {
+        it('enumerates only 3-input variants for untyped Grassroots', () => {
+            const ctx = createCtx('politicalAction');
+            const G = SetupGame({ ctx });
+
+            const tileId = 'tile_untyped';
+            G.zones[CoreZoneName.Board].items.push(tileId);
+            G.grid['0,0'] = tileId;
+            G.tiles[tileId] = {
+                id: tileId,
+                type: TileType.Grassroots,
+                conversion: { inputSlots: 3, outputSlots: 1 }
+            } as any;
+
+            // Control & Resources
+            G.zones[tileId] = { id: tileId, items: ['inf_0'] } as any;
+            G.objects['inf_0'] = { id: 'inf_0', type: 'Influence', owner: '0' } as any;
+            G.zones['PersonalSupply:0'] = { id: 'PersonalSupply:0', items: ['r1', 'r2', 'r3'] } as any;
+            G.objects['r1'] = { id: 'r1', type: 'Resource', owner: '0', resort: 'DOM' } as any;
+            G.objects['r2'] = { id: 'r2', type: 'Resource', owner: '0', resort: 'FOR' } as any;
+            G.objects['r3'] = { id: 'r3', type: 'Resource', owner: '0', resort: 'INF' } as any;
+
+            const intents = enumerateLegalIntents(G as any, ctx, '0')
+                .filter(i => i.moveType === 'convertResources' && i.payload.grassrootsTileId === tileId);
+
+            // Expect only 3-input variants
+            expect(intents.every(i => i.payload.inputResourceIds.length === 3)).toBe(true);
+            // Expect all 3 core resorts as outputs
+            const outputs = new Set(intents.map(i => i.payload.outputResort));
+            expect(outputs).toEqual(new Set(['DOM', 'FOR', 'INF']));
+        });
+
+        it('enumerates Variant A (2:T) and Variant B (3:!T) for typed Grassroots', () => {
+            const ctx = createCtx('politicalAction');
+            const G = SetupGame({ ctx });
+
+            const tileId = 'tile_typed_dom';
+            G.zones[CoreZoneName.Board].items.push(tileId);
+            G.grid['0,0'] = tileId;
+            G.tiles[tileId] = {
+                id: tileId,
+                type: TileType.Grassroots,
+                resort: 'DOM',
+                conversion: { inputSlots: 2, outputSlots: 1, typedResort: 'DOM' }
+            } as any;
+
+            // Control & Resources
+            G.zones[tileId] = { id: tileId, items: ['inf_0'] } as any;
+            G.objects['inf_0'] = { id: 'inf_0', type: 'Influence', owner: '0' } as any;
+            const supplyId = 'PersonalSupply:0';
+            G.zones[supplyId] = { id: supplyId, items: ['r1', 'r2', 'r3'] } as any;
+            G.objects['r1'] = { id: 'r1', type: 'Resource', owner: '0', resort: 'DOM' } as any;
+            G.objects['r2'] = { id: 'r2', type: 'Resource', owner: '0', resort: 'FOR' } as any;
+            G.objects['r3'] = { id: 'r3', type: 'Resource', owner: '0', resort: 'INF' } as any;
+
+            const intents = enumerateLegalIntents(G as any, ctx, '0')
+                .filter(i => i.moveType === 'convertResources' && i.payload.grassrootsTileId === tileId);
+
+            const variantA = intents.filter(i => i.payload.inputResourceIds.length === 2);
+            const variantB = intents.filter(i => i.payload.inputResourceIds.length === 3);
+
+            expect(variantA.length).toBeGreaterThan(0);
+            expect(variantB.length).toBeGreaterThan(0);
+
+            // Variant A: 2 inputs -> output must be DOM
+            expect(variantA.every(i => i.payload.outputResort === 'DOM')).toBe(true);
+
+            // Variant B: 3 inputs -> output must NOT be DOM
+            const bOutputs = new Set(variantB.map(i => i.payload.outputResort));
+            expect(bOutputs).toEqual(new Set(['FOR', 'INF']));
+            expect(bOutputs.has('DOM')).toBe(false);
+        });
+    });
 });

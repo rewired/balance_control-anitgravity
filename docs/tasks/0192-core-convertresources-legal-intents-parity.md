@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -28,8 +28,8 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * GR-013: Bot legality depends on enumeration correctness; prevent illegal suggestions.
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 
 ---
 
@@ -99,7 +99,7 @@ Suggested location:
 
 ### 5.3 Docs
 
-* [ ] `/docs/changelog.md` updated.
+* [x] `/docs/changelog.md` updated.
 * [ ] DD doc — N/A
 * [ ] ERRATA — N/A
 
@@ -124,25 +124,25 @@ Suggested location:
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Introduce shared conversion-variant helper under `packages/game/src/mechanics/`.
-* [ ] Step 2: Refactor `moves/shared.ts` to use the shared helper.
-* [ ] Step 3: Update `enumerateConvertResources` to enumerate only spec-legal variants.
-* [ ] Step 4: Add/extend tests for typed/untyped variant enumeration.
-* [ ] Step 5: Run `pnpm test`.
+* [x] Step 1: Introduce shared conversion-variant helper under `packages/game/src/mechanics/`.
+* [x] Step 2: Refactor `moves/shared.ts` to use the shared helper.
+* [x] Step 3: Update `enumerateConvertResources` to enumerate only spec-legal variants.
+* [x] Step 4: Add/extend tests for typed/untyped variant enumeration.
+* [x] Step 5: Run `pnpm test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] Typed and untyped Grassroots enumerate the correct legal variants only.
-* [ ] No illegal ConvertResources intents are offered.
-* [ ] Tests pass.
+* [x] Typed and untyped Grassroots enumerate the correct legal variants only.
+* [x] No illegal ConvertResources intents are offered.
+* [x] Tests pass.
 
 ---
 
 ## 10) PR Checklist
 
-* [ ] Guardrails listed accurately.
-* [ ] Normative anchors cited.
-* [ ] `pnpm test` passes.
-* [ ] Working tree clean after postflight amend.
+* [x] Guardrails listed accurately.
+* [x] Normative anchors cited.
+* [x] `pnpm test` passes.
+* [x] Working tree clean after postflight amend.

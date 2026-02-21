@@ -2,6 +2,7 @@
 
 ## Unreleased
  
+- 2026-02-21: task(0192) Align `enumerateConvertResources` with spec variants (typed/untyped) using shared mechanics (CORE-01-04-22).
 - 2026-02-21: task(0191) Ensure hotspot "prohibited" still marks resolved (CORE-01-06-03B, CORE-01-06-04(c)).
 
 - 2026-02-21: task(0190) Ensure `placeInfluence` is illegal if PersonalSupply has no Influence (CORE-01-04-11A); validate before costs.

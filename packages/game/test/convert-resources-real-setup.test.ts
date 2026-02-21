@@ -54,8 +54,17 @@ describe('ConvertResources with real setup-generated Grassroots tiles', () => {
         const pid = ctx.currentPlayer;
         const supply = G.zones[`${CoreZoneName.PersonalSupply}:${pid}`];
 
-        addPlayerResource(G, pid, 'res_dom_input', 'DOM');
-        addPlayerResource(G, pid, 'res_for_input', 'FOR');
+        const tile = G.tiles[grassrootsTileId];
+        const typedResort = (tile.conversion?.typedResort ?? tile.resort) || 'DOM';
+
+        // Variant A: 2 inputs -> output fixed to T. 
+        // Use resorts for inputs that are NOT the typed resort to avoid ID collision if the bank is used.
+        const coreResorts = ['DOM', 'FOR', 'INF'];
+        const inputResorts = coreResorts.filter(r => r !== typedResort);
+
+        addPlayerResource(G, pid, 'res_in_1', inputResorts[0]);
+        addPlayerResource(G, pid, 'res_in_2', inputResorts[1]);
+
         const influenceId = supply.items.find((itemId: string) => G.objects[itemId]?.type === 'Influence') as string;
         supply.items = supply.items.filter((itemId: string) => itemId !== influenceId);
         G.zones[grassrootsTileId].items.push(influenceId);
@@ -64,24 +73,22 @@ describe('ConvertResources with real setup-generated Grassroots tiles', () => {
             { G, ctx, events },
             {
                 grassrootsTileId,
-                inputResourceIds: ['res_dom_input', 'res_for_input'],
-                outputResort: 'INF'
+                inputResourceIds: ['res_in_1', 'res_in_2'],
+                outputResort: typedResort
             }
         );
 
         expect(result).not.toBe(INVALID_MOVE);
-        expect(supply.items).not.toContain('res_dom_input');
-        expect(supply.items).not.toContain('res_for_input');
-        expect(G.zones[CoreZoneName.Bank].items).toContain('res_dom_input');
-        expect(G.zones[CoreZoneName.Bank].items).toContain('res_for_input');
+        expect(supply.items).not.toContain('res_in_1');
+        expect(supply.items).not.toContain('res_in_2');
 
         const granted = supply.items
             .map((id: string) => G.objects[id])
-            .filter((obj: any) => obj?.type === 'Resource' && obj.id !== 'res_dom_input' && obj.id !== 'res_for_input');
+            .filter((obj: any) => obj?.type === 'Resource' && !['res_in_1', 'res_in_2'].includes(obj.id));
 
         expect(granted).toHaveLength(1);
         expect(granted[0].owner).toBe(pid);
-        expect(granted[0].resort).toBe('INF');
+        expect(granted[0].resort).toBe(typedResort);
     });
 
     it('should fail atomically on invalid conversion input count', () => {

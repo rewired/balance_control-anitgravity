@@ -7,6 +7,7 @@ import { EffectResolver } from './resolver';
 import { evaluateTileSelector } from './selectors';
 import { EnginePackRegistry } from '../expansion-registry';
 import { getPlayerMetaMarker } from '../state-lookup';
+import { getLegalGrassrootsOutputs } from '../mechanics/conversion';
 
 type CostSlot = string[] | 'ANY';
 type JsonLike =
@@ -315,37 +316,39 @@ function enumerateConvertResources(G: GameState, playerID: string): LegalIntent[
     const intents: LegalIntent[] = [];
     const boardTiles = getBoardTileIds(G);
     const supplyResources = getPlayerResourceIds(G, playerID);
-    const coreResorts = ['DOM', 'FOR', 'INF'];
 
     for (const tileId of boardTiles) {
         const tile = G.tiles[tileId];
         if (!tile || tile.type !== TileType.Grassroots) continue;
         if (EffectResolver.isProhibited(G as any, 'convertResources', playerID, tileId)) continue;
-        const conversionSpec = tile.conversion;
-        if (!conversionSpec || conversionSpec.inputSlots <= 0) continue;
         const { controller } = computeMajority(tileId, G);
         if (controller !== playerID) continue;
 
-        const inputCombos = enumerateResourceCombos(G, supplyResources, conversionSpec.inputSlots);
         const extraCostSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'convertResources', tileId);
 
-        for (const inputResourceIds of inputCombos) {
-            const extraResourceCombos = extraCostSlots.length === 0
-                ? [[]]
-                : enumerateCostResourceIds(G, playerID, extraCostSlots, new Set(inputResourceIds));
-            if (extraResourceCombos.length === 0) continue;
-            for (const outputResort of coreResorts) {
-                for (const extraResourceIds of extraResourceCombos) {
-                    intents.push({
-                        moveType: 'convertResources',
-                        payload: {
-                            grassrootsTileId: tileId,
-                            inputResourceIds,
-                            outputResort,
-                            extraResourceIds: extraResourceIds.length > 0 ? extraResourceIds : undefined
-                        },
-                        contextTileId: tileId
-                    });
+        for (const inputCount of [2, 3]) {
+            const outputs = getLegalGrassrootsOutputs(tile, inputCount);
+            if (outputs.length === 0) continue;
+
+            const inputCombos = enumerateResourceCombos(G, supplyResources, inputCount);
+            for (const inputResourceIds of inputCombos) {
+                const extraResourceCombos = extraCostSlots.length === 0
+                    ? [[]]
+                    : enumerateCostResourceIds(G, playerID, extraCostSlots, new Set(inputResourceIds));
+                if (extraResourceCombos.length === 0) continue;
+                for (const outputResort of outputs) {
+                    for (const extraResourceIds of extraResourceCombos) {
+                        intents.push({
+                            moveType: 'convertResources',
+                            payload: {
+                                grassrootsTileId: tileId,
+                                inputResourceIds,
+                                outputResort,
+                                extraResourceIds: extraResourceIds.length > 0 ? extraResourceIds : undefined
+                            },
+                            contextTileId: tileId
+                        });
+                    }
                 }
             }
         }

@@ -46,11 +46,6 @@ export function hasOverlap(a: string[], b?: string[]): boolean {
 
 export type CostSlot = string[] | 'ANY';
 
-interface GrassrootsConversionSpec {
-    inputSlots: number;
-    outputSlots: number;
-}
-
 /**
  * Checks if a tile is on the board.
  * @remarks infrastructure; no direct SPEC binding
@@ -62,47 +57,7 @@ export function isBoardTile(G: any, tileId: string): boolean {
     return Boolean(boardZone?.items?.includes(tileId));
 }
 
-/**
- * Validates declared variant and returns spec for Grassroots conversion.
- * @rule CORE-01-04-22K
- * @rule CORE-01-04-22L
- * @deterministic
- * @pure
- */
-export function getGrassrootsConversionSpec(tile: any, inputCount: number, outputResort?: string): GrassrootsConversionSpec | null {
-    const spec = tile?.conversion;
-    if (!spec || typeof spec.inputSlots !== 'number') return null;
-
-    const typedResort = spec.typedResort ?? tile?.resort;
-    const isTyped = Boolean(typedResort) || spec.inputSlots === 2;
-
-    if (isTyped) {
-        if (inputCount === 2) {
-            return { inputSlots: 2, outputSlots: 1 };
-        }
-        if (inputCount === 3 && typedResort) {
-            // CORE-01-04-22L Variant B: output must be â‰  T (only when tile has resort)
-            if (outputResort && outputResort === typedResort) return null;
-            return { inputSlots: 3, outputSlots: 1 };
-        }
-        return null;
-    }
-    // Untyped CORE-01-04-22K: 3 inputs only
-    if (inputCount === 3) {
-        return { inputSlots: 3, outputSlots: 1 };
-    }
-    return null;
-}
-
-/**
- * Checks if a resort is a core resort.
- * @remarks infrastructure; no direct SPEC binding
- * @deterministic
- * @pure
- */
-export function isCoreResort(resort: string): boolean {
-    return resort === 'DOM' || resort === 'FOR' || resort === 'INF';
-}
+export * from '../mechanics/conversion';
 
 /**
  * Places a meta-marker on a tile and sets its mode.
