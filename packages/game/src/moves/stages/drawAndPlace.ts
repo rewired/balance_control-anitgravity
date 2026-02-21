@@ -49,15 +49,7 @@ export const DrawAndPlaceMoves = {
         const tileId = staging.items[0];
         const tile = G.tiles[tileId];
 
-        // Generalized Action Type for cost check
-        const actionType = tile && tile.type === TileType.Resort ? 'placeResort' : 'placeTile';
-
-        // Generic Prohibition check
-        if (EffectResolver.isProhibited(G, actionType, pid)) return INVALID_MOVE;
-
-        // Decoupled Extra Costs
-        if (!EffectResolver.checkAndPayCosts(G, pid, actionType, undefined, extraResourceIds)) return INVALID_MOVE;
-
+        // Structural validations
         if (G.grid[targetCoord]) return INVALID_MOVE; // Occupied
 
         const coord = stringToCoord(targetCoord);
@@ -68,6 +60,15 @@ export const DrawAndPlaceMoves = {
         if (!hasNeighbor) {
             if (Object.keys(G.grid).length > 0) return INVALID_MOVE;
         }
+
+        // Generalized Action Type for cost check
+        const actionType = tile && tile.type === TileType.Resort ? 'placeResort' : 'placeTile';
+
+        // Generic Prohibition check
+        if (EffectResolver.isProhibited(G, actionType, pid)) return INVALID_MOVE;
+
+        // Decoupled Extra Costs (Side-effectful)
+        if (!EffectResolver.checkAndPayCosts(G, pid, actionType, undefined, extraResourceIds)) return INVALID_MOVE;
 
         const boardZone = G.zones[CoreZoneName.Board];
 
