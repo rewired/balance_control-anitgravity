@@ -63,6 +63,8 @@
             "activeAction": "Active action",
             "step": "Step",
             "pinnedSource": "Pinned source",
+            "pinnedTile": "Pinned tile",
+            "resolveChoice": "Resolve choice",
             "title": "Inspector",
             "empty": "No tile selected",
             "coord": "Coord",
@@ -71,7 +73,8 @@
             "weight": "Weight",
             "influence": "Influence",
             "resources": "Resources",
-            "none": "None"
+            "none": "None",
+            "na": "N/A"
         }
     }
 }

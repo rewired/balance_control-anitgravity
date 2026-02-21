@@ -63,6 +63,8 @@
             "activeAction": "Aktive Aktion",
             "step": "Schritt",
             "pinnedSource": "Fixierte Quelle",
+            "pinnedTile": "Fixiertes Feld",
+            "resolveChoice": "Entscheidung treffen",
             "title": "Inspektor",
             "empty": "Kein Feld ausgewählt",
             "coord": "Koord",
@@ -71,7 +73,8 @@
             "weight": "Gewicht",
             "influence": "Einfluss",
             "resources": "Ressourcen",
-            "none": "Keine"
+            "none": "Keine",
+            "na": "N/V"
         }
     }
 }

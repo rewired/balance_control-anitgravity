@@ -8,6 +8,7 @@ import { PublicNoticeOverlay } from './PublicNoticeOverlay';
 import { ResortIcon } from '../ui/tiles/ResortIcon';
 import { useGameInteractionController } from '../ui/interaction/useGameInteractionController';
 import { InspectorActionStatus } from './InspectorActionStatus';
+import { useT } from '../ui/i18n';
 
 interface GameLayoutProps {
     G: GameState;
@@ -23,6 +24,7 @@ interface GameLayoutProps {
  * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
  */
 export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID, isActive }) => {
+    const t = useT();
     const zoneNames = {
         PersonalSupply: 'PersonalSupply',
         Bank: 'Bank',
@@ -205,39 +207,39 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
             {/* Right Panel: Opponents / Deck / Info */}
             <aside className="right-panel glass-panel">
                 <div className="inspector-panel" data-testid="inspector-panel">
-                    <h3>Inspector</h3>
+                    <h3>{t('core:inspector.title')}</h3>
                     <InspectorActionStatus controller={controller} />
                     {!inspectorData && (
                         <div className="inspector-empty" data-testid="inspector-empty">
-                            No tile selected
+                            {t('core:inspector.empty')}
                         </div>
                     )}
                     {inspectorData && (
                         <div className="inspector-details">
                             <div className="inspector-row">
-                                <span className="inspector-label">Coord</span>
+                                <span className="inspector-label">{t('core:inspector.coord')}</span>
                                 <span className="inspector-value" data-testid="inspector-coord">
-                                    {inspectorData.coord ?? 'N/A'}
+                                    {inspectorData.coord ?? t('core:inspector.na')}
                                 </span>
                             </div>
                             <div className="inspector-row">
-                                <span className="inspector-label">Type</span>
+                                <span className="inspector-label">{t('core:inspector.type')}</span>
                                 <span className="inspector-value">{inspectorData.tile.type}</span>
                             </div>
                             <div className="inspector-row">
-                                <span className="inspector-label">Resort</span>
-                                <span className="inspector-value">{inspectorData.tile.resort ?? 'N/A'}</span>
+                                <span className="inspector-label">{t('core:inspector.resort')}</span>
+                                <span className="inspector-value">{inspectorData.tile.resort ?? t('core:inspector.na')}</span>
                             </div>
                             <div className="inspector-row">
-                                <span className="inspector-label">Weight</span>
+                                <span className="inspector-label">{t('core:inspector.weight')}</span>
                                 <span className="inspector-value">
-                                    {typeof inspectorData.tile.weight === 'number' ? inspectorData.tile.weight : 'N/A'}
+                                    {typeof inspectorData.tile.weight === 'number' ? inspectorData.tile.weight : t('core:inspector.na')}
                                 </span>
                             </div>
                             <div className="inspector-section">
-                                <div className="inspector-subtitle">Influence</div>
+                                <div className="inspector-subtitle">{t('core:inspector.influence')}</div>
                                 {Object.keys(inspectorData.influenceByOwner).length === 0 && (
-                                    <div className="inspector-empty">None</div>
+                                    <div className="inspector-empty">{t('core:inspector.none')}</div>
                                 )}
                                 {Object.entries(inspectorData.influenceByOwner)
                                     .sort(([a], [b]) => a.localeCompare(b))
@@ -249,9 +251,9 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                                     ))}
                             </div>
                             <div className="inspector-section">
-                                <div className="inspector-subtitle">Resources</div>
+                                <div className="inspector-subtitle">{t('core:inspector.resources')}</div>
                                 {Object.keys(inspectorData.resourceByResort).length === 0 && (
-                                    <div className="inspector-empty">None</div>
+                                    <div className="inspector-empty">{t('core:inspector.none')}</div>
                                 )}
                                 {Object.entries(inspectorData.resourceByResort)
                                     .sort(([a], [b]) => a.localeCompare(b))

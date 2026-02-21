@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { TileType } from '@balance-control/rules';
 import { GameLayout } from '../src/components/GameLayout';
+import { I18nProvider } from '../src/ui/i18n';
 
 const mockEnumerateLegalIntents = vi.fn();
 
@@ -63,13 +64,15 @@ describe('PendingChoiceModal', () => {
             { moveType: 'resolveChoice', payload: { choiceId: 'choice-1', selection: 'A' } }
         ]);
         render(
-            <GameLayout
-                G={createState()}
-                ctx={baseCtx}
-                moves={{ resolveChoice: vi.fn() }}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={createState()}
+                    ctx={baseCtx}
+                    moves={{ resolveChoice: vi.fn() }}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         expect(screen.getByTestId('pending-choice-overlay')).not.toBeNull();
@@ -83,13 +86,15 @@ describe('PendingChoiceModal', () => {
             { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } }
         ]);
         render(
-            <GameLayout
-                G={createState()}
-                ctx={baseCtx}
-                moves={{ resolveChoice: vi.fn(), placeInfluence: vi.fn() }}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={createState()}
+                    ctx={baseCtx}
+                    moves={{ resolveChoice: vi.fn(), placeInfluence: vi.fn() }}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         expect(screen.queryByTestId('btn-place-influence')).toBeNull();
@@ -103,13 +108,15 @@ describe('PendingChoiceModal', () => {
             { moveType: 'resolveChoice', payload: { choiceId: 'choice-1', selection: 'a' } }
         ]);
         render(
-            <GameLayout
-                G={createState()}
-                ctx={baseCtx}
-                moves={{ resolveChoice }}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={createState()}
+                    ctx={baseCtx}
+                    moves={{ resolveChoice }}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         const firstOption = screen.getByTestId('pending-choice-option-0');
@@ -144,13 +151,15 @@ describe('PendingChoiceModal', () => {
         mockEnumerateLegalIntents.mockReturnValue(state.engine.pendingChoice.resolveChoice);
 
         render(
-            <GameLayout
-                G={state}
-                ctx={baseCtx}
-                moves={{ resolveChoice: vi.fn() }}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={state}
+                    ctx={baseCtx}
+                    moves={{ resolveChoice: vi.fn() }}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         expect(screen.queryByTestId('pending-choice-overlay')).toBeNull();
@@ -170,13 +179,15 @@ describe('PendingChoiceModal', () => {
         mockEnumerateLegalIntents.mockReturnValue(state.engine.pendingChoice.resolveChoice);
 
         render(
-            <GameLayout
-                G={state}
-                ctx={baseCtx}
-                moves={{ resolveChoice }}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={state}
+                    ctx={baseCtx}
+                    moves={{ resolveChoice }}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         // Find the tile on the board
@@ -206,13 +217,15 @@ describe('PendingChoiceModal', () => {
         mockEnumerateLegalIntents.mockReturnValue(state.engine.pendingChoice.resolveChoice);
 
         render(
-            <GameLayout
-                G={state}
-                ctx={baseCtx}
-                moves={{ resolveChoice }}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={state}
+                    ctx={baseCtx}
+                    moves={{ resolveChoice }}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         // 1. Click non-target tile (tile_beta at 1,0)
@@ -243,13 +256,15 @@ describe('PendingChoiceModal', () => {
         mockEnumerateLegalIntents.mockReturnValue(state.engine.pendingChoice.resolveChoice);
 
         render(
-            <GameLayout
-                G={state}
-                ctx={baseCtx}
-                moves={{ resolveChoice }}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={state}
+                    ctx={baseCtx}
+                    moves={{ resolveChoice }}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         // Verify ghost exists at 0,1
