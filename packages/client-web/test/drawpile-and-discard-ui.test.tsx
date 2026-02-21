@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import { TileType } from '@balance-control/rules';
 import { GameLayout } from '../src/components/GameLayout';
+import { I18nProvider } from '../src/ui/i18n';
 
 vi.mock('@balance-control/game', async () => {
     const actual = await vi.importActual<any>('@balance-control/game');
@@ -56,13 +57,15 @@ describe('DrawPile and DiscardFaceUp UI', () => {
     it('renders DrawPile as count-only widget (no Zone renderer)', () => {
         ensureResizeObserver();
         render(
-            <GameLayout
-                G={createState()}
-                ctx={baseCtx}
-                moves={{}}
-                playerID={'0'}
-                isActive={false}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={createState()}
+                    ctx={baseCtx}
+                    moves={{}}
+                    playerID={'0'}
+                    isActive={false}
+                />
+            </I18nProvider>
         );
 
         expect(screen.getByTestId('draw-bag-widget')).not.toBeNull();
@@ -73,13 +76,15 @@ describe('DrawPile and DiscardFaceUp UI', () => {
     it('renders DiscardFaceUp as a visible zone with tiles', () => {
         ensureResizeObserver();
         render(
-            <GameLayout
-                G={createState()}
-                ctx={baseCtx}
-                moves={{}}
-                playerID={'0'}
-                isActive={false}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={createState()}
+                    ctx={baseCtx}
+                    moves={{}}
+                    playerID={'0'}
+                    isActive={false}
+                />
+            </I18nProvider>
         );
 
         expect(screen.getByText('Discard (Face Up)')).not.toBeNull();

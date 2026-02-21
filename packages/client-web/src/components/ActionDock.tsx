@@ -43,7 +43,9 @@ const formatIntentLabel = (intent: LegalIntent, t: (key: string, vars?: any) => 
         });
     }
     if (intent.moveType.endsWith('.takeMeasure')) {
-        return t('core:action.takeMeasure') + ' ' + getObjectLabel(G, intent.payload);
+        return t('core:draft.takeMeasureSummary', {
+            measure: getObjectLabel(G, intent.payload)
+        });
     }
     if (intent.moveType === 'passTilePlacement') {
         return t('core:ui.skipPlacement');
@@ -170,7 +172,7 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
     return null;
 };
 
-const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ controller }) => {
+const CurrentActionPanel: React.FC<{ G: GameState; controller: InteractionController }> = ({ G, controller }) => {
     const t = useT();
     const {
         actionMode,
@@ -189,7 +191,7 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
         vm
     } = controller;
 
-    const actionLabel = getActionLabel(actionMode, draft.intent, t, vm.G);
+    const actionLabel = getActionLabel(actionMode, draft.intent, t, G);
     const stepLabel = getStepLabel(interactionState, actionMode, moveInfluenceSourceId, t);
 
     return (
@@ -202,19 +204,19 @@ const CurrentActionPanel: React.FC<{ controller: InteractionController }> = ({ c
                 {moveInfluenceSourceId && (
                     <div className="pinned-params" style={{ marginTop: '4px', fontSize: '12px' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>{t('core:ui.source')}: </span>
-                        {getObjectLabel(vm.G, moveInfluenceSourceId)}
+                        {getObjectLabel(G, moveInfluenceSourceId)}
                     </div>
                 )}
                 {pinnedCommitteeTileId && (
                     <div className="pinned-params" style={{ marginTop: '4px', fontSize: '12px' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>{t('core:ui.committee')}: </span>
-                        {getObjectLabel(vm.G, pinnedCommitteeTileId)}
+                        {getObjectLabel(G, pinnedCommitteeTileId)}
                     </div>
                 )}
                 {pinnedGrassrootsTileId && (
                     <div className="pinned-params" style={{ marginTop: '4px', fontSize: '12px' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>{t('core:ui.grassroots')}: </span>
-                        {getObjectLabel(vm.G, pinnedGrassrootsTileId)}
+                        {getObjectLabel(G, pinnedGrassrootsTileId)}
                     </div>
                 )}
             </div>
@@ -376,7 +378,7 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
                                 userSelect: 'none'
                             }}
                         >
-                            {t('core:group.expansions')} ({vm.political.others.length})
+                            {t('core:group.expansionsWithCount', { count: vm.political.others.length.toString() })}
                         </summary>
                         <div className="action-panel-secondary" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
                             {vm.political.others.map(intent => (
@@ -430,7 +432,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                 <div className="action-panel-stage">{stageLabel}</div>
             </div>
 
-            <CurrentActionPanel controller={controller} />
+            <CurrentActionPanel G={G} controller={controller} />
 
             {interactionState === 'selectingVariant' ? (
                 <VariantSelectionPanel controller={controller} />

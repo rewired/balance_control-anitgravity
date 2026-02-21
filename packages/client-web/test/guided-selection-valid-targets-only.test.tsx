@@ -3,6 +3,7 @@ import React from 'react';
 import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import { TileType } from '@balance-control/rules';
 import { GameLayout } from '../src/components/GameLayout';
+import { I18nProvider } from '../src/ui/i18n';
 
 // Mock @balance-control/game to return controlled legal intents
 vi.mock('@balance-control/game', async () => {
@@ -69,13 +70,15 @@ describe('Guided selection - valid targets only', () => {
         ]);
 
         render(
-            <GameLayout
-                G={G}
-                ctx={baseCtx}
-                moves={{}}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={G}
+                    ctx={baseCtx}
+                    moves={{}}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         // 1. Enter Move Influence mode

@@ -134,26 +134,26 @@ Update/extend ActionDock UI tests to assert the **keys resolve** (not the raw ke
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Wire `useT()` at top of ActionDock and thread `t` into helper functions.
-* [ ] Step 2: Replace the label helpers (`getActionLabel`, `getStepLabel`, `formatIntentLabel`) to use `t(...)` and the draft summary templates.
-* [ ] Step 3: Replace UI strings in markup (group headers, button labels, header text).
-* [ ] Step 4: Update tests.
-* [ ] Step 5: Run `pnpm -C packages/client-web test`.
+* [x] Step 1: Wire `useT()` at top of ActionDock and thread `t` into helper functions.
+* [x] Step 2: Replace the label helpers (`getActionLabel`, `getStepLabel`, `formatIntentLabel`) to use `t(...)` and the draft summary templates.
+* [x] Step 3: Replace UI strings in markup (group headers, button labels, header text).
+* [x] Step 4: Update tests.
+* [x] Step 5: Run `pnpm -C packages/client-web test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] ActionDock renders with no hardcoded user-facing strings (all visible labels come from `t(...)`).
-* [ ] Contract required keys are used where applicable.
-* [ ] `pnpm -C packages/client-web test` passes.
+* [x] ActionDock renders with no hardcoded user-facing strings (all visible labels come from `t(...)`).
+* [x] Contract required keys are used where applicable.
+* [x] `pnpm -C packages/client-web test` passes.
 
 ---
 
 ## 10) PR Checklist
 
-* [ ] Guardrails listed accurately (GR-002).
-* [ ] Normative anchors cited.
-* [ ] No engine/rule/spec changes.
-* [ ] `pnpm lint` passes.
-* [ ] `pnpm -C packages/client-web test` passes.
+* [x] Guardrails listed accurately (GR-002).
+* [x] Normative anchors cited.
+* [x] No engine/rule/spec changes.
+* [x] `pnpm lint` passes.
+* [x] `pnpm -C packages/client-web test` passes.

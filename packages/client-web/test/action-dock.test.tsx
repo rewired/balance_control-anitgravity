@@ -206,10 +206,14 @@ describe('ActionDock', () => {
         expect(screen.getByText('target tile_alpha')).toBeDefined();
         expect(screen.getByText('Preview')).toBeDefined(); // Step label
 
-        fireEvent.click(screen.getByTestId('btn-confirm-draft'));
+        const confirmBtn = screen.getByTestId('btn-confirm-draft');
+        expect(confirmBtn.textContent).toBe('Confirm');
+        fireEvent.click(confirmBtn);
         expect(confirmDraft).toHaveBeenCalledTimes(1);
 
-        fireEvent.click(screen.getByTestId('btn-cancel-draft'));
+        const cancelBtn = screen.getByTestId('btn-cancel-draft');
+        expect(cancelBtn.textContent).toBe('Cancel');
+        fireEvent.click(cancelBtn);
         expect(cancelDraft).toHaveBeenCalledTimes(1);
     });
 
@@ -561,5 +565,38 @@ describe('ActionDock', () => {
 
         fireEvent.click(changeTileBtn);
         expect(editPinnedTile).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses German translations when locale is de', () => {
+        // Mock window.location.search
+        const originalLocation = window.location;
+        // @ts-ignore
+        delete window.location;
+        window.location = { ...originalLocation, search: '?lang=de' };
+
+        const intents = [] as any;
+        const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null }), intents } as any;
+        const controller = {
+            vm,
+            actionMode: 'none',
+            setActionMode: vi.fn(),
+            intents: intents,
+            draft: { intent: null },
+            interactionState: 'selectingAction'
+        } as any;
+
+        renderWithI18n(
+            <ActionDock
+                isActive={true}
+                G={{} as any}
+                controller={controller}
+            />
+        );
+
+        expect(screen.getByText('Einfluss')).toBeDefined(); // German for Influence
+        expect(screen.getByText('Aktionen')).toBeDefined(); // German for Actions
+
+        // Restore window.location
+        window.location = originalLocation;
     });
 });
