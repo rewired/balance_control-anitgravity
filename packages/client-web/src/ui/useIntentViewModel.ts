@@ -80,6 +80,11 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         if (intent.moveType === 'convertResources') return false;
         if (intent.moveType.endsWith('.takeMeasure')) return false;
         return true;
+    }).sort((a, b) => {
+        if (a.moveType !== b.moveType) {
+            return a.moveType.localeCompare(b.moveType);
+        }
+        return canonicalJsonStringify(a.payload ?? {}).localeCompare(canonicalJsonStringify(b.payload ?? {}));
     });
 
     const ghostCoords = stableSortCoords(
