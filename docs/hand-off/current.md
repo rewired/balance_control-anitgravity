@@ -6,24 +6,23 @@
 >
 > **BASE CONTRACTS:** AGENTS.md + ARCH-01..05
 >
-> **LAST COMPLETED TASK:** 0141
+> **LAST COMPLETED TASK:** 0185
 >
 > **CURRENT STATE (facts):**
 >
 > - `EnginePackRegistry` is the canonical registry in `packages/game` with deterministic ordering + duplicate detection (moves + atoms).
 > - `@balance-control/game` does **not** depend on `@balance-control/expansion-*` (decoupled).
 > - `@balance-control/packs` is the canonical entrypoint for pack exports and deterministic registration.
-> - Pack wrappers (`CorePack`, `Exp01Pack`, `Exp02Pack`, `Exp03Pack`) live in `@balance-control/packs` and reference expansion engine definitions.
-> - Measure dispatch is routed via `EnginePackRegistry.getMeasureAtomsForExpansion(...)` and pack-level `getMeasureAtoms` hooks.
-> - CORE tile definitions are data-driven (JSON) via `packages/game/src/packs/core/resources/core-tiles.json` and a deterministic generator.
-> - Config `packs.enabledPacks` is the canonical enablement surface; legacy `cfg.expansions` is accepted only for compatibility and mismatch-detected.
-> - `scripts/verify-packs.mjs` validates pack manifests, canonical order, and public-surface hashing using the public APIs (`@balance-control/game`, `@balance-control/packs`).
+> - `InteractionController` manages multi-step draft state; actions are committed only via explicit confirm; direct interaction via `ClickGate` (ARCH-06).
+> - `verify:ui-interaction` script enforces no-direct-commit tripwire on UI components.
+> - i18n scaffolded for `en` and `de`; initial keys mapped for ActionDock and Inspector.
+> - `scripts/verify-packs.mjs` validates pack manifests, canonical order, and public-surface hashing.
 >
 > **OPEN:**
 >
 > - (None currently)
 >
-> **NEXT PACKET GOAL:** Reintroduce **golden replays** as the canonical integration gate (public API + real packs), and keep engine tests pack-agnostic.
+> **NEXT PACKET GOAL:** CORE rules conformance patchset (0187–0192): DrawPile top semantics, starting player RNG, atomic costs, influence supply legality, hotspot resolved-mark, convert intent parity.
 >
 > **CONSTRAINTS:**
 >
@@ -37,19 +36,21 @@
 
 ## Last done
 
-- **Task:** 0141
-- **Date:** 2026-02-19
+- **Task:** 0185
+- **Date:** 2026-02-21
 
 ## Current state (facts)
 
 - `EnginePackRegistry` is the canonical registry in `packages/game` with deterministic ordering + duplicate detection (moves + atoms).
 - `@balance-control/game` does **not** depend on `@balance-control/expansion-*` (decoupled).
 - `@balance-control/packs` is the canonical entrypoint for pack exports and deterministic registration.
+- `InteractionController` manages multi-step draft state; actions are committed only via explicit confirm (ARCH-06).
+- `verify:ui-interaction` script enforces no-direct-commit tripwire on UI components.
+- i18n scaffolded for `en` and `de`; initial keys mapped for ActionDock and Inspector.
 - Pack wrappers (`CorePack`, `Exp01Pack`, `Exp02Pack`, `Exp03Pack`) live in `@balance-control/packs` and reference expansion engine definitions.
-- Measure dispatch is routed via `EnginePackRegistry.getMeasureAtomsForExpansion(...)` and pack-level `getMeasureAtoms` hooks.
-- CORE tile definitions are data-driven (JSON) via `packages/game/src/packs/core/resources/core-tiles.json` and a deterministic generator.
-- Config `packs.enabledPacks` is the canonical enablement surface; legacy `cfg.expansions` is accepted only for compatibility and mismatch-detected.
-- `scripts/verify-packs.mjs` validates pack manifests, canonical order, and public-surface hashing using the public APIs (`@balance-control/game`, `@balance-control/packs`).
+- Measure dispatch is routed via `EnginePackRegistry.getMeasureAtomsForExpansion(...)`.
+- CORE tile definitions are data-driven (JSON) via `packages/game/src/packs/core/resources/core-tiles.json`.
+- `scripts/verify-packs.mjs` validates pack manifests, canonical order, and public-surface hashing using the public APIs.
 
 ## Decisions
 
@@ -72,19 +73,23 @@
 
 ## Next packet goal
 
-**Golden replays as an integration gate:**
+**CORE rules conformance patchset (0187–0192):**
 
-- Put the authoritative golden replay fixtures + runner in `packages/integration-tests`.
-- Ensure `audit:spec` runs that runner (public APIs + real packs).
-- Keep `packages/game/test` pack-agnostic and focused on engine invariants.
+- **0187:** DrawPile top = first element (shift() instead of pop()).
+- **0188:** Starting player RNG (canonical seed-based selection).
+- **0189:** PlaceTile atomic costs (pay before placement).
+- **0190:** PlaceInfluence requires personal supply check.
+- **0191:** Hotspot resolved-mark persists correctly.
+- **0192:** ConvertResources enumeration matches variant spec.
 
 ## Mini diff map (likely touched)
 
-- `packages/integration-tests/test/golden/*`
-- `packages/integration-tests/test/golden-replay.test.ts`
-- `packages/integration-tests/scripts/*` (new)
-- `packages/integration-tests/package.json`
-- `package.json` (root: `audit:spec`)
-- `packages/game/test/golden-replay.test.ts` (delete)
-- `packages/game/test/golden/*` (delete)
+- `packages/game/src/mechanics-draw.ts` (0187)
+- `packages/game/src/logic/GameLogic.ts` (0188)
+- `packages/game/src/moves/PlaceTile.ts` (0189)
+- `packages/game/src/moves/PlaceInfluence.ts` (0190)
+- `packages/game/src/state/Board.ts` (0191)
+- `packages/game/src/mechanics/conversion.ts` (0192)
+- `packages/game/src/engine/legal-intents.ts` (0192)
 - `docs/hand-off/current.md`
+

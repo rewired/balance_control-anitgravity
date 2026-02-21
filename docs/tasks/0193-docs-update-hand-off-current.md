@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -23,7 +23,7 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * NONE
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
+* [x] I read the guardrails file before implementation.
 
 ---
 
@@ -78,20 +78,20 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 
 ## 7) Implementation Plan
 
-* [ ] Step 1: Update the header capsule fields and the duplicated sections below it.
-* [ ] Step 2: Ensure “Current state (facts)” matches the repo reality (no wishful thinking).
-* [ ] Step 3: Ensure Next Packet Goal matches 0187–0192.
+* [x] Step 1: Update the header capsule fields and the duplicated sections below it.
+* [x] Step 2: Ensure “Current state (facts)” matches the repo reality (no wishful thinking).
+* [x] Step 3: Ensure Next Packet Goal matches 0187–0192.
 
 ---
 
 ## 8) Acceptance Criteria
 
-* [ ] `/docs/hand-off/current.md` no longer says “LAST COMPLETED TASK: 0141”.
-* [ ] The “Next Packet Goal” is actionable and matches the next tasks.
+* [x] `/docs/hand-off/current.md` no longer says “LAST COMPLETED TASK: 0141”.
+* [x] The “Next Packet Goal” is actionable and matches the next tasks.
 
 ---
 
 ## 9) PR Checklist
 
-* [ ] Docs only; no code changes.
-* [ ] Working tree clean.
+* [x] Docs only; no code changes.
+* [x] Working tree clean.
