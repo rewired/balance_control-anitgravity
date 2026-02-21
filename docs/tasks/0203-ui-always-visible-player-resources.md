@@ -92,7 +92,23 @@ Accessibility:
 
 ## 8) Acceptance Criteria
 
-* [ ] Resources for all players are always visible.
-* [ ] Display uses icons + numeric counts (no colored chips for resources).
-* [ ] Seat order is stable/deterministic.
-* [ ] Baseline checks green.
+* [x] Resources for all players are always visible.
+* [x] Display uses icons + numeric counts (no colored chips for resources).
+* [x] Seat order is stable/deterministic.
+* [x] Baseline checks green.
+
+---
+
+## 9) Work Summary
+
+* Created `PlayerResourcesRow.tsx` to display player resources (Influence, DOM, FOR, INF, etc.) with icons and counts.
+* Updated `GameLayout.tsx` to render `PlayerResourcesRow` for all players in the left sidebar.
+* Removed the legacy "My Supply" zone rendering which used colored chips.
+* Updated `index.css` with styles for the new resource rows.
+* Added `test/player-resources.test.tsx` to verify rendering and active player highlighting.
+* Verified that existing tests pass.
+
+## 10) Commands Run
+
+* `pnpm --filter @balance-control/client-web test test/player-resources.test.tsx` -> Passed
+* `pnpm --filter @balance-control/client-web test` -> Passed (30 files, 177 tests)

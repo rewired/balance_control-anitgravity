@@ -1017,3 +1017,68 @@ button.btn-primary:hover {
     justify-content: center;
     pointer-events: none;
 }
+
+/* Player Resources Row */
+.player-resources-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-md);
+    transition: background 0.2s;
+}
+
+.player-resources-row.active {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.player-indicator {
+    display: flex;
+    align-items: center;
+    min-width: 60px;
+}
+
+.player-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.player-resources-row.active .player-label {
+    color: var(--text-primary);
+}
+
+.resources-list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.resource-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.resource-count {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Hide zone title for cleaner look if needed */
+.zone-title-hidden {
+    display: none;
+}

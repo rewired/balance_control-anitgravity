@@ -8,6 +8,7 @@ import { PublicNoticeOverlay } from './PublicNoticeOverlay';
 import { ResortIcon } from '../ui/tiles/ResortIcon';
 import { useGameInteractionController } from '../ui/interaction/useGameInteractionController';
 import { InspectorActionStatus } from './InspectorActionStatus';
+import { PlayerResourcesRow } from './PlayerResourcesRow';
 import { useT } from '../ui/i18n';
 
 interface GameLayoutProps {
@@ -37,7 +38,6 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     const controller = useGameInteractionController({ G, ctx, playerID, moves });
     const { vm, selectedTileId, selectedCoord, selectTile, selectMoveInfluenceSource, proposeIntent, actionMode, moveInfluenceSourceId, interactionState, draft, resolveChoice } = controller;
 
-    // Wrap selectTile to enforce "valid targets only" for parameter selection
     const handleSelectTile = React.useCallback((tileId: string, coordStr: string) => {
         // Always allow inspection
         selectTile(tileId, coordStr);
@@ -53,9 +53,6 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
         }
     }, [selectTile, actionMode, moveInfluenceSourceId, vm.intents, selectMoveInfluenceSource]);
 
-    // Determine player's personal supply
-    const myPid = playerID ?? ctx.currentPlayer ?? '0';
-    const mySupplyId = `${zoneNames.PersonalSupply}:${myPid}`;
 
     const inspectorData = useMemo(() => {
         if (!selectedTileId) return null;
@@ -138,14 +135,20 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
             {/* Left Panel: Bank & Supply */}
             <aside className="left-panel glass-panel">
                 <div className="player-info">
-                    <h3>Player {myPid}</h3>
-                    <div className="status-indicator" style={{
-                        width: '8px', height: '8px', borderRadius: '50%',
-                        background: ctx.currentPlayer === myPid ? 'var(--accent-eco)' : 'var(--text-secondary)'
-                    }} />
+                    <h3>Players</h3>
                 </div>
 
-                <Zone zoneId={mySupplyId} G={G} title="My Supply" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                    {(ctx.playOrder || ['0', '1']).map((pid: string) => (
+                        <PlayerResourcesRow
+                            key={pid}
+                            playerId={pid}
+                            G={G}
+                            active={ctx.currentPlayer === pid}
+                        />
+                    ))}
+                </div>
+
                 <Zone zoneId={zoneNames.Bank} G={G} title="Bank" />
             </aside>
 
