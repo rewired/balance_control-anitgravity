@@ -1,3 +1,4 @@
+import { canonicalJsonStringify } from './utils';
 import type { LegalIntent } from '@balance-control/game';
 
 export interface FormalizeGroup {
@@ -42,11 +43,9 @@ export function groupFormalizeIntents(intents: LegalIntent[]): Map<string, Forma
     for (const [committeeTileId, groupsMap] of byCommittee.entries()) {
         const groups: FormalizeGroup[] = [];
         for (const [paymentKey, variants] of groupsMap.entries()) {
-            // Sort variants by extraResourceIds to ensure deterministic ordering.
+            // Sort variants by full canonical payload to ensure deterministic ordering.
             const sortedVariants = [...variants].sort((a, b) => {
-                const extraA = ((a.payload?.extraResourceIds as string[]) ?? []).slice().sort().join('|');
-                const extraB = ((b.payload?.extraResourceIds as string[]) ?? []).slice().sort().join('|');
-                return extraA.localeCompare(extraB);
+                return canonicalJsonStringify(a.payload ?? {}).localeCompare(canonicalJsonStringify(b.payload ?? {}));
             });
 
             groups.push({

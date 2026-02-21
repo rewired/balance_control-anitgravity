@@ -36,8 +36,10 @@ const formatIntentLabel = (intent: LegalIntent) => {
     return intent.moveType;
 };
 
+import { canonicalJsonStringify } from '../ui/interaction/utils';
+
 const intentSortKey = (intent: LegalIntent) => {
-    const payloadKey = JSON.stringify(intent.payload ?? {});
+    const payloadKey = canonicalJsonStringify(intent.payload ?? {});
     return `${intent.moveType}:${payloadKey}`;
 };
 

@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** FROZEN
 
 ## Task State Machine (Loop-Breaker)
 
@@ -40,9 +40,9 @@ Iteration budget (hard stop): **Max 2 fix cycles** after the first full test run
 * GR-006: No changes to pendingChoice handling; any new sorting must not surface non-`resolveChoice` intents while hard-gated.
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -157,25 +157,30 @@ Iteration budget (hard stop): **Max 2 fix cycles** after the first full test run
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails: affected GR-xxx listed and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No phantom moves introduced
-* [ ] `pnpm lint` passes
-* [ ] `pnpm -C packages/client-web test` passes
-* [ ] No temporary files committed
+* [x] Guardrails: affected GR-xxx listed and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No phantom moves introduced
+* [x] `pnpm lint` passes
+* [x] `pnpm -C packages/client-web test` passes
+* [x] No temporary files committed
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <fill during implementation>
+* Implemented deterministic sorting for `political.others` in `useIntentViewModel` using `canonicalJsonStringify`.
+* Updated `ActionDock` to use `canonicalJsonStringify` for intent keys to ensure stability.
+* Updated `MeasureTray` to use stable keys derived from canonical payload instead of array indices.
+* Enhanced `formalizeHelpers` and `convertHelpers` to sort variants by full canonical payload for strict determinism.
+* Added `interactionHelpers.test.ts` to verify deterministic grouping and sorting of variants.
+* Added tests in `intentViewModel.test.ts` to verify `political.others` sorting.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* `pnpm lint` → …
-* `pnpm -C packages/client-web test` → …
+* `pnpm lint` → Passed (with TS version warning but no errors)
+* `pnpm -C packages/client-web test` → Passed (26 files, 101 tests)
 
 ---
 

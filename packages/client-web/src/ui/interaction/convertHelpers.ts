@@ -1,3 +1,4 @@
+import { canonicalJsonStringify } from './utils';
 import type { LegalIntent } from '@balance-control/game';
 
 export interface ConvertComboGroup {
@@ -60,11 +61,9 @@ export function groupConvertIntents(intents: LegalIntent[]): Map<string, Convert
             // Sort combos by inputKey
             outputGroup.combos.sort((a, b) => a.inputKey.localeCompare(b.inputKey));
             for (const comboGroup of outputGroup.combos) {
-                // Sort variants by extraResourceIds
+                // Sort variants by full canonical payload
                 comboGroup.variants.sort((a, b) => {
-                    const extraA = ((a.payload?.extraResourceIds as string[]) ?? []).slice().sort().join('|');
-                    const extraB = ((b.payload?.extraResourceIds as string[]) ?? []).slice().sort().join('|');
-                    return extraA.localeCompare(extraB);
+                    return canonicalJsonStringify(a.payload ?? {}).localeCompare(canonicalJsonStringify(b.payload ?? {}));
                 });
             }
         }

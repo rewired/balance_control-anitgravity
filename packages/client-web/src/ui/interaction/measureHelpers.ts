@@ -1,3 +1,4 @@
+import { canonicalJsonStringify } from './utils';
 import type { LegalIntent } from '@balance-control/game';
 
 export interface MeasureGroup {
@@ -25,7 +26,9 @@ export function groupMeasureIntents(intents: LegalIntent[]): MeasureGroup[] {
     for (const [expansionId, expansionIntents] of byExpansion.entries()) {
         result.push({
             expansionId,
-            intents: [...expansionIntents].sort((a, b) => String(a.payload).localeCompare(String(b.payload)))
+            intents: [...expansionIntents].sort((a, b) => 
+                canonicalJsonStringify(a.payload).localeCompare(canonicalJsonStringify(b.payload))
+            )
         });
     }
 
