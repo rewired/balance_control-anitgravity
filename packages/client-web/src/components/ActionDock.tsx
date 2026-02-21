@@ -328,19 +328,34 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
 
             {showMoreActions && (
                 <div className="action-group">
-                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>Expansions → Other</h4>
-                    <div className="action-panel-secondary" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        {vm.political.others.map(intent => (
-                            <button
-                                key={intentSortKey(intent)}
-                                className="btn-secondary"
-                                onClick={() => proposeIntent(intent)}
-                                style={{ textAlign: 'left' }}
-                            >
-                                {formatIntentLabel(intent)}
-                            </button>
-                        ))}
-                    </div>
+                    <details className="action-group-collapsible">
+                        <summary
+                            data-testid="summary-expansions-other"
+                            style={{
+                                cursor: 'pointer',
+                                margin: '0 0 8px 0',
+                                fontSize: '0.9em',
+                                textTransform: 'uppercase',
+                                color: 'var(--text-secondary)',
+                                userSelect: 'none'
+                            }}
+                        >
+                            Expansions → Other ({vm.political.others.length})
+                        </summary>
+                        <div className="action-panel-secondary" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
+                            {vm.political.others.map(intent => (
+                                <button
+                                    key={intentSortKey(intent)}
+                                    className="btn-secondary"
+                                    onClick={() => proposeIntent(intent)}
+                                    style={{ textAlign: 'left' }}
+                                    data-testid={`btn-other-${intent.moveType}`}
+                                >
+                                    {formatIntentLabel(intent)}
+                                </button>
+                            ))}
+                        </div>
+                    </details>
                 </div>
             )}
         </div>

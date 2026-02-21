@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -30,8 +30,8 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * GR-006: Panel must not be interactive while hard-gated.
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 
 ---
 
@@ -90,9 +90,9 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
     * `proposeIntent` called exactly once
 
 ### 5.3 Docs
-* [ ] `/docs/changelog.md` updated — N/A (UI-only)
-* [ ] DD doc — N/A
-* [ ] ERRATA — N/A
+* [x] `/docs/changelog.md` updated — N/A (UI-only)
+* [x] DD doc — N/A
+* [x] ERRATA — N/A
 
 ---
 
@@ -113,40 +113,44 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Wrap “Expansions → Other” list in collapsible container (default closed).
-* [ ] Step 2: Ensure click handler only proposes intent (draft).
-* [ ] Step 3: Update tests for collapsible UI.
-* [ ] Step 4: Run `pnpm -C packages/client-web test`.
+* [x] Step 1: Wrap “Expansions → Other” list in collapsible container (default closed).
+* [x] Step 2: Ensure click handler only proposes intent (draft).
+* [x] Step 3: Update tests for collapsible UI.
+* [x] Step 4: Run `pnpm -C packages/client-web test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] “Expansions → Other” is collapsible and closed by default.
-* [ ] Clicking an “Other” entry proposes a draft (does not commit).
-* [ ] Tests pass.
+* [x] “Expansions → Other” is collapsible and closed by default.
+* [x] Clicking an “Other” entry proposes a draft (does not commit).
+* [x] Tests pass.
 
 ---
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails listed + compliant
-* [ ] Anchors cited
-* [ ] `pnpm lint` passes
-* [ ] `pnpm -C packages/client-web test` passes
+* [x] Guardrails listed + compliant
+* [x] Anchors cited
+* [x] `pnpm lint` passes
+* [x] `pnpm -C packages/client-web test` passes
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <fill during implementation>
+* Replaced the "Expansions → Other" list with a `<details>` element in `ActionDock.tsx`.
+* Added a `<summary>` showing the count of "Other" items (e.g., "Expansions → Other (3)").
+* Ensured the list is closed by default.
+* Updated tests in `action-dock.test.tsx` to verify the collapsible behavior and correct interaction flow.
+* Verified that clicking an item proposes an intent (draft) and does not commit directly.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* `pnpm lint` → …
-* `pnpm -C packages/client-web test` → …
+* `pnpm lint` → Passed
+* `pnpm -C packages/client-web test` → Passed (25 test files, 97 tests)
 
 ---
 

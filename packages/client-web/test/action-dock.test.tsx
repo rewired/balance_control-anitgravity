@@ -147,9 +147,18 @@ describe('ActionDock', () => {
             />
         );
 
-        expect(screen.getByText('Expansions → Other')).toBeDefined();
-        const moveButton = screen.getByText('unknownAction');
+        // Check for collapsible summary with count
+        const summary = screen.getByTestId('summary-expansions-other');
+        expect(summary).toBeDefined();
+        expect(summary.textContent).toContain('Expansions → Other (1)');
+
+        // Open the details panel
+        fireEvent.click(summary);
+
+        // Click the action button
+        const moveButton = screen.getByTestId('btn-other-unknownAction');
         fireEvent.click(moveButton);
+        
         expect(proposeIntent).toHaveBeenCalledTimes(1);
         expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
     });
