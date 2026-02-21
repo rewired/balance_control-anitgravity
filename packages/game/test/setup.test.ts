@@ -21,6 +21,9 @@ function createSeededRandom(seed: number) {
                 [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
             return shuffled;
+            },
+            Die(n: number): number {
+                return Math.floor(next() * n) + 1;
         }
     };
 }
@@ -173,5 +176,35 @@ describe('SetupGame', () => {
         expect(disabled.zones[CoreZoneName.DrawPile].items.includes('tile_ex01_mock')).toBe(false);
         expect(enabledA.zones[CoreZoneName.DrawPile].items).toEqual(enabledB.zones[CoreZoneName.DrawPile].items);
         expect(enabledA.zones[CoreZoneName.DrawPile].items).not.toEqual(disabled.zones[CoreZoneName.DrawPile].items);
+    });
+
+    it('should determine starting player via canonical RNG and apply handicap (CORE-01-03-02A.2, VAR-01-02-02)', () => {
+        // We need a seeded random that we can predict
+        // Seed 42 for 2 players:
+        // shuffleFisherYates will consume RNG based on draw pile size (71 items)
+        // Then one Die(2) call for starting player.
+        const ctx: any = {
+            numPlayers: 2,
+            random: createSeededRandom(42)
+        };
+
+        const G = SetupGame({ ctx, setupData: { firstPlayerHandicap: true } });
+
+        const startingPlayerIndex = G.engine.attributes.startingPlayerIndex;
+        expect(startingPlayerIndex).toBeGreaterThanOrEqual(0);
+        expect(startingPlayerIndex).toBeLessThan(2);
+
+        // Verify handicap: starting player should have 3 influence, other should have 4 (for 2 players)
+        for (let i = 0; i < 2; i++) {
+            const pid = i.toString();
+            const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
+            const influence = G.zones[supplyId].items.filter(id => G.objects[id].type === 'Influence');
+
+            if (i === startingPlayerIndex) {
+                expect(influence.length).toBe(3);
+            } else {
+                expect(influence.length).toBe(4);
+            }
+        }
     });
 });

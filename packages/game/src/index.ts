@@ -155,6 +155,10 @@ export function createBalanceControlGame(): Game<GameState> {
         },
 
         turn: {
+            order: {
+                first: ({ G }: { G: GameState }) => G.engine.attributes.startingPlayerIndex ?? 0,
+                next: ({ ctx }: { ctx: any }) => (ctx.playOrderPos + 1) % ctx.numPlayers,
+            },
             activePlayers: {
                 currentPlayer: 'drawAndPlace',
             },
@@ -186,8 +190,9 @@ export function createBalanceControlGame(): Game<GameState> {
                 EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
 
                 // CORE-01-07-02: After last player, Round Settlement
-                const lastPlayer = (ctx.numPlayers - 1).toString();
-                if (ctx.currentPlayer === lastPlayer) {
+                const startingPlayerIndex = G.engine.attributes.startingPlayerIndex ?? 0;
+                const lastPlayerIndex = (startingPlayerIndex + ctx.numPlayers - 1) % ctx.numPlayers;
+                if (ctx.currentPlayer === String(lastPlayerIndex)) {
                     // Gap 11: Round counter
                     if (!G.roundNumber) G.roundNumber = 0;
                     G.roundNumber++;

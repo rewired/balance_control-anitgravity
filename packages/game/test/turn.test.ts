@@ -42,13 +42,14 @@ function createMetaMarkerPersistenceGame() {
         ...BalanceControlNoPlayerView,
         setup: (ctx: any) => {
             const G = SetupGame({ ctx });
-            const markerId = 'meta_0';
-            const supplyId = `${CoreZoneName.PersonalSupply}:0`;
+            const pid = String(G.engine.attributes.startingPlayerIndex ?? 0);
+            const markerId = `meta_${pid}`;
+            const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
             if (!G.zones[supplyId]) {
                 G.zones[supplyId] = { id: supplyId, name: supplyId, items: [] };
             }
             if (!G.objects[markerId]) {
-                G.objects[markerId] = { id: markerId, type: 'MetaMarker', owner: '0' } as any;
+                G.objects[markerId] = { id: markerId, type: 'MetaMarker', owner: pid } as any;
                 G.zones[supplyId].items.push(markerId);
             }
             const marker = G.objects[markerId] as any;
@@ -222,7 +223,8 @@ describe('Turn Structure (Stages)', () => {
         client.start();
 
         const startState = client.getState();
-        const marker = startState.G.objects['meta_0'] as any;
+        const pid = startState.ctx.currentPlayer;
+        const marker = startState.G.objects[`meta_${pid}`] as any;
         expect(marker).toBeTruthy();
         expect(startState.G.zones['tile_start_committee'].items).toContain(marker.id);
 
@@ -232,7 +234,7 @@ describe('Turn Structure (Stages)', () => {
 
         const afterActionState = client.getState();
         expect(afterActionState.G.zones['tile_start_committee'].items).not.toContain(marker.id);
-        expect(afterActionState.G.zones['PersonalSupply:0'].items).toContain(marker.id);
+        expect(afterActionState.G.zones[`PersonalSupply:${pid}`].items).toContain(marker.id);
     });
 
     it('should complete two full rounds in 3-player hotseat without softlock', () => {
