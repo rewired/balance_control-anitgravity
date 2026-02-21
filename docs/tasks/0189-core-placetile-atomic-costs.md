@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -28,8 +28,8 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * GR-002: Keep all legality/cost behavior engine-side.
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 
 ---
 
@@ -105,19 +105,19 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: In `placeTile`, move **all** validations that can fail (stage, staging tile exists, target unoccupied, adjacency/legal position) **before** `checkAndPayCosts(...)`.
-* [ ] Step 2: Keep prohibition check before costs (it is pure), but after the basic structural validations.
-* [ ] Step 3: Add the regression test that fails on current behavior and passes after reorder.
-* [ ] Step 4: Run `pnpm test`.
+* [x] Step 1: In `placeTile`, move **all** validations that can fail (stage, staging tile exists, target unoccupied, adjacency/legal position) **before** `checkAndPayCosts(...)`.
+* [x] Step 2: Keep prohibition check before costs (it is pure), but after the basic structural validations.
+* [x] Step 3: Add the regression test that fails on current behavior and passes after reorder.
+* [x] Step 4: Run `pnpm test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] Attempting an invalid `placeTile` does not move any Resources (no cost payment).
-* [ ] Attempting an invalid `placeTile` does not change staging/board/grid/adjacency.
-* [ ] All tests pass.
-* [ ] `/docs/changelog.md` references CORE-01-06-00-03 and ARCH-03:RESOLUTION_ORDER.
+* [x] Attempting an invalid `placeTile` does not move any Resources (no cost payment).
+* [x] Attempting an invalid `placeTile` does not change staging/board/grid/adjacency.
+* [x] All tests pass.
+* [x] `/docs/changelog.md` references CORE-01-06-00-03 and ARCH-03:RESOLUTION_ORDER.
 
 ---
 
