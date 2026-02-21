@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ActionDock } from '../src/components/ActionDock';
 import { buildIntentViewModel } from '../src/ui/useIntentViewModel';
+import { I18nProvider } from '../src/ui/i18n';
 
 describe('Controls - StartCommittee targeting', () => {
     it('disables Place Influence button when no placeInfluence intents are available', () => {
@@ -18,10 +19,12 @@ describe('Controls - StartCommittee targeting', () => {
         } as any;
 
         render(
-            <ActionDock
-                isActive={true}
-                controller={controller}
-            />
+            <I18nProvider>
+                <ActionDock
+                    isActive={true}
+                    controller={controller}
+                />
+            </I18nProvider>
         );
 
         const btn = screen.getByTestId('btn-mode-place-influence') as HTMLButtonElement;

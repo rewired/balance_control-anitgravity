@@ -4,6 +4,7 @@ import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import { TileType } from '@balance-control/rules';
 import { GameLayout } from '../src/components/GameLayout';
 import { InspectorActionStatus } from '../src/components/InspectorActionStatus';
+import { I18nProvider } from '../src/ui/i18n';
 
 vi.mock('@balance-control/game', async () => {
     const actual = await vi.importActual<any>('@balance-control/game');
@@ -57,13 +58,15 @@ describe('Selection inspector', () => {
         ensureResizeObserver();
         const G = createState();
         render(
-            <GameLayout
-                G={G}
-                ctx={baseCtx}
-                moves={{}}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={G}
+                    ctx={baseCtx}
+                    moves={{}}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         const tileCell = screen.getByTestId('hex-tile-0_0');
@@ -88,13 +91,15 @@ describe('Selection inspector', () => {
         ensureResizeObserver();
         const G = createState();
         render(
-            <GameLayout
-                G={G}
-                ctx={baseCtx}
-                moves={{}}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={G}
+                    ctx={baseCtx}
+                    moves={{}}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         const tileCell = screen.getByTestId('hex-tile-0_0');
@@ -108,13 +113,15 @@ describe('Selection inspector', () => {
         ensureResizeObserver();
         const G = createState();
         render(
-            <GameLayout
-                G={G}
-                ctx={baseCtx}
-                moves={{}}
-                playerID={'0'}
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={G}
+                    ctx={baseCtx}
+                    moves={{}}
+                    playerID={'0'}
+                    isActive={true}
+                />
+            </I18nProvider>
         );
         expect(screen.getByTestId('inspector-action-status')).toBeDefined();
         expect(screen.getByTestId('inspector-active-action').textContent).toBe('None');
@@ -130,7 +137,11 @@ describe('Selection inspector', () => {
             vm: { hasPendingChoice: false }
         };
 
-        render(<InspectorActionStatus controller={mockController} />);
+        render(
+            <I18nProvider>
+                <InspectorActionStatus controller={mockController} />
+            </I18nProvider>
+        );
 
         expect(screen.getByText('Move influence')).toBeDefined();
         expect(screen.getByText('Pinned source')).toBeDefined();

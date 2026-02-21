@@ -14,6 +14,7 @@ vi.mock('@balance-control/game', async () => {
 // Import the mocked function so we can control it
 import { enumerateLegalIntents } from '@balance-control/game';
 import { GameLayout } from '../src/components/GameLayout';
+import { I18nProvider } from '../src/ui/i18n';
 
 // Polyfill ResizeObserver for react-zoom-pan-pinch
 global.ResizeObserver = class ResizeObserver {
@@ -70,13 +71,15 @@ describe('No Auto-Commit Board Surface', () => {
         mockEnumerateLegalIntents.mockReturnValue([placeIntent]);
 
         render(
-            <GameLayout
-                G={mockG}
-                ctx={mockCtx}
-                moves={mockMoves}
-                playerID="0"
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={mockG}
+                    ctx={mockCtx}
+                    moves={mockMoves}
+                    playerID="0"
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         // 1. Find the ghost tile
@@ -113,13 +116,15 @@ describe('No Auto-Commit Board Surface', () => {
         mockEnumerateLegalIntents.mockReturnValue([passIntent]);
 
         render(
-            <GameLayout
-                G={mockG}
-                ctx={mockCtx}
-                moves={mockMoves}
-                playerID="0"
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={mockG}
+                    ctx={mockCtx}
+                    moves={mockMoves}
+                    playerID="0"
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         // 1. Find Skip Placement button
@@ -157,13 +162,15 @@ describe('No Auto-Commit Board Surface', () => {
         mockEnumerateLegalIntents.mockReturnValue([placeIntent1, placeIntent2]);
 
         render(
-            <GameLayout
-                G={mockG}
-                ctx={mockCtx}
-                moves={mockMoves}
-                playerID="0"
-                isActive={true}
-            />
+            <I18nProvider>
+                <GameLayout
+                    G={mockG}
+                    ctx={mockCtx}
+                    moves={mockMoves}
+                    playerID="0"
+                    isActive={true}
+                />
+            </I18nProvider>
         );
 
         // 1. Click first ghost (0,0)

@@ -5,7 +5,8 @@
             "committees": "Komitees",
             "economy": "Wirtschaft",
             "measures": "Maßnahmen",
-            "expansions": "Erweiterungen"
+            "expansions": "Erweiterungen",
+            "expansionsWithCount": "Erweiterungen ({{count}})"
         },
         "action": {
             "placeInfluence": "Einfluss platzieren",
@@ -55,7 +56,8 @@
             "placeInfluenceSummary": "Ziel {{target}}",
             "placeTileSummary": "{{tile}} @ {{coord}}",
             "formalizeSummary": "Feld {{tile}}",
-            "convertSummary": "Feld {{tile}}"
+            "convertSummary": "Feld {{tile}}",
+            "takeMeasureSummary": "Maßnahme ziehen {{measure}}"
         },
         "inspector": {
             "activeAction": "Aktive Aktion",
