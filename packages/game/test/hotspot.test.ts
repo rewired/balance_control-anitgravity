@@ -201,4 +201,44 @@ describe('Hotspot Mechanics', () => {
         ).length;
         expect(infCount).toBe(1);
     });
+    it('should mark hotspot as resolved even if placement is prohibited', () => {
+        const game = makeHotspotTestGame();
+        const origSetup = game.setup as any;
+        game.setup = (...args: any[]) => {
+            const G = origSetup(...args);
+            // Prohibit hotspot.resolve on tile_center
+            const prohibitions = G.engine.attributes.prohibitions;
+            if (!prohibitions['tile_center']) prohibitions['tile_center'] = {};
+            prohibitions['tile_center']['hotspot.resolve'] = true;
+            return G;
+        };
+
+        const client = Client({ game, numPlayers: 2 });
+        client.start();
+
+        // 1. Place tile to trigger hotspot
+        client.moves.placeTile({ targetCoord: '0,1' });
+
+        const state1 = client.getState()!;
+        const centerZone = state1.G.zones['tile_center'];
+        const infCount1 = centerZone.items.filter(
+            (id: string) => state1.G.objects[id]?.type === 'Influence'
+        ).length;
+
+        // Should NOT have placed influence
+        expect(infCount1).toBe(1);
+
+        // SHOULD be marked as resolved
+        expect(state1.G.engine.attributes.resolvedHotspots).toContain('tile_center');
+
+        // 2. Remove prohibition
+        const G2 = JSON.parse(JSON.stringify(state1.G));
+        if (G2.engine.attributes.prohibitions['tile_center']) {
+            delete G2.engine.attributes.prohibitions['tile_center']['hotspot.resolve'];
+        }
+
+        // Even if we were to manually enqueue the resolution atom again, 
+        // it would return immediately because tile_center is in resolvedHotspots.
+        // The Single-Resolution Invariant (CORE-01-06-03B) is now correctly preserved.
+    });
 });

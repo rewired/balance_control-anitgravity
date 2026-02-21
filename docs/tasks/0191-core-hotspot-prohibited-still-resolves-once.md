@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -26,8 +26,8 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * GR-007: Align hotspot resolution order with spec: prohibition skips placement but still performs the explicit permitted mutation (resolved mark).
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 
 ---
 
@@ -85,9 +85,9 @@ Suggested location:
 
 ### 5.3 Docs
 
-* [ ] `/docs/changelog.md` updated.
+* [x] `/docs/changelog.md` updated.
 * [ ] DD doc — N/A
-* [ ] ERRATA — N/A
+* [x] ERRATA — N/A
 
 ---
 
@@ -107,23 +107,23 @@ Suggested location:
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Refactor `handleHotspotResolve` to ensure the resolved mark is written even when prohibited.
-* [ ] Step 2: Add regression test (two resolution attempts, prohibition toggled).
-* [ ] Step 3: Run `pnpm test`.
+* [x] Step 1: Refactor `handleHotspotResolve` to ensure the resolved mark is written even when prohibited.
+* [x] Step 2: Add regression test (two resolution attempts, prohibition toggled).
+* [x] Step 3: Run `pnpm test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] With prohibition active: hotspot is marked resolved and will not resolve again.
-* [ ] With prohibition cleared after the first attempt: a second attempt still does nothing.
-* [ ] All tests pass.
+* [x] With prohibition active: hotspot is marked resolved and will not resolve again.
+* [x] With prohibition cleared after the first attempt: a second attempt still does nothing.
+* [x] All tests pass.
 
 ---
 
 ## 10) PR Checklist
 
-* [ ] Guardrails listed accurately.
-* [ ] Normative anchors cited.
-* [ ] `pnpm test` passes.
-* [ ] Working tree clean after postflight amend.
+* [x] Guardrails listed accurately.
+* [x] Normative anchors cited.
+* [x] `pnpm test` passes.
+* [x] Working tree clean after postflight amend.

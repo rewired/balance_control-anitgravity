@@ -21,26 +21,30 @@ function handleHotspotResolve(G: GameState & { engine: EngineState }, ctx: any, 
     if (resolved.includes(tileId)) return;
 
     // 1. Prohibitions & Modifiers
-    if (isProhibited(G, 'hotspot.resolve', 'NONE', tileId)) return;
-    applyModifiers(G, ctx, 'beforeAction', atom);
+    const prohibited = isProhibited(G, 'hotspot.resolve', 'NONE', tileId);
+    if (!prohibited) {
+        applyModifiers(G, ctx, 'beforeAction', atom);
 
-    // 2. Determine Majority
-    const { controller } = computeMajority(tileId, G);
-    if (controller) {
-        // Emit influence placement
-        G.engine.effectQueue.unshift({
-            kind: 'influence.place',
-            playerId: controller,
-            targetTileId: tileId,
-            context: { source: 'hotspot.resolve', tileId }
-        });
+        // 2. Determine Majority
+        const { controller } = computeMajority(tileId, G);
+        if (controller) {
+            // Emit influence placement
+            G.engine.effectQueue.unshift({
+                kind: 'influence.place',
+                playerId: controller,
+                targetTileId: tileId,
+                context: { source: 'hotspot.resolve', tileId }
+            });
+        }
     }
 
     // CORE-01-06-03B: Mark Hotspot as resolved
     if (!G.engine.attributes.resolvedHotspots) G.engine.attributes.resolvedHotspots = [];
     G.engine.attributes.resolvedHotspots.push(tileId);
 
-    applyModifiers(G, ctx, 'afterAction', atom);
+    if (!prohibited) {
+        applyModifiers(G, ctx, 'afterAction', atom);
+    }
 }
 
 export const coreHotspotAtoms: AtomRegistration[] = [
