@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import React from 'react';
-import { fireEvent, render, screen, cleanup } from '@testing-library/react';
+import { fireEvent, render, screen, cleanup, within } from '@testing-library/react';
 import { TileType } from '@balance-control/rules';
 import { GameLayout } from '../src/components/GameLayout';
 import { InspectorActionStatus } from '../src/components/InspectorActionStatus';
@@ -123,8 +123,12 @@ describe('Selection inspector', () => {
                 />
             </I18nProvider>
         );
-        expect(screen.getByTestId('inspector-action-status')).toBeDefined();
-        expect(screen.getByTestId('inspector-active-action').textContent).toBe('None');
+        const statusBlock = screen.getByTestId('inspector-action-status');
+        expect(statusBlock).toBeDefined();
+
+        // Labels from i18n (use within to avoid collision with ActionDock)
+        expect(within(statusBlock).getByText('Active action')).toBeDefined();
+        expect(within(statusBlock).getByTestId('inspector-active-action').textContent).toBe('None');
     });
 
     it('displays pinned source when moveInfluenceSourceId is set', () => {

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { GameLayout } from '../src/components/GameLayout';
+import { I18nProvider } from '../src/ui/i18n';
 
 // Mock engine
 const mockEnumerateLegalIntents = vi.fn();
@@ -85,13 +86,15 @@ describe('PendingChoice Hard-Gate Regression', () => {
             const placeTile = vi.fn();
 
             render(
-                <GameLayout
-                    G={state}
-                    ctx={baseCtx}
-                    moves={{ resolveChoice, placeTile }}
-                    playerID={'0'}
-                    isActive={true}
-                />
+                <I18nProvider>
+                    <GameLayout
+                        G={state}
+                        ctx={baseCtx}
+                        moves={{ resolveChoice, placeTile }}
+                        playerID={'0'}
+                        isActive={true}
+                    />
+                </I18nProvider>
             );
 
             // 1. Verify Modal is present
@@ -131,13 +134,15 @@ describe('PendingChoice Hard-Gate Regression', () => {
             const resolveChoice = vi.fn();
 
             render(
-                <GameLayout
-                    G={state}
-                    ctx={baseCtx}
-                    moves={{ resolveChoice }}
-                    playerID={'0'}
-                    isActive={true}
-                />
+                <I18nProvider>
+                    <GameLayout
+                        G={state}
+                        ctx={baseCtx}
+                        moves={{ resolveChoice }}
+                        playerID={'0'}
+                        isActive={true}
+                    />
+                </I18nProvider>
             );
 
             // 1. Verify Modal is NOT present
@@ -166,13 +171,15 @@ describe('PendingChoice Hard-Gate Regression', () => {
             const resolveChoice = vi.fn();
 
             render(
-                <GameLayout
-                    G={state}
-                    ctx={baseCtx}
-                    moves={{ resolveChoice }}
-                    playerID={'0'}
-                    isActive={true}
-                />
+                <I18nProvider>
+                    <GameLayout
+                        G={state}
+                        ctx={baseCtx}
+                        moves={{ resolveChoice }}
+                        playerID={'0'}
+                        isActive={true}
+                    />
+                </I18nProvider>
             );
 
             // 1. Click target (tile_alpha)

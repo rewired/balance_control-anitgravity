@@ -7,7 +7,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -26,8 +26,8 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 * GR-002: Inspector remains read-only; this task only replaces strings.
 
 ### guardrail_gate
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 
 ---
 
@@ -112,26 +112,26 @@ If other tests fail due to changed text (common), update them to use `data-testi
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Import `useT()` into Inspector components.
-* [ ] Step 2: Replace string literals with `t(...)` calls.
-* [ ] Step 3: Add any missing `core.*` keys to `en.json` and `de.json` (Task 0182 scope).
-* [ ] Step 4: Fix/adjust tests (prefer `data-testid`).
-* [ ] Step 5: Run `pnpm -C packages/client-web test`.
+* [x] Step 1: Import `useT()` into Inspector components.
+* [x] Step 2: Replace string literals with `t(...)` calls.
+* [x] Step 3: Add any missing `core.*` keys to `en.json` and `de.json` (Task 0182 scope).
+* [x] Step 4: Fix/adjust tests (prefer `data-testid`).
+* [x] Step 5: Run `pnpm -C packages/client-web test`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] InspectorActionStatus uses contract required keys.
-* [ ] Inspector panel has no new hardcoded user-visible strings.
-* [ ] `pnpm -C packages/client-web test` passes.
+* [x] InspectorActionStatus uses contract required keys.
+* [x] Inspector panel has no new hardcoded user-visible strings.
+* [x] `pnpm -C packages/client-web test` passes.
 
 ---
 
 ## 10) PR Checklist
 
-* [ ] Guardrails listed accurately (GR-002).
-* [ ] Normative anchors cited.
-* [ ] No engine/rule/spec changes.
-* [ ] `pnpm lint` passes.
-* [ ] `pnpm -C packages/client-web test` passes.
+* [x] Guardrails listed accurately (GR-002).
+* [x] Normative anchors cited.
+* [x] No engine/rule/spec changes.
+* [x] `pnpm lint` passes.
+* [x] `pnpm -C packages/client-web test` passes.

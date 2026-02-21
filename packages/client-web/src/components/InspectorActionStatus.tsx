@@ -1,5 +1,6 @@
 import React from 'react';
 import { InteractionController } from '../ui/interaction/types';
+import { useT } from '../ui/i18n';
 
 interface InspectorActionStatusProps {
     controller: InteractionController;
@@ -11,6 +12,7 @@ interface InspectorActionStatusProps {
  * @see ARCH-06 Inspector responsibilities
  */
 export const InspectorActionStatus: React.FC<InspectorActionStatusProps> = ({ controller }) => {
+    const t = useT();
     const { 
         actionMode, 
         interactionState, 
@@ -20,69 +22,69 @@ export const InspectorActionStatus: React.FC<InspectorActionStatusProps> = ({ co
         vm 
     } = controller;
 
-    let activeActionLabel = 'None';
+    let activeActionLabel = t('core:inspector.none');
     let stepLabel = '';
     let pinnedLabel = '';
     let pinnedValue = '';
 
     // 1. Active Action
     switch (actionMode) {
-        case 'placeInfluence': activeActionLabel = 'Place influence'; break;
-        case 'moveInfluence': activeActionLabel = 'Move influence'; break;
-        case 'formalizeInfluence': activeActionLabel = 'Formalize'; break;
-        case 'convertResources': activeActionLabel = 'Convert'; break;
-        case 'takeMeasure': activeActionLabel = 'Take measure'; break;
-        case 'none': activeActionLabel = 'None'; break;
+        case 'placeInfluence': activeActionLabel = t('core:action.placeInfluence'); break;
+        case 'moveInfluence': activeActionLabel = t('core:action.moveInfluence'); break;
+        case 'formalizeInfluence': activeActionLabel = t('core:action.formalize'); break;
+        case 'convertResources': activeActionLabel = t('core:action.convert'); break;
+        case 'takeMeasure': activeActionLabel = t('core:action.takeMeasure'); break;
+        case 'none': activeActionLabel = t('core:inspector.none'); break;
     }
 
     // 2. Step
     if (vm.hasPendingChoice) {
-         stepLabel = 'Resolve choice';
+         stepLabel = t('core:inspector.resolveChoice');
     } else {
         switch (interactionState) {
             case 'selectingAction':
-                stepLabel = 'Select action';
+                stepLabel = t('core:step.chooseAction');
                 break;
             case 'selectingParams':
                 if (actionMode === 'moveInfluence') {
-                    if (!moveInfluenceSourceId) stepLabel = 'Select source';
-                    else stepLabel = 'Select destination';
+                    if (!moveInfluenceSourceId) stepLabel = t('core:step.chooseSource');
+                    else stepLabel = t('core:step.chooseDestination');
                 } else if (actionMode === 'placeInfluence') {
-                     stepLabel = 'Select tile';
+                     stepLabel = t('core:step.chooseTile');
                 } else if (actionMode === 'formalizeInfluence' || actionMode === 'convertResources') {
-                     stepLabel = 'Select tile';
+                     stepLabel = t('core:step.chooseTile');
                 }
                 break;
             case 'selectingVariant':
-                stepLabel = 'Select variant';
+                stepLabel = t('core:step.chooseVariant');
                 break;
             case 'draftReady':
-                stepLabel = 'Confirm';
+                stepLabel = t('core:ui.confirm');
                 break;
         }
     }
     
     // 3. Pinned Params
     if (actionMode === 'moveInfluence' && moveInfluenceSourceId) {
-        pinnedLabel = 'Pinned source';
+        pinnedLabel = t('core:inspector.pinnedSource');
         pinnedValue = moveInfluenceSourceId;
     } else if (actionMode === 'formalizeInfluence' && pinnedCommitteeTileId) {
-        pinnedLabel = 'Pinned tile';
+        pinnedLabel = t('core:inspector.pinnedTile');
         pinnedValue = pinnedCommitteeTileId;
     } else if (actionMode === 'convertResources' && pinnedGrassrootsTileId) {
-        pinnedLabel = 'Pinned tile';
+        pinnedLabel = t('core:inspector.pinnedTile');
         pinnedValue = pinnedGrassrootsTileId;
     }
 
     return (
         <div className="inspector-action-status" data-testid="inspector-action-status" style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
             <div className="inspector-row">
-                <span className="inspector-label">Active action</span>
+                <span className="inspector-label">{t('core:inspector.activeAction')}</span>
                 <span className="inspector-value" data-testid="inspector-active-action">{activeActionLabel}</span>
             </div>
             {stepLabel && (
                 <div className="inspector-row">
-                    <span className="inspector-label">Step</span>
+                    <span className="inspector-label">{t('core:inspector.step')}</span>
                     <span className="inspector-value" data-testid="inspector-step">{stepLabel}</span>
                 </div>
             )}
