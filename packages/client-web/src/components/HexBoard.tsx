@@ -265,7 +265,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     const testId = `hex-ghost-${coordStr.replace(',', '_')}`;
                     const isGhostHovered = hoveredGhostCoord === coordStr;
                     const canPropose = !draftIntent && isInteractive;
-                    const isResolveChoice = intent!.moveType === 'resolveChoice';
+                    const isResolveChoice = intent?.moveType === 'resolveChoice';
 
                     return (
                         <button
