@@ -48,8 +48,6 @@
     --seat-4: #10b981;
     --seat-5: #ef4444;
     --seat-6: #38bdf8;
-    /* Shapes */
-    --hex-clip: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
 }
 
 body {
@@ -382,7 +380,7 @@ body {
     width: var(--hex-cell-w);
     height: var(--hex-cell-h);
     transform: translate(-50%, -50%);
-    clip-path: var(--hex-clip);
+    clip-path: url(#hex-outline-clip);
     border: 2px dashed rgba(255, 255, 255, 0.35);
     pointer-events: none;
     animation: pulse-target 2s infinite;
@@ -400,7 +398,7 @@ body {
     width: var(--hex-cell-w);
     height: var(--hex-cell-h);
     transform: translate(-50%, -50%);
-    clip-path: var(--hex-clip);
+    clip-path: url(#hex-outline-clip);
     border: 2px dashed var(--active-seat-color, rgba(255, 255, 255, 0.5));
     background: radial-gradient(circle, var(--active-seat-color, rgba(255, 255, 255, 0.15)) 0%, transparent 75%);
     filter: drop-shadow(0 0 8px var(--active-seat-color, rgba(255, 255, 255, 0.3)));
@@ -437,7 +435,7 @@ body {
     width: var(--hex-cell-w);
     height: var(--hex-cell-h);
     transform: translate(-50%, -50%);
-    clip-path: var(--hex-clip);
+    clip-path: url(#hex-outline-clip);
     border: 2px dashed rgba(6, 182, 212, 0.8);
     background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 75%);
     filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.45));
@@ -454,23 +452,34 @@ body {
 }
 
 .hex-ghost {
-    border: 1px dashed rgba(6, 182, 212, 0.45);
     background: rgba(6, 182, 212, 0.08);
     color: var(--text-secondary);
-    clip-path: var(--hex-clip);
+    /* Derived from base_tile.svg via HexSilhouette component */
+    clip-path: url(#hex-outline-clip);
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.hex-ghost-outline {
+    stroke: rgba(6, 182, 212, 0.45);
+    stroke-width: 2px;
+    stroke-dasharray: 5 3;
     transition: all 0.2s ease;
 }
 
 .hex-ghost:hover {
-    border-color: rgba(6, 182, 212, 0.8);
-    box-shadow: 0 0 18px rgba(6, 182, 212, 0.35);
+    background: rgba(6, 182, 212, 0.12);
     color: var(--text-primary);
+}
+
+.hex-ghost:hover .hex-ghost-outline {
+    stroke: rgba(6, 182, 212, 0.8);
+    filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.5));
 }
 
 .hex-ghost:disabled {
     opacity: 0.35;
     cursor: not-allowed;
-    box-shadow: none;
 }
 
 .player-info {

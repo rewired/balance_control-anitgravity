@@ -52,6 +52,8 @@ function getReplaySeed(state: any): string | number | null {
     return state?.ctx?.randomSeed ?? state?.ctx?._randomSeed ?? null;
 }
 
+import { HexSilhouette } from './components/HexSilhouette';
+
 /**
  * @remarks
  * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
@@ -71,6 +73,7 @@ const App: React.FC = () => {
     if (devScene === 'hex-tile' && DevHexTilePlayground) {
         return (
             <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading playground…</div>}>
+                <HexSilhouette />
                 <DevHexTilePlayground />
             </Suspense>
         );
@@ -218,24 +221,28 @@ const App: React.FC = () => {
 
     if (mode === 'start' && !session) {
         return (
-            <StartScreen
-                onSelectHotseat={() => setMode('hotseat')}
-                onSelectOnlineLobby={() => setMode('onlineLobby')}
-                onResumeOnlineSession={(stored) => {
-                    setLeaveError(null);
-                    pendingMovesRef.current = [];
-                    setMoveLog([]);
-                    wasConnectedRef.current = false;
-                    setSession(stored);
-                    setMode('onlineMatch');
-                }}
-            />
+            <>
+                <HexSilhouette />
+                <StartScreen
+                    onSelectHotseat={() => setMode('hotseat')}
+                    onSelectOnlineLobby={() => setMode('onlineLobby')}
+                    onResumeOnlineSession={(stored) => {
+                        setLeaveError(null);
+                        pendingMovesRef.current = [];
+                        setMoveLog([]);
+                        wasConnectedRef.current = false;
+                        setSession(stored);
+                        setMode('onlineMatch');
+                    }}
+                />
+            </>
         );
     }
 
     if (mode === 'hotseat') {
         return (
             <>
+                <HexSilhouette />
                 <div className="game-topbar glass-panel" data-testid="startflow-topbar">
                     <div className="game-topbar-text">Local hotseat</div>
                     <button className="btn-secondary" onClick={() => setMode('start')} data-testid="back-to-start">
@@ -252,6 +259,7 @@ const App: React.FC = () => {
     if (mode === 'onlineLobby' && !session) {
         return (
             <>
+                <HexSilhouette />
                 <div className="game-topbar glass-panel" data-testid="startflow-topbar">
                     <div className="game-topbar-text">Online lobby</div>
                     <button className="btn-secondary" onClick={() => setMode('start')} data-testid="back-to-start">
@@ -280,6 +288,7 @@ const App: React.FC = () => {
 
     return (
         <>
+            <HexSilhouette />
             <div className="game-topbar glass-panel" data-testid="game-topbar">
                 <div className="game-topbar-text">
                     {connectionLabel} | Match {matchID} | Player {playerID}

@@ -50,7 +50,7 @@ test('hex overlays (selection and target) use cell variables for sizing and have
         expect(styles).not.toBeNull();
         expect(styles!.width).toBe(expectedW);
         expect(styles!.height).toBe(expectedH);
-        expect(styles!.clipPath).toContain('polygon');
+        expect(styles!.clipPath).toContain('hex-outline-clip');
         expect(styles!.borderStyle).toBe('dashed');
         expect(styles!.position).toBe('absolute');
     };

@@ -40,8 +40,8 @@ test('hex selection outline has hex clip-path, bloom filter, and dotted border',
     }, selector);
 
     expect(styles).not.toBeNull();
-    // clip-path should contain 'polygon'
-    expect(styles!.clipPath).toContain('polygon');
+    // clip-path should reference the outline clip (browser might return url(...) with absolute path)
+    expect(styles!.clipPath).toContain('hex-outline-clip');
 
     // filter should not be 'none' (it should contain drop-shadow)
     expect(styles!.filter).not.toBe('none');

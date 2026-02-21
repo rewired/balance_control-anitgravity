@@ -7,6 +7,7 @@ import { HexTileVisual } from '../ui/tiles/HexTileVisual';
 import { ResortIcon } from '../ui/tiles/ResortIcon';
 import { seatColor } from '../ui/tiles/seatColor';
 import type { SeatId } from '../ui/tiles/types';
+import { HexSilhouette, HexOutline } from './HexSilhouette';
 
 interface HexBoardProps {
     G: GameState;
@@ -291,10 +292,12 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 left: x + offsetX,
                                 top: y + offsetY,
                                 ['--hex-cell-w' as any]: `${cellWidth}px`,
-                                ['--hex-cell-h' as any]: `${cellHeight}px`
+                                ['--hex-cell-h' as any]: `${cellHeight}px`,
+                                clipPath: 'url(#hex-outline-clip)'
                             }}
                             title={`Place at ${coordStr}`}
                         >
+                            <HexOutline className="hex-ghost-outline" />
                             {((pendingTile && isGhostHovered) || (isDraftedGhost && pendingTile)) && (
                                 <div className="ghost-preview" style={{ opacity: isDraftedGhost ? 0.9 : 0.6, pointerEvents: 'none' }}>
                                     <HexTileVisual
