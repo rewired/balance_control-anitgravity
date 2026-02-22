@@ -33,15 +33,27 @@ export const HotseatShell: React.FC = () => {
                 matchID: MATCH_ID,
                 playerID: '1',
                 multiplayer: localMultiplayer,
-            })
+            }),
         } as const;
     }, [localMultiplayer]);
 
+    const spectatorClient = useMemo(() => {
+        return Client({
+            game: BalanceControlGame,
+            numPlayers: 2,
+            matchID: MATCH_ID,
+            playerID: null,
+            multiplayer: localMultiplayer,
+        });
+    }, [localMultiplayer]);
+
     const [seatState, setSeatState] = useState<Record<SeatID, any | null>>({ '0': null, '1': null });
+    const [spectatorState, setSpectatorState] = useState<any>(null);
 
     useEffect(() => {
         const unsubscribes: Array<() => void> = [];
 
+        // 1. Seat clients (for moves)
         (Object.keys(clients) as SeatID[]).forEach((seat) => {
             const client = clients[seat];
             client.start();
@@ -53,18 +65,29 @@ export const HotseatShell: React.FC = () => {
             );
         });
 
+        // 2. Spectator client (for rendering)
+        spectatorClient.start();
+        setSpectatorState(spectatorClient.getState());
+        unsubscribes.push(
+            spectatorClient.subscribe((next: any) => setSpectatorState(next))
+        );
+
         return () => {
             unsubscribes.forEach((fn) => fn());
             (Object.keys(clients) as SeatID[]).forEach((seat) => {
                 clients[seat].stop();
             });
+            spectatorClient.stop();
         };
-    }, [clients]);
+    }, [clients, spectatorClient]);
 
-    const state = seatState[activeSeat];
-    const ctx = state?.ctx;
+    // Render from spectator state (full visibility)
+    // Dispatch moves via active seat client
+    const G = spectatorState?.G;
+    const ctx = spectatorState?.ctx;
+    
+    // Compute isActive from spectator context + activeSeat
     const currentPlayer: string | null = ctx?.currentPlayer ?? null;
-
     const gameover = Boolean(ctx?.gameover);
     const isMyTurn = currentPlayer === activeSeat;
     const isActiveByStage = Boolean(ctx?.activePlayers?.[activeSeat]);
@@ -95,11 +118,11 @@ export const HotseatShell: React.FC = () => {
                     </button>
                 </div>
             </div>
-            {state ? (
+            {G && ctx ? (
                 <div data-testid="hotseat-game-screen">
                     <Board
-                        G={state.G}
-                        ctx={state.ctx}
+                        G={G}
+                        ctx={ctx}
                         moves={clients[activeSeat].moves}
                         playerID={activeSeat}
                         isActive={isActive}

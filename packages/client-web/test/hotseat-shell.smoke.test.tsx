@@ -63,9 +63,11 @@ describe('HotseatShell', () => {
         fireEvent.click(screen.getByTestId('hotseat-switch-1'));
         expect(screen.getByTestId('hotseat-status').textContent).toContain('Active seat P1');
 
-        expect(clientInstances).toHaveLength(2);
-        const playerIDs = clientInstances.map((x) => x.config.playerID).sort();
-        expect(playerIDs).toEqual(['0', '1']);
+        expect(clientInstances).toHaveLength(3);
+        const playerIDs = clientInstances.map((x) => x.config.playerID);
+        expect(playerIDs).toContain('0');
+        expect(playerIDs).toContain('1');
+        expect(playerIDs).toContain(null);
 
         const matchIDs = new Set(clientInstances.map((x) => x.config.matchID));
         expect(Array.from(matchIDs)).toEqual(['local-hotseat-2p']);
