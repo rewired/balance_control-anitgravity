@@ -61,7 +61,8 @@
             "committee": "Komitee",
             "grassroots": "Basis",
             "selectOutput": "Ziel-Resort wählen",
-            "back": "Zurück"
+            "back": "Zurück",
+            "players": "Spieler"
         },
         "draft": {
             "moveInfluenceSummary": "{{source}} → {{target}}",

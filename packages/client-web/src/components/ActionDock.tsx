@@ -19,7 +19,7 @@ interface ActionDockProps {
     onToggleRightPanel?: () => void;
 }
 
-const formatIntentLabel = (intent: LegalIntent, t: (key: string, vars?: any) => string, G: GameState) => {
+const formatIntentLabel = (intent: LegalIntent, t: (key: string, vars?: Record<string, string>) => string, G: GameState) => {
     if (intent.moveType === 'moveInfluence') {
         return t('core:draft.moveInfluenceSummary', {
             source: getObjectLabel(G, intent.payload?.sourceId),
@@ -65,7 +65,7 @@ const intentSortKey = (intent: LegalIntent) => {
     return `${intent.moveType}:${payloadKey}`;
 };
 
-const getActionLabel = (mode: InteractionActionMode, draftIntent: LegalIntent | null, t: (key: string, vars?: any) => string, G: GameState) => {
+const getActionLabel = (mode: InteractionActionMode, draftIntent: LegalIntent | null, t: (key: string, vars?: Record<string, string>) => string, G: GameState) => {
     if (draftIntent) return formatIntentLabel(draftIntent, t, G);
     switch (mode) {
         case 'placeInfluence': return t('core:action.placeInfluence');
@@ -77,7 +77,7 @@ const getActionLabel = (mode: InteractionActionMode, draftIntent: LegalIntent | 
     }
 };
 
-const getStepLabel = (state: string, mode: InteractionActionMode, moveInfluenceSourceId: string | null, t: (key: string, vars?: any) => string) => {
+const getStepLabel = (state: string, mode: InteractionActionMode, moveInfluenceSourceId: string | null, t: (key: string, vars?: Record<string, string>) => string) => {
     if (state === 'draftReady') return t('core:ui.preview');
     if (state === 'selectingParams') {
         if (mode === 'moveInfluence' && !moveInfluenceSourceId) return t('core:step.chooseSource');
@@ -337,11 +337,11 @@ const CurrentActionPanel: React.FC<{ G: GameState; controller: InteractionContro
 };
 
 const getCoachMessage = (
-    stage: string | undefined,
+    stage: string | null | undefined,
     interactionState: string,
     mode: InteractionActionMode,
     moveInfluenceSourceId: string | null,
-    t: (key: string, vars?: any) => string
+    t: (key: string, vars?: Record<string, string>) => string
 ) => {
     if (interactionState === 'draftReady') return t('core:coach.review');
 
@@ -526,7 +526,7 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
                             userSelect: 'none'
                         }}
                     >
-                        {t('core:group.moreActions', { count: moreItems.length })}
+                        {t('core:group.moreActions', { count: String(moreItems.length) })}
                     </summary>
                     <div className="action-panel-secondary" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
                         {moreItems}
@@ -575,7 +575,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                     data-testid="toggle-left-panel"
                 >
                     <span style={{ fontSize: '1.2em' }}>{showLeftPanel ? '◀' : '▶'}</span>
-                    <span>{t('core:ui.players', 'Players')}</span>
+                    <span>{t('core:ui.players')}</span>
                 </button>
 
                 <button
@@ -584,7 +584,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                     title={showRightPanel ? "Collapse Inspector Panel" : "Expand Inspector Panel"}
                     data-testid="toggle-right-panel"
                 >
-                    <span>{t('core:inspector.title', 'Inspector')}</span>
+                    <span>{t('core:inspector.title')}</span>
                     <span style={{ fontSize: '1.2em' }}>{showRightPanel ? '▶' : '◀'}</span>
                 </button>
             </div>

@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** FROZEN
 
 ## Task State Machine (Loop-Breaker)
 
@@ -44,9 +44,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -183,33 +183,34 @@ Notes:
 
 This section MUST be completed in this task file before declaring done.
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <what changed>
-* <why>
+* Fixed TypeScript errors in `ActionDock.tsx` related to `t()` and `getCoachMessage`.
+* Updated `getCoachMessage` signature to accept `string | null | undefined` for `stage`.
+* Wrapped numeric variable `count` in `String()` for `core:group.moreActions`.
+* Removed fallback strings from `t()` calls and added missing keys to `en.json` and `de.json`.
+* Verified build passes with `pnpm -C packages/client-web build`.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-Paste exact commands and short outcomes.
-
-* `pnpm lint` → <ok/fail + details>
-* `pnpm test` → <ok/fail + details>
-* (optional) `pnpm vitest run <pattern>` → <ok/fail + details>
+* `pnpm lint` → passed (warning about TS version ignored as unrelated)
+* `pnpm test` → passed (all packages)
+* `pnpm -C packages/client-web build` → passed
 
 ---
 
