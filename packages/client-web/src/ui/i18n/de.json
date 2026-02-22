@@ -77,6 +77,13 @@
             "resources": "Ressourcen",
             "none": "Keine",
             "na": "N/V"
+        },
+        "tileIcon": {
+            "startTile": "Start-Komitee",
+            "committee": "Komitee",
+            "grassroots": "Basis",
+            "hotspot": "Hotspot",
+            "lobbyist": "Lobbyist"
         }
     }
 }

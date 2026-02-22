@@ -1,8 +1,8 @@
 # Task 0204 — UI: Wire tile icons from assets/tile-icons (committee/grassroots/lobbyist/start/hotspot)
 
-**Date:** 2026-02-21  
-**Owner:** Codex  
-**Branch:** `task/0204-ui-wire-tile-icons-from-assets`  
+**Date:** 2026-02-21
+**Owner:** Codex
+**Branch:** `task/0204-ui-wire-tile-icons-from-assets`
 **Skills:** S05 (Boundary Check), S08 (PR Hygiene)
 
 ---
@@ -116,9 +116,29 @@ Add a lightweight test (unit/component or e2e) that verifies the mapping loads:
 
 ---
 
+## Work Summary
+
+* Extended `tileAssets.ts` with `tileIconUrlByType` mapping for Committee, Grassroots, Hotspot, Lobbyist, StartCommittee.
+* Created `TileTypeIcon` component to render type icons safely.
+* Updated `HexBoard` and `HexTileVisual` to accept and render `typeIcon` (as fallback or primary if resort absent).
+* Updated `Tile` component to render icons in header.
+* Updated `ActionDock` to show icons on "Formalize" and "Convert" buttons.
+* Added i18n keys for tile icons in `en.json` and `de.json`.
+* Added `TileIconMapping.test.tsx` to verify mapping integrity.
+
+## Commands Run
+
+* `pnpm test src/ui/tiles/__tests__/TileIconMapping.test.tsx` (Passed)
+* `pnpm check:spec-anchors` (Passed)
+
+## Guardrails
+
+* GR-002: Compliant (UI-only presentation changes).
+* GR-014: Compliant (Stabilized icon mapping).
+
 ## 8) Acceptance Criteria
 
-* [ ] The 5 icons are wired from `assets/tile-icons/*.svg` via a central mapping.
-* [ ] UI uses these icons where tile-type icons are shown.
-* [ ] i18n/aria labels present.
-* [ ] Baseline checks green.
+* [x] The 5 icons are wired from `assets/tile-icons/*.svg` via a central mapping.
+* [x] UI uses these icons where tile-type icons are shown.
+* [x] i18n/aria labels present.
+* [x] Baseline checks green.
