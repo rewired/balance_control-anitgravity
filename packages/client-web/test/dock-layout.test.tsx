@@ -30,7 +30,7 @@ vi.mock('../src/ui/interaction/useGameInteractionController', () => ({
             intents: [],
             drawAndPlace: { placeTile: [] },
             pendingChoice: { resolveChoice: [] },
-            political: { formalizeInfluence: [], convertResources: [] },
+            political: { formalizeInfluence: [], convertResources: [], measures: [], others: [] },
             ghostCoords: []
         },
         selectedTileId: null,

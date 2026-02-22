@@ -13,6 +13,10 @@ interface ActionDockProps {
     isActive: boolean;
     G: GameState;
     controller: InteractionController;
+    showLeftPanel?: boolean;
+    onToggleLeftPanel?: () => void;
+    showRightPanel?: boolean;
+    onToggleRightPanel?: () => void;
 }
 
 const formatIntentLabel = (intent: LegalIntent, t: (key: string, vars?: any) => string, G: GameState) => {
@@ -541,7 +545,11 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
 export const ActionDock: React.FC<ActionDockProps> = ({
     isActive,
     G,
-    controller
+    controller,
+    showLeftPanel,
+    onToggleLeftPanel,
+    showRightPanel,
+    onToggleRightPanel
 }) => {
     const t = useT();
     if (!isActive) return null;
@@ -559,6 +567,28 @@ export const ActionDock: React.FC<ActionDockProps> = ({
 
     return (
         <div className="action-panel action-dock" data-testid="action-dock">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
+                <button
+                    onClick={onToggleLeftPanel}
+                    style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '4px' }}
+                    title={showLeftPanel ? "Collapse Players Panel" : "Expand Players Panel"}
+                    data-testid="toggle-left-panel"
+                >
+                    <span style={{ fontSize: '1.2em' }}>{showLeftPanel ? '◀' : '▶'}</span>
+                    <span>{t('core:ui.players', 'Players')}</span>
+                </button>
+
+                <button
+                    onClick={onToggleRightPanel}
+                    style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '4px' }}
+                    title={showRightPanel ? "Collapse Inspector Panel" : "Expand Inspector Panel"}
+                    data-testid="toggle-right-panel"
+                >
+                    <span>{t('core:inspector.title', 'Inspector')}</span>
+                    <span style={{ fontSize: '1.2em' }}>{showRightPanel ? '▶' : '◀'}</span>
+                </button>
+            </div>
+
             <div className="action-panel-header" data-testid="coach-header">
                 <div className="action-panel-title" style={{ fontSize: '1.1em', fontWeight: 'bold' }}>{coachMessage}</div>
             </div>

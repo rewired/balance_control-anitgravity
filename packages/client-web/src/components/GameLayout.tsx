@@ -128,13 +128,44 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     const isBoardInteractive = isActive && (!vm.hasPendingChoice || placementIntents.length > 0 || isSelectTilePending);
     const canInspect = !vm.hasPendingChoice;
 
+    // Task 0214: Collapsible side panels
+    const [showLeftPanel, setShowLeftPanel] = React.useState(() => {
+        try {
+            return localStorage.getItem('bc_ui_showLeftPanel') === 'true';
+        } catch {
+            return false;
+        }
+    });
+
+    const [showRightPanel, setShowRightPanel] = React.useState(() => {
+        try {
+            return localStorage.getItem('bc_ui_showRightPanel') === 'true';
+        } catch {
+            return false;
+        }
+    });
+
+    const toggleLeftPanel = () => {
+        const newValue = !showLeftPanel;
+        setShowLeftPanel(newValue);
+        try { localStorage.setItem('bc_ui_showLeftPanel', String(newValue)); } catch {}
+    };
+
+    const toggleRightPanel = () => {
+        const newValue = !showRightPanel;
+        setShowRightPanel(newValue);
+        try { localStorage.setItem('bc_ui_showRightPanel', String(newValue)); } catch {}
+    };
+
+    const gridTemplateColumns = `${showLeftPanel ? '280px' : '0px'} 1fr ${showRightPanel ? '280px' : '0px'}`;
+
     return (
-        <div className="game-layout">
+        <div className="game-layout" style={{ gridTemplateColumns }}>
             <PublicNoticeOverlay G={G} />
             <ModalHost G={G} controller={controller} />
 
             {/* Left Panel: Bank & Supply */}
-            <aside className="left-panel glass-panel">
+            <aside className="left-panel glass-panel" style={{ display: showLeftPanel ? 'flex' : 'none' }}>
                 <div className="player-info">
                     <h3>Players</h3>
                 </div>
@@ -227,7 +258,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
             </main>
 
             {/* Right Panel: Opponents / Deck / Info */}
-            <aside className="right-panel glass-panel">
+            <aside className="right-panel glass-panel" style={{ display: showRightPanel ? 'flex' : 'none' }}>
                 <div className="inspector-panel" data-testid="inspector-panel">
                     <h3>{t('core:inspector.title')}</h3>
                     <InspectorActionStatus controller={controller} />
@@ -306,6 +337,10 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                         isActive={isActive}
                         G={G}
                         controller={controller}
+                        showLeftPanel={showLeftPanel}
+                        onToggleLeftPanel={toggleLeftPanel}
+                        showRightPanel={showRightPanel}
+                        onToggleRightPanel={toggleRightPanel}
                     />
                 </div>
             )}

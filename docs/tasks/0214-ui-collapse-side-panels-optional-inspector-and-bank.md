@@ -66,19 +66,24 @@ Reduce clutter: side information should not dominate the play experience.
 - GR-014 (UI icon stability): do not change tile-type ↔ icon mapping.
 
 ## 5) Acceptance Criteria
-- [ ] Left + right panels are collapsed by default.
-- [ ] User can toggle panels from the dock instantly.
-- [ ] Board space increases when panels are collapsed.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Left + right panels are collapsed by default.
+- [x] User can toggle panels from the dock instantly.
+- [x] Board space increases when panels are collapsed.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005/006/014).
-- [ ] No engine/rule/spec changes.
-- [ ] No new commit shortcuts / auto-commit.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005/006/014).
+- [x] No engine/rule/spec changes.
+- [x] No new commit shortcuts / auto-commit.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 7) Work Summary
-- TBD (append-only)
+- Modified `GameLayout.tsx` to add `showLeftPanel`/`showRightPanel` state with `localStorage` persistence (default: collapsed).
+- Updated `ActionDock.tsx` to include toggle buttons for "Players" and "Inspector" panels above the coach header.
+- Implemented dynamic CSS grid column resizing in `GameLayout` to reclaim board space when panels are hidden.
+- Created `test/dock-toggles.test.tsx` verifying default collapsed state, toggle interactions, and persistence.
+- Updated `test/dock-layout.test.tsx` mock data to support `ActionDock` changes.
 
 ## 8) Commands Run
-- TBD (append-only)
+- `pnpm test test/dock-toggles.test.tsx` (Passed)
+- `pnpm -C packages/client-web test` (Passed)
