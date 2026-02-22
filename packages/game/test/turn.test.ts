@@ -172,6 +172,47 @@ describe('Turn Structure (Stages)', () => {
         expect(afterState.ctx.activePlayers[pid]).toBe('drawAndPlace');
     });
 
+    it('should reject passTilePlacement when staging is empty but drawPile is not empty and no flags set', () => {
+        const game = {
+            ...BalanceControlNoPlayerView,
+            turn: {
+                ...BalanceControlNoPlayerView.turn,
+                onBegin: (params: any) => {
+                     // Call original onBegin
+                     if (BalanceControlNoPlayerView.turn?.onBegin) {
+                        (BalanceControlNoPlayerView.turn.onBegin as any)(params);
+                     }
+                     // Force empty staging
+                     const { G, ctx } = params;
+                     const stagingId = `staging_${ctx.currentPlayer}`;
+                     if (G.zones[stagingId]) G.zones[stagingId].items = [];
+
+                     // Ensure flags are NOT set
+                     delete G.engine.attributes.drawPileEmptyAtTurnStart;
+                     delete G.engine.attributes.noLegalPlacements;
+                }
+            }
+        };
+
+        const client = Client({ game, numPlayers: 2 });
+        client.start();
+
+        const state = client.getState();
+        const pid = state.ctx.currentPlayer;
+
+        // Verify our setup worked
+        expect(state.G.zones[`staging_${pid}`].items.length).toBe(0);
+        expect(state.G.zones[CoreZoneName.DrawPile].items.length).toBeGreaterThan(0);
+
+        // Attempt passTilePlacement
+        client.moves.passTilePlacement({});
+
+        const afterState = client.getState();
+
+        // Should be rejected (no change in stage)
+        expect(afterState.ctx.activePlayers[pid]).toBe('drawAndPlace');
+    });
+
     it('should end turn and game when passTilePlacement with empty staging (DrawPile empty, CORE-01-09-01A)', () => {
         const client = Client({ game: createTinyDrawPileGame(), numPlayers: 2 });
         client.start();
