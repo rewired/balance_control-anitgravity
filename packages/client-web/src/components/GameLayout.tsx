@@ -29,7 +29,6 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     const t = useT();
     const zoneNames = {
         PersonalSupply: 'PersonalSupply',
-        Bank: 'Bank',
         Board: 'Board',
         DrawPile: 'DrawPile',
         DiscardFaceUp: 'DiscardFaceUp',
@@ -149,8 +148,6 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                         />
                     ))}
                 </div>
-
-                <Zone zoneId={zoneNames.Bank} G={G} title="Bank" />
             </aside>
 
             {/* Center: Board */}

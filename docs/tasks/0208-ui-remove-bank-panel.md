@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** COMMIT_READY
 
 ## Task State Machine (Loop-Breaker)
 
@@ -169,23 +169,24 @@ Write pass/fail criteria; avoid vague language.
 
 This section MUST be completed in this task file before declaring done.
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <what changed>
-* <why>
+* Removed Bank zone widget from left panel in `GameLayout.tsx` (redundant UI).
+* Removed unused `Bank` constant from `zoneNames` map.
+* Added `layout-panels.test.tsx` to verify Bank widget absence and Player list presence.
 
 ---
 
@@ -193,9 +194,8 @@ This section MUST be completed in this task file before declaring done.
 
 Paste exact commands and short outcomes.
 
-* `pnpm lint` → <ok/fail + details>
-* `pnpm test` → <ok/fail + details>
-* (optional) `pnpm vitest run <pattern>` → <ok/fail + details>
+* `pnpm lint` → Passed (0 errors).
+* `pnpm test` (client-web) → Passed (33 files, 190 tests).
 
 ---
 
