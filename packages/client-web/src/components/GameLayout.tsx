@@ -6,6 +6,7 @@ import { BoardViewport } from './BoardViewport';
 import { ModalHost } from './ModalHost';
 import { PublicNoticeOverlay } from './PublicNoticeOverlay';
 import { ResortIcon } from '../ui/tiles/ResortIcon';
+import { TileTypeIcon } from '../ui/tiles/TileTypeIcon';
 import { useGameInteractionController } from '../ui/interaction/useGameInteractionController';
 import { InspectorActionStatus } from './InspectorActionStatus';
 import { PlayerResourcesRow } from './PlayerResourcesRow';
@@ -172,7 +173,25 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                         boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
                     }}>
                         <div style={{ width: '48px', height: '48px', position: 'relative' }}>
-                            <ResortIcon resort={pendingTile.resort} />
+                            {pendingTile.type !== 'Grassroots' && pendingTile.resort ? (
+                                <ResortIcon resort={pendingTile.resort} />
+                            ) : (
+                                <TileTypeIcon type={pendingTile.type} />
+                            )}
+                            {pendingTile.type === 'Grassroots' && (pendingTile.conversion?.typedResort || pendingTile.resort) && (
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: '-2px',
+                                    width: '100%',
+                                    textAlign: 'center',
+                                    color: 'white',
+                                    fontSize: '10px',
+                                    fontWeight: 'bold',
+                                    textShadow: '0 1px 2px black'
+                                }}>
+                                    {pendingTile.conversion?.typedResort || pendingTile.resort}
+                                </div>
+                            )}
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span style={{ fontWeight: 'bold', color: 'white' }}>

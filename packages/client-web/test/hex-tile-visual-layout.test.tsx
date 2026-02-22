@@ -94,4 +94,38 @@ describe('HexTileVisual Layout', () => {
         // Default cy - 10 = 431.625 - 10 = 421.625
         expect(textY).toBeCloseTo(421.625, 1);
     });
+
+    it('renders typeIcon and typeTag for Typed Grassroots', () => {
+        const { getByText, container } = render(
+            <HexTileVisual
+                majoritySeat={null}
+                seatColor={() => '#000'}
+                isHovered={false}
+                isSelected={false}
+                influenceBySeat={{}}
+                metaIconsBySeat={{}}
+                badges={[]}
+                typeIcon={<rect data-testid="type-icon" width="24" height="24" />}
+                typeTag="DOM"
+            />
+        );
+
+        const iconGroup = container.querySelector('g g[transform*="translate"]');
+        const textElement = getByText('DOM');
+
+        expect(iconGroup).toBeTruthy();
+        expect(textElement).toBeTruthy();
+
+        const transform = iconGroup!.getAttribute('transform');
+        const iconYMatch = transform?.match(/translate\([\d.]+ ([\d.-]+)\)/);
+        const iconY = iconYMatch ? parseFloat(iconYMatch[1]) : null;
+
+        const textY = parseFloat(textElement.getAttribute('y') || '0');
+
+        // Expected iconY ~ 431.6 - 110 = 321.6
+        expect(iconY).toBeCloseTo(321.625, 1);
+        
+        // Expected textY ~ 431.6 + 75 = 506.6
+        expect(textY).toBeCloseTo(506.625, 1);
+    });
 });

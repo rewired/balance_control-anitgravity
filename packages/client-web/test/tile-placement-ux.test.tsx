@@ -73,4 +73,44 @@ describe('HexBoard UX', () => {
         expect(preview).not.toBeNull();
         expect(preview?.querySelector('[data-component="HexTileVisual"]')).not.toBeNull();
     });
+
+    it('renders Typed Grassroots ghost preview with correct typeTag', () => {
+        const intents = [
+            { moveType: 'placeTile', payload: { targetCoord: '0,2' } }
+        ];
+        const G = {
+            grid: {},
+            tiles: {},
+            zones: {},
+            objects: {},
+            adjacency: {},
+        } as any;
+
+        // Typed Grassroots definition
+        const pendingTile = {
+            id: 't2',
+            type: 'Grassroots',
+            resort: 'DOM',
+            conversion: { typedResort: 'DOM' }
+        };
+
+        const { container, getByText, getByTestId } = render(
+            <HexBoard
+                G={G}
+                placeTileIntents={intents as any}
+                ghostCoords={['0,2']}
+                isInteractive={true}
+                pendingTile={pendingTile as any}
+            />
+        );
+
+        const ghost = getByTestId('hex-ghost-0_2');
+        fireEvent.mouseEnter(ghost);
+
+        const preview = container.querySelector('.ghost-preview');
+        expect(preview).not.toBeNull();
+
+        // Check for DOM tag text
+        expect(getByText('DOM')).toBeDefined();
+    });
 });

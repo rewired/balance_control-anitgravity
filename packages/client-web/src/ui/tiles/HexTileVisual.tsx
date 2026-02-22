@@ -20,6 +20,7 @@ export type HexTileVisualProps = {
 
   resortIcon?: ReactNode;
   typeIcon?: ReactNode;
+  typeTag?: string;
   valueW?: number;
   className?: string;
 };
@@ -44,6 +45,7 @@ export function HexTileVisual({
   badges,
   resortIcon,
   typeIcon,
+  typeTag,
   valueW,
   className,
 }: HexTileVisualProps) {
@@ -53,22 +55,33 @@ export function HexTileVisual({
   // Prefer resortIcon if both are present (though usually mutually exclusive)
   const activeIcon = resortIcon || typeIcon;
 
-  const hasBoth = activeIcon && valueW !== undefined;
+  const hasValue = valueW !== undefined;
+  const hasTag = typeTag !== undefined;
+
+  // Layout logic:
+  // If we have both icon and value (e.g. Resort with weight), shift icon up and value down.
+  // If we have both icon and tag (e.g. Typed Grassroots), shift icon up and tag down.
+  // Otherwise center the single item.
+
+  const hasSecondary = hasValue || hasTag;
+  const hasBoth = activeIcon && hasSecondary;
+
   const iconOffset = hasBoth ? -110 : -60;
-  const valueOffset = hasBoth ? 75 : -10;
+  const secondaryOffset = hasBoth ? 75 : -10;
 
   const contentLayer =
-    activeIcon || valueW !== undefined ? (
+    activeIcon || hasSecondary ? (
       <g style={{ color: CONTENT_COLOR }}>
         {activeIcon ? (
           <g transform={`translate(${cx} ${cy + iconOffset}) scale(${resortIconScale}) translate(${-DEFAULT_ICON_VIEWBOX_SIZE / 2} ${-DEFAULT_ICON_VIEWBOX_SIZE / 2})`}>
             {activeIcon}
           </g>
         ) : null}
-        {valueW !== undefined ? (
+
+        {hasValue ? (
           <text
             x={cx}
-            y={cy + valueOffset}
+            y={cy + secondaryOffset}
             textAnchor="middle"
             dominantBaseline="middle"
             fill={CONTENT_COLOR}
@@ -77,6 +90,19 @@ export function HexTileVisual({
             style={{ fontVariantNumeric: "tabular-nums" }}
           >
             {valueW}
+          </text>
+        ) : hasTag ? (
+           <text
+            x={cx}
+            y={cy + secondaryOffset}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill={CONTENT_COLOR}
+            fontSize={60}
+            fontWeight={700}
+            style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "0.05em" }}
+          >
+            {typeTag}
           </text>
         ) : null}
       </g>

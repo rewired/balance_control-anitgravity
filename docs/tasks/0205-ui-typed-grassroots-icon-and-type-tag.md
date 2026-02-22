@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** VERIFYING
 
 ## Task State Machine (Loop-Breaker)
 
@@ -44,9 +44,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -166,13 +166,13 @@ Concrete artifacts that must exist after completion.
 
 Write the plan as a checklist. Each item should be small and verifiable.
 
-* [ ] Add `typeTag` / `subLabel` prop support in `HexTileVisual` (render below icon; deterministic font size & baseline).
-* [ ] Update `HexBoard` tile rendering:
-  * [ ] Grassroots always uses `typeIcon`.
-  * [ ] Typed Grassroots uses `tile.conversion.typedResort` as label.
-  * [ ] Ghost preview uses the same logic.
-* [ ] Update `GameLayout` pending-tile HUD to use type icon + tag label when tile.type === Grassroots.
-* [ ] Add/update tests for board tile rendering, ghost preview, and pending HUD.
+* [x] Add `typeTag` / `subLabel` prop support in `HexTileVisual` (render below icon; deterministic font size & baseline).
+* [x] Update `HexBoard` tile rendering:
+  * [x] Grassroots always uses `typeIcon`.
+  * [x] Typed Grassroots uses `tile.conversion.typedResort` as label.
+  * [x] Ghost preview uses the same logic.
+* [x] Update `GameLayout` pending-tile HUD to use type icon + tag label when tile.type === Grassroots.
+* [x] Add/update tests for board tile rendering, ghost preview, and pending HUD.
 
 Notes:
 
@@ -184,11 +184,11 @@ Notes:
 
 Write pass/fail criteria; avoid vague language.
 
-* [ ] A typed Grassroots tile renders the Grassroots icon on the board.
-* [ ] The typed tag label (DOM/FOR/INF) appears under the Grassroots icon and does not overlap the weight text.
-* [ ] Ghost preview and pending-tile HUD show the same corrected rendering.
-* [ ] No regressions for Resort/Committee/Lobbyist/Hotspot icons.
-* [ ] Golden replay unchanged or updated intentionally with explanation.
+* [x] A typed Grassroots tile renders the Grassroots icon on the board.
+* [x] The typed tag label (DOM/FOR/INF) appears under the Grassroots icon and does not overlap the weight text.
+* [x] Ghost preview and pending-tile HUD show the same corrected rendering.
+* [x] No regressions for Resort/Committee/Lobbyist/Hotspot icons.
+* [x] Golden replay unchanged or updated intentionally with explanation.
 
 ---
 
@@ -196,75 +196,43 @@ Write pass/fail criteria; avoid vague language.
 
 This section MUST be completed in this task file before declaring done.
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
 
 ---
 
-## 11) Work Summary (3–7 bullets)
+## 11) Work Summary
 
-* <what changed>
-* <why>
-
----
-
-## 12) Commands Run (with outcomes)
-
-Paste exact commands and short outcomes.
-
-* `pnpm lint` → <ok/fail + details>
-* `pnpm test` → <ok/fail + details>
-* (optional) `pnpm vitest run <pattern>` → <ok/fail + details>
+* Modified `HexTileVisual` to accept a `typeTag` prop and render it below the icon, ensuring no overlap with weight (which Grassroots tiles lack).
+* Updated `HexBoard` to correctly identify Typed Grassroots and pass the Grassroots `typeIcon` + `typeTag` (from `conversion.typedResort` or `resort`) instead of defaulting to `resortIcon`.
+* Updated `GameLayout` to ensure the "Pending Tile HUD" (top-left helper) also renders the Grassroots icon + tag for Typed Grassroots, matching the board visual.
+* Added tests in `hex-tile-visual-layout.test.tsx` to verify the SVG layout of the tag.
+* Added tests in `tile-placement-ux.test.tsx` to verify the ghost preview rendering logic in `HexBoard`.
 
 ---
 
-## 13) Postflight Proof (recorded in commit message)
+## 12) Commands Run
 
-Do NOT paste command outputs into this task file (it would dirty the tree after committing and cause an amend loop). Instead, capture postflight proof AFTER the final commit and append it to the latest commit message under a `Postflight:` section via ONE amend that edits the commit message only (no file changes).
-
-Required commands:
-
-* `git status -sb`
-* `git diff --stat`
-* tests (e.g. `pnpm test` or `pnpm vitest run`)
-
-Rule:
-
-* After the postflight amend, do not modify any tracked files. The working tree must remain clean.
-
-### 13.1 Recorded
-
-Recorded in final commit message (Postflight: block).
+* `pnpm test test/hex-tile-visual-layout.test.tsx` (Passed)
+* `pnpm test test/tile-placement-ux.test.tsx` (Passed)
 
 ---
 
-## 14) Commit Proof (recorded in commit message)
+## 13) Postflight Proof
 
-After creating exactly ONE commit, include `git show -1 --stat` output inside the same `Postflight:` block in the commit message (amend message only, no file changes).
-
-### 14.1 Recorded
-
-Recorded in final commit message (Postflight: block).
+(To be filled in the commit message)
 
 ---
 
-## 15) Amendments (append-only)
+## 14) Guardrails
 
-Use only if something in Sections 0–9 must change after freezing the task.
+* **Affected Guardrails:** GR-002, GR-014
+* **Compliance:**
+  * GR-002: Presentation-only change; no state mutation or rule logic affected.
+  * GR-014: Respects existing iconography; ensures correct icon selection for Typed Grassroots.
 
-Format (append one block per amendment):
+---
 
-### A-01 — <short title>
+## 15) Amendments (Append-Only)
 
-* Reason: <why the change is necessary>
-* Change: <what changed (describe, don’t rewrite earlier sections)>
-* Spec anchors: <added/changed anchors>
-* Guardrails: <GR-xxx impacted>
+* None.

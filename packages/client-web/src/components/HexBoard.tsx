@@ -230,8 +230,9 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 influenceBySeat={influenceBySeat}
                                 metaIconsBySeat={{}}
                                 badges={[]}
-                                resortIcon={tile.resort && isResortKey(tile.resort) ? <ResortIcon resort={tile.resort} /> : undefined}
-                                typeIcon={!tile.resort && isTileTypeKey(tile.type) ? <TileTypeIcon type={tile.type} /> : undefined}
+                                resortIcon={tile.type !== 'Grassroots' && tile.resort && isResortKey(tile.resort) ? <ResortIcon resort={tile.resort} /> : undefined}
+                                typeIcon={(tile.type === 'Grassroots' || (!tile.resort && isTileTypeKey(tile.type))) ? <TileTypeIcon type={tile.type} /> : undefined}
+                                typeTag={tile.type === 'Grassroots' ? (tile.conversion?.typedResort || tile.resort) : undefined}
                                 valueW={typeof tile.weight === 'number' ? tile.weight : undefined}
                                 className="hex-tile-visual"
                             />
@@ -310,7 +311,9 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                         influenceBySeat={{}}
                                         metaIconsBySeat={{}}
                                         badges={[]}
-                                        resortIcon={<ResortIcon resort={pendingTile!.resort} />}
+                                        resortIcon={pendingTile!.type !== 'Grassroots' && pendingTile!.resort ? <ResortIcon resort={pendingTile!.resort} /> : undefined}
+                                        typeIcon={(pendingTile!.type === 'Grassroots' || !pendingTile!.resort) ? <TileTypeIcon type={pendingTile!.type} /> : undefined}
+                                        typeTag={pendingTile!.type === 'Grassroots' ? (pendingTile!.conversion?.typedResort || pendingTile!.resort) : undefined}
                                         valueW={typeof pendingTile!.weight === 'number' ? pendingTile!.weight : undefined}
                                         className="hex-tile-visual"
                                     />
