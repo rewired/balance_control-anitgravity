@@ -10,8 +10,8 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Baseline scan (no edits yet):
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Baseline scan (no edits yet):
    - `rg -n "HexSilhouette|hex-outline-clip|HexTileFrame|ghost-preview|hex-ghost" packages/client-web/src`
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
@@ -69,18 +69,23 @@ When placing a tile, the ghost must be “what you see is what you get”:
 - No phantom moves (GR-005): purely visual polish; do not add behavior.
 
 ## 5) Acceptance Criteria
-- [ ] Ghost outlines match real tiles (no visible mismatch at normal zoom).
-- [ ] Ghost preview content (icon + weight/tag) does not overlap.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Ghost outlines match real tiles (no visible mismatch at normal zoom).
+- [x] Ghost preview content (icon + weight/tag) does not overlap.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005).
-- [ ] No engine/rule/spec changes.
-- [ ] No new commit shortcuts / auto-commit.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005).
+- [x] No engine/rule/spec changes.
+- [x] No new commit shortcuts / auto-commit.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 7) Work Summary
-- TBD (append-only)
+- Derived `HEX_NORMALIZED_PATH_POINTS` in `tileGeometry.ts` from `INFLUENCE_MARKER_CENTERS_ABS` to ensure mathematical consistency.
+- Updated `HexSilhouette.tsx` to use `HEX_NORMALIZED_PATH_POINTS` for `clipPath` and `HexOutline`, fixing geometry drift.
+- Updated `HexTileVisual.tsx` offsets (icon: -115, secondary: +85) to increase separation and prevent overlap.
+- Added `tileGeometry.test.tsx` to verify normalized points match absolute source.
+- Updated `hex-tile-visual-layout.test.tsx` to reflect new layout offsets.
 
 ## 8) Commands Run
-- TBD (append-only)
+- `grep "HexSilhouette|hex-outline-clip|HexTileFrame|ghost-preview|hex-ghost" packages/client-web/src`
+- `pnpm -C packages/client-web test`

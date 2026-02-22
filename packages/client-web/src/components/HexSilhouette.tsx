@@ -1,4 +1,8 @@
 import React from 'react';
+import { HEX_NORMALIZED_PATH_POINTS } from '../ui/tiles/tileGeometry';
+
+const CLIP_PATH_D = `M ${HEX_NORMALIZED_PATH_POINTS.map(([x, y]) => `${x} ${y}`).join(" L ")} Z`;
+const OUTLINE_PATH_D = `M ${HEX_NORMALIZED_PATH_POINTS.map(([x, y]) => `${x * 100} ${y * 100}`).join(" L ")} Z`;
 
 /**
  * HexSilhouette provides a canonical SVG clipPath and visual outline for hex-shaped cells,
@@ -12,17 +16,8 @@ export const HexSilhouette: React.FC = () => {
     return (
         <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none' }} aria-hidden="true">
             <defs>
-                {/* 
-                  Geometry derived from base_tile.svg (747x864 viewbox):
-                  (373.5, 0)   -> (0.5, 0)
-                  (747, 216)   -> (1.0, 0.25)
-                  (747, 648)   -> (1.0, 0.75)
-                  (373.5, 864) -> (0.5, 1.0)
-                  (0, 648)     -> (0, 0.75)
-                  (0, 216)     -> (0, 0.25)
-                */}
                 <clipPath id="hex-outline-clip" clipPathUnits="objectBoundingBox">
-                    <path d="M 0.5 0 L 1 0.25 L 1 0.75 L 0.5 1 L 0 0.75 L 0 0.25 Z" />
+                    <path d={CLIP_PATH_D} />
                 </clipPath>
             </defs>
         </svg>
@@ -55,7 +50,7 @@ export const HexOutline: React.FC<HexOutlineProps> = ({ className, style }) => {
             }}
         >
             <path
-                d="M 50 0 L 100 25 L 100 75 L 50 100 L 0 75 L 0 25 Z"
+                d={OUTLINE_PATH_D}
                 fill="none"
                 vectorEffect="non-scaling-stroke"
             />

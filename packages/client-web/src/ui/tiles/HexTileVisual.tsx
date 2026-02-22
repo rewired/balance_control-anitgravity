@@ -66,8 +66,8 @@ export function HexTileVisual({
   const hasSecondary = hasValue || hasTag;
   const hasBoth = activeIcon && hasSecondary;
 
-  const iconOffset = hasBoth ? -110 : -60;
-  const secondaryOffset = hasBoth ? 75 : -10;
+  const iconOffset = hasBoth ? -115 : -60;
+  const secondaryOffset = hasBoth ? 85 : -10;
 
   const contentLayer =
     activeIcon || hasSecondary ? (

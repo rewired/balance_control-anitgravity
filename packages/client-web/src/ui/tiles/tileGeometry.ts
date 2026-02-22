@@ -56,3 +56,17 @@ export const OVERLAY_RENDER_RECT = {
   height: 864,
   preserveAspectRatio: "none",
 } as const;
+
+/**
+ * Normalized hex vertices (0..1) for clipPath usage.
+ * Order: Top -> TR -> BR -> B -> BL -> TL (matches HexSilhouette path order)
+ * Derived from INFLUENCE_MARKER_CENTERS_ABS to ensure congruence with HexTileFrame.
+ */
+export const HEX_NORMALIZED_PATH_POINTS = [
+  INFLUENCE_MARKER_CENTERS_ABS[2], // Top
+  INFLUENCE_MARKER_CENTERS_ABS[3], // Top-Right
+  INFLUENCE_MARKER_CENTERS_ABS[4], // Bottom-Right
+  INFLUENCE_MARKER_CENTERS_ABS[5], // Bottom
+  INFLUENCE_MARKER_CENTERS_ABS[6], // Bottom-Left
+  INFLUENCE_MARKER_CENTERS_ABS[1], // Top-Left
+].map(([x, y]) => [x / VIEWBOX[2], y / VIEWBOX[3]] as const);

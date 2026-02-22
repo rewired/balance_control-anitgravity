@@ -35,10 +35,10 @@ describe('HexTileVisual Layout', () => {
         expect(iconY).not.toBeNull();
         expect(iconY).not.toBe(textY);
 
-        // Expected iconY ~ 431.6 - 110 = 321.6
-        // Expected textY ~ 431.6 + 75 = 506.6
-        expect(iconY).toBeCloseTo(321.625, 1);
-        expect(textY).toBeCloseTo(506.625, 1);
+        // Expected iconY ~ 431.6 - 115 = 316.6
+        // Expected textY ~ 431.6 + 85 = 516.6
+        expect(iconY).toBeCloseTo(316.625, 1);
+        expect(textY).toBeCloseTo(516.625, 1);
     });
 
     it('renders only resortIcon at its default position when valueW is missing', () => {
@@ -122,10 +122,10 @@ describe('HexTileVisual Layout', () => {
 
         const textY = parseFloat(textElement.getAttribute('y') || '0');
 
-        // Expected iconY ~ 431.6 - 110 = 321.6
-        expect(iconY).toBeCloseTo(321.625, 1);
-        
-        // Expected textY ~ 431.6 + 75 = 506.6
-        expect(textY).toBeCloseTo(506.625, 1);
+        // Expected iconY ~ 431.6 - 115 = 316.6
+        expect(iconY).toBeCloseTo(316.625, 1);
+
+        // Expected textY ~ 431.6 + 85 = 516.6
+        expect(textY).toBeCloseTo(516.625, 1);
     });
 });
