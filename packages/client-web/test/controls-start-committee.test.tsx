@@ -27,7 +27,7 @@ describe('Controls - StartCommittee targeting', () => {
             </I18nProvider>
         );
 
-        const btn = screen.getByTestId('btn-mode-place-influence') as HTMLButtonElement;
-        expect(btn.disabled).toBe(true);
+        const btn = screen.queryByTestId('btn-mode-place-influence');
+        expect(btn).toBeNull();
     });
 });

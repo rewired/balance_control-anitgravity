@@ -1,6 +1,16 @@
 {
     "core": {
+        "coach": {
+            "placeTile": "Place your tile.",
+            "chooseAction": "Choose an action.",
+            "chooseSource": "Select source.",
+            "chooseDestination": "Select destination.",
+            "chooseTarget": "Select target.",
+            "chooseVariant": "Select variant.",
+            "review": "Review & confirm."
+        },
         "group": {
+            "moreActions": "More actions ({{count}})",
             "influence": "Influence",
             "committees": "Committees",
             "economy": "Economy",

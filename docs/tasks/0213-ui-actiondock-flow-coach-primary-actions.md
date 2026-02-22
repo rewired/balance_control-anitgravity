@@ -1,6 +1,6 @@
 # Task 0213 — PG-7: Simplify ActionDock for flow (coach header + 3 primary actions + “More…”)
 
-Status: DRAFT
+Status: COMPLETE
 
 ## Meta
 - Owner: Codex
@@ -10,11 +10,11 @@ Status: DRAFT
 - affected_guardrails: GR-002, GR-005, GR-006
 
 ## 0) Preflight (mandatory)
-1. [ ] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
-2. [ ] Re-check the UI interaction contract + checklist:
+1. [x] Read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`.
+2. [x] Re-check the UI interaction contract + checklist:
    - `/docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.v1.yaml`
    - `/docs/architecture/ARCH-06-UI-INTERACTION-CHECKLIST.md`
-3. [ ] Baseline scan (no edits yet):
+3. [x] Baseline scan (no edits yet):
    - `rg -n "ActionGroupList|action-group|action-panel-header" packages/client-web/src/components/ActionDock.tsx`
    - `pnpm -C packages/client-web test` (record outcome for Postflight)
 
@@ -86,19 +86,25 @@ Reduce cognitive load and improve “what do I do now?” clarity without changi
 - Pending choice gate (GR-006): no coach/primary actions should appear when pendingChoice exists (unless already required by contract).
 
 ## 5) Acceptance Criteria
-- [ ] The dock has a clear coach header describing the next step (EN + DE).
-- [ ] Political action phase shows up to 3 primary actions and a single “More…” section.
-- [ ] The UI remains deterministic (ordering does not change across runs with identical state).
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] The dock has a clear coach header describing the next step (EN + DE).
+- [x] Political action phase shows up to 3 primary actions and a single “More…” section.
+- [x] The UI remains deterministic (ordering does not change across runs with identical state).
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 6) PR Checklist
-- [ ] Guardrails listed accurately (GR-002/005/006).
-- [ ] No engine/rule/spec changes.
-- [ ] No new commit shortcuts / auto-commit.
-- [ ] `pnpm -C packages/client-web test` passes.
+- [x] Guardrails listed accurately (GR-002/005/006).
+- [x] No engine/rule/spec changes.
+- [x] No new commit shortcuts / auto-commit.
+- [x] `pnpm -C packages/client-web test` passes.
 
 ## 7) Work Summary
-- TBD (append-only)
+- Implemented `getCoachMessage` helper to derive imperative next-step text from `interactionState`.
+- Replaced `ActionGroupList` with `PoliticalActionList` implementing the 3-Primary-Action logic (Place, Move, Formalize/Convert/Measure).
+- Moved `MeasureTray` out of the list into the main Dock area, visible only when `takeMeasure` mode is active.
+- Added "More actions" collapsible section for overflow actions.
+- Updated I18N files (EN/DE) with coach messages and new UI labels.
+- Updated tests to reflect the new UI structure (removed group header checks, updated test IDs).
 
 ## 8) Commands Run
-- TBD (append-only)
+- `pnpm -C packages/client-web test` (Baseline: Passed)
+- `pnpm -C packages/client-web test` (Post-change: Passed)

@@ -1,6 +1,16 @@
 {
     "core": {
+        "coach": {
+            "placeTile": "Platziere dein Feld.",
+            "chooseAction": "Wähle eine Aktion.",
+            "chooseSource": "Wähle eine Quelle.",
+            "chooseDestination": "Wähle ein Ziel.",
+            "chooseTarget": "Wähle ein Ziel.",
+            "chooseVariant": "Wähle eine Variante.",
+            "review": "Überprüfen & Bestätigen."
+        },
         "group": {
+            "moreActions": "Weitere Aktionen ({{count}})",
             "influence": "Einfluss",
             "committees": "Komitees",
             "economy": "Wirtschaft",

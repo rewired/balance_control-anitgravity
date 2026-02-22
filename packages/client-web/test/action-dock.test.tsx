@@ -43,9 +43,9 @@ describe('ActionDock', () => {
 
         expect(screen.getByTestId('btn-mode-place-influence')).toBeDefined();
         expect(screen.getByTestId('btn-mode-move-influence')).toBeDefined();
-
-        // Assertion for group header translation
-        expect(screen.getByText('Influence')).toBeDefined();
+        
+        // Coach header
+        expect(screen.getByTestId('coach-header').textContent).toBe('Choose an action.');
     });
 
     it('highlights active mode button', () => {
@@ -107,7 +107,7 @@ describe('ActionDock', () => {
         expect(screen.getByText('Select tile')).toBeDefined();
     });
 
-    it('shows group headers', () => {
+    it('shows coach header', () => {
         const intents = [] as any;
         const vm = { ...buildIntentViewModel({ ctx: { activePlayers: { '0': 'politicalAction' } }, playerID: '0', intents, selectedTileId: null, stagedTileId: null, pendingChoiceKind: null }), intents, political: { others: [], formalizeInfluence: [], convertResources: [], measures: [] } } as any;
         const controller = {
@@ -127,9 +127,7 @@ describe('ActionDock', () => {
             />
         );
 
-        expect(screen.getByText('Influence')).toBeDefined();
-        expect(screen.queryByText('Committees')).toBeNull();
-        expect(screen.queryByText('Economy')).toBeNull();
+        expect(screen.getByTestId('coach-header').textContent).toBe('Choose an action.');
     });
 
     it('proposes a secondary action exactly once', () => {
@@ -158,9 +156,9 @@ describe('ActionDock', () => {
         );
 
         // Check for collapsible summary with count
-        const summary = screen.getByTestId('summary-expansions-other');
+        const summary = screen.getByTestId('summary-more-actions');
         expect(summary).toBeDefined();
-        expect(summary.textContent).toContain('Expansions (1)');
+        expect(summary.textContent).toContain('More actions (1)');
 
         // Open the details panel
         fireEvent.click(summary);
@@ -217,7 +215,7 @@ describe('ActionDock', () => {
         expect(cancelDraft).toHaveBeenCalledTimes(1);
     });
 
-    it('shows Measures group and toggles MeasureTray', () => {
+    it('shows Measures button and toggles MeasureTray', () => {
         const intents = [
             { moveType: 'exp01.takeMeasure', payload: 'm1' }
         ] as any;
@@ -258,8 +256,7 @@ describe('ActionDock', () => {
             />
         );
 
-        // Check for Measures group and button
-        expect(screen.getByText('Measures')).toBeDefined();
+        // Check for Measures button
         const button = screen.getByTestId('btn-mode-take-measure');
         expect(button).toBeDefined();
 
@@ -271,7 +268,7 @@ describe('ActionDock', () => {
         expect(setActionMode).toHaveBeenCalledWith('takeMeasure');
 
         // Re-render with active mode to simulate state update
-        const activeController = { ...controller, actionMode: 'takeMeasure' };
+        const activeController = { ...controller, actionMode: 'takeMeasure', interactionState: 'selectingParams' };
         rerender(
             <I18nProvider>
                 <ActionDock
@@ -650,8 +647,7 @@ describe('ActionDock', () => {
             />
         );
 
-        expect(screen.getByText('Einfluss')).toBeDefined(); // German for Influence
-        expect(screen.getByText('Aktionen')).toBeDefined(); // German for Actions
+        expect(screen.getByText('Wähle eine Aktion.')).toBeDefined();
 
         // Restore window.location
         window.location = originalLocation;

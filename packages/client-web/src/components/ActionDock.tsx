@@ -332,123 +332,202 @@ const CurrentActionPanel: React.FC<{ G: GameState; controller: InteractionContro
     );
 };
 
-const ActionGroupList: React.FC<{ G: GameState; controller: InteractionController }> = ({ G, controller }) => {
+const getCoachMessage = (
+    stage: string | undefined,
+    interactionState: string,
+    mode: InteractionActionMode,
+    moveInfluenceSourceId: string | null,
+    t: (key: string, vars?: any) => string
+) => {
+    if (interactionState === 'draftReady') return t('core:coach.review');
+
+    if (stage === 'drawAndPlace') return t('core:coach.placeTile');
+
+    if (stage === 'politicalAction') {
+        if (interactionState === 'selectingParams') {
+            if (mode === 'moveInfluence') {
+                return moveInfluenceSourceId ? t('core:coach.chooseDestination') : t('core:coach.chooseSource');
+            }
+            if (mode === 'placeInfluence') return t('core:coach.chooseTarget');
+            if (mode === 'formalizeInfluence' || mode === 'convertResources') return t('core:coach.chooseTarget');
+            return t('core:coach.chooseVariant');
+        }
+        if (interactionState === 'selectingVariant') return t('core:coach.chooseVariant');
+        return t('core:coach.chooseAction');
+    }
+
+    return t('core:coach.chooseAction');
+};
+
+const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionController }> = ({ G, controller }) => {
     const t = useT();
     const { vm, actionMode, setActionMode, proposeIntent } = controller;
 
-    const hasPlaceInfluenceIntents = vm.intents.some(i => i.moveType === 'placeInfluence');
-    const hasMoveInfluenceIntents = vm.intents.some(i => i.moveType === 'moveInfluence');
-    const hasFormalizeInfluenceIntents = vm.political.formalizeInfluence.length > 0;
-    const hasConvertResourcesIntents = vm.political.convertResources.length > 0;
-    const showMoreActions = vm.political.others.length > 0;
+    // 1. Place Influence
+    const placeIntents = vm.intents.filter(i => i.moveType === 'placeInfluence');
+    const hasPlace = placeIntents.length > 0;
+
+    // 2. Move Influence
+    const moveIntents = vm.intents.filter(i => i.moveType === 'moveInfluence');
+    const hasMove = moveIntents.length > 0;
+
+    // 3. Best of Rest
+    const formalizeIntents = vm.political.formalizeInfluence;
+    const convertIntents = vm.political.convertResources;
+    const measureIntents = vm.political.measures;
+
+    let thirdActionType: 'formalize' | 'convert' | 'takeMeasure' | null = null;
+    // Priority: Formalize > Convert > Measure
+    if (formalizeIntents.length > 0) thirdActionType = 'formalize';
+    else if (convertIntents.length > 0) thirdActionType = 'convert';
+    else if (measureIntents.length > 0) thirdActionType = 'takeMeasure';
+
+    // Collect "More" items
+    const moreItems: React.ReactNode[] = [];
+
+    // Helper to add to More
+    const addToMore = (key: string, label: string, onClick: () => void, testId: string, count?: number) => {
+        moreItems.push(
+             <button
+                key={key}
+                className="btn-secondary"
+                onClick={onClick}
+                style={{ textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
+                data-testid={testId}
+            >
+                <span>{label}</span>
+                {count !== undefined && <span style={{opacity: 0.7, fontSize: '0.9em'}}>({count})</span>}
+            </button>
+        );
+    };
+
+    // If Formalize is NOT primary but has intents
+    if (thirdActionType !== 'formalize' && formalizeIntents.length > 0) {
+        addToMore('formalize', t('core:action.formalize'),
+            () => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence'),
+            'btn-more-formalize', formalizeIntents.length);
+    }
+
+    // If Convert is NOT primary but has intents
+    if (thirdActionType !== 'convert' && convertIntents.length > 0) {
+         addToMore('convert', t('core:action.convert'),
+            () => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources'),
+            'btn-more-convert', convertIntents.length);
+    }
+
+    // If Measure is NOT primary but has intents
+    if (thirdActionType !== 'takeMeasure' && measureIntents.length > 0) {
+         addToMore('takeMeasure', t('core:action.takeMeasure'),
+            () => setActionMode(actionMode === 'takeMeasure' ? 'none' : 'takeMeasure'),
+            'btn-more-takeMeasure', measureIntents.length);
+    }
+
+    // Others (Expansions)
+    vm.political.others.forEach(intent => {
+         moreItems.push(
+            <button
+                key={intentSortKey(intent)}
+                className="btn-secondary"
+                onClick={() => proposeIntent(intent)}
+                style={{ textAlign: 'left', width: '100%' }}
+                data-testid={`btn-other-${intent.moveType}`}
+            >
+                {formatIntentLabel(intent, t, G)}
+            </button>
+         );
+    });
 
     return (
-        <div className="action-group-list" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className="action-group">
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.influence')}</h4>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    <button
-                        className={actionMode === 'placeInfluence' ? 'btn-primary' : 'btn-secondary'}
-                        disabled={!hasPlaceInfluenceIntents}
-                        onClick={() => setActionMode(actionMode === 'placeInfluence' ? 'none' : 'placeInfluence')}
-                        data-testid="btn-mode-place-influence"
-                    >
-                        {t('core:action.placeInfluence')}
-                    </button>
-                    <button
-                        className={actionMode === 'moveInfluence' ? 'btn-primary' : 'btn-secondary'}
-                        disabled={!hasMoveInfluenceIntents}
-                        onClick={() => setActionMode(actionMode === 'moveInfluence' ? 'none' : 'moveInfluence')}
-                        data-testid="btn-mode-move-influence"
-                    >
-                        {t('core:action.moveInfluence')}
-                    </button>
-                </div>
-            </div>
+        <div className="political-action-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {/* Primary 1: Place */}
+            {hasPlace && (
+                <button
+                    className={actionMode === 'placeInfluence' ? 'btn-primary' : 'btn-secondary'}
+                    onClick={() => setActionMode(actionMode === 'placeInfluence' ? 'none' : 'placeInfluence')}
+                    data-testid="btn-mode-place-influence"
+                    style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
+                >
+                    <span>{t('core:action.placeInfluence')}</span>
+                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({placeIntents.length})</span>
+                </button>
+            )}
 
-            {hasFormalizeInfluenceIntents && (
-                <div className="action-group">
-                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.committees')}</h4>
-                    <button
-                        className={actionMode === 'formalizeInfluence' ? 'btn-primary' : 'btn-secondary'}
-                        disabled={!hasFormalizeInfluenceIntents}
-                        onClick={() => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence')}
-                        data-testid="btn-mode-formalize-influence"
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
-                    >
+            {/* Primary 2: Move */}
+            {hasMove && (
+                <button
+                    className={actionMode === 'moveInfluence' ? 'btn-primary' : 'btn-secondary'}
+                    onClick={() => setActionMode(actionMode === 'moveInfluence' ? 'none' : 'moveInfluence')}
+                    data-testid="btn-mode-move-influence"
+                     style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
+                >
+                    <span>{t('core:action.moveInfluence')}</span>
+                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({moveIntents.length})</span>
+                </button>
+            )}
+
+            {/* Primary 3: Best of Rest */}
+            {thirdActionType === 'formalize' && (
+                <button
+                    className={actionMode === 'formalizeInfluence' ? 'btn-primary' : 'btn-secondary'}
+                    onClick={() => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence')}
+                    data-testid="btn-mode-formalize-influence"
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}
+                >
+                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                         <img src={tileIconUrlByType.Committee} style={{ width: 16, height: 16 }} alt="" />
                         {t('core:action.formalize')}
-                    </button>
-                </div>
+                    </div>
+                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({formalizeIntents.length})</span>
+                </button>
             )}
 
-            {hasConvertResourcesIntents && (
-                <div className="action-group">
-                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.economy')}</h4>
-                    <button
-                        className={actionMode === 'convertResources' ? 'btn-primary' : 'btn-secondary'}
-                        disabled={!hasConvertResourcesIntents}
-                        onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
-                        data-testid="btn-mode-convert-resources"
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
-                    >
+            {thirdActionType === 'convert' && (
+                 <button
+                    className={actionMode === 'convertResources' ? 'btn-primary' : 'btn-secondary'}
+                    onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
+                    data-testid="btn-mode-convert-resources"
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}
+                >
+                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                         <img src={tileIconUrlByType.Grassroots} style={{ width: 16, height: 16 }} alt="" />
                         {t('core:action.convert')}
-                    </button>
-                </div>
+                    </div>
+                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({convertIntents.length})</span>
+                </button>
             )}
 
-            {vm.political.measures.length > 0 && (
-                <div className="action-group">
-                    <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>{t('core:group.measures')}</h4>
-                    <button
-                        className={actionMode === 'takeMeasure' ? 'btn-primary' : 'btn-secondary'}
-                        onClick={() => setActionMode(actionMode === 'takeMeasure' ? 'none' : 'takeMeasure')}
-                        data-testid="btn-mode-take-measure"
+            {thirdActionType === 'takeMeasure' && (
+                <button
+                    className={actionMode === 'takeMeasure' ? 'btn-primary' : 'btn-secondary'}
+                    onClick={() => setActionMode(actionMode === 'takeMeasure' ? 'none' : 'takeMeasure')}
+                    data-testid="btn-mode-take-measure"
+                     style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
+                >
+                    <span>{t('core:action.takeMeasure')}</span>
+                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({measureIntents.length})</span>
+                </button>
+            )}
+
+            {/* More Actions */}
+            {moreItems.length > 0 && (
+                <details className="action-group-collapsible">
+                    <summary
+                        data-testid="summary-more-actions"
+                        style={{
+                            cursor: 'pointer',
+                            margin: '8px 0',
+                            fontSize: '0.9em',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-secondary)',
+                            userSelect: 'none'
+                        }}
                     >
-                        {t('core:action.takeMeasure')}
-                    </button>
-                    {actionMode === 'takeMeasure' && (
-                        <MeasureTray
-                            G={G}
-                            intents={vm.political.measures}
-                            onSelect={proposeIntent}
-                        />
-                    )}
-                </div>
-            )}
-
-            {showMoreActions && (
-                <div className="action-group">
-                    <details className="action-group-collapsible">
-                        <summary
-                            data-testid="summary-expansions-other"
-                            style={{
-                                cursor: 'pointer',
-                                margin: '0 0 8px 0',
-                                fontSize: '0.9em',
-                                textTransform: 'uppercase',
-                                color: 'var(--text-secondary)',
-                                userSelect: 'none'
-                            }}
-                        >
-                            {t('core:group.expansionsWithCount', { count: vm.political.others.length.toString() })}
-                        </summary>
-                        <div className="action-panel-secondary" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
-                            {vm.political.others.map(intent => (
-                                <button
-                                    key={intentSortKey(intent)}
-                                    className="btn-secondary"
-                                    onClick={() => proposeIntent(intent)}
-                                    style={{ textAlign: 'left' }}
-                                    data-testid={`btn-other-${intent.moveType}`}
-                                >
-                                    {formatIntentLabel(intent, t, G)}
-                                </button>
-                            ))}
-                        </div>
-                    </details>
-                </div>
+                        {t('core:group.moreActions', { count: moreItems.length })}
+                    </summary>
+                    <div className="action-panel-secondary" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
+                        {moreItems}
+                    </div>
+                </details>
             )}
         </div>
     );
@@ -470,20 +549,18 @@ export const ActionDock: React.FC<ActionDockProps> = ({
     const {
         vm,
         proposeIntent,
-        interactionState
+        interactionState,
+        actionMode
     } = controller;
 
-    const stageLabel = vm.stage
-        ? (t(`core:ui.${vm.stage}`) !== `core:ui.${vm.stage}` ? t(`core:ui.${vm.stage}`) : vm.stage)
-        : t('core:ui.waiting');
+    const coachMessage = getCoachMessage(vm.stage, interactionState, actionMode, controller.moveInfluenceSourceId, t);
     const isDrawAndPlace = vm.stage === 'drawAndPlace';
     const isPoliticalAction = vm.stage === 'politicalAction';
 
     return (
         <div className="action-panel action-dock" data-testid="action-dock">
-            <div className="action-panel-header">
-                <div className="action-panel-title">{t('core:ui.actions')}</div>
-                <div className="action-panel-stage">{stageLabel}</div>
+            <div className="action-panel-header" data-testid="coach-header">
+                <div className="action-panel-title" style={{ fontSize: '1.1em', fontWeight: 'bold' }}>{coachMessage}</div>
             </div>
 
             <CurrentActionPanel G={G} controller={controller} />
@@ -508,7 +585,18 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                             </div>
                         )}
                         {isPoliticalAction && (
-                            <ActionGroupList G={G} controller={controller} />
+                            <>
+                                {actionMode === 'takeMeasure' && interactionState === 'selectingParams' && (
+                                    <div style={{ marginBottom: '16px' }}>
+                                        <MeasureTray
+                                            G={G}
+                                            intents={vm.political.measures}
+                                            onSelect={proposeIntent}
+                                        />
+                                    </div>
+                                )}
+                                <PoliticalActionList G={G} controller={controller} />
+                            </>
                         )}
                     </>
                 ))}
