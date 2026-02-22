@@ -224,16 +224,6 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     draftIntent={draft.intent}
                 />
 
-                {/* Bottom Controls */}
-                {!vm.hasPendingChoice && (
-                    <div className="controls-container">
-                        <ActionDock
-                            isActive={isActive}
-                            G={G}
-                            controller={controller}
-                        />
-                    </div>
-                )}
             </main>
 
             {/* Right Panel: Opponents / Deck / Info */}
@@ -308,6 +298,17 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                 <Zone zoneId={zoneNames.DiscardFaceUp} G={G} title="Discard (Face Up)" />
                 <Zone zoneId={zoneNames.Noise} G={G} title="Noise" />
             </aside>
+
+            {/* Bottom Controls: Full Width Dock */}
+            {!vm.hasPendingChoice && (
+                <div className="controls-container">
+                    <ActionDock
+                        isActive={isActive}
+                        G={G}
+                        controller={controller}
+                    />
+                </div>
+            )}
 
         </div>
     );

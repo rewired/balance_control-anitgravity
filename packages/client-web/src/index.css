@@ -272,6 +272,7 @@ body {
 .game-layout {
     display: grid;
     grid-template-columns: 280px 1fr 280px;
+    grid-template-rows: 1fr auto;
     height: 100vh;
     gap: var(--space-md);
     padding: var(--space-md);
@@ -597,9 +598,9 @@ body {
 }
 
 .controls-container {
+    grid-column: 1 / -1;
     position: relative;
     width: 100%;
-    margin-top: auto;
     z-index: 10;
 }
 
