@@ -4,7 +4,8 @@ import type { LegalIntent } from '@balance-control/game';
 import { selectTileController } from '@balance-control/game';
 import { axialToPixel, computeBoardLayout, parseCoordString, stableSortCoords } from '../ui/hexLayout';
 import { HexTileVisual } from '../ui/tiles/HexTileVisual';
-import { ResortIcon } from '../ui/tiles/ResortIcon';
+import { ResortIcon, isResortKey } from '../ui/tiles/ResortIcon';
+import { TileTypeIcon, isTileTypeKey } from '../ui/tiles/TileTypeIcon';
 import { seatColor } from '../ui/tiles/seatColor';
 import type { SeatId } from '../ui/tiles/types';
 import { HexSilhouette, HexOutline } from './HexSilhouette';
@@ -229,7 +230,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 influenceBySeat={influenceBySeat}
                                 metaIconsBySeat={{}}
                                 badges={[]}
-                                resortIcon={<ResortIcon resort={tile.resort} />}
+                                resortIcon={tile.resort && isResortKey(tile.resort) ? <ResortIcon resort={tile.resort} /> : undefined}
+                                typeIcon={!tile.resort && isTileTypeKey(tile.type) ? <TileTypeIcon type={tile.type} /> : undefined}
                                 valueW={typeof tile.weight === 'number' ? tile.weight : undefined}
                                 className="hex-tile-visual"
                             />

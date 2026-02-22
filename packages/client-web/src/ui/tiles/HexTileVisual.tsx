@@ -19,6 +19,7 @@ export type HexTileVisualProps = {
   badges: TileBadge[];
 
   resortIcon?: ReactNode;
+  typeIcon?: ReactNode;
   valueW?: number;
   className?: string;
 };
@@ -42,22 +43,26 @@ export function HexTileVisual({
   metaIconsBySeat,
   badges,
   resortIcon,
+  typeIcon,
   valueW,
   className,
 }: HexTileVisualProps) {
   const [cx, cy] = CENTER_ABS;
   const resortIconScale = RESORT_ICON_SIZE / DEFAULT_ICON_VIEWBOX_SIZE;
 
-  const hasBoth = resortIcon && valueW !== undefined;
+  // Prefer resortIcon if both are present (though usually mutually exclusive)
+  const activeIcon = resortIcon || typeIcon;
+
+  const hasBoth = activeIcon && valueW !== undefined;
   const iconOffset = hasBoth ? -110 : -60;
   const valueOffset = hasBoth ? 75 : -10;
 
   const contentLayer =
-    resortIcon || valueW !== undefined ? (
+    activeIcon || valueW !== undefined ? (
       <g style={{ color: CONTENT_COLOR }}>
-        {resortIcon ? (
+        {activeIcon ? (
           <g transform={`translate(${cx} ${cy + iconOffset}) scale(${resortIconScale}) translate(${-DEFAULT_ICON_VIEWBOX_SIZE / 2} ${-DEFAULT_ICON_VIEWBOX_SIZE / 2})`}>
-            {resortIcon}
+            {activeIcon}
           </g>
         ) : null}
         {valueW !== undefined ? (

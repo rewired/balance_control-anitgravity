@@ -7,6 +7,7 @@ import { groupFormalizeIntents } from '../ui/interaction/formalizeHelpers';
 import { groupConvertIntents } from '../ui/interaction/convertHelpers';
 import { useT } from '../ui/i18n';
 import { getObjectLabel } from '../ui/interaction/labelHelpers';
+import { tileIconUrlByType } from '../ui/tiles/tileAssets';
 
 interface ActionDockProps {
     isActive: boolean;
@@ -373,7 +374,9 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
                         disabled={!hasFormalizeInfluenceIntents}
                         onClick={() => setActionMode(actionMode === 'formalizeInfluence' ? 'none' : 'formalizeInfluence')}
                         data-testid="btn-mode-formalize-influence"
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
                     >
+                        <img src={tileIconUrlByType.Committee} style={{ width: 16, height: 16 }} alt="" />
                         {t('core:action.formalize')}
                     </button>
                 </div>
@@ -387,7 +390,9 @@ const ActionGroupList: React.FC<{ G: GameState; controller: InteractionControlle
                         disabled={!hasConvertResourcesIntents}
                         onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
                         data-testid="btn-mode-convert-resources"
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
                     >
+                        <img src={tileIconUrlByType.Grassroots} style={{ width: 16, height: 16 }} alt="" />
                         {t('core:action.convert')}
                     </button>
                 </div>

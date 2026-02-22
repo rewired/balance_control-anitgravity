@@ -77,6 +77,13 @@
             "resources": "Resources",
             "none": "None",
             "na": "N/A"
+        },
+        "tileIcon": {
+            "startTile": "Start Committee",
+            "committee": "Committee",
+            "grassroots": "Grassroots",
+            "hotspot": "Hotspot",
+            "lobbyist": "Lobbyist"
         }
     }
 }

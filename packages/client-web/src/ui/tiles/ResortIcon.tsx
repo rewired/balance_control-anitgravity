@@ -6,7 +6,7 @@ export type ResortIconProps = {
 
 const DEFAULT_ICON_VIEWBOX_SIZE = 24;
 
-function isResortKey(value: string): value is ResortKey {
+export function isResortKey(value: string): value is ResortKey {
   return value in resortIconUrlByResort;
 }
 
