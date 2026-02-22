@@ -369,7 +369,7 @@ body {
 }
 
 .hex-cell-target {
-    z-index: 2;
+    z-index: 10;
 }
 
 .hex-cell-target::after {
@@ -387,7 +387,7 @@ body {
 }
 
 .hex-cell-target-destination {
-    z-index: 2;
+    z-index: 10;
 }
 
 .hex-cell-target-destination::after {
@@ -423,8 +423,12 @@ body {
     }
 }
 
+.hex-cell-hovered {
+    z-index: 20;
+}
+
 .hex-cell-selected {
-    z-index: 3;
+    z-index: 30;
 }
 
 .hex-cell-selected::after {
@@ -459,6 +463,7 @@ body {
     border: none;
     transition: all 0.2s ease;
 }
+
 
 .hex-ghost-outline {
     stroke: rgba(6, 182, 212, 0.45);
@@ -950,7 +955,7 @@ button.btn-primary:hover {
 }
 
 .hex-cell-drafted {
-    z-index: 4;
+    z-index: 40;
 }
 
 .hex-ghost-drafted {

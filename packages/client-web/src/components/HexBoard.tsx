@@ -166,7 +166,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     }
 
                     const isSelected = selectedTileId === tileId || selectedCoord === coordStr || moveInfluenceSourceId === tileId;
-                    const isHot = isSelected || hoveredTileId === tileId || isValidTarget || isDrafted;
+                    const isHovered = hoveredTileId === tileId;
+                    const isHot = isSelected || isHovered || isValidTarget || isDrafted;
                     const disabled = !isInteractive;
                     const testId = `hex-tile-${coordStr.replace(',', '_')}`;
 
@@ -192,6 +193,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             className={[
                                 'hex-cell',
                                 isSelected ? 'hex-cell-selected' : null,
+                                isHovered ? 'hex-cell-hovered' : null,
                                 isValidTarget ? 'hex-cell-target' : null,
                                 isDestination ? 'hex-cell-target-destination' : null,
                                 isHot ? 'hex-cell-hot' : null,
