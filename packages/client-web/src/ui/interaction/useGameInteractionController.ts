@@ -108,7 +108,7 @@ export function useGameInteractionController({
             return;
         }
         setProposedIntent(intent);
-    }, [proposedIntent]);
+    }, [proposedIntent, isHardGate]);
 
     const selectTile = useCallback((tileId: string | null, coord: string | null) => {
         // Hard-gate: no tile selection (inspection disabled) when pending choice exists
@@ -150,7 +150,7 @@ export function useGameInteractionController({
                 setPinnedGrassrootsTileId(tileId);
             }
         }
-    }, [actionMode, vm.intents, proposedIntent]);
+    }, [actionMode, vm.intents, proposedIntent, isHardGate, pinnedCommitteeTileId, pinnedGrassrootsTileId]);
 
     const confirmDraft = useCallback(() => {
         // Hard-gate: no confirmation allowed if pending choice exists
@@ -169,7 +169,7 @@ export function useGameInteractionController({
             setPinnedGrassrootsTileId(null);
             setSelectedConvertFamily(null);
         }
-    }, [proposedIntent, moves]);
+    }, [proposedIntent, moves, isHardGate]);
 
     const cancelDraft = useCallback(() => {
         setProposedIntent(null);
@@ -198,6 +198,18 @@ export function useGameInteractionController({
         setPinnedGrassrootsTileId(null);
         setSelectedConvertFamily(null);
     }, [stage]);
+
+    // Reset interaction state when active player seat changes (Hotseat)
+    useEffect(() => {
+        setProposedIntent(null);
+        setActionMode('none');
+        setMoveInfluenceSourceId(null);
+        setPinnedCommitteeTileId(null);
+        setPinnedGrassrootsTileId(null);
+        setSelectedConvertFamily(null);
+        setSelectedTileId(null);
+        setSelectedCoord(null);
+    }, [myPid]);
 
     // Handle Escape key to clear selection/proposal
     useEffect(() => {
@@ -259,7 +271,7 @@ export function useGameInteractionController({
             setSelectedTileId(null);
             setSelectedCoord(null);
         }
-    }, []);
+    }, [isHardGate]);
 
     const selectMoveInfluenceSource = useCallback((tileId: string) => {
         setMoveInfluenceSourceId(tileId);
