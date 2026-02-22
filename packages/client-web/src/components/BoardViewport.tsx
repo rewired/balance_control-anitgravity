@@ -20,6 +20,7 @@ type BoardViewportGameProps = {
     moveInfluenceSourceId?: string | null;
     ghostCoords: string[];
     isInteractive: boolean;
+    canInspect?: boolean;
     selectedTileId?: string | null;
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
@@ -162,6 +163,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
                                             moveInfluenceSourceId={gameProps!.moveInfluenceSourceId}
                                             ghostCoords={gameProps!.ghostCoords}
                                             isInteractive={gameProps!.isInteractive}
+                                            canInspect={gameProps!.canInspect}
                                             selectedTileId={gameProps!.selectedTileId}
                                             selectedCoord={gameProps!.selectedCoord}
                                             onSelectTile={gameProps!.onSelectTile}

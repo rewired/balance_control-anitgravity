@@ -126,6 +126,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
 
     const isSelectTilePending = vm.pendingChoice.kind === 'selectTile';
     const isBoardInteractive = isActive && (!vm.hasPendingChoice || placementIntents.length > 0 || isSelectTilePending);
+    const canInspect = !vm.hasPendingChoice;
 
     return (
         <div className="game-layout">
@@ -212,6 +213,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     moveInfluenceSourceId={moveInfluenceSourceId}
                     ghostCoords={placementGhostCoords}
                     isInteractive={isBoardInteractive}
+                    canInspect={canInspect}
                     selectedTileId={selectedTileId}
                     selectedCoord={selectedCoord}
                     onSelectTile={isSelectTilePending ? undefined : handleSelectTile}

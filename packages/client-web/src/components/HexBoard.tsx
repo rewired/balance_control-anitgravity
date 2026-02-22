@@ -22,6 +22,7 @@ interface HexBoardProps {
     moveInfluenceSourceId?: string | null;
     ghostCoords: string[];
     isInteractive: boolean;
+    canInspect?: boolean;
     selectedTileId?: string | null;
     selectedCoord?: string | null;
     onSelectTile?: (tileId: string, coordStr: string) => void;
@@ -51,6 +52,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     moveInfluenceSourceId,
     ghostCoords,
     isInteractive,
+    canInspect,
     selectedTileId,
     selectedCoord,
     onSelectTile,
@@ -168,7 +170,8 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     const isSelected = selectedTileId === tileId || selectedCoord === coordStr || moveInfluenceSourceId === tileId;
                     const isHovered = hoveredTileId === tileId;
                     const isHot = isSelected || isHovered || isValidTarget || isDrafted;
-                    const disabled = !isInteractive;
+                    const canClick = isInteractive || canInspect;
+                    const disabled = !canClick;
                     const testId = `hex-tile-${coordStr.replace(',', '_')}`;
 
                     const tile = G.tiles[tileId];
@@ -215,11 +218,11 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             onClick={
                                 disabled
                                     ? undefined
-                                    : (isResolveChoice && targetIntent && onResolveChoice)
+                                    : (isInteractive && isResolveChoice && targetIntent && onResolveChoice)
                                         ? () => onResolveChoice(targetIntent!)
-                                        : (!draftIntent && isValidTarget && targetIntent && onProposeMove)
+                                        : (isInteractive && !draftIntent && isValidTarget && targetIntent && onProposeMove)
                                             ? () => onProposeMove(targetIntent!)
-                                            : () => onSelectTile && onSelectTile(tileId, coordStr)
+                                            : () => canInspect && onSelectTile && onSelectTile(tileId, coordStr)
                             }
                             role={disabled ? undefined : 'button'}
                             tabIndex={disabled ? undefined : 0}
