@@ -2,6 +2,7 @@
 
 ## Unreleased
  
+- 2026-02-22: task(0206) UI: Ensure influence marker labels are not occluded by adjacent tiles (z-index fix).
 - 2026-02-21: task(0192) Align `enumerateConvertResources` with spec variants (typed/untyped) using shared mechanics (CORE-01-04-22).
 - 2026-02-21: task(0191) Ensure hotspot "prohibited" still marks resolved (CORE-01-06-03B, CORE-01-06-04(c)).
 

@@ -5,6 +5,7 @@ import { TileType } from '@balance-control/rules';
 import { Tile } from '../src/components/Tile';
 import { Token } from '../src/components/Token';
 import { HexBoard } from '../src/components/HexBoard';
+import { I18nProvider } from '../src/ui/i18n';
 
 const baseG = {
     zones: {
@@ -20,26 +21,34 @@ const baseG = {
 describe('Tile', () => {
     it('adds tile-selected when selected', () => {
         const { container } = render(
-            <Tile tileId="tile_alpha" G={baseG} selected={true} testId="tile" />
+            <I18nProvider>
+                <Tile tileId="tile_alpha" G={baseG} selected={true} testId="tile" />
+            </I18nProvider>
         );
         expect((container.firstChild as HTMLElement).className).toContain('tile-selected');
     });
 
     it('adds tile-disabled when disabled', () => {
         const { container } = render(
-            <Tile tileId="tile_alpha" G={baseG} disabled={true} testId="tile" />
+            <I18nProvider>
+                <Tile tileId="tile_alpha" G={baseG} disabled={true} testId="tile" />
+            </I18nProvider>
         );
         expect((container.firstChild as HTMLElement).className).toContain('tile-disabled');
     });
 
     it('adds tile-clickable only when onClick is set and not disabled', () => {
         const { container, rerender } = render(
-            <Tile tileId="tile_alpha" G={baseG} onClick={() => undefined} testId="tile" />
+            <I18nProvider>
+                <Tile tileId="tile_alpha" G={baseG} onClick={() => undefined} testId="tile" />
+            </I18nProvider>
         );
         expect((container.firstChild as HTMLElement).className).toContain('tile-clickable');
 
         rerender(
-            <Tile tileId="tile_alpha" G={baseG} onClick={() => undefined} disabled={true} testId="tile" />
+            <I18nProvider>
+                <Tile tileId="tile_alpha" G={baseG} onClick={() => undefined} disabled={true} testId="tile" />
+            </I18nProvider>
         );
         expect((container.firstChild as HTMLElement).className).not.toContain('tile-clickable');
     });
