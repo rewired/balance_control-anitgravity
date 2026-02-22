@@ -27,9 +27,7 @@ function selectMoves(mergedMoves: MoveMap, moveIds: readonly string[], stageName
 
 function isZoneVisible(zoneId: string, playerID: string): boolean {
     if (zoneId.startsWith('staging_')) return zoneId === `staging_${playerID}`;
-    if (zoneId.startsWith(`${CoreZoneName.PersonalSupply}:`)) {
-        return zoneId === `${CoreZoneName.PersonalSupply}:${playerID}`;
-    }
+    // PersonalSupply is now public (Task 0207)
     if (zoneId.startsWith(`${CoreZoneName.PlayerHand}:`)) {
         return zoneId === `${CoreZoneName.PlayerHand}:${playerID}`;
     }

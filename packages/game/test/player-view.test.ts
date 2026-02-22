@@ -9,21 +9,25 @@ describe('playerView', () => {
         registerTestPacks();
     });
 
-    it('hides other players private zones and objects', () => {
+    it('hides private zones (hand, staging) but shows PersonalSupply', () => {
         const game = createBalanceControlGame();
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
+
+        // Manually add a hand for player 1 to test privacy
+        const otherHandId = `${CoreZoneName.PlayerHand}:1`;
+        G.zones[otherHandId] = { id: otherHandId, items: ['secret_card'] };
+        G.objects['secret_card'] = { id: 'secret_card', type: 'Card' };
+
         const view = game.playerView?.({ G, ctx, playerID: '0' }) as any;
 
         const otherSupplyId = `${CoreZoneName.PersonalSupply}:1`;
-        const otherSupplyItems = G.zones[otherSupplyId].items;
-
-        expect(view.zones[otherSupplyId]).toBeUndefined();
-        expect(view.zones[`${CoreZoneName.PersonalSupply}:0`]).toBeDefined();
-
-        for (const itemId of otherSupplyItems) {
-            expect(view.objects[itemId]).toBeUndefined();
-        }
+        // Task 0207: PersonalSupply is now public
+        expect(view.zones[otherSupplyId]).toBeDefined();
+        
+        // Hand should still be hidden
+        expect(view.zones[otherHandId]).toBeUndefined();
+        expect(view.objects['secret_card']).toBeUndefined();
     });
 
     it('hides pendingChoice for other players', () => {

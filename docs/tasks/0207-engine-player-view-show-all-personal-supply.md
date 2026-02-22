@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -44,9 +44,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -187,23 +187,26 @@ Write pass/fail criteria; avoid vague language.
 
 This section MUST be completed in this task file before declaring done.
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <what changed>
-* <why>
+* Modified `isZoneVisible` in `packages/game/src/index.ts` to make `PersonalSupply` zones visible to all players.
+* Created `packages/game/test/player-view-visibility.test.ts` to verify `PersonalSupply` visibility while ensuring `DrawPile` and `staging_` remain masked/private.
+* Updated `packages/game/test/player-view.test.ts` to reflect the new visibility rule (PersonalSupply is public, Hand is private).
+* Verified changes with full test suite run.
+* Updated `docs/changelog.md` to reflect the visibility change.
 
 ---
 
@@ -211,9 +214,9 @@ This section MUST be completed in this task file before declaring done.
 
 Paste exact commands and short outcomes.
 
-* `pnpm lint` → <ok/fail + details>
-* `pnpm test` → <ok/fail + details>
-* (optional) `pnpm vitest run <pattern>` → <ok/fail + details>
+* `pnpm lint` → OK (no errors)
+* `pnpm test` → OK (all tests passed, including new visibility tests)
+* `pnpm vitest run packages/game/test/player-view-visibility.test.ts` → OK (3 passed)
 
 ---
 
