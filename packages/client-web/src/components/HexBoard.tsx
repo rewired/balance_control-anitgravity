@@ -9,6 +9,7 @@ import { TileTypeIcon, isTileTypeKey } from '../ui/tiles/TileTypeIcon';
 import { seatColor } from '../ui/tiles/seatColor';
 import type { SeatId } from '../ui/tiles/types';
 import { HexSilhouette, HexOutline } from './HexSilhouette';
+import { BoardHoverCard } from './BoardHoverCard';
 
 interface HexBoardProps {
     G: GameState;
@@ -62,7 +63,12 @@ export const HexBoard: React.FC<HexBoardProps> = ({
     activePlayerId,
     draftIntent
 }) => {
-    const [hoveredTileId, setHoveredTileId] = useState<string | null>(null);
+    const [hoveredState, setHoveredState] = useState<{
+        tileId: string;
+        coord: string;
+        rect: DOMRect;
+    } | null>(null);
+    const hoveredTileId = hoveredState?.tileId ?? null;
     const [hoveredGhostCoord, setHoveredGhostCoord] = useState<string | null>(null);
 
     const occupiedCoords = useMemo(() => {
@@ -108,6 +114,21 @@ export const HexBoard: React.FC<HexBoardProps> = ({
 
     const activeSeat = activePlayerId ? playerIdToSeatId(activePlayerId) : null;
     const activeSeatColor = activeSeat ? seatColor(activeSeat) : undefined;
+
+    const getInfluenceForTile = (tileId: string) => {
+        const zone = G.zones[tileId];
+        const influenceBySeat: Partial<Record<SeatId, number>> = {};
+        if (zone) {
+            for (const itemId of zone.items) {
+                const obj = G.objects[itemId];
+                if (obj?.type !== 'Influence' || !obj.owner) continue;
+                const seat = playerIdToSeatId(obj.owner);
+                if (!seat) continue;
+                influenceBySeat[seat] = (influenceBySeat[seat] ?? 0) + 1;
+            }
+        }
+        return influenceBySeat;
+    };
 
     return (
         <div className="hex-board" style={{ width, height }} data-testid="hex-board">
@@ -212,9 +233,12 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 ['--active-seat-color' as any]: isDestination ? activeSeatColor : undefined
                             }}
                             data-testid={testId}
-                            title={`coord ${coordStr}`}
-                            onMouseEnter={() => setHoveredTileId(tileId)}
-                            onMouseLeave={() => setHoveredTileId((prev) => (prev === tileId ? null : prev))}
+                            title=""
+                            onMouseEnter={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                setHoveredState({ tileId, coord: coordStr, rect });
+                            }}
+                            onMouseLeave={() => setHoveredState((prev) => (prev?.tileId === tileId ? null : prev))}
                             onClick={
                                 disabled
                                     ? undefined
@@ -328,6 +352,15 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                     );
                 })}
             </div>
+            {hoveredState && G.tiles[hoveredState.tileId] && (
+                <BoardHoverCard
+                    tile={G.tiles[hoveredState.tileId]}
+                    coord={hoveredState.coord}
+                    influenceBySeat={getInfluenceForTile(hoveredState.tileId)}
+                    seatColor={seatColor}
+                    targetRect={hoveredState.rect}
+                />
+            )}
         </div>
     );
 };

@@ -91,6 +91,98 @@ body {
     background: var(--accent-influence);
 }
 
+/* Board Hover Card */
+.board-hover-card {
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(8px);
+    border: var(--border-glass);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    font-size: 13px;
+    color: var(--text-primary);
+    pointer-events: none;
+}
+
+.hover-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 4px;
+    margin-bottom: 2px;
+}
+
+.hover-card-type {
+    font-weight: 600;
+    color: var(--accent-control);
+}
+
+.hover-card-coord {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-family: monospace;
+}
+
+.hover-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hover-card-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.hover-card-label {
+    color: var(--text-secondary);
+}
+
+.hover-card-influence {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hover-card-subtitle {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+}
+
+.influence-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.influence-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.influence-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 2px rgba(0,0,0,0.5);
+}
+
+.influence-count {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
 .token.resource-dom {
     background: var(--accent-control);
 }
