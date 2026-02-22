@@ -116,6 +116,7 @@ describe('HexBoard Preview Overlay', () => {
                 actionMode="placeInfluence"
                 ghostCoords={[]}
                 isInteractive={true}
+                canInspect={true}
                 draftIntent={draftIntent as any}
             />
         );

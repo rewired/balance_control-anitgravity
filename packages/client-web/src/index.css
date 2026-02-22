@@ -445,12 +445,21 @@ body {
     overflow: visible;
     isolation: isolate;
     --hex-hit-pad: 0px;
-    width: calc(var(--hex-cell-w) + (var(--hex-hit-pad) * 2));
-    height: calc(var(--hex-cell-h) + (var(--hex-hit-pad) * 2));
+    width: var(--hex-cell-w);
+    height: var(--hex-cell-h);
+    will-change: transform;
 }
 
 .hex-cell-hot {
     --hex-hit-pad: 28px;
+}
+
+.hex-cell::before {
+    content: '';
+    position: absolute;
+    inset: calc(var(--hex-hit-pad) * -1);
+    background: transparent;
+    z-index: -1;
 }
 
 .hex-tile-visual {
