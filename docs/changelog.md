@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-22: task(0218) Restrict passTilePlacement to final-settlement conditions (no “skip placement” during normal turns).
 - 2026-02-22: task(0209) UI: Inspector selection works consistently (inspect always, except Hard-Gate).
 - 2026-02-22: task(0207) Engine: Make PersonalSupply zones public in playerView (fix misleading 0 counts for opponents).
 - 2026-02-22: task(0206) UI: Ensure influence marker labels are not occluded by adjacent tiles (z-index fix).

@@ -131,7 +131,7 @@ export const DrawAndPlaceMoves = {
         const staging = G.zones[stagingId];
         if (!staging || staging.items.length > 0) return INVALID_MOVE;
 
-        // CORE-01-09-01A: DrawPile was empty at turn start â†’ final Round Settlement, then end (skip Political Action)
+        // CORE-01-09-01A: DrawPile was empty at turn start → final Round Settlement, then end (skip Political Action)
         if (G.engine.attributes.drawPileEmptyAtTurnStart || G.engine.attributes.noLegalPlacements) {
             delete G.engine.attributes.drawPileEmptyAtTurnStart;
             delete G.engine.attributes.noLegalPlacements;
@@ -143,10 +143,6 @@ export const DrawAndPlaceMoves = {
             return;
         }
 
-        if (events && events.endStage) {
-            events.endStage();
-        } else if (events && events.setStage) {
-            events.setStage(POLITICAL_ACTION_STAGE);
-        }
+        return INVALID_MOVE;
     }
 };
