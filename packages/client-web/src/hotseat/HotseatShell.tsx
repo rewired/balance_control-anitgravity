@@ -18,75 +18,39 @@ export const HotseatShell: React.FC = () => {
 
     const localMultiplayer = useMemo(() => Local(), []);
 
-    const clients = useMemo(() => {
-        return {
-            '0': Client({
-                game: BalanceControlGame,
-                numPlayers: 2,
-                matchID: MATCH_ID,
-                playerID: '0',
-                multiplayer: localMultiplayer,
-            }),
-            '1': Client({
-                game: BalanceControlGame,
-                numPlayers: 2,
-                matchID: MATCH_ID,
-                playerID: '1',
-                multiplayer: localMultiplayer,
-            }),
-        } as const;
-    }, [localMultiplayer]);
-
-    const spectatorClient = useMemo(() => {
+    const client = useMemo(() => {
         return Client({
             game: BalanceControlGame,
             numPlayers: 2,
             matchID: MATCH_ID,
-            playerID: null,
+            playerID: '0',
             multiplayer: localMultiplayer,
         });
     }, [localMultiplayer]);
 
-    const [seatState, setSeatState] = useState<Record<SeatID, any | null>>({ '0': null, '1': null });
-    const [spectatorState, setSpectatorState] = useState<any>(null);
+    const [clientState, setClientState] = useState<any>(null);
 
     useEffect(() => {
-        const unsubscribes: Array<() => void> = [];
-
-        // 1. Seat clients (for moves)
-        (Object.keys(clients) as SeatID[]).forEach((seat) => {
-            const client = clients[seat];
-            client.start();
-            setSeatState((prev) => ({ ...prev, [seat]: client.getState() }));
-            unsubscribes.push(
-                client.subscribe((next: any) => {
-                    setSeatState((prev) => ({ ...prev, [seat]: next }));
-                })
-            );
-        });
-
-        // 2. Spectator client (for rendering)
-        spectatorClient.start();
-        setSpectatorState(spectatorClient.getState());
-        unsubscribes.push(
-            spectatorClient.subscribe((next: any) => setSpectatorState(next))
-        );
+        client.start();
+        setClientState(client.getState());
+        const unsubscribe = client.subscribe((next: any) => setClientState(next));
 
         return () => {
-            unsubscribes.forEach((fn) => fn());
-            (Object.keys(clients) as SeatID[]).forEach((seat) => {
-                clients[seat].stop();
-            });
-            spectatorClient.stop();
+            unsubscribe();
+            client.stop();
         };
-    }, [clients, spectatorClient]);
+    }, [client]);
 
-    // Render from spectator state (full visibility)
-    // Dispatch moves via active seat client
-    const G = spectatorState?.G;
-    const ctx = spectatorState?.ctx;
+    useEffect(() => {
+        client.updatePlayerID(activeSeat);
+        // updatePlayerID may not emit a state subscription update when only the playerView changes.
+        setClientState(client.getState());
+    }, [activeSeat, client]);
+
+    // Render and dispatch moves from the same Client state authority.
+    const G = clientState?.G;
+    const ctx = clientState?.ctx;
     
-    // Compute isActive from spectator context + activeSeat
     const currentPlayer: string | null = ctx?.currentPlayer ?? null;
     const gameover = Boolean(ctx?.gameover);
     const isMyTurn = currentPlayer === activeSeat;
@@ -123,7 +87,7 @@ export const HotseatShell: React.FC = () => {
                     <Board
                         G={G}
                         ctx={ctx}
-                        moves={clients[activeSeat].moves}
+                        moves={client.moves}
                         playerID={activeSeat}
                         isActive={isActive}
                     />
