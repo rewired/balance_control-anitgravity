@@ -3,13 +3,14 @@ import { GameState, CoreZoneName, TileType } from '@balance-control/rules';
 import { SetupGame } from './setup';
 import { positionKeyFromCoordString } from './topology';
 import { drawTileToStaging } from './mechanics-draw';
+import { runFinalRoundSettlement } from './mechanics-turn';
 import { EffectResolver } from './engine/resolver';
 import { assemblePacks, buildStageMoveMap, type MoveMap } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
 import { validateSurfaceHash } from './surface';
 
 const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources', 'resolveChoice'] as const;
-const DRAW_AND_PLACE_MOVE_IDS = ['placeTile', 'passTilePlacement'] as const;
+const DRAW_AND_PLACE_MOVE_IDS = ['placeTile'] as const;
 
 function selectMoves(mergedMoves: MoveMap, moveIds: readonly string[], stageName: string): MoveMap {
     const out: MoveMap = {};
@@ -96,6 +97,53 @@ function buildPlayerView(G: GameState, playerID?: string | null): GameState {
     return { ...G, zones, objects, tiles, engine };
 }
 
+function computeCoreGameover(G: GameState): { winner: string } | { draw: true } {
+    // CORE-01-09-03: Count Influence ON BOARD tiles only
+    const scores: Record<string, number> = {};
+    const boardZone = G.zones[CoreZoneName.Board];
+    if (boardZone) {
+        for (const tileId of boardZone.items) {
+            const tileZone = G.zones[tileId];
+            if (!tileZone) continue;
+            for (const itemId of tileZone.items) {
+                const obj = G.objects[itemId];
+                if (obj && obj.type === 'Influence' && obj.owner) {
+                    scores[obj.owner] = (scores[obj.owner] || 0) + 1;
+                }
+            }
+        }
+    }
+
+    const maxScore = Math.max(...Object.values(scores), 0);
+    const winners = Object.entries(scores)
+        .filter(([_, s]) => s === maxScore)
+        .map(([p]) => p);
+
+    if (winners.length === 1) {
+        return { winner: winners[0] };
+    }
+    // CORE-01-09-04: Shared victory on tie
+    return { draw: true };
+}
+
+function shouldEndByNoLegalPlacements(G: GameState): boolean {
+    return Boolean(G.engine?.attributes?.endedByNoLegalPlacements);
+}
+
+function shouldAutoFinalSettlement(G: GameState, ctx: any): boolean {
+    if ((G as any).roundSettlementDone) return false;
+    if (G.engine?.pendingChoice) return false;
+    const attrs = G.engine?.attributes ?? {};
+    if (!attrs.drawPileEmptyAtTurnStart && !attrs.noLegalPlacements) return false;
+
+    const stagingId = `staging_${ctx.currentPlayer}`;
+    const staging = G.zones[stagingId];
+    const stagingEmpty = !staging || staging.items.length === 0;
+    if (!stagingEmpty) return false;
+
+    return true;
+}
+
 /**
  * Factory for creating the Balance Control game configuration.
  * @remarks infrastructure; no direct SPEC binding
@@ -121,35 +169,13 @@ export function createBalanceControlGame(): Game<GameState> {
         },
 
         // CORE-01-09-01: End when DrawPile is empty
+        // VAR-01-01-08: If no legal placements exist, treat as DrawPile empty for termination.
         endIf: ({ G }: { G: GameState }) => {
             const drawPile = G.zones[CoreZoneName.DrawPile];
-            if (drawPile && drawPile.items.length === 0 && (G as any).roundSettlementDone) {
-                // CORE-01-09-03: Count Influence ON BOARD tiles only
-                const scores: Record<string, number> = {};
-                const boardZone = G.zones[CoreZoneName.Board];
-                if (boardZone) {
-                    for (const tileId of boardZone.items) {
-                        const tileZone = G.zones[tileId];
-                        if (!tileZone) continue;
-                        for (const itemId of tileZone.items) {
-                            const obj = G.objects[itemId];
-                            if (obj && obj.type === 'Influence' && obj.owner) {
-                                scores[obj.owner] = (scores[obj.owner] || 0) + 1;
-                            }
-                        }
-                    }
-                }
-                const maxScore = Math.max(...Object.values(scores), 0);
-                const winners = Object.entries(scores)
-                    .filter(([_, s]) => s === maxScore)
-                    .map(([p]) => p);
-
-                if (winners.length === 1) {
-                    return { winner: winners[0] };
-                }
-                // CORE-01-09-04: Shared victory on tie
-                return { draw: true };
-            }
+            const shouldEndForDrawPile = Boolean(drawPile && drawPile.items.length === 0);
+            if (!(G as any).roundSettlementDone) return;
+            if (!shouldEndForDrawPile && !shouldEndByNoLegalPlacements(G)) return;
+            return computeCoreGameover(G);
         },
 
         turn: {
@@ -169,23 +195,46 @@ export function createBalanceControlGame(): Game<GameState> {
                     moves: politicalActionMoves,
                 },
             },
-            onBegin: ({ G, ctx }: any) => {
+            onBegin: ({ G, ctx, events }: any) => {
                 validateSurfaceHash(G);
                 EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
                 drawTileToStaging(G, ctx);
-                // CORE-01-09-01A: Flag when DrawPile is empty and no tile is staged (skip Political Action)
-                const drawPile = G.zones[CoreZoneName.DrawPile];
-                const stagingId = `staging_${ctx.currentPlayer}`;
-                const staging = G.zones[stagingId];
-                const stagingEmpty = !staging || staging.items.length === 0;
-                if (stagingEmpty && drawPile?.items.length === 0) {
-                    G.engine.attributes.drawPileEmptyAtTurnStart = true;
-                }
                 EffectResolver.triggerHook(G as any, ctx, 'onTurnBegin', { playerId: ctx.currentPlayer });
+
+                // CORE-01-09-01A / VAR-01-01-08: Automatic final settlement trigger (no player action).
+                if (shouldAutoFinalSettlement(G, ctx)) {
+                    const attrs = G.engine.attributes ?? {};
+                    const endedByNoLegalPlacements = Boolean(attrs.noLegalPlacements);
+                    delete attrs.drawPileEmptyAtTurnStart;
+                    delete attrs.noLegalPlacements;
+                    if (endedByNoLegalPlacements) {
+                        attrs.endedByNoLegalPlacements = true;
+                    }
+                    G.engine.attributes = attrs;
+
+                    if (!G.roundNumber) G.roundNumber = 0;
+                    G.roundNumber++;
+                    runFinalRoundSettlement(G as any, ctx);
+                    G.roundSettlementDone = true;
+
+                    const drawPile = G.zones[CoreZoneName.DrawPile];
+                    const shouldEndForDrawPile = Boolean(drawPile && drawPile.items.length === 0);
+                    const shouldEnd = shouldEndForDrawPile || endedByNoLegalPlacements;
+                    if (shouldEnd && typeof events?.endGame === 'function') {
+                        events.endGame(computeCoreGameover(G));
+                    }
+                }
             },
             onEnd: ({ G, ctx }: any) => {
                 EffectResolver.triggerHook(G as any, ctx, 'onTurnEnd', { playerId: ctx.currentPlayer });
                 EffectResolver.resetTurnScopedUsage(G as any, ctx.currentPlayer);
+
+                // Safety: if final settlement already ran and termination is satisfied, do not run another settlement pass.
+                const drawPile = G.zones[CoreZoneName.DrawPile];
+                const shouldEndForDrawPile = Boolean(drawPile && drawPile.items.length === 0);
+                if ((G as any).roundSettlementDone && (shouldEndForDrawPile || shouldEndByNoLegalPlacements(G))) {
+                    return;
+                }
 
                 // CORE-01-07-02: After last player, Round Settlement
                 const startingPlayerIndex = G.engine.attributes.startingPlayerIndex ?? 0;
@@ -248,4 +297,3 @@ export { EffectResolver } from './engine/resolver';
 export { lookupMeasureDeckForObjectId } from './engine/measure-deck-provider';
 export { exp02RegulationAtoms } from './engine/atoms/regulation';
 export { exp03CountdownAtoms } from './engine/atoms/countdown';
-

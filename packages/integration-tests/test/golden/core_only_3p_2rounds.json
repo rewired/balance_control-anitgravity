@@ -6,8 +6,8 @@
       "ex03": false
     }
   },
-  "expectedFinalHash": "c1a99fade389fca89fe609a149f1567bbdad82a108694002215f6e394097552f",
-  "expectedPublicSurfaceHash": "a1d761f0b05b75275a1d00fcfd69c16b95871c0e8382dee9154d9df83f534bd9",
+  "expectedFinalHash": "ea032fc8df60eacaba7ec4c7adbced7d2c0e51e353cf62055bac7fc8f2395dca",
+  "expectedPublicSurfaceHash": "600edc6b6b052ddefdfd3efae43d321594f9ed44b7816c1954db2a14068d2ce8",
   "id": "core_only_3p_2rounds",
   "moves": [
     {

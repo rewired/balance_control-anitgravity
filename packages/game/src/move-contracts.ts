@@ -34,18 +34,12 @@ export const placeTilePayloadSchema = z.object({
     extraResourceIds: z.array(z.string()).optional(),
 }).strict();
 
-export const passTilePlacementPayloadSchema = z.union([
-    z.undefined(),
-    z.object({}).strict(),
-]);
-
 export type ResolveChoicePayload = z.infer<typeof resolveChoicePayloadSchema>;
 export type PlaceInfluencePayload = z.infer<typeof placeInfluencePayloadSchema>;
 export type MoveInfluencePayload = z.infer<typeof moveInfluencePayloadSchema>;
 export type FormalizeInfluencePayload = z.infer<typeof formalizeInfluencePayloadSchema>;
 export type ConvertResourcesPayload = z.infer<typeof convertResourcesPayloadSchema>;
 export type PlaceTilePayload = z.infer<typeof placeTilePayloadSchema>;
-export type PassTilePlacementPayload = z.infer<typeof passTilePlacementPayloadSchema>;
 
 /**
  * Validates a move payload against a schema.

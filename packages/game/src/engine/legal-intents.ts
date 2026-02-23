@@ -94,10 +94,6 @@ export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string):
                     }
                 }
             }
-        } else {
-            if (G.engine.attributes.drawPileEmptyAtTurnStart || G.engine.attributes.noLegalPlacements) {
-                intents.push({ moveType: 'passTilePlacement', payload: {} });
-            }
         }
     }
 

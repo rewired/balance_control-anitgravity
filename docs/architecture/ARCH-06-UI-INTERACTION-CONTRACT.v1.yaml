@@ -190,9 +190,6 @@ action_taxonomy:
       - id: core.placeTile
         moveType: placeTile
         steps: [selectCoord]
-      - id: core.passTilePlacement
-        moveType: passTilePlacement
-        steps: [draftReady]
   others_fallback:
     location: expansions.other
     rule:

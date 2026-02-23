@@ -18,6 +18,51 @@ const renderWithI18n = (ui: React.ReactElement) => {
 };
 
 describe('ActionDock', () => {
+    it('does not render "Skip placement" (passTilePlacement) button', () => {
+        const intents = [{ moveType: 'passTilePlacement', payload: {} }] as any;
+        const vm = {
+            ...buildIntentViewModel({
+                ctx: { activePlayers: { '0': 'drawAndPlace' } },
+                playerID: '0',
+                intents,
+                selectedTileId: null,
+                stagedTileId: null,
+                pendingChoiceKind: null
+            }),
+            intents
+        } as any;
+
+        const controller = {
+            vm,
+            actionMode: 'none',
+            setActionMode: vi.fn(),
+            proposeIntent: vi.fn(),
+            intents,
+            draft: { intent: null, isLegalNow: false },
+            interactionState: 'selectingAction',
+            confirmDraft: vi.fn(),
+            cancelDraft: vi.fn(),
+            editDraftSource: vi.fn(),
+            editDraftDestination: vi.fn(),
+            editDraftTarget: vi.fn(),
+            editDraftVariant: vi.fn(),
+            editPinnedTile: vi.fn(),
+            moveInfluenceSourceId: null,
+            pinnedCommitteeTileId: null,
+            pinnedGrassrootsTileId: null,
+        } as any;
+
+        renderWithI18n(
+            <ActionDock
+                isActive={true}
+                G={{ objects: {} } as any}
+                controller={controller}
+            />
+        );
+
+        expect(screen.queryByTestId('btn-skip-placement')).toBeNull();
+    });
+
     it('shows Place Influence and Move Influence buttons in politicalAction', () => {
         const intents = [
             { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } },

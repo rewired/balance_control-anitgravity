@@ -17,7 +17,6 @@ describe('intent view model', () => {
         const intents: LegalIntent[] = [
             intent('placeTile', { targetCoord: '1,0' }),
             intent('placeTile', { targetCoord: '0,0' }),
-            intent('passTilePlacement', {}),
             intent('convertResources', { outputResort: 'INF' }),
         ];
 
@@ -34,16 +33,15 @@ describe('intent view model', () => {
         expect(vm.hasPendingChoice).toBe(false);
         expect(vm.drawAndPlace.placeTile.map((i) => i.payload?.targetCoord)).toEqual(['1,0', '0,0']);
         expect(vm.ghostCoords).toEqual(['0,0', '1,0']);
-        expect(vm.drawAndPlace.passTilePlacement?.moveType).toBe('passTilePlacement');
 
         expect(vm.political.convertResources.map((i) => i.moveType)).toEqual(['convertResources']);
         expect(vm.political.others).toHaveLength(0);
     });
 
-    it('moves passTilePlacement to trailing actions outside drawAndPlace', () => {
+    it('does not surface unknown drawAndPlace-only intents in other groups', () => {
         const intents: LegalIntent[] = [
             intent('convertResources', { outputResort: 'FOR' }),
-            intent('passTilePlacement', {}),
+            intent('someOtherMove', {}),
         ];
 
         const vm = buildIntentViewModel({
@@ -56,10 +54,8 @@ describe('intent view model', () => {
         });
 
         expect(vm.stage).toBe('politicalAction');
-        // passTilePlacement is specifically handled in drawAndPlace regardless of stage
-        expect(vm.drawAndPlace.passTilePlacement?.moveType).toBe('passTilePlacement');
         expect(vm.political.convertResources.map((i) => i.moveType)).toEqual(['convertResources']);
-        expect(vm.political.others).toHaveLength(0);
+        expect(vm.political.others.map((i) => i.moveType)).toEqual(['someOtherMove']);
     });
 
     it('excludes placeInfluence and moveInfluence from others', () => {
