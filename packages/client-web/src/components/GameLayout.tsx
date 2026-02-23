@@ -11,6 +11,7 @@ import { useGameInteractionController } from '../ui/interaction/useGameInteracti
 import { InspectorActionStatus } from './InspectorActionStatus';
 import { PlayerResourcesRow } from './PlayerResourcesRow';
 import { useT } from '../ui/i18n';
+import type { DispatchTripwireInfo } from '../ui/interaction/types';
 
 interface GameLayoutProps {
     G: GameState;
@@ -18,6 +19,8 @@ interface GameLayoutProps {
     moves: any;
     playerID: string | null;
     isActive: boolean;
+    getDispatchStateKey?: (() => string | null) | undefined;
+    onTripwireMismatch?: ((info: DispatchTripwireInfo) => void) | undefined;
 }
 
 /**
@@ -25,7 +28,7 @@ interface GameLayoutProps {
  * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
  * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
  */
-export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID, isActive }) => {
+export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID, isActive, getDispatchStateKey, onTripwireMismatch }) => {
     const t = useT();
     const zoneNames = {
         PersonalSupply: 'PersonalSupply',
@@ -35,7 +38,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
         Noise: 'Noise'
     } as const;
 
-    const controller = useGameInteractionController({ G, ctx, playerID, moves });
+    const controller = useGameInteractionController({ G, ctx, playerID, moves, getDispatchStateKey, onTripwireMismatch });
     const { vm, selectedTileId, selectedCoord, selectTile, selectMoveInfluenceSource, proposeIntent, actionMode, moveInfluenceSourceId, interactionState, draft, resolveChoice } = controller;
 
     const handleSelectTile = React.useCallback((tileId: string, coordStr: string) => {
@@ -161,7 +164,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
 
     return (
         <div className="game-layout" style={{ gridTemplateColumns }}>
-            <PublicNoticeOverlay G={G} />
+            <PublicNoticeOverlay G={G} uiNotices={controller.uiNotices} />
             <ModalHost G={G} controller={controller} />
 
             {/* Left Panel: Bank & Supply */}

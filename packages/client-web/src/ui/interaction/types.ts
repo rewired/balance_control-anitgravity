@@ -95,4 +95,22 @@ export interface InteractionController {
 
     /** Sets the selected family for Convert Resources mode. */
     setSelectedConvertFamily: (family: string | null) => void;
+
+    /** Transient UI-only notices (non-blocking). */
+    uiNotices: UiNotice[];
 }
+
+export type UiNotice = {
+    id: string;
+    kind: 'dispatch.rejected';
+    moveType: string;
+    seat: string;
+    currentPlayer: string | null;
+    reason: 'missingMove' | 'invalidMove' | 'exception' | 'unknown';
+};
+
+export type DispatchTripwireInfo = {
+    moveType: string;
+    renderStateKey: string;
+    dispatchStateKey: string;
+};

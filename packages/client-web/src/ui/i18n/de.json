@@ -62,7 +62,15 @@
             "grassroots": "Basis",
             "selectOutput": "Ziel-Resort wählen",
             "back": "Zurück",
-            "players": "Spieler"
+            "players": "Spieler",
+            "moveRejectedTitle": "Zug abgelehnt",
+            "moveRejectedBody": "\"{{moveType}}\" (Sitz P{{seat}}; currentPlayer P{{currentPlayer}}).",
+            "moveRejectedReason": {
+                "missingMove": "Grund: Zug nicht im Client verfuegbar",
+                "invalidMove": "Grund: Engine hat abgelehnt (INVALID_MOVE)",
+                "exception": "Grund: Fehler beim Dispatch",
+                "unknown": "Grund: unbekannt"
+            }
         },
         "draft": {
             "moveInfluenceSummary": "{{source}} → {{target}}",

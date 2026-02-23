@@ -62,7 +62,15 @@
             "grassroots": "Grassroots",
             "selectOutput": "Select output",
             "back": "Back",
-            "players": "Players"
+            "players": "Players",
+            "moveRejectedTitle": "Move rejected",
+            "moveRejectedBody": "\"{{moveType}}\" (seat P{{seat}}; currentPlayer P{{currentPlayer}}).",
+            "moveRejectedReason": {
+                "missingMove": "Reason: move not available on client",
+                "invalidMove": "Reason: engine rejected (INVALID_MOVE)",
+                "exception": "Reason: dispatch threw an exception",
+                "unknown": "Reason: unknown"
+            }
         },
         "draft": {
             "moveInfluenceSummary": "{{source}} → {{target}}",
