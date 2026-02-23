@@ -43,8 +43,13 @@ const formatIntentLabel = (intent: LegalIntent, t: (key: string, vars?: Record<s
         });
     }
     if (intent.moveType === 'convertResources') {
+        const outputResort = typeof intent.payload?.outputResort === 'string' ? intent.payload.outputResort : '?';
+        const inputCount = inferConvertInputCount(intent.payload);
+        const paySummary = inputCount ? `${inputCount}×Resource` : t('core:ui.free');
         return t('core:draft.convertSummary', {
-            tile: getObjectLabel(G, intent.payload?.tileId || intent.payload?.grassrootsTileId)
+            tile: getObjectLabel(G, intent.payload?.tileId || intent.payload?.grassrootsTileId),
+            to: outputResort,
+            pay: paySummary
         });
     }
     if (intent.moveType.endsWith('.takeMeasure')) {
@@ -99,7 +104,10 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
         pinnedCommitteeTileId,
         pinnedGrassrootsTileId,
         proposeIntent,
-        vm
+        vm,
+        draft,
+        selectedConvertFamily,
+        setSelectedConvertFamily
     } = controller;
 
     if (interactionState !== 'selectingVariant') return null;
@@ -143,8 +151,6 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
 
         if (!tileGroup) return <div data-testid="no-variants">{t('core:ui.noVariants')}</div>;
 
-        const { selectedConvertFamily, setSelectedConvertFamily } = controller;
-
         if (!selectedConvertFamily) {
             return (
                 <div className="variant-selection-panel" data-testid="variant-selection-panel">
@@ -185,39 +191,38 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
                     <div style={{ fontWeight: 'bold' }}>{t('core:ui.to', { to: outputGroup.outputResort })}</div>
                 </div>
 
-                {outputGroup.combos.map(combo => (
-                    <div key={combo.inputKey} style={{ marginBottom: '12px', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '8px' }}>
-                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px', textTransform: 'uppercase' }}>
-                            {t('core:ui.from', { from: combo.inputResourceIds.join(', ') })}
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            {combo.variants.map(variant => {
-                                const extra = (variant.payload?.extraResourceIds as string[]) ?? [];
-                                const label = extra.length > 0
-                                    ? t('core:ui.extra', { extra: extra.join(', ') })
-                                    : t('core:ui.standard');
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {outputGroup.variants.map((variant, index) => {
+                        const inputCount = inferConvertInputCount(variant.payload);
+                        const paySummary = inputCount ? `${inputCount}×Resource` : t('core:ui.free');
 
-                                return (
-                                    <button
-                                        key={intentSortKey(variant)}
-                                        className="btn-secondary btn-small"
-                                        onClick={() => proposeIntent(variant)}
-                                        style={{ textAlign: 'left' }}
-                                        data-testid={`btn-variant-${combo.inputKey}-${extra.join('-') || 'base'}`}
-                                    >
-                                        {label}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                ))}
+                        return (
+                            <button
+                                key={intentSortKey(variant)}
+                                className="btn-secondary"
+                                onClick={() => proposeIntent(variant)}
+                                style={{ textAlign: 'left' }}
+                                data-testid={`btn-variant-pay-${outputGroup.outputResort}-${inputCount ?? 'unknown'}-${index}`}
+                            >
+                                {t('core:ui.pay', { pay: paySummary })}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
         );
     }
 
     return null;
 };
+
+function inferConvertInputCount(payload: any): number | null {
+    const declared = payload?.inputCount;
+    if (typeof declared === 'number' && Number.isFinite(declared)) return declared;
+    const ids = payload?.inputResourceIds;
+    if (Array.isArray(ids)) return ids.length;
+    return null;
+}
 
 const CurrentActionPanel: React.FC<{ G: GameState; controller: InteractionController }> = ({ G, controller }) => {
     const t = useT();

@@ -6,6 +6,7 @@ import { dispatchIntent } from './dispatchIntent';
 import type { InteractionController, InteractionActionMode, InteractionStateId, DraftIntentState, UiNotice, DispatchTripwireInfo } from './types';
 import { canonicalJsonStringify } from './utils';
 import { computeUiStateKey } from './diagnostics';
+import { groupConvertIntents } from './convertHelpers';
 
 export interface InteractionControllerProps {
     G: GameState;
@@ -258,6 +259,29 @@ export function useGameInteractionController({
         setPinnedGrassrootsTileId(null);
         setSelectedConvertFamily(null);
     }, [stage]);
+
+    // ConvertResources: auto-select single-option steps (ARCH-06).
+    useEffect(() => {
+        if (isHardGate) return;
+        if (proposedIntent) return;
+        if (actionMode !== 'convertResources') return;
+        if (!pinnedGrassrootsTileId) return;
+
+        const tileGroup = groupConvertIntents(vm.intents).get(pinnedGrassrootsTileId);
+        if (!tileGroup) return;
+
+        if (!selectedConvertFamily && tileGroup.outputs.length === 1) {
+            setSelectedConvertFamily(tileGroup.outputs[0].outputResort);
+            return;
+        }
+
+        if (!selectedConvertFamily) return;
+        const outputGroup = tileGroup.outputs.find(o => o.outputResort === selectedConvertFamily);
+        if (!outputGroup) return;
+        if (outputGroup.variants.length !== 1) return;
+
+        setProposedIntent(outputGroup.variants[0]);
+    }, [isHardGate, proposedIntent, actionMode, pinnedGrassrootsTileId, selectedConvertFamily, vm.intents]);
 
     // Reset interaction state when active player seat changes (Hotseat)
     useEffect(() => {

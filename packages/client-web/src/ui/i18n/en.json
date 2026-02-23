@@ -77,7 +77,7 @@
             "placeInfluenceSummary": "target {{target}}",
             "placeTileSummary": "{{tile}} @ {{coord}}",
             "formalizeSummary": "tile {{tile}}",
-            "convertSummary": "tile {{tile}}",
+            "convertSummary": "tile {{tile}} → {{to}} ({{pay}})",
             "takeMeasureSummary": "Take measure {{measure}}"
         },
         "inspector": {

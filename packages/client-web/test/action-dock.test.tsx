@@ -465,7 +465,15 @@ describe('ActionDock', () => {
                 payload: {
                     grassrootsTileId: 'T1',
                     outputResort: 'INF',
-                    inputResourceIds: ['r1', 'r2']
+                    inputCount: 2
+                }
+            },
+            {
+                moveType: 'convertResources',
+                payload: {
+                    grassrootsTileId: 'T1',
+                    outputResort: 'FOR',
+                    inputCount: 2
                 }
             }
         ];
@@ -516,7 +524,15 @@ describe('ActionDock', () => {
                 payload: {
                     grassrootsTileId: 'T1',
                     outputResort: 'INF',
-                    inputResourceIds: ['r1', 'r2']
+                    inputCount: 2
+                }
+            },
+            {
+                moveType: 'convertResources',
+                payload: {
+                    grassrootsTileId: 'T1',
+                    outputResort: 'INF',
+                    inputCount: 3
                 }
             }
         ];
@@ -553,15 +569,73 @@ describe('ActionDock', () => {
         );
 
         expect(screen.getByText('To: INF')).toBeDefined();
-        expect(screen.getByText('From: r1, r2')).toBeDefined();
+        expect(screen.queryByText(/From:\s*/)).toBeNull();
+        expect(screen.getByText('Pay: 2×Resource')).toBeDefined();
+        expect(screen.getByText('Pay: 3×Resource')).toBeDefined();
 
-        const variantBtn = screen.getByTestId('btn-variant-r1|r2-base');
-        fireEvent.click(variantBtn);
+        fireEvent.click(screen.getByText('Pay: 2×Resource'));
         expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
 
         const backBtn = screen.getByTestId('btn-back-to-families');
         fireEvent.click(backBtn);
         expect(setSelectedConvertFamily).toHaveBeenCalledWith(null);
+    });
+
+    it('does not render resource token ids for convertResources (aggregated costs only)', () => {
+        const intents = [
+            {
+                moveType: 'convertResources',
+                payload: {
+                    grassrootsTileId: 'T1',
+                    outputResort: 'INF',
+                    inputResourceIds: ['RES_DOM_1', 'RES_FOR_2']
+                }
+            },
+            {
+                moveType: 'convertResources',
+                payload: {
+                    grassrootsTileId: 'T1',
+                    outputResort: 'INF',
+                    inputResourceIds: ['RES_DOM_1', 'RES_FOR_2', 'RES_INF_3']
+                }
+            }
+        ];
+
+        const G = { objects: {} } as any;
+
+        const vm = {
+            stage: 'politicalAction',
+            intents,
+            political: { others: [], formalizeInfluence: [], convertResources: intents, measures: [] },
+            G
+        } as any;
+
+        const proposeIntent = vi.fn();
+
+        const controller = {
+            vm,
+            actionMode: 'convertResources',
+            interactionState: 'selectingVariant',
+            pinnedGrassrootsTileId: 'T1',
+            selectedConvertFamily: 'INF',
+            setSelectedConvertFamily: vi.fn(),
+            proposeIntent,
+            draft: { intent: null }
+        } as any;
+
+        renderWithI18n(
+            <ActionDock
+                isActive={true}
+                G={G}
+                controller={controller}
+            />
+        );
+
+        const panel = screen.getByTestId('variant-selection-panel');
+        expect(panel.textContent).toContain('Pay: 2×Resource');
+        expect(panel.textContent).toContain('Pay: 3×Resource');
+        expect(panel.textContent).not.toContain('RES_');
+        expect(panel.textContent).not.toContain('RES_DOM_1');
     });
 
     it('shows "Change selection" button when a measure is drafted', () => {
