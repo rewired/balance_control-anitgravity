@@ -454,6 +454,53 @@ describe('enumerateLegalIntents', () => {
             expect(convertIntents.every((intent) => intent.payload.inputCount === 3)).toBe(true);
             expect(convertIntents.every((intent) => intent.payload.inputResourceIds === undefined)).toBe(true);
         });
+
+        it('keeps ConvertResources intent count invariant to fungible supply size', () => {
+            const ctx = createCtx('politicalAction');
+            const G = SetupGame({ ctx });
+
+            const tileId = 'tile_grassroots_supply_invariant';
+            G.zones[CoreZoneName.Board].items.push(tileId);
+            G.grid['0,0'] = tileId;
+            G.tiles[tileId] = {
+                id: tileId,
+                type: TileType.Grassroots,
+                conversion: { inputSlots: 3 }, // Untyped
+                resort: null
+            } as any;
+
+            // Give player control
+            const influenceId = 'inf_control_0b';
+            G.objects[influenceId] = { id: influenceId, type: 'Influence', owner: '0' } as any;
+            if (!G.zones[tileId]) G.zones[tileId] = { id: tileId, items: [] } as any;
+            G.zones[tileId].items.push(influenceId);
+
+            const supply = G.zones['PersonalSupply:0'];
+            const seedSupply = (count: number) => {
+                supply.items = supply.items.filter((id: string) => !String(id).startsWith('res_inv_'));
+                for (let i = 0; i < count; i++) {
+                    const rid = `res_inv_${String(i).padStart(3, '0')}`;
+                    G.objects[rid] = { id: rid, type: 'Resource', owner: '0', resort: 'DOM' } as any;
+                    supply.items.push(rid);
+                }
+            };
+
+            seedSupply(6);
+            const intentsSmall = enumerateLegalIntents(G as any, ctx, '0').filter(
+                (intent) => intent.moveType === 'convertResources' && intent.payload.grassrootsTileId === tileId
+            );
+
+            seedSupply(60);
+            const intentsLarge = enumerateLegalIntents(G as any, ctx, '0').filter(
+                (intent) => intent.moveType === 'convertResources' && intent.payload.grassrootsTileId === tileId
+            );
+
+            expect(intentsSmall).toHaveLength(3);
+            expect(intentsLarge).toHaveLength(3);
+            expect(intentsLarge.map((i) => i.payload.outputResort).sort()).toEqual(
+                intentsSmall.map((i) => i.payload.outputResort).sort()
+            );
+        });
     });
 
     describe('Grassroots Conversion Variants', () => {
