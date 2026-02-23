@@ -411,13 +411,11 @@ describe('enumerateLegalIntents', () => {
         });
     });
 
-    describe('Intent Budget Cap', () => {
-        it('deterministically caps massive intent explosions', () => {
+    describe('ConvertResources Dedup (Fungible Payment)', () => {
+        it('does not enumerate combinatorial inputResourceIds combinations', () => {
             const ctx = createCtx('politicalAction');
             const G = SetupGame({ ctx });
 
-            // Create a Grassroots tile with high combinatorial conversion
-            // 5 input slots from many resources -> huge number of combinations
             const tileId = 'tile_grassroots_explosion';
             G.zones[CoreZoneName.Board].items.push(tileId);
             G.grid['0,0'] = tileId;
@@ -434,10 +432,7 @@ describe('enumerateLegalIntents', () => {
             if (!G.zones[tileId]) G.zones[tileId] = { id: tileId, items: [] } as any;
             G.zones[tileId].items.push(influenceId);
 
-            // Give player many resources to generate combinations
-            // 20 resources. nCr(20, 3) = 1140.
-            // x3 output resorts = 3420 intents.
-            // Should exceed 2000 cap.
+            // Give player many resources (previously caused combinatorial intent explosion)
             const supply = G.zones['PersonalSupply:0'];
             for (let i = 0; i < 20; i++) {
                 const rid = `res_expl_${i}`;
@@ -448,14 +443,16 @@ describe('enumerateLegalIntents', () => {
             const intentsA = enumerateLegalIntents(G as any, ctx, '0');
             const intentsB = enumerateLegalIntents(G as any, ctx, '0');
 
-            expect(intentsA.length).toBe(2000); // verify exact cap
-            expect(intentsA.length).toBeLessThan(4000); // verify we actually generated enough to be capped
-
             // Determinism check
             expect(JSON.stringify(intentsA)).toEqual(JSON.stringify(intentsB));
 
-            // Verify they are sorted before cut (first item should be convertResources)
-            expect(intentsA[0].moveType).toBe('convertResources');
+            const convertIntents = intentsA
+                .filter((intent) => intent.moveType === 'convertResources' && intent.payload.grassrootsTileId === tileId);
+
+            // Untyped Grassroots (3 inputs) => exactly 3 output choices.
+            expect(convertIntents).toHaveLength(3);
+            expect(convertIntents.every((intent) => intent.payload.inputCount === 3)).toBe(true);
+            expect(convertIntents.every((intent) => intent.payload.inputResourceIds === undefined)).toBe(true);
         });
     });
 
@@ -485,7 +482,7 @@ describe('enumerateLegalIntents', () => {
                 .filter(i => i.moveType === 'convertResources' && i.payload.grassrootsTileId === tileId);
 
             // Expect only 3-input variants
-            expect(intents.every(i => i.payload.inputResourceIds.length === 3)).toBe(true);
+            expect(intents.every(i => i.payload.inputCount === 3)).toBe(true);
             // Expect all 3 core resorts as outputs
             const outputs = new Set(intents.map(i => i.payload.outputResort));
             expect(outputs).toEqual(new Set(['DOM', 'FOR', 'INF']));
@@ -517,8 +514,8 @@ describe('enumerateLegalIntents', () => {
             const intents = enumerateLegalIntents(G as any, ctx, '0')
                 .filter(i => i.moveType === 'convertResources' && i.payload.grassrootsTileId === tileId);
 
-            const variantA = intents.filter(i => i.payload.inputResourceIds.length === 2);
-            const variantB = intents.filter(i => i.payload.inputResourceIds.length === 3);
+            const variantA = intents.filter(i => i.payload.inputCount === 2);
+            const variantB = intents.filter(i => i.payload.inputCount === 3);
 
             expect(variantA.length).toBeGreaterThan(0);
             expect(variantB.length).toBeGreaterThan(0);

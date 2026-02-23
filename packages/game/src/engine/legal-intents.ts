@@ -8,6 +8,7 @@ import { evaluateTileSelector } from './selectors';
 import { EnginePackRegistry } from '../expansion-registry';
 import { getPlayerMetaMarker } from '../state-lookup';
 import { getLegalGrassrootsOutputs } from '../mechanics/conversion';
+import { selectDeterministicCostResourceIds } from './deterministic-cost';
 
 type CostSlot = string[] | 'ANY';
 type JsonLike =
@@ -313,7 +314,6 @@ function enumerateFormalize(G: GameState, ctx: any, playerID: string): LegalInte
 function enumerateConvertResources(G: GameState, playerID: string): LegalIntent[] {
     const intents: LegalIntent[] = [];
     const boardTiles = getBoardTileIds(G);
-    const supplyResources = getPlayerResourceIds(G, playerID);
 
     for (const tileId of boardTiles) {
         const tile = G.tiles[tileId];
@@ -322,32 +322,35 @@ function enumerateConvertResources(G: GameState, playerID: string): LegalIntent[
         const { controller } = computeMajority(tileId, G);
         if (controller !== playerID) continue;
 
-        const extraCostSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'convertResources', tileId);
-
         for (const inputCount of [2, 3]) {
             const outputs = getLegalGrassrootsOutputs(tile, inputCount);
             if (outputs.length === 0) continue;
 
-            const inputCombos = enumerateResourceCombos(G, supplyResources, inputCount);
-            for (const inputResourceIds of inputCombos) {
-                const extraResourceCombos = extraCostSlots.length === 0
-                    ? [[]]
-                    : enumerateCostResourceIds(G, playerID, extraCostSlots, new Set(inputResourceIds));
-                if (extraResourceCombos.length === 0) continue;
-                for (const outputResort of outputs) {
-                    for (const extraResourceIds of extraResourceCombos) {
-                        intents.push({
-                            moveType: 'convertResources',
-                            payload: {
-                                grassrootsTileId: tileId,
-                                inputResourceIds,
-                                outputResort,
-                                extraResourceIds: extraResourceIds.length > 0 ? extraResourceIds : undefined
-                            },
-                            contextTileId: tileId
-                        });
-                    }
-                }
+            const extraCostSlots = EffectResolver.getExtraCostSlots(G as any, playerID, 'convertResources', tileId);
+            const extraResourceIds = extraCostSlots.length === 0
+                ? []
+                : selectDeterministicCostResourceIds(G, playerID, extraCostSlots);
+            if (extraCostSlots.length > 0 && !extraResourceIds) continue;
+
+            const baseSlots: CostSlot[] = Array.from({ length: inputCount }, () => 'ANY');
+            const baseResourceIds = selectDeterministicCostResourceIds(
+                G,
+                playerID,
+                baseSlots,
+                new Set(extraResourceIds ?? [])
+            );
+            if (!baseResourceIds) continue;
+
+            for (const outputResort of outputs) {
+                intents.push({
+                    moveType: 'convertResources',
+                    payload: {
+                        grassrootsTileId: tileId,
+                        inputCount,
+                        outputResort
+                    },
+                    contextTileId: tileId
+                });
             }
         }
     }

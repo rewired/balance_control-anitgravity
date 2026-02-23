@@ -342,7 +342,7 @@ describe('Moves', () => {
         expect(JSON.stringify(G)).toBe(before);
     });
 
-    it('convertResources should require extra cost when meta-marker is in Convert mode', () => {
+    it('convertResources should auto-pay extra cost when meta-marker is in Convert mode', () => {
         G.roundNumber = 2;
         G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'res_inf', 'inf_1', 'meta_p1'];
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'meta_p1');
@@ -351,25 +351,17 @@ describe('Moves', () => {
         G.zones.board_t1.items.push('meta_p1');
         G.objects.meta_p1.mode = 'Convert';
 
-        const beforeFail = JSON.stringify(G);
-        const fail = CoreMoves.convertResources(
-            { G, ctx, events },
-            { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'], outputResort: 'INF' }
-        );
-        expect(fail).toBe(INVALID_MOVE);
-        expect(JSON.stringify(G)).toBe(beforeFail);
-
         const result = CoreMoves.convertResources(
             { G, ctx, events },
             {
                 grassrootsTileId: 'board_gr',
                 inputResourceIds: ['res_dom', 'res_for'],
                 outputResort: 'INF',
-                extraResourceIds: ['res_inf']
             }
         );
 
         expect(result).not.toBe(INVALID_MOVE);
+        expect(G.zones['PersonalSupply:p1'].items).not.toContain('res_inf'); // auto-paid extra cost
     });
 
     it('convertResources should place meta-marker on the anchor with Convert mode', () => {
