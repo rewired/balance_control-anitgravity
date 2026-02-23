@@ -124,7 +124,7 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
         return vm.ghostCoords;
     }, [vm.hasPendingChoice, placementIntents, vm.ghostCoords]);
 
-    const isSelectTilePending = vm.pendingChoice.kind === 'selectTile';
+    const isSelectTilePending = vm.hasPendingChoice && vm.pendingChoice.kind === 'selectTile';
     const isBoardInteractive = isActive && (!vm.hasPendingChoice || placementIntents.length > 0 || isSelectTilePending);
     const canInspect = !vm.hasPendingChoice;
 

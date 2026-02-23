@@ -142,6 +142,7 @@ describe('PendingChoiceModal', () => {
         ensureResizeObserver();
         const state = createState();
         state.engine.pendingChoice = {
+            player: '0',
             kind: 'selectTile',
             resolveChoice: [
                 { moveType: 'resolveChoice', payload: { choiceId: 'choice-1', selection: 'tile_alpha' } }
@@ -170,6 +171,7 @@ describe('PendingChoiceModal', () => {
         const resolveChoice = vi.fn();
         const state = createState();
         state.engine.pendingChoice = {
+            player: '0',
             kind: 'selectTile',
             resolveChoice: [
                 { moveType: 'resolveChoice', payload: { choiceId: 'choice-1', selection: 'tile_alpha' } }
@@ -208,6 +210,7 @@ describe('PendingChoiceModal', () => {
 
         // Setup pending choice targeting only tile_alpha
         state.engine.pendingChoice = {
+            player: '0',
             kind: 'selectTile',
             resolveChoice: [
                 { moveType: 'resolveChoice', payload: { choiceId: 'choice-1', selection: 'tile_alpha' } }
@@ -247,6 +250,7 @@ describe('PendingChoiceModal', () => {
 
         // Setup pending choice targeting a coordinate (ghost)
         state.engine.pendingChoice = {
+            player: '0',
             kind: 'selectTile',
             resolveChoice: [
                 { moveType: 'resolveChoice', payload: { choiceId: 'choice-2', selection: '0,1' } }

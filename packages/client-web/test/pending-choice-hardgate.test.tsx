@@ -71,6 +71,7 @@ describe('PendingChoice Hard-Gate Regression', () => {
         it('disables board interaction completely (no inspect, no rogue moves)', () => {
             ensureResizeObserver();
             const state = createState({
+                player: '0',
                 kind: 'selectOption',
                 resolveChoice: [
                     { moveType: 'resolveChoice', payload: { choiceId: 'c1', selection: 'A' } }
@@ -124,6 +125,7 @@ describe('PendingChoice Hard-Gate Regression', () => {
         it('disables inspection (click on non-target does nothing)', () => {
             ensureResizeObserver();
             const state = createState({
+                player: '0',
                 kind: 'selectTile',
                 resolveChoice: [
                     { moveType: 'resolveChoice', payload: { choiceId: 'c1', selection: 'tile_alpha' } }
@@ -161,6 +163,7 @@ describe('PendingChoice Hard-Gate Regression', () => {
         it('dispatches resolveChoice immediately on target click', () => {
             ensureResizeObserver();
             const state = createState({
+                player: '0',
                 kind: 'selectTile',
                 resolveChoice: [
                     { moveType: 'resolveChoice', payload: { choiceId: 'c1', selection: 'tile_alpha' } }
