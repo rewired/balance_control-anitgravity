@@ -10,7 +10,7 @@ export type CostSlot = string[] | 'ANY';
  * - Sort candidate IDs lexicographically (canonical).
  * - For each slot, pick the first unused candidate that matches the slot constraint.
  *
- * @remarks infrastructure; used to collapse fungible-payment intent combinations
+ * @remarks infrastructure; no direct SPEC binding. Used to collapse fungible-payment intent combinations.
  * @deterministic
  * @pure
  */
@@ -59,4 +59,3 @@ export function selectDeterministicCostResourceIds(
 
     return selected;
 }
-
