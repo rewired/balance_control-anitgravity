@@ -27,6 +27,7 @@ vi.mock('boardgame.io/client', async () => {
             moves: {},
             start: vi.fn(),
             stop: vi.fn(),
+            updatePlayerID: vi.fn(),
             getState: vi.fn(() => ({
                 G: {},
                 ctx: { numPlayers: 2, currentPlayer: '0', activePlayers: { '0': 'drawAndPlace' }, gameover: null },
@@ -58,4 +59,3 @@ describe('Start flow mode select', () => {
         expect(await screen.findByTestId('lobby-screen')).toBeTruthy();
     });
 });
-

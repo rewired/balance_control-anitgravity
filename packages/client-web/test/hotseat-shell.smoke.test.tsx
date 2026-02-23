@@ -3,7 +3,7 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { HotseatShell } from '../src/hotseat/HotseatShell';
 
-const clientInstances: Array<{ config: any; stop: ReturnType<typeof vi.fn> }> = [];
+const clientInstances: Array<{ config: any; stop: ReturnType<typeof vi.fn>; updatePlayerID: ReturnType<typeof vi.fn> }> = [];
 
 vi.mock('boardgame.io/multiplayer', () => {
     return {
@@ -22,6 +22,7 @@ vi.mock('boardgame.io/client', async () => {
                 moves: {},
                 start: vi.fn(),
                 stop: vi.fn(),
+                updatePlayerID: vi.fn(),
                 getState: vi.fn(() => ({
                     G: {},
                     ctx: {
@@ -63,14 +64,11 @@ describe('HotseatShell', () => {
         fireEvent.click(screen.getByTestId('hotseat-switch-1'));
         expect(screen.getByTestId('hotseat-status').textContent).toContain('Active seat P1');
 
-        expect(clientInstances).toHaveLength(3);
-        const playerIDs = clientInstances.map((x) => x.config.playerID);
-        expect(playerIDs).toContain('0');
-        expect(playerIDs).toContain('1');
-        expect(playerIDs).toContain(null);
+        expect(clientInstances).toHaveLength(1);
+        expect(clientInstances[0].config.playerID).toBe('0');
+        expect(clientInstances[0].updatePlayerID).toHaveBeenCalledWith('1');
 
         const matchIDs = new Set(clientInstances.map((x) => x.config.matchID));
         expect(Array.from(matchIDs)).toEqual(['local-hotseat-2p']);
     });
 });
-
