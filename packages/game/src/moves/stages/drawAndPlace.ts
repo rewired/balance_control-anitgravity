@@ -1,10 +1,9 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneName, TileType } from '@balance-control/rules';
 import { stringToCoord, coordToString, getNeighbors, isSurrounded, positionKeyFromCoordString } from '../../topology';
-import { runFinalRoundSettlement } from '../../mechanics-turn';
 import { EffectResolver } from '../../engine/resolver';
-import { passTilePlacementPayloadSchema, placeTilePayloadSchema, validateMovePayload } from '../../move-contracts';
-import { DRAW_AND_PLACE_STAGE, POLITICAL_ACTION_STAGE, requireStage } from '../shared';
+import { placeTilePayloadSchema, validateMovePayload } from '../../move-contracts';
+import { DRAW_AND_PLACE_STAGE, requireStage } from '../shared';
 
 /**
  * Checks if there is any open placement on the board.
@@ -56,7 +55,7 @@ export const DrawAndPlaceMoves = {
         const neighbors = getNeighbors(coord);
 
         // CORE-01-04-05: Must be adjacent to at least one Board tile
-        const hasNeighbor = neighbors.some(n => G.grid[coordToString(n)] !== undefined);
+        const hasNeighbor = neighbors.some((n) => G.grid[coordToString(n)] !== undefined);
         if (!hasNeighbor) {
             if (Object.keys(G.grid).length > 0) return INVALID_MOVE;
         }
@@ -79,7 +78,7 @@ export const DrawAndPlaceMoves = {
 
         if (!G.adjacency[tileId]) G.adjacency[tileId] = [];
 
-        neighbors.forEach(n => {
+        neighbors.forEach((n) => {
             const nStr = coordToString(n);
             const nId = G.grid[nStr];
             if (nId) {
@@ -92,7 +91,7 @@ export const DrawAndPlaceMoves = {
         // CORE-01-06-02/03/03A: Hotspot check — skip StartCommittee; resolve in ascending PositionKey order
         const resolved = G.engine.attributes.resolvedHotspots ?? [];
         const candidatePairs: { coordStr: string; tileId: string }[] = [];
-        [coord, ...neighbors].forEach(c => {
+        [coord, ...neighbors].forEach((c) => {
             const cStr = coordToString(c);
             const tId = G.grid[cStr];
             if (!tId || resolved.includes(tId)) return;
@@ -105,44 +104,12 @@ export const DrawAndPlaceMoves = {
             .forEach(({ tileId }) => G.engine.effectQueue.push({ kind: 'hotspot.resolve', tileId }));
         EffectResolver.resolve(G, ctx);
 
-        // End Stage â†’ politicalAction
+        // End Stage → politicalAction
         if (events && events.endStage) {
             events.endStage();
         } else if (events && events.setStage) {
             events.setStage('politicalAction');
         }
     },
-
-    /**
-     * Passes tile placement when no tile is staged.
-     * @rule CORE-01-04-04
-     * @rule CORE-01-09-01A
-     * @deterministic
-     * @sideEffects
-     */
-    passTilePlacement: ({ G, ctx, events }: any, payload?: unknown) => {
-        const validated = validateMovePayload('passTilePlacement', passTilePlacementPayloadSchema, payload);
-        if (!validated.ok) return INVALID_MOVE;
-
-        const pid = ctx.currentPlayer;
-        if (!requireStage(ctx, DRAW_AND_PLACE_STAGE, 'passTilePlacement')) return INVALID_MOVE;
-
-        const stagingId = `staging_${pid}`;
-        const staging = G.zones[stagingId];
-        if (!staging || staging.items.length > 0) return INVALID_MOVE;
-
-        // CORE-01-09-01A: DrawPile was empty at turn start → final Round Settlement, then end (skip Political Action)
-        if (G.engine.attributes.drawPileEmptyAtTurnStart || G.engine.attributes.noLegalPlacements) {
-            delete G.engine.attributes.drawPileEmptyAtTurnStart;
-            delete G.engine.attributes.noLegalPlacements;
-            if (!G.roundNumber) G.roundNumber = 0;
-            G.roundNumber++;
-            runFinalRoundSettlement(G, ctx);
-            G.roundSettlementDone = true;
-            events.endTurn();
-            return;
-        }
-
-        return INVALID_MOVE;
-    }
 };
+

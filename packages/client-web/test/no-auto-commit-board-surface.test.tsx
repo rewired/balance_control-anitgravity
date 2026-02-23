@@ -28,7 +28,6 @@ const mockEnumerateLegalIntents = enumerateLegalIntents as any;
 describe('No Auto-Commit Board Surface', () => {
     const mockMoves = {
         placeTile: vi.fn(),
-        passTilePlacement: vi.fn(),
     };
 
     const mockCtx = {
@@ -105,48 +104,6 @@ describe('No Auto-Commit Board Surface', () => {
         // 6. Assert moves.placeTile called exactly once
         expect(mockMoves.placeTile).toHaveBeenCalledTimes(1);
         expect(mockMoves.placeTile).toHaveBeenCalledWith(placeIntent.payload);
-    });
-
-    it('Skip placement is draft-only (does not commit immediately)', () => {
-        // Setup: enumerateLegalIntents returns passTilePlacement
-        const passIntent: LegalIntent = {
-            moveType: 'passTilePlacement',
-            payload: {}
-        };
-        mockEnumerateLegalIntents.mockReturnValue([passIntent]);
-
-        render(
-            <I18nProvider>
-                <GameLayout
-                    G={mockG}
-                    ctx={mockCtx}
-                    moves={mockMoves}
-                    playerID="0"
-                    isActive={true}
-                />
-            </I18nProvider>
-        );
-
-        // 1. Find Skip Placement button
-        const skipBtn = screen.getByTestId('btn-skip-placement');
-        expect(skipBtn).toBeDefined();
-
-        // 2. Click Skip
-        fireEvent.click(skipBtn);
-
-        // 3. Assert moves.passTilePlacement NOT called
-        expect(mockMoves.passTilePlacement).not.toHaveBeenCalled();
-
-        // 4. Assert Confirm button appears
-        const confirmBtn = screen.getByTestId('btn-confirm-draft');
-        expect(confirmBtn).toBeDefined();
-
-        // 5. Click Confirm
-        fireEvent.click(confirmBtn);
-
-        // 6. Assert moves.passTilePlacement called exactly once
-        expect(mockMoves.passTilePlacement).toHaveBeenCalledTimes(1);
-        expect(mockMoves.passTilePlacement).toHaveBeenCalledWith(passIntent.payload);
     });
 
     it('While draftReady, further board clicks do not change which intent is confirmed', () => {

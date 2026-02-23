@@ -25,7 +25,6 @@ export type IntentViewModel = {
     };
     drawAndPlace: {
         placeTile: LegalIntent[];
-        passTilePlacement: LegalIntent | null;
     };
     political: {
         others: LegalIntent[];
@@ -76,7 +75,6 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
     const hasPendingChoice = resolveChoice.length > 0;
 
     const placeTile = input.intents.filter((intent) => intent.moveType === 'placeTile');
-    const passTilePlacement = input.intents.find((intent) => intent.moveType === 'passTilePlacement') ?? null;
     const formalizeInfluence = input.intents.filter((intent) => intent.moveType === 'formalizeInfluence');
     const convertResources = input.intents.filter((intent) => intent.moveType === 'convertResources');
     const measures = input.intents.filter((intent) => intent.moveType.endsWith('.takeMeasure'));
@@ -86,7 +84,6 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         if (intent.moveType === 'placeTile') return false;
         if (intent.moveType === 'placeInfluence') return false;
         if (intent.moveType === 'moveInfluence') return false;
-        if (intent.moveType === 'passTilePlacement') return false;
         if (intent.moveType === 'formalizeInfluence') return false;
         if (intent.moveType === 'convertResources') return false;
         if (intent.moveType.endsWith('.takeMeasure')) return false;
@@ -117,7 +114,7 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
             kind: input.pendingChoiceKind,
             resolveChoice
         },
-        drawAndPlace: { placeTile, passTilePlacement },
+        drawAndPlace: { placeTile },
         political: {
             others: baseOthers,
             formalizeInfluence,

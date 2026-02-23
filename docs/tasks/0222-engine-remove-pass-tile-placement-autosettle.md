@@ -140,9 +140,22 @@ List the exact normative anchors that justify this task.
 
 ## 15) PR Checklist (to be filled during implementation)
 
-- [ ] Preflight: read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`
-- [ ] Engine/client boundary respected (ARCH-01)
-- [ ] Determinism preserved (no Date.now/Math.random)
-- [ ] Tests updated/added as needed and pass
-- [ ] Task file updated with Work Summary + Commands Run
-- [ ] Single meaningful commit with Postflight block
+- [x] Preflight: read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`
+- [x] Engine/client boundary respected (ARCH-01)
+- [x] Determinism preserved (no Date.now/Math.random)
+- [x] Tests updated/added as needed and pass
+- [x] Task file updated with Work Summary + Commands Run
+- [x] Single meaningful commit with Postflight block
+
+### Work Summary
+- Removed `passTilePlacement` from engine moves and legality enumeration.
+- Added automatic final settlement + immediate game end when termination conditions are reached (CORE-01-09-01A, VAR-01-01-08), with a guard against double-settlement.
+- Updated UI view-model + ActionDock to no longer surface/render “Skip placement”.
+- Updated/added tests to assert automatic end-game and absence of “Skip placement”, and refreshed replay hash fixture.
+- Updated UI interaction contract YAML + `docs/changelog.md`.
+
+### Commands Run
+- `pnpm -C packages/client-web test` (pass)
+- `pnpm -C packages/game test` (pass)
+- `pnpm -C packages/integration-tests test` (pass)
+- `pnpm test` (pass)

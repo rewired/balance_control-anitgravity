@@ -154,104 +154,16 @@ describe('Turn Structure (Stages)', () => {
         expect(afterState.ctx.activePlayers[pid]).toBe('politicalAction');
     });
 
-    it('should reject passTilePlacement when a staging tile exists', () => {
-        const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
-        client.start();
-
-        const beforeState = client.getState();
-        const pid = beforeState.ctx.currentPlayer;
-        const beforeG = JSON.stringify(beforeState.G);
-
-        client.moves.passTilePlacement({});
-
-        const afterState = client.getState();
-        const afterG = JSON.stringify(afterState.G);
-
-        expect(afterG).toBe(beforeG);
-        expect(afterState.ctx.currentPlayer).toBe(pid);
-        expect(afterState.ctx.activePlayers[pid]).toBe('drawAndPlace');
-    });
-
-    it('should reject passTilePlacement when staging is empty but drawPile is not empty and no flags set', () => {
-        const game = {
-            ...BalanceControlNoPlayerView,
-            turn: {
-                ...BalanceControlNoPlayerView.turn,
-                onBegin: (params: any) => {
-                     // Call original onBegin
-                     if (BalanceControlNoPlayerView.turn?.onBegin) {
-                        (BalanceControlNoPlayerView.turn.onBegin as any)(params);
-                     }
-                     // Force empty staging
-                     const { G, ctx } = params;
-                     const stagingId = `staging_${ctx.currentPlayer}`;
-                     if (G.zones[stagingId]) G.zones[stagingId].items = [];
-
-                     // Ensure flags are NOT set
-                     delete G.engine.attributes.drawPileEmptyAtTurnStart;
-                     delete G.engine.attributes.noLegalPlacements;
-                }
-            }
-        };
-
-        const client = Client({ game, numPlayers: 2 });
-        client.start();
-
-        const state = client.getState();
-        const pid = state.ctx.currentPlayer;
-
-        // Verify our setup worked
-        expect(state.G.zones[`staging_${pid}`].items.length).toBe(0);
-        expect(state.G.zones[CoreZoneName.DrawPile].items.length).toBeGreaterThan(0);
-
-        // Attempt passTilePlacement
-        client.moves.passTilePlacement({});
-
-        const afterState = client.getState();
-
-        // Should be rejected (no change in stage)
-        expect(afterState.ctx.activePlayers[pid]).toBe('drawAndPlace');
-    });
-
-    it('should end turn and game when passTilePlacement with empty staging (DrawPile empty, CORE-01-09-01A)', () => {
-        const client = Client({ game: createTinyDrawPileGame(), numPlayers: 2 });
-        client.start();
-
-        client.moves.placeTile({ targetCoord: '1,0' });
-        client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, '1,0') });
-
-        const secondState = client.getState();
-        const secondPid = secondState.ctx.currentPlayer;
-        expect(secondState.ctx.activePlayers[secondPid]).toBe('drawAndPlace');
-        expect(secondState.G.zones[`staging_${secondPid}`].items.length).toBe(0);
-
-        client.moves.passTilePlacement({});
-
-        // CORE-01-09-01A: DrawPile empty at turn start → final settlement, skip Political Action, game ends
-        const afterState = client.getState();
-        expect(afterState.G.roundSettlementDone).toBe(true);
-        expect(afterState.ctx.gameover).toBeDefined();
-    });
-
-    it('should end only after round settlement when draw pile empties mid-round', () => {
+    it('should auto-run final settlement and end game when DrawPile is empty at turn start (CORE-01-09-01A)', () => {
         const client = Client({ game: createTinyDrawPileGame(), numPlayers: 2 });
         client.start();
 
         const stateAfterStart = client.getState();
         expect(stateAfterStart.G.zones[CoreZoneName.DrawPile].items.length).toBe(0);
+        expect(stateAfterStart.ctx.gameover).toBeUndefined();
 
         client.moves.placeTile({ targetCoord: '1,0' });
         client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, '1,0') });
-
-        const midRoundState = client.getState();
-        const secondPid = midRoundState.ctx.currentPlayer;
-        expect(midRoundState.ctx.gameover).toBeUndefined();
-        expect(midRoundState.G.roundSettlementDone).toBeUndefined();
-        expect(midRoundState.G.roundNumber ?? 0).toBe(0);
-        expect(midRoundState.ctx.activePlayers[secondPid]).toBe('drawAndPlace');
-        expect(midRoundState.G.zones[`staging_${secondPid}`].items.length).toBe(0);
-
-        client.moves.passTilePlacement({});
 
         const finalState = client.getState();
         expect(finalState.G.roundNumber).toBe(1);

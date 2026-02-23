@@ -6,8 +6,8 @@
       "ex03": false
     }
   },
-  "expectedFinalHash": "09873c9a2031029233e0e0f9de7a260a1cb7efff9e5a8e8133d946fa35345bc1",
-  "expectedPublicSurfaceHash": "a1d761f0b05b75275a1d00fcfd69c16b95871c0e8382dee9154d9df83f534bd9",
+  "expectedFinalHash": "325fac92a49c476ee4669ce985e465b1b432b62b4516c4c14a68de9a78a28a17",
+  "expectedPublicSurfaceHash": "600edc6b6b052ddefdfd3efae43d321594f9ed44b7816c1954db2a14068d2ce8",
   "id": "core_pingpong_meta_marker",
   "moves": [
     {

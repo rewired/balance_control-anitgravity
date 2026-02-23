@@ -52,9 +52,6 @@ const formatIntentLabel = (intent: LegalIntent, t: (key: string, vars?: Record<s
             measure: getObjectLabel(G, intent.payload)
         });
     }
-    if (intent.moveType === 'passTilePlacement') {
-        return t('core:ui.skipPlacement');
-    }
     return intent.moveType;
 };
 
@@ -603,15 +600,6 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                         {isDrawAndPlace && (
                             <div className="action-panel-primary">
                                 <div className="action-panel-meta">{t('core:ui.staged', { tile: vm.stagedTileId || t('core:inspector.none') })}</div>
-                                {vm.drawAndPlace.passTilePlacement && (
-                                    <button
-                                        className="btn-primary"
-                                        onClick={() => proposeIntent(vm.drawAndPlace.passTilePlacement!)}
-                                        data-testid="btn-skip-placement"
-                                    >
-                                        {t('core:ui.skipPlacement')}
-                                    </button>
-                                )}
                             </div>
                         )}
                         {isPoliticalAction && (
