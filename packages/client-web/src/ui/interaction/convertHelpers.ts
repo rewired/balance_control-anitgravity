@@ -1,15 +1,9 @@
 import { canonicalJsonStringify } from './utils';
 import type { LegalIntent } from '@balance-control/game';
 
-export interface ConvertComboGroup {
-    inputKey: string;
-    inputResourceIds: string[];
-    variants: LegalIntent[];
-}
-
 export interface ConvertOutputGroup {
     outputResort: string;
-    combos: ConvertComboGroup[];
+    variants: LegalIntent[];
 }
 
 export interface ConvertTileGroup {
@@ -18,8 +12,8 @@ export interface ConvertTileGroup {
 }
 
 /**
- * Groups convertResources intents by grassroots tile, then output resort, then input combo.
- * @remarks Presentation-only.
+ * Groups convertResources intents by grassroots tile, then output resort.
+ * @remarks Presentation-only. Must never render token IDs (e.g. `RES_*`) to users.
  */
 export function groupConvertIntents(intents: LegalIntent[]): Map<string, ConvertTileGroup> {
     const convertIntents = intents.filter((i) => i.moveType === 'convertResources');
@@ -30,9 +24,6 @@ export function groupConvertIntents(intents: LegalIntent[]): Map<string, Convert
         const outputResort = intent.payload?.outputResort;
         if (typeof tileId !== 'string' || typeof outputResort !== 'string') continue;
 
-        const inputResourceIds: string[] = intent.payload?.inputResourceIds ?? [];
-        const inputKey = [...inputResourceIds].sort().join('|');
-
         if (!result.has(tileId)) {
             result.set(tileId, { grassrootsTileId: tileId, outputs: [] });
         }
@@ -40,17 +31,10 @@ export function groupConvertIntents(intents: LegalIntent[]): Map<string, Convert
         const tileGroup = result.get(tileId)!;
         let outputGroup = tileGroup.outputs.find(o => o.outputResort === outputResort);
         if (!outputGroup) {
-            outputGroup = { outputResort, combos: [] };
+            outputGroup = { outputResort, variants: [] };
             tileGroup.outputs.push(outputGroup);
         }
-
-        let comboGroup = outputGroup.combos.find(c => c.inputKey === inputKey);
-        if (!comboGroup) {
-            comboGroup = { inputKey, inputResourceIds, variants: [] };
-            outputGroup.combos.push(comboGroup);
-        }
-
-        comboGroup.variants.push(intent);
+        outputGroup.variants.push(intent);
     }
 
     // Sorting
@@ -58,16 +42,23 @@ export function groupConvertIntents(intents: LegalIntent[]): Map<string, Convert
         // Sort outputs by resort name
         tileGroup.outputs.sort((a, b) => a.outputResort.localeCompare(b.outputResort));
         for (const outputGroup of tileGroup.outputs) {
-            // Sort combos by inputKey
-            outputGroup.combos.sort((a, b) => a.inputKey.localeCompare(b.inputKey));
-            for (const comboGroup of outputGroup.combos) {
-                // Sort variants by full canonical payload
-                comboGroup.variants.sort((a, b) => {
-                    return canonicalJsonStringify(a.payload ?? {}).localeCompare(canonicalJsonStringify(b.payload ?? {}));
-                });
-            }
+            // Sort variants by stable key. Prefer lower inputCount, then payload canonical.
+            outputGroup.variants.sort((a, b) => {
+                const aCount = inferInputCount(a.payload);
+                const bCount = inferInputCount(b.payload);
+                if (aCount !== bCount) return aCount - bCount;
+                return canonicalJsonStringify(a.payload ?? {}).localeCompare(canonicalJsonStringify(b.payload ?? {}));
+            });
         }
     }
 
     return result;
+}
+
+function inferInputCount(payload: any): number {
+    const declared = payload?.inputCount;
+    if (typeof declared === 'number' && Number.isFinite(declared)) return declared;
+    const ids = payload?.inputResourceIds;
+    if (Array.isArray(ids)) return ids.length;
+    return Number.POSITIVE_INFINITY;
 }

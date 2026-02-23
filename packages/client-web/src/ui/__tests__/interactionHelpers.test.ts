@@ -52,15 +52,12 @@ describe('interaction helpers', () => {
             const intents: LegalIntent[] = [
                 // Tile T1
                 // Output O1
-                // Input I1 (A)
-                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputResourceIds: ['A'], extraResourceIds: ['Z'] }),
-                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputResourceIds: ['A'], extraResourceIds: ['X'] }),
-
-                // Input I2 (B)
-                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputResourceIds: ['B'] }),
+                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputCount: 2, extraResourceIds: ['Z'] }),
+                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputCount: 2, extraResourceIds: ['X'] }),
+                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputCount: 3 }),
 
                 // Output O2
-                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O2', inputResourceIds: ['A'] }),
+                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O2', inputCount: 2 }),
             ];
 
             const groupsMap = groupConvertIntents(intents);
@@ -70,16 +67,15 @@ describe('interaction helpers', () => {
             expect(t1Group.outputs[0].outputResort).toBe('O1');
             expect(t1Group.outputs[1].outputResort).toBe('O2');
 
-            const o1Combos = t1Group.outputs[0].combos;
-            expect(o1Combos).toHaveLength(2);
-            expect(o1Combos[0].inputKey).toBe('A');
-            expect(o1Combos[1].inputKey).toBe('B');
+            const o1Variants = t1Group.outputs[0].variants;
+            expect(o1Variants).toHaveLength(3);
 
-            const aVariants = o1Combos[0].variants;
-            expect(aVariants).toHaveLength(2);
-            // Expected order: "X" then "Z"
-            expect(aVariants[0].payload.extraResourceIds).toEqual(['X']);
-            expect(aVariants[1].payload.extraResourceIds).toEqual(['Z']);
+            // Sorting: inputCount ASC, then canonical payload (so extraResourceIds "X" then "Z")
+            expect(o1Variants[0].payload.inputCount).toBe(2);
+            expect(o1Variants[0].payload.extraResourceIds).toEqual(['X']);
+            expect(o1Variants[1].payload.inputCount).toBe(2);
+            expect(o1Variants[1].payload.extraResourceIds).toEqual(['Z']);
+            expect(o1Variants[2].payload.inputCount).toBe(3);
         });
     });
 
