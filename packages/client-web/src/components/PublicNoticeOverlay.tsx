@@ -45,7 +45,7 @@ export const PublicNoticeOverlay: React.FC<PublicNoticeOverlayProps> = ({ G, uiN
                     <div className="public-notice-message">
                         Player {latest.playerId} drew a tile that cannot be placed. It was discarded face-up.
                     </div>
-                    {hasTile && (
+                    {tileId && hasTile && (
                         <div className="public-notice-tile">
                             <Tile tileId={tileId} G={G} disabled={true} testId="public-notice-tile" />
                         </div>
