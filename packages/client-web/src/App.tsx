@@ -101,6 +101,7 @@ const App: React.FC = () => {
             matchID: session.matchID,
             playerID: session.playerID,
             credentials: session.credentials,
+            debug: false,
         });
     }, [session]);
 

@@ -206,9 +206,13 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     }}>
                         <div style={{ width: '48px', height: '48px', position: 'relative' }}>
                             {pendingTile.type !== 'Grassroots' && pendingTile.resort ? (
-                                <ResortIcon resort={pendingTile.resort} />
+                                <svg width="48" height="48" viewBox="0 0 24 24" aria-hidden="true">
+                                    <ResortIcon resort={pendingTile.resort} />
+                                </svg>
                             ) : (
-                                <TileTypeIcon type={pendingTile.type} />
+                                <svg width="48" height="48" viewBox="0 0 24 24" aria-hidden="true">
+                                    <TileTypeIcon type={pendingTile.type} />
+                                </svg>
                             )}
                             {pendingTile.type === 'Grassroots' && (pendingTile.conversion?.typedResort || pendingTile.resort) && (
                                 <div style={{
