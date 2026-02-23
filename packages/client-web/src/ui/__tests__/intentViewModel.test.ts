@@ -1,12 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import type { LegalIntent } from '@balance-control/game';
-import { buildIntentViewModel } from '../useIntentViewModel';
+import { buildIntentViewModel, getPendingChoiceKindForPlayer } from '../useIntentViewModel';
 
 function intent(moveType: string, payload: any = {}): LegalIntent {
     return { moveType, payload };
 }
 
 describe('intent view model', () => {
+    it('nulls pendingChoice kind when not owned by playerID', () => {
+        expect(getPendingChoiceKindForPlayer({ player: '0', kind: 'selectTile' }, '1')).toBeNull();
+        expect(getPendingChoiceKindForPlayer({ player: '1', kind: 'selectTile' }, '1')).toBe('selectTile');
+        expect(getPendingChoiceKindForPlayer(undefined, '0')).toBeNull();
+    });
+
     it('groups drawAndPlace intents and computes ghostCoords deterministically', () => {
         const intents: LegalIntent[] = [
             intent('placeTile', { targetCoord: '1,0' }),

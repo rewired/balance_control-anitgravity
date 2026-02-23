@@ -52,6 +52,17 @@ function inferStageBestEffort(ctx: any, playerID: string): IntentStage {
 
 /**
  * @remarks
+ * Presentation-only: expose pendingChoice.kind only to the owning seat.
+ * This prevents non-owner pendingChoice state from hard-gating board interactions (GR-006).
+ */
+export function getPendingChoiceKindForPlayer(pendingChoice: any, playerID: string): string | null {
+    if (!pendingChoice) return null;
+    if (pendingChoice.player !== playerID) return null;
+    return pendingChoice.kind ?? null;
+}
+
+/**
+ * @remarks
  * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
  * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
  */
@@ -128,7 +139,7 @@ export function useIntentViewModel({ G, ctx, playerID, selectedTileId, stagedTil
 
     const vmWithoutIntents = useMemo(() => {
         const pendingChoice = G?.engine?.pendingChoice;
-        const pendingChoiceKind = pendingChoice?.kind ?? null;
+        const pendingChoiceKind = getPendingChoiceKindForPlayer(pendingChoice, pid);
         return buildIntentViewModel({
             ctx,
             playerID: pid,
@@ -137,7 +148,7 @@ export function useIntentViewModel({ G, ctx, playerID, selectedTileId, stagedTil
             stagedTileId,
             pendingChoiceKind
         });
-    }, [ctx, intents, pid, selectedTileId, stagedTileId, G?.engine?.pendingChoice?.kind]);
+    }, [ctx, intents, pid, selectedTileId, stagedTileId, G?.engine?.pendingChoice?.kind, G?.engine?.pendingChoice?.player]);
 
     return useMemo(() => {
         return {

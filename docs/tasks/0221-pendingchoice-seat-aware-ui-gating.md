@@ -110,9 +110,23 @@ List the exact normative anchors that justify this task.
 
 ## 15) PR Checklist (to be filled during implementation)
 
-- [ ] Preflight: read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`
-- [ ] Engine/client boundary respected (ARCH-01)
-- [ ] Determinism preserved (no Date.now/Math.random)
-- [ ] Tests updated/added as needed and pass
-- [ ] Task file updated with Work Summary + Commands Run
-- [ ] Single meaningful commit with Postflight block
+- [x] Preflight: read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`
+- [x] Engine/client boundary respected (ARCH-01)
+- [x] Determinism preserved (no Date.now/Math.random)
+- [x] Tests updated/added as needed and pass
+- [x] Task file updated with Work Summary + Commands Run
+- [x] Single meaningful commit with Postflight block
+
+### Work Summary
+
+- Make `pendingChoice.kind` seat-aware via `getPendingChoiceKindForPlayer()` so non-owner pendingChoice never disables board interactions.
+- Gate select-tile hard-routing in `GameLayout` behind `vm.hasPendingChoice` to avoid poisoned-turn UI state when switching seats.
+- Add a small unit test for seat-aware pendingChoice kind derivation.
+- Update pendingChoice UI tests to include `pendingChoice.player` to match the engine contract shape.
+
+### Commands Run
+
+- `pnpm -C packages/client-web test` (FAIL; 5 failed: pendingChoice tests missing `pendingChoice.player`)
+- `pnpm -C packages/client-web test` (PASS)
+- `pnpm lint` (PASS)
+- `pnpm test` (PASS)
