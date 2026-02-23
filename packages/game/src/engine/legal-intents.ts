@@ -99,11 +99,11 @@ export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string):
 
     if (stage === 'politicalAction') {
         if (EffectResolver.checkUsageLimit(G as any, 'politicalAction', playerID)) {
-            intents.push(...enumeratePlaceInfluence(G, playerID));
-            intents.push(...enumerateMoveInfluence(G, playerID));
-            intents.push(...enumerateFormalize(G, ctx, playerID));
-            intents.push(...enumerateConvertResources(G, playerID));
-            intents.push(...enumerateTakeMeasure(G, playerID));
+            appendIntents(intents, enumeratePlaceInfluence(G, playerID));
+            appendIntents(intents, enumerateMoveInfluence(G, playerID));
+            appendIntents(intents, enumerateFormalize(G, ctx, playerID));
+            appendIntents(intents, enumerateConvertResources(G, playerID));
+            appendIntents(intents, enumerateTakeMeasure(G, playerID));
         }
     }
 
@@ -521,4 +521,10 @@ function sortIntents(intents: LegalIntent[]): LegalIntent[] {
         const bPayload = canonicalJsonStringify(b.payload ?? {});
         return aPayload.localeCompare(bPayload);
     });
+}
+
+function appendIntents(target: LegalIntent[], additions: LegalIntent[]): void {
+    for (const intent of additions) {
+        target.push(intent);
+    }
 }

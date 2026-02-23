@@ -169,6 +169,44 @@ describe('enumerateLegalIntents', () => {
         expect(hasConvert).toBe(true);
     });
 
+    it('does not throw when convertResources intent count is very large (avoid spread overflow)', () => {
+        const ctx = createCtx('politicalAction');
+        const G = SetupGame({ ctx });
+
+        const grassrootsId = Object.values(G.tiles).find(tile => tile.type === TileType.Grassroots)?.id as string;
+        expect(grassrootsId).toBeTruthy();
+
+        // Ensure it is treated as a "typed" Grassroots so both 2-input and 3-input variants are enumerated.
+        // (This test only cares that enumeration can be very large and must not throw.)
+        (G.tiles as any)[grassrootsId].conversion = { inputSlots: 2, typedResort: 'DOM' };
+
+        G.zones[CoreZoneName.Board].items.push(grassrootsId);
+        G.grid['1,0'] = grassrootsId;
+
+        const supply = G.zones['PersonalSupply:0'];
+        supply.items = supply.items.filter(itemId => G.objects[itemId]?.type !== 'Resource');
+
+        // Provide enough resources to exceed typical JS spread-argument limits when enumerating convertResources.
+        // 85 resources yields >200k convertResources intents for a typed Grassroots (2-input + 3-input variants).
+        for (let i = 0; i < 85; i++) {
+            const rid = `test_res_${i}`;
+            const resort = i % 3 === 0 ? 'DOM' : i % 3 === 1 ? 'FOR' : 'INF';
+            (G.objects as any)[rid] = { id: rid, type: 'Resource', owner: '0', resort };
+            supply.items.push(rid);
+        }
+
+        const influenceId = supply.items.find(itemId => G.objects[itemId]?.type === 'Influence') as string;
+        expect(influenceId).toBeTruthy();
+        supply.items = supply.items.filter(itemId => itemId !== influenceId);
+        G.zones[grassrootsId].items.push(influenceId);
+
+        expect(() => enumerateLegalIntents(G as any, ctx, '0')).not.toThrow();
+
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        expect(intents.some(intent => intent.moveType === 'convertResources')).toBe(true);
+        expect(intents.length).toBeLessThanOrEqual(2000);
+    });
+
     it('limits intents to resolveChoice when pending choice exists', () => {
         const ctx = createCtx('politicalAction');
         const G = SetupGame({ ctx });
