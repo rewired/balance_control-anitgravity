@@ -28,6 +28,7 @@ export const HotseatShell: React.FC = () => {
             matchID: MATCH_ID,
             playerID: '0',
             multiplayer: localMultiplayer,
+            debug: false,
         });
     }, [localMultiplayer]);
 
