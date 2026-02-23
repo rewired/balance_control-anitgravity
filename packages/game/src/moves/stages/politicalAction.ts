@@ -29,6 +29,7 @@ import {
     placeMetaMarkerOnTile,
     requireStage
 } from '../shared';
+import { selectDeterministicCostResourceIds } from '../../engine/deterministic-cost';
 
 export const PoliticalActionMoves = {
     /**
@@ -301,7 +302,9 @@ export const PoliticalActionMoves = {
     convertResources: ({ G, ctx, events }: any, payload: unknown) => {
         const validated = validateMovePayload('convertResources', convertResourcesPayloadSchema, payload);
         if (!validated.ok) return INVALID_MOVE;
-        const { grassrootsTileId, inputResourceIds, outputResort, extraResourceIds } = validated.value;
+        const { grassrootsTileId, inputCount, inputResourceIds, outputResort, extraResourceIds } = validated.value as any;
+        const declaredInputCount: number | undefined = inputCount ?? inputResourceIds?.length;
+        if (!declaredInputCount) return INVALID_MOVE;
 
         const pid = ctx.currentPlayer;
         if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'convertResources')) return INVALID_MOVE;
@@ -311,15 +314,17 @@ export const PoliticalActionMoves = {
         if (!tile || tile.type !== TileType.Grassroots) return INVALID_MOVE;
         if (!isBoardTile(G, grassrootsTileId)) return INVALID_MOVE;
 
-        if (hasDuplicateIds(inputResourceIds)) return INVALID_MOVE;
-        if (hasOverlap(inputResourceIds, extraResourceIds)) return INVALID_MOVE;
+        if (inputResourceIds) {
+            if (hasDuplicateIds(inputResourceIds)) return INVALID_MOVE;
+            if (hasOverlap(inputResourceIds, extraResourceIds)) return INVALID_MOVE;
+        }
         if (!isCoreResort(outputResort)) return INVALID_MOVE;
 
         // Generic Prohibition check
         if (EffectResolver.isProhibited(G, 'convertResources', pid, grassrootsTileId)) return INVALID_MOVE;
 
         // CORE-01-04-22K/22L/22L.1: Validate recipe variant and output (Typed Variant B: output â‰  T)
-        const conversionSpec = getGrassrootsConversionSpec(tile, inputResourceIds.length, outputResort);
+        const conversionSpec = getGrassrootsConversionSpec(tile, declaredInputCount, outputResort);
         if (!conversionSpec) return INVALID_MOVE;
 
         const { controller } = computeMajority(grassrootsTileId, G);
@@ -327,31 +332,46 @@ export const PoliticalActionMoves = {
 
         const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;
         const supply = G.zones[supplyId];
-        for (const rid of inputResourceIds) {
+        const baseSlots: CostSlot[] = Array.from({ length: conversionSpec.inputSlots }, () => 'ANY');
+
+        const extraCostSlots = EffectResolver.getExtraCostSlots(G, pid, 'convertResources', grassrootsTileId);
+        if (extraCostSlots.length > 0 && extraResourceIds && extraResourceIds.length !== extraCostSlots.length) {
+            return INVALID_MOVE;
+        }
+
+        const resolvedExtraResourceIds = extraCostSlots.length === 0
+            ? undefined
+            : (extraResourceIds ?? selectDeterministicCostResourceIds(G, pid, extraCostSlots, new Set(inputResourceIds ?? [])));
+        if (extraCostSlots.length > 0 && !resolvedExtraResourceIds) return INVALID_MOVE;
+
+        const resolvedInputResourceIds = inputResourceIds ?? selectDeterministicCostResourceIds(
+            G,
+            pid,
+            baseSlots,
+            new Set(resolvedExtraResourceIds ?? [])
+        );
+        if (!resolvedInputResourceIds) return INVALID_MOVE;
+
+        for (const rid of resolvedInputResourceIds) {
             if (!supply.items.includes(rid)) return INVALID_MOVE;
             if (G.objects[rid]?.owner !== pid) return INVALID_MOVE;
         }
 
-        if (inputResourceIds.length !== conversionSpec.inputSlots) return INVALID_MOVE;
+        if (resolvedInputResourceIds.length !== conversionSpec.inputSlots) return INVALID_MOVE;
 
         const baseCostValidation = EffectResolver.validateCost(G, ctx, {
             playerId: pid,
-            slots: Array.from({ length: conversionSpec.inputSlots }, () => 'ANY'),
-            resourceIds: inputResourceIds
+            slots: baseSlots,
+            resourceIds: resolvedInputResourceIds
         });
         if (!baseCostValidation.ok) return INVALID_MOVE;
 
-        const extraCostSlots = EffectResolver.getExtraCostSlots(G, pid, 'convertResources', grassrootsTileId);
-        if (extraCostSlots.length > 0 && (!extraResourceIds || extraResourceIds.length !== extraCostSlots.length)) {
-            return INVALID_MOVE;
-        }
-
         // Decoupled Extra Costs
-        if (!EffectResolver.checkAndPayCosts(G, pid, 'convertResources', grassrootsTileId, extraResourceIds)) return INVALID_MOVE;
+        if (!EffectResolver.checkAndPayCosts(G, pid, 'convertResources', grassrootsTileId, resolvedExtraResourceIds)) return INVALID_MOVE;
 
         // Emit conversion atoms
         G.engine.effectQueue.push(
-            { kind: 'resource.pay', playerId: pid, amount: inputResourceIds.length, resorts: 'ANY', resourceIds: inputResourceIds }, // Logic for ANY handled by resolver
+            { kind: 'resource.pay', playerId: pid, amount: resolvedInputResourceIds.length, resorts: 'ANY', resourceIds: resolvedInputResourceIds }, // Logic for ANY handled by resolver
             {
                 kind: 'resource.grant',
                 playerId: pid,

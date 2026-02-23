@@ -22,12 +22,46 @@ export const formalizeInfluencePayloadSchema = z.object({
     extraResourceIds: z.array(z.string()).optional(),
 }).strict();
 
+const convertResourcesInputCountSchema = z.number().int().refine((count) => count === 2 || count === 3, {
+    message: 'inputCount must be 2 or 3'
+});
+
 export const convertResourcesPayloadSchema = z.object({
     grassrootsTileId: z.string(),
-    inputResourceIds: z.array(z.string()),
+    inputCount: convertResourcesInputCountSchema.optional(),
+    inputResourceIds: z.array(z.string()).optional(),
     outputResort: z.string().min(1),
     extraResourceIds: z.array(z.string()).optional(),
-}).strict();
+}).strict().superRefine((value, ctx) => {
+    const declaredCount = value.inputCount ?? value.inputResourceIds?.length;
+    if (!declaredCount) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['inputCount'],
+            message: 'either inputCount or inputResourceIds is required'
+        });
+        return;
+    }
+
+    if (declaredCount !== 2 && declaredCount !== 3) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['inputCount'],
+            message: 'declared input count must be 2 or 3'
+        });
+        return;
+    }
+
+    if (value.inputResourceIds) {
+        if (value.inputResourceIds.length !== declaredCount) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['inputResourceIds'],
+                message: 'inputResourceIds length must match inputCount'
+            });
+        }
+    }
+});
 
 export const placeTilePayloadSchema = z.object({
     targetCoord: z.string(),
