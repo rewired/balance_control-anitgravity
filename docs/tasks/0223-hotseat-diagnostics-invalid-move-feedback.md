@@ -116,9 +116,21 @@ List the exact normative anchors that justify this task.
 
 ## 15) PR Checklist (to be filled during implementation)
 
-- [ ] Preflight: read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`
-- [ ] Engine/client boundary respected (ARCH-01)
-- [ ] Determinism preserved (no Date.now/Math.random)
-- [ ] Tests updated/added as needed and pass
-- [ ] Task file updated with Work Summary + Commands Run
+- [x] Preflight: read `/docs/architecture/ARCH-00-MASTERPLAN-GUARDRAILS.json`
+- [x] Engine/client boundary respected (ARCH-01)
+- [x] Determinism preserved (no Date.now/Math.random)
+- [x] Tests updated/added as needed and pass
+- [x] Task file updated with Work Summary + Commands Run
 - [ ] Single meaningful commit with Postflight block
+
+### Work Summary
+
+- `dispatchIntent` returns a structured result and detects `INVALID_MOVE` rejections.
+- Hotseat confirm/resolveChoice surfaces rejections as non-blocking toasts (moveType + seat + currentPlayer).
+- Dev-only hotseat tripwire warns on render-state vs dispatch-state mismatch and surfaces a topbar badge.
+- Added i18n keys (EN/DE) for rejection toasts + required-keys gate coverage.
+- Added a UI test for the rejection toast path.
+
+### Commands Run
+
+- `pnpm -C packages/client-web test` (pass)

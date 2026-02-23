@@ -8,6 +8,8 @@ interface BoardProps {
     events?: any;
     playerID: string | null;
     isActive: boolean;
+    getDispatchStateKey?: (() => string | null) | undefined;
+    onTripwireMismatch?: ((info: import('./ui/interaction/types').DispatchTripwireInfo) => void) | undefined;
 }
 
 /**

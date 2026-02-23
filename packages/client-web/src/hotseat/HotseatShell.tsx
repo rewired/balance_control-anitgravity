@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Client } from 'boardgame.io/client';
 import { Local } from 'boardgame.io/multiplayer';
 import { BalanceControlGame } from '../game';
 import { Board } from '../Board';
+import { computeUiStateKey } from '../ui/interaction/diagnostics';
+import type { DispatchTripwireInfo } from '../ui/interaction/types';
 
 type SeatID = '0' | '1';
 
@@ -15,6 +17,7 @@ const MATCH_ID = 'local-hotseat-2p';
  */
 export const HotseatShell: React.FC = () => {
     const [activeSeat, setActiveSeat] = useState<SeatID>('0');
+    const [tripwireMismatch, setTripwireMismatch] = useState<DispatchTripwireInfo | null>(null);
 
     const localMultiplayer = useMemo(() => Local(), []);
 
@@ -57,12 +60,30 @@ export const HotseatShell: React.FC = () => {
     const isActiveByStage = Boolean(ctx?.activePlayers?.[activeSeat]);
     const isActive = !gameover && (isMyTurn || isActiveByStage);
 
+    const getDispatchStateKey = useCallback(() => {
+        const s = client.getState();
+        return computeUiStateKey(s?.G, s?.ctx);
+    }, [client]);
+
+    const handleTripwireMismatch = useCallback((info: DispatchTripwireInfo) => {
+        setTripwireMismatch(info);
+    }, []);
+
     return (
         <>
             <div className="game-topbar glass-panel" data-testid="hotseat-topbar">
                 <div className="game-topbar-text" data-testid="hotseat-status">
                     Hotseat | Active seat P{activeSeat} | currentPlayer P{currentPlayer ?? '?'}
                 </div>
+                {import.meta.env.DEV && tripwireMismatch && (
+                    <div
+                        className="hotseat-tripwire-badge"
+                        data-testid="hotseat-tripwire"
+                        title={`UI/dispatch mismatch (last move: ${tripwireMismatch.moveType})`}
+                    >
+                        DESYNC
+                    </div>
+                )}
                 <div style={{ display: 'flex', gap: 8 }}>
                     <button
                         className="btn-secondary"
@@ -90,6 +111,8 @@ export const HotseatShell: React.FC = () => {
                         moves={client.moves}
                         playerID={activeSeat}
                         isActive={isActive}
+                        getDispatchStateKey={getDispatchStateKey}
+                        onTripwireMismatch={handleTripwireMismatch}
                     />
                 </div>
             ) : (

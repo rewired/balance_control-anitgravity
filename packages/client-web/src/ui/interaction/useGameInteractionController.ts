@@ -1,16 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameState } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
 import { useIntentViewModel } from '../useIntentViewModel';
 import { dispatchIntent } from './dispatchIntent';
-import type { InteractionController, InteractionActionMode, InteractionStateId, DraftIntentState } from './types';
+import type { InteractionController, InteractionActionMode, InteractionStateId, DraftIntentState, UiNotice, DispatchTripwireInfo } from './types';
 import { canonicalJsonStringify } from './utils';
+import { computeUiStateKey } from './diagnostics';
 
 export interface InteractionControllerProps {
     G: GameState;
     ctx: any;
     playerID: string | null;
     moves: any;
+    getDispatchStateKey?: (() => string | null) | undefined;
+    onTripwireMismatch?: ((info: DispatchTripwireInfo) => void) | undefined;
 }
 
 /**
@@ -21,7 +24,9 @@ export function useGameInteractionController({
     G,
     ctx,
     playerID,
-    moves
+    moves,
+    getDispatchStateKey,
+    onTripwireMismatch
 }: InteractionControllerProps): InteractionController {
     const myPid = playerID ?? ctx.currentPlayer ?? '0';
 
@@ -38,6 +43,33 @@ export function useGameInteractionController({
     const stagedTileId = (G.zones[stagingZoneId]?.items[0]) || null;
 
     const vm = useIntentViewModel({ G, ctx, playerID: myPid, selectedTileId, stagedTileId });
+
+    const renderStateKey = useMemo(() => computeUiStateKey(G, ctx), [G, ctx]);
+
+    const [uiNotices, setUiNotices] = useState<UiNotice[]>([]);
+    const nextNoticeIdRef = useRef(1);
+    const noticeTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+    useEffect(() => {
+        return () => {
+            for (const timeout of noticeTimeoutsRef.current.values()) {
+                clearTimeout(timeout);
+            }
+            noticeTimeoutsRef.current.clear();
+        };
+    }, []);
+
+    const pushNotice = useCallback((notice: Omit<UiNotice, 'id'>) => {
+        const id = `n${nextNoticeIdRef.current++}`;
+        setUiNotices((prev) => [...prev, { ...notice, id }].slice(-3));
+
+        const timeout = setTimeout(() => {
+            setUiNotices((prev) => prev.filter((n) => n.id !== id));
+            noticeTimeoutsRef.current.delete(id);
+        }, 4500);
+
+        noticeTimeoutsRef.current.set(id, timeout);
+    }, []);
 
     // ARCH-06: PendingChoice Hard-Gate
     // When a pending choice exists, the controller enters a restrictive mode.
@@ -159,17 +191,32 @@ export function useGameInteractionController({
         }
 
         if (proposedIntent) {
-            dispatchIntent(moves, proposedIntent);
-            setProposedIntent(null);
-            setSelectedTileId(null);
-            setSelectedCoord(null);
-            setActionMode('none');
-            setMoveInfluenceSourceId(null);
-            setPinnedCommitteeTileId(null);
-            setPinnedGrassrootsTileId(null);
-            setSelectedConvertFamily(null);
+            const result = dispatchIntent(moves, proposedIntent, {
+                renderStateKey,
+                getDispatchStateKey,
+                onTripwireMismatch
+            });
+
+            if (result.ok) {
+                setProposedIntent(null);
+                setSelectedTileId(null);
+                setSelectedCoord(null);
+                setActionMode('none');
+                setMoveInfluenceSourceId(null);
+                setPinnedCommitteeTileId(null);
+                setPinnedGrassrootsTileId(null);
+                setSelectedConvertFamily(null);
+            } else {
+                pushNotice({
+                    kind: 'dispatch.rejected',
+                    moveType: proposedIntent.moveType,
+                    seat: myPid,
+                    currentPlayer: ctx?.currentPlayer ?? null,
+                    reason: result.reason ?? 'unknown'
+                });
+            }
         }
-    }, [proposedIntent, moves, isHardGate]);
+    }, [isHardGate, proposedIntent, moves, renderStateKey, getDispatchStateKey, onTripwireMismatch, pushNotice, myPid, ctx?.currentPlayer]);
 
     const cancelDraft = useCallback(() => {
         setProposedIntent(null);
@@ -186,8 +233,21 @@ export function useGameInteractionController({
             console.error(`[resolveChoice] Attempted to dispatch non-choice intent: ${intent.moveType}`);
             return;
         }
-        dispatchIntent(moves, intent);
-    }, [moves]);
+        const result = dispatchIntent(moves, intent, {
+            renderStateKey,
+            getDispatchStateKey,
+            onTripwireMismatch
+        });
+        if (!result.ok) {
+            pushNotice({
+                kind: 'dispatch.rejected',
+                moveType: intent.moveType,
+                seat: myPid,
+                currentPlayer: ctx?.currentPlayer ?? null,
+                reason: result.reason ?? 'unknown'
+            });
+        }
+    }, [moves, renderStateKey, getDispatchStateKey, onTripwireMismatch, pushNotice, myPid, ctx?.currentPlayer]);
 
     // Reset action mode when phase changes
     const stage = vm.stage;
@@ -321,6 +381,7 @@ export function useGameInteractionController({
         editDraftVariant,
         editPinnedTile,
         setSelectedConvertFamily,
-        resolveChoice
+        resolveChoice,
+        uiNotices
     };
 }
