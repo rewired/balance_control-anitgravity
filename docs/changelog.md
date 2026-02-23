@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-23: task(0226) Engine: Prevent legal-intent enumeration stack overflow when intent sets are very large (e.g., ConvertResources).
 - 2026-02-22: task(0222) Engine/UI: Remove passTilePlacement and auto-run final settlement at end-of-game (CORE-01-09-01A, VAR-01-01-08).
 - 2026-02-22: task(0219) UI: Fix Hotseat manual seat switch breaking next turn (stale closure hazard in interaction controller).
 - 2026-02-22: task(0218) Restrict passTilePlacement to final-settlement conditions (no “skip placement” during normal turns).
