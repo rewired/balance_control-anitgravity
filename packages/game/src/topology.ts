@@ -49,7 +49,7 @@ export function positionKeyFromCoordString(coordStr: string): string {
 
 /**
  * Returns the neighbors of a coordinate.
- * @remarks infrastructure; no direct SPEC binding
+ * @rule CORE-01-00-T07
  * @deterministic
  * @pure
  */

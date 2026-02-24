@@ -238,6 +238,11 @@
       "line": 66
     },
     {
+      "id": "CORE-01-00-T07A",
+      "source": "docs/rules/000-core.md",
+      "line": 67
+    },
+    {
       "id": "CORE-01-00-T08",
       "source": "docs/rules/000-core.md",
       "line": 69

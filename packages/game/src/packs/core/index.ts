@@ -33,6 +33,16 @@ export const CorePack: EnginePackDefinition = {
     manifest: CORE_PACK_MANIFEST,
     moves: CoreMoves,
     setup: {
+        /**
+         * @rule CORE-01-00-02A
+         * @rule CORE-01-00-03A
+         * @rule CORE-01-00-T09
+         * @rule CORE-01-00-T06
+         * @rule CORE-01-02-01
+         * @rule CORE-01-02-02
+         * @rule CORE-01-02-17A
+         * @rule CORE-01-02-17E
+         */
         preShuffle: (G: GameState, ctx: any, _cfg: GameConfig) => {
             // 1. Initialize Zones
             const globalZones = [CoreZoneName.DrawPile, CoreZoneName.DiscardFaceUp, CoreZoneName.Board, CoreZoneName.Bank, CoreZoneName.Noise];
@@ -70,6 +80,11 @@ export const CorePack: EnginePackDefinition = {
                 G.zones[tile.id] = { id: tile.id, name: tile.name || tile.id, items: [] };
             }
         },
+        /**
+         * @rule CORE-01-03-04
+         * @rule CORE-01-03-05
+         * @rule CORE-01-03-06
+         */
         postShuffle: (G: GameState, ctx: any, cfg: GameConfig) => {
             // CORE-01-03-03B(5): Assign Starting Influence after Shuffle
             for (let i = 0; i < ctx.numPlayers; i++) {

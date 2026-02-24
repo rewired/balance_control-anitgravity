@@ -90,6 +90,7 @@ function shuffleDrawPile(G: GameState, ctx: any): void {
  * @rule CORE-01-04-04
  * @rule CORE-01-04-06
  * @rule CORE-01-04-07
+ * @rule CORE-01-02-03
  * @usesRNG
  * @rule CORE-01-03-02A
  * @deterministic

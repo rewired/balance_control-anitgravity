@@ -8,6 +8,11 @@ import { isProhibited } from '../resolver/prohibitions';
 /**
  * Processes hotspot resolution for a single tile.
  * @rule CORE-01-06-04
+ * @rule CORE-01-06-05
+ * @rule CORE-01-06-06
+ * @rule CORE-01-06-07
+ * @rule CORE-01-06-08
+ * @rule CORE-01-06-03A
  * @deterministic
  * @sideEffects
  */

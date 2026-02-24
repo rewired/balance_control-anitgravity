@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -37,9 +37,9 @@ Rules (non-negotiable):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -134,28 +134,28 @@ N/A (no new tests in this task)
 
 ## 8) Implementation Plan
 
-* [ ] Run `pnpm audit:core-obligations` and list **top clusters** of `normativeMissingEvidence` by section (Setup / Turn Structure / Control / Effects / Settlement).
-* [ ] For each missing normative obligation:
+* [x] Run `pnpm audit:core-obligations` and list **top clusters** of `normativeMissingEvidence` by section (Setup / Turn Structure / Control / Effects / Settlement).
+* [x] For each missing normative obligation:
 
   1) Find the authoritative engine locus (enumerator, resolver, settlement, topology adapter).
   2) Add `@rule <ID>` tags in TSDoc at the *real* enforcement point.
   3) Add an evidence entry in `CORE-01-OBLIGATIONS.json` pointing to that locus.
 
-* [ ] For obligations that are genuinely not directly bound to a single function:
+* [x] For obligations that are genuinely not directly bound to a single function:
 
   * Mark as `DERIVED` and fill `derivedFrom` + a short `notes` rationale.
   * Do **not** pretend it is implemented by tagging random code.
 
-* [ ] Re-run `pnpm run check:spec-anchors` and `pnpm audit:core-obligations`.
+* [x] Re-run `pnpm run check:spec-anchors` and `pnpm audit:core-obligations`.
 
 ---
 
 ## 9) Acceptance Criteria
 
-* [ ] `CORE-01-OBLIGATIONS.json` has **no** `NORMATIVE_*` entry without evidence.
-* [ ] `pnpm audit:core-obligations` reports `normativeMissingEvidence.length == 0`.
-* [ ] All added `@rule` tags pass the spec-anchor tripwire (`pnpm run check:spec-anchors`).
-* [ ] No behavior changes (golden hashes unchanged).
+* [x] `CORE-01-OBLIGATIONS.json` has **no** `NORMATIVE_*` entry without evidence.
+* [x] `pnpm audit:core-obligations` reports `normativeMissingEvidence.length == 0`.
+* [x] All added `@rule` tags pass the spec-anchor tripwire (`pnpm run check:spec-anchors`).
+* [x] No behavior changes (golden hashes unchanged).
 
 ---
 

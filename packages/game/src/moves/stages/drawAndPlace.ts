@@ -30,6 +30,10 @@ export const DrawAndPlaceMoves = {
      * Places the drawn tile at the target coordinate.
      * @rule CORE-01-04-02
      * @rule CORE-01-04-05
+     * @rule CORE-01-06-01
+     * @rule CORE-01-06-02
+     * @rule CORE-01-06-03
+     * @rule CORE-01-06-03A
      * @deterministic
      * @sideEffects
      */

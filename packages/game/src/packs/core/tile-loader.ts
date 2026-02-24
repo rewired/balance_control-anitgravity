@@ -24,7 +24,15 @@ const data = coreTilesData as CoreTilesData;
 /**
  * Generates the CORE tile set from JSON definition.
  * Replaces the hardcoded logic in previous versions.
- * @remarks infrastructure; no direct SPEC binding
+ * @rule CORE-01-02-04
+ * @rule CORE-01-02-10
+ * @rule CORE-01-02-11
+ * @rule CORE-01-02-12
+ * @rule CORE-01-02-13
+ * @rule CORE-01-02-14
+ * @rule CORE-01-02-14A
+ * @rule CORE-01-02-15
+ * @rule CORE-01-02-16
  * @deterministic
  * @pure
  * @param numPlayers Number of players in the match

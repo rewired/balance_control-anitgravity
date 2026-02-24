@@ -26,6 +26,7 @@ function normalizeBoardgameCtx(ctx: any): Ctx {
 /**
  * Main entry point for initializing the Balance Control game state.
  * @rule CORE-01-03-01
+ * @rule CORE-01-00-09
  * @usesRNG
  * @rule CORE-01-03-02A
  * @deterministic
@@ -137,6 +138,7 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
  * CORE-01-03-02A.1: Fisher-Yates shuffle; j = RNG.nextInt(i+1). Uses ctx.random for determinism.
  * @usesRNG
  * @rule CORE-01-03-02A
+ * @rule CORE-01-03-02A.1A
  */
 function shuffleFisherYates<T>(arr: T[], random: { Die?: (n: number) => number; Shuffle?: (a: T[]) => T[] }): T[] {
     if (typeof random.Die === 'function') {

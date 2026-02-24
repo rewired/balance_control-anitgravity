@@ -18,6 +18,12 @@ import { assemblePacks } from '../move-assembly';
 /**
  * The EffectResolver is the central "CPU" of the game.
  * It processes instructions (Atoms) and applies reactive rules (Modifiers).
+ * @rule CORE-01-06-00-01
+ * @rule CORE-01-06-00-02
+ * @rule CORE-01-06-00-03
+ * @rule CORE-01-06-00-04
+ * @rule CORE-01-06-00-05
+ * @rule CORE-01-06-00-06
  */
 export class EffectResolver {
     private static readonly TURN_SCOPED_USAGE_ACTIONS = [
