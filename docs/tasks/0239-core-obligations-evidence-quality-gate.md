@@ -1,8 +1,8 @@
-# Task 0244 — CORE obligations evidence-quality gate
+# Task 0239 — CORE obligations evidence-quality gate
 
 **Date:** 2026-02-24
 **Owner:** Codex
-**Branch:** `task/0244-core-obligations-evidence-quality-gate`
+**Branch:** `task/0239-core-obligations-evidence-quality-gate`
 
 ---
 
