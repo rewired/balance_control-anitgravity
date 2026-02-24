@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-24: task(0241) Tests/Docs: Harden setup + draw-flow obligation evidence with explicit assertion bindings for setup order, canonical shuffle/RNG sequencing, and 2-player starting Influence allocation (no runtime logic changes).
 - 2026-02-24: task(0240) Tests/Docs: Harden topology obligation evidence with explicit CORE-01-00-11 and CORE-01-00-12 assertion bindings (no runtime logic changes).
 - 2026-02-23: task(0227) Engine: Deduplicate ConvertResources legal intents by collapsing fungible payment token-ID combinations; deterministic auto-payment when IDs are omitted.
 - 2026-02-23: task(0226) Engine: Prevent legal-intent enumeration stack overflow when intent sets are very large (e.g., ConvertResources).

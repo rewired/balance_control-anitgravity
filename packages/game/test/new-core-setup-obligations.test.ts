@@ -81,6 +81,41 @@ describe('CORE-01 Setup and Components Obligations', () => {
         expect(inf).toHaveLength(2);
     });
 
+
+    /** @rule CORE-01-03-03B */
+    it('assigns starting Influence only to PersonalSupply zones and marks them as starting [CORE-01-03-03B]', () => {
+        const ctx: any = { numPlayers: 3, random: { Die: (_n: number) => 1 } };
+        const G = SetupGame({ ctx });
+
+        const boardInfluence = G.zones[CoreZoneName.Board].items.filter((id) => G.objects[id]?.type === 'Influence');
+        expect(boardInfluence).toHaveLength(0);
+
+        for (const pid of ['0', '1', '2']) {
+            const personalSupply = G.zones[`${CoreZoneName.PersonalSupply}:${pid}`].items;
+            const influence = personalSupply
+                .map((id) => G.objects[id])
+                .filter((obj) => obj?.type === 'Influence');
+
+            expect(influence).toHaveLength(3);
+            for (const inf of influence) {
+                expect(inf.owner).toBe(pid);
+                expect(inf.isStarting).toBe(true);
+            }
+        }
+    });
+
+    /** @rule CORE-01-03-04 */
+    it('assigns exactly 4 starting Influence to each player in a 2-player game [CORE-01-03-04]', () => {
+        const ctx: any = { numPlayers: 2, random: { Die: (_n: number) => 1 } };
+        const G = SetupGame({ ctx });
+
+        for (const pid of ['0', '1']) {
+            const personalSupply = G.zones[`${CoreZoneName.PersonalSupply}:${pid}`].items;
+            const influence = personalSupply.filter((id) => G.objects[id]?.type === 'Influence');
+            expect(influence).toHaveLength(4);
+        }
+    });
+
     /** @rule CORE-01-03-02A */
     it('ensures seeded RNG produces identical game state [CORE-01-03-02A]', () => {
         const seed = 12345;
