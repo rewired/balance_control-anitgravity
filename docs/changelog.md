@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-24: task(0250) Engine: Split political-action moves into per-move modules under `packages/game/src/moves/stages/politicalAction/` with a compatibility `index.ts` export (mechanical refactor; no semantic changes).
 - 2026-02-24: task(0249) Tests/Docs: Close settlement/endgame evidence with explicit immediate-end assertions after final settlement trigger, illegal post-end political-action no-op proof, and deterministic replay revalidation (no runtime logic changes).
 - 2026-02-24: task(0248) Tests/Docs: Close resolver + production evidence loop via obligation-audit confirmation, deterministic focused suite reruns, and task artifact completion (no runtime logic changes).
 - 2026-02-24: task(0247) Tests/Docs: Close turn-gating and legal-intent evidence loop via audit/test revalidation and task artifact completion (no runtime logic changes).
