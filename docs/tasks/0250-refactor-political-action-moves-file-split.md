@@ -107,4 +107,7 @@ Recorded in final commit message (Postflight: block).
 Recorded in final commit message (Postflight: block).
 
 ## 15) Amendments (append-only)
-* N/A
+* 2026-02-24 (amendment): Added `stages/politicalAction/shared.ts` helper to centralize stage assertion, political-action usage precheck, and canonical successful finalization (usage increment + `events.endTurn`) across place/move/formalize/convert moves.
+* 2026-02-24 (amendment): Preserved Start Committee special-case tracking in `formalizeInfluence` via explicit `beforeUsageIncrement` callback hook.
+* 2026-02-24 (amendment): Expanded `packages/game/test/moves.test.ts` with regression coverage for invalid stage rejection, exhausted usage rejection, and successful finalization usage/endTurn invariants.
+* 2026-02-24 (amendment): Command reruns — `pnpm lint` ✅; `pnpm --filter @balance-control/game test -- moves.test.ts` ⚠️ (pre-existing workspace/Vite package-entry resolution failure for `@balance-control/rules`).

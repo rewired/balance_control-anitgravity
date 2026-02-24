@@ -2,8 +2,9 @@ import { INVALID_MOVE } from 'boardgame.io/core';
 import { TileType } from '@balance-control/rules';
 import { EffectResolver } from '../../../engine/resolver';
 import { placeInfluencePayloadSchema, validateMovePayload } from '../../../move-contracts';
-import { POLITICAL_ACTION_STAGE, isBoardTile, requireStage } from '../../shared';
+import { isBoardTile } from '../../shared';
 import { hasInfluenceInSupply, returnMetaMarkerToSupply } from '../../../mechanics-turn';
+import { beginPoliticalActionMove, finalizePoliticalActionMove } from './shared';
 
 /**
  * Places one influence from supply onto a board tile.
@@ -18,9 +19,8 @@ export const placeInfluence = ({ G, ctx, events }: any, payload: unknown) => {
     if (!validated.ok) return INVALID_MOVE;
     const { targetTileId, extraResourceIds } = validated.value;
 
-    const pid = ctx.currentPlayer;
-    if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'placeInfluence')) return INVALID_MOVE;
-    if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
+    const pid = beginPoliticalActionMove({ G, ctx }, 'placeInfluence');
+    if (pid === INVALID_MOVE) return INVALID_MOVE;
 
     const tile = G.tiles[targetTileId];
 
@@ -48,7 +48,5 @@ export const placeInfluence = ({ G, ctx, events }: any, payload: unknown) => {
     // CORE-01-04-09A: PlaceInfluence does not place Meta-Marker → return to supply
     returnMetaMarkerToSupply(G, pid);
 
-    // Usage tracking
-    EffectResolver.incrementUsage(G, 'politicalAction', pid);
-    events.endTurn();
+    finalizePoliticalActionMove({ G, events }, pid);
 };
