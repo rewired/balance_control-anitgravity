@@ -6,7 +6,7 @@
       "ex03": false
     }
   },
-  "expectedFinalHash": "a980ac374dfbc06df0a81f56d345548a8e7c06eac896c345aa1d6e83a3e42fe8",
+  "expectedFinalHash": "9cdbcc6b724f161269e577134bc428e67fd9a4be0b804be702f5331dfd936989",
   "expectedPublicSurfaceHash": "600edc6b6b052ddefdfd3efae43d321594f9ed44b7816c1954db2a14068d2ce8",
   "id": "core_hotspot_surrounded",
   "moves": [
