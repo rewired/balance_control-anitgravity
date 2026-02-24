@@ -112,6 +112,35 @@ describe('Topology Invariants', () => {
     });
 
     /**
+     * @rule CORE-01-00-11
+     * @rule CORE-01-00-T03
+     */
+    it('should only change adjacency-dependent legal intents when topology adjacency changes', () => {
+        const ctx: any = {
+            numPlayers: 2,
+            currentPlayer: '0',
+            activePlayers: { '0': 'politicalAction' },
+            random: { Die: () => 1 }
+        };
+        const G = SetupGame({ ctx });
+
+        const normalize = (value: unknown) => JSON.stringify(value);
+        const nonMoveIntentSignatures = () =>
+            enumerateLegalIntents(G, ctx, '0')
+                .filter(intent => intent.moveType !== 'moveInfluence')
+                .map(intent => normalize({ moveType: intent.moveType, payload: intent.payload }))
+                .sort();
+
+        const baseline = nonMoveIntentSignatures();
+
+        G.adjacency = {
+            tile_start_committee: [],
+        };
+
+        expect(nonMoveIntentSignatures()).toEqual(baseline);
+    });
+
+    /**
      * @rule CORE-01-00-T03
      */
     it('should ensure moveInfluence intents respect topology', () => {

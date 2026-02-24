@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-24: task(0240) Tests/Docs: Harden topology obligation evidence with explicit CORE-01-00-11 and CORE-01-00-12 assertion bindings (no runtime logic changes).
 - 2026-02-23: task(0227) Engine: Deduplicate ConvertResources legal intents by collapsing fungible payment token-ID combinations; deterministic auto-payment when IDs are omitted.
 - 2026-02-23: task(0226) Engine: Prevent legal-intent enumeration stack overflow when intent sets are very large (e.g., ConvertResources).
 - 2026-02-22: task(0222) Engine/UI: Remove passTilePlacement and auto-run final settlement at end-of-game (CORE-01-09-01A, VAR-01-01-08).

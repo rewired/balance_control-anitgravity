@@ -142,7 +142,10 @@ describe('REF_RESOLVER invariants (tripwires)', () => {
         );
     });
 
-    it('disabled expansions contribute no atom handlers (exp-only atoms become no-ops)', () => {
+    /**
+     * @rule CORE-01-00-12
+     */
+    it('keeps expansion-specific zones isolated when expansion handlers are disabled', () => {
         const base: any = {
             zones: {
                 RegulationSupply: { id: 'RegulationSupply', name: 'RegulationSupply', items: ['reg_m13_1'] },
