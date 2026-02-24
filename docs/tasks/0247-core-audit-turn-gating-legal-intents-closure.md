@@ -62,31 +62,39 @@
 * Illegal payloads must fail atomically.
 
 ## 8) Implementation Plan
-* [ ] Build rule-to-test matrix for turn gating/legality IDs.
-* [ ] Add missing direct tests with explicit rule-ID mapping.
-* [ ] Re-run audits and ensure no legal-intents SUSPECT entries remain.
+* [x] Build rule-to-test matrix for turn gating/legality IDs.
+* [x] Add missing direct tests with explicit rule-ID mapping.
+* [x] Re-run audits and ensure no legal-intents SUSPECT entries remain.
 
 ## 9) Acceptance Criteria
-* [ ] Each listed CORE legality ID has a direct executable assertion.
-* [ ] `pnpm -w audit:core-obligations` shows no WEAK/SUSPECT for turn/legality cluster.
-* [ ] Golden replay unchanged or intentionally updated with explanation.
+* [x] Each listed CORE legality ID has a direct executable assertion.
+* [x] `pnpm -w audit:core-obligations` shows no WEAK/SUSPECT for turn/legality cluster.
+* [x] Golden replay unchanged or intentionally updated with explanation.
 
 ## 10) PR Checklist (Repo Artifact)
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ## 11) Work Summary (3–7 bullets)
-* N/A
+* Verified the turn-gating legality cluster already has direct executable assertions in targeted suites (`moves.test.ts` and `legal-intents.test.ts`) for CORE-01-04-11A, CORE-01-04-22D/E, and CORE-01-08-08/08A.
+* Re-ran the obligations audit and confirmed zero WEAK/MISSING/SUSPECT entries, including the turn/legality cluster.
+* Built workspace packages to restore workspace export resolution before running targeted turn-gating suites, then ran full repository quality gates (`lint`, `test`) to preserve deterministic evidence closure.
+* Updated changelog and task execution artifact sections for closure-mode completion (no runtime logic changes required).
 ## 12) Commands Run (with outcomes)
-* N/A
+* `pnpm -w audit:core-obligations` ✅ PASS (WEAK: 0, SUSPECT: 0).
+* `pnpm vitest run packages/game/test/moves.test.ts packages/game/test/legal-intents.test.ts` ⚠️ INITIAL FAIL (`@balance-control/rules` export resolution before build).
+* `pnpm -r build` ✅ PASS.
+* `pnpm vitest run packages/game/test/moves.test.ts packages/game/test/legal-intents.test.ts` ✅ PASS.
+* `pnpm lint` ✅ PASS.
+* `pnpm test` ✅ PASS.
 ## 13) Postflight Proof (recorded in commit message)
 ### 13.1 Recorded
 Recorded in final commit message (Postflight: block).
@@ -94,4 +102,4 @@ Recorded in final commit message (Postflight: block).
 ### 14.1 Recorded
 Recorded in final commit message (Postflight: block).
 ## 15) Amendments (append-only)
-* N/A
+* 2026-02-24: Executed in closure mode by validating the turn-gating legality evidence cluster, re-running audits/tests, and updating Sections 8–12 plus changelog bookkeeping.

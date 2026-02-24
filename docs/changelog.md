@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-24: task(0247) Tests/Docs: Close turn-gating and legal-intent evidence loop via audit/test revalidation and task artifact completion (no runtime logic changes).
 - 2026-02-24: task(0245) Tests/Docs: Close topology evidence gaps with direct Board position-binding and placeTile adjacency assertions; align obligation registry links and add DD trace (no runtime logic changes).
 - 2026-02-24: task(0244) Tests/Docs: Harden CORE endgame legality evidence with assertion-level winner/tie checks and deterministic immediate-settlement replay coverage (no runtime logic changes).
 - 2026-02-24: task(0243) Tests/Docs: Harden resolver + production evidence with explicit CORE production tie/noise assertions, Start Committee immunity proof, and deterministic golden replay rerun coverage (no runtime logic changes).
