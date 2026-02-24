@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CoreMoves } from '../src/moves';
 import { GameState, TileType, CoreZoneName } from '@balance-control/rules';
 import { INVALID_MOVE } from 'boardgame.io/core';
@@ -439,4 +439,94 @@ describe('Moves', () => {
         expect(result).toBe(INVALID_MOVE);
         expect(JSON.stringify(G)).toBe(before);
     });
+
+    it('political actions should reject when not in POLITICAL_ACTION_STAGE', () => {
+        const run = (move: 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources') => {
+            const localEvents = { endTurn: vi.fn(), endStage: vi.fn() };
+            ctx.activePlayers = { p1: 'drawAndPlace' };
+            const before = JSON.stringify(G);
+
+            if (move === 'placeInfluence') {
+                return { result: CoreMoves.placeInfluence({ G, ctx, events: localEvents }, { targetTileId: 'board_t2' }), before, localEvents };
+            }
+            if (move === 'moveInfluence') {
+                G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+                G.zones.board_t1.items.push('inf_1');
+                return { result: CoreMoves.moveInfluence({ G, ctx, events: localEvents }, { sourceId: 'board_t1', targetId: 'board_t2' }), before, localEvents };
+            }
+            if (move === 'formalizeInfluence') {
+                return {
+                    result: CoreMoves.formalizeInfluence(
+                        { G, ctx, events: localEvents },
+                        { committeeTileId: 'board_t2', paymentResourceIds: ['res_dom', 'res_for'] }
+                    ),
+                    before,
+                    localEvents
+                };
+            }
+            G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1'];
+            G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+            G.zones.board_gr.items.push('inf_1');
+            return {
+                result: CoreMoves.convertResources(
+                    { G, ctx, events: localEvents },
+                    { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'], outputResort: 'INF' }
+                ),
+                before,
+                localEvents
+            };
+        };
+
+        for (const move of ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources'] as const) {
+            const { result, before, localEvents } = run(move);
+            expect(result).toBe(INVALID_MOVE);
+            expect(JSON.stringify(G)).toBe(before);
+            expect(localEvents.endTurn).not.toHaveBeenCalled();
+        }
+    });
+
+    it('political actions should reject when usage is exhausted', () => {
+        G.engine.attributes.limits.politicalAction = 1;
+        G.engine.attributes.usage = { p1: { politicalAction: 1 }, politicalAction: 1 } as any;
+
+        const localEvents = { endTurn: vi.fn(), endStage: vi.fn() };
+
+        expect(CoreMoves.placeInfluence({ G, ctx, events: localEvents }, { targetTileId: 'board_t2' })).toBe(INVALID_MOVE);
+
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones.board_t1.items.push('inf_1');
+        expect(CoreMoves.moveInfluence({ G, ctx, events: localEvents }, { sourceId: 'board_t1', targetId: 'board_t2' })).toBe(INVALID_MOVE);
+
+        expect(
+            CoreMoves.formalizeInfluence(
+                { G, ctx, events: localEvents },
+                { committeeTileId: 'board_t2', paymentResourceIds: ['res_dom', 'res_for'] }
+            )
+        ).toBe(INVALID_MOVE);
+
+        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1'];
+        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones.board_gr.items.push('inf_1');
+        expect(
+            CoreMoves.convertResources(
+                { G, ctx, events: localEvents },
+                { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'], outputResort: 'INF' }
+            )
+        ).toBe(INVALID_MOVE);
+
+        expect(localEvents.endTurn).not.toHaveBeenCalled();
+        expect(G.engine.attributes.usage.p1.politicalAction).toBe(1);
+    });
+
+    it('political action success should increment usage and end turn', () => {
+        const localEvents = { endTurn: vi.fn(), endStage: vi.fn() };
+
+        const result = CoreMoves.placeInfluence({ G, ctx, events: localEvents }, { targetTileId: 'board_t2' });
+
+        expect(result).not.toBe(INVALID_MOVE);
+        expect(G.engine.attributes.usage.p1.politicalAction).toBe(1);
+        expect(G.engine.attributes.usage.politicalAction).toBe(1);
+        expect(localEvents.endTurn).toHaveBeenCalledTimes(1);
+    });
+
 });

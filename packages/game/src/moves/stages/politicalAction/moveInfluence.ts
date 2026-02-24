@@ -4,8 +4,9 @@ import { isMoveAdjacent } from '../../../engine/topology';
 import { EffectResolver } from '../../../engine/resolver';
 import { findObjectZoneId, getPlayerMetaMarker } from '../../../state-lookup';
 import { moveInfluencePayloadSchema, validateMovePayload } from '../../../move-contracts';
-import { POLITICAL_ACTION_STAGE, hasDuplicateIds, hasOverlap, isBoardTile, placeMetaMarkerOnTile, requireStage } from '../../shared';
+import { hasDuplicateIds, hasOverlap, isBoardTile, placeMetaMarkerOnTile } from '../../shared';
 import { returnMetaMarkerToSupply } from '../../../mechanics-turn';
+import { beginPoliticalActionMove, finalizePoliticalActionMove } from './shared';
 
 /**
  * Moves exactly one influence from one board tile to another.
@@ -23,9 +24,8 @@ export const moveInfluence = ({ G, ctx, events }: any, payload: unknown) => {
     if (!validated.ok) return INVALID_MOVE;
     const { sourceId, targetId, extraResourceIds = [] } = validated.value;
 
-    const pid = ctx.currentPlayer;
-    if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'moveInfluence')) return INVALID_MOVE;
-    if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
+    const pid = beginPoliticalActionMove({ G, ctx }, 'moveInfluence');
+    if (pid === INVALID_MOVE) return INVALID_MOVE;
 
     // Generic Prohibition check
     if (EffectResolver.isProhibited(G, 'influence.move', pid, targetId)) return INVALID_MOVE;
@@ -105,7 +105,5 @@ export const moveInfluence = ({ G, ctx, events }: any, payload: unknown) => {
         returnMetaMarkerToSupply(G, pid);
     }
 
-    // Usage tracking
-    EffectResolver.incrementUsage(G, 'politicalAction', pid);
-    events.endTurn();
+    finalizePoliticalActionMove({ G, events }, pid);
 };

@@ -5,17 +5,16 @@ import { EffectResolver } from '../../../engine/resolver';
 import { convertResourcesPayloadSchema, validateMovePayload } from '../../../move-contracts';
 import {
     CostSlot,
-    POLITICAL_ACTION_STAGE,
     getGrassrootsConversionSpec,
     hasDuplicateIds,
     hasOverlap,
     isBoardTile,
     isCoreResort,
     placeMetaMarkerOnTile,
-    requireStage
 } from '../../shared';
 import { selectDeterministicCostResourceIds } from '../../../engine/deterministic-cost';
 import { getPlayerMetaMarker } from '../../../state-lookup';
+import { beginPoliticalActionMove, finalizePoliticalActionMove } from './shared';
 
 /**
  * Converts resources via a grassroots tile.
@@ -44,9 +43,8 @@ export const convertResources = ({ G, ctx, events }: any, payload: unknown) => {
     const declaredInputCount: number | undefined = inputCount ?? inputResourceIds?.length;
     if (!declaredInputCount) return INVALID_MOVE;
 
-    const pid = ctx.currentPlayer;
-    if (!requireStage(ctx, POLITICAL_ACTION_STAGE, 'convertResources')) return INVALID_MOVE;
-    if (!EffectResolver.checkUsageLimit(G, 'politicalAction', pid)) return INVALID_MOVE;
+    const pid = beginPoliticalActionMove({ G, ctx }, 'convertResources');
+    if (pid === INVALID_MOVE) return INVALID_MOVE;
     const tile = G.tiles[grassrootsTileId];
 
     if (!tile || tile.type !== TileType.Grassroots) return INVALID_MOVE;
@@ -125,7 +123,5 @@ export const convertResources = ({ G, ctx, events }: any, payload: unknown) => {
         placeMetaMarkerOnTile(G, marker, grassrootsTileId, 'Convert');
     }
 
-    // Usage tracking
-    EffectResolver.incrementUsage(G, 'politicalAction', pid);
-    events.endTurn();
+    finalizePoliticalActionMove({ G, events }, pid);
 };
