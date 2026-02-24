@@ -293,7 +293,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/integration-tests/test/golden/core_majority_tie_no_control.json"
       ],
       "notes": ""
     },
@@ -828,7 +829,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/engine/legal-intents.ts",
-        "packages/game/src/moves/stages/drawAndPlace.ts"
+        "packages/game/src/moves/stages/drawAndPlace.ts",
+        "packages/integration-tests/test/golden/core_placement_legality.json"
       ],
       "notes": ""
     },
@@ -838,7 +840,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/legal-intents.ts"
+        "packages/game/src/engine/legal-intents.ts",
+        "packages/integration-tests/test/golden/core_placement_legality.json"
       ],
       "notes": ""
     },
@@ -992,7 +995,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/integration-tests/test/golden/core_formalize_influence.json"
       ],
       "notes": ""
     },
@@ -1002,7 +1006,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/integration-tests/test/golden/core_formalize_influence.json"
       ],
       "notes": ""
     },
@@ -1012,7 +1017,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/integration-tests/test/golden/core_formalize_influence.json"
       ],
       "notes": ""
     },
@@ -1022,7 +1028,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/integration-tests/test/golden/core_convert_resources.json"
       ],
       "notes": ""
     },
@@ -1032,7 +1039,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/integration-tests/test/golden/core_convert_resources.json"
       ],
       "notes": ""
     },
@@ -1123,7 +1131,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics/conversion.ts",
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/integration-tests/test/golden/core_convert_resources.json"
       ],
       "notes": ""
     },
@@ -1232,7 +1241,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics/conversion.ts",
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/integration-tests/test/golden/core_convert_resources.json"
       ],
       "notes": ""
     },
@@ -1243,7 +1253,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics/conversion.ts",
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/integration-tests/test/golden/core_convert_resources.json"
       ],
       "notes": ""
     },
@@ -1264,7 +1275,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/integration-tests/test/golden/core_majority_tie_no_control.json"
       ],
       "notes": ""
     },
@@ -1416,7 +1428,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/drawAndPlace.ts"
+        "packages/game/src/moves/stages/drawAndPlace.ts",
+        "packages/integration-tests/test/golden/core_hotspot_surrounded.json"
       ],
       "notes": ""
     },
@@ -1426,7 +1439,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/drawAndPlace.ts"
+        "packages/game/src/moves/stages/drawAndPlace.ts",
+        "packages/integration-tests/test/golden/core_hotspot_surrounded.json"
       ],
       "notes": ""
     },
@@ -1437,7 +1451,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/engine/atoms/hotspot.ts",
-        "packages/game/test/hotspot.test.ts"
+        "packages/game/test/hotspot.test.ts",
+        "packages/integration-tests/test/golden/core_hotspot_surrounded.json"
       ],
       "notes": ""
     },
@@ -1469,7 +1484,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/hotspot.ts"
+        "packages/game/src/engine/atoms/hotspot.ts",
+        "packages/integration-tests/test/golden/core_hotspot_surrounded.json"
       ],
       "notes": ""
     },
@@ -1541,7 +1557,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/production.ts"
+        "packages/game/src/engine/atoms/production.ts",
+        "packages/integration-tests/test/golden/core_majority_tie_no_control.json"
       ],
       "notes": ""
     },
@@ -1715,7 +1732,8 @@
       "evidence": [
         "packages/game/src/mechanics-turn.ts",
         "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/legal-intents.test.ts"
+        "packages/game/test/legal-intents.test.ts",
+        "packages/integration-tests/test/golden/core_formalize_influence.json"
       ],
       "notes": ""
     },

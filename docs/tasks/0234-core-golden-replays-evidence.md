@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -35,9 +35,9 @@ Rules (non-negotiable):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -125,7 +125,7 @@ N/A
 
 ## 8) Implementation Plan
 
-* [ ] Add curated fixtures to cover the following CORE clusters (use prelude helpers as needed):
+* [x] Add curated fixtures to cover the following CORE clusters (use prelude helpers as needed):
 
   * DrawAndPlaceTile placement legality + adjacency/topology basics
   * ConvertResources (typed vs untyped grassroots) + payment behavior
@@ -133,8 +133,8 @@ N/A
   * Majority tie → no control (ensure production behaves accordingly)
   * Hotspot fully surrounded → resolve path
 
-* [ ] For each new fixture, run the update script (or manual hash capture) in a deterministic way and commit the expected hashes.
-* [ ] Update `CORE-01-OBLIGATIONS.json`:
+* [x] For each new fixture, run the update script (or manual hash capture) in a deterministic way and commit the expected hashes.
+* [x] Update `CORE-01-OBLIGATIONS.json`:
 
   * Add `golden:` evidence entries mapping relevant obligations to fixture IDs/files.
   * Keep evidence minimal and high signal.
@@ -143,10 +143,10 @@ N/A
 
 ## 9) Acceptance Criteria
 
-* [ ] New fixtures exist and pass in integration tests.
-* [ ] At least one fixture covers each listed CORE cluster above.
-* [ ] `CORE-01-OBLIGATIONS.json` references the fixtures as evidence.
-* [ ] No unintended hash drift.
+* [x] New fixtures exist and pass in integration tests.
+* [x] At least one fixture covers each listed CORE cluster above.
+* [x] `CORE-01-OBLIGATIONS.json` references the fixtures as evidence.
+* [x] No unintended hash drift.
 
 ---
 
@@ -162,13 +162,21 @@ N/A
 
 ## 11) Work Summary (3–7 bullets)
 
-* TODO (fill during VERIFYING/COMMIT_READY)
+* Created 5 new golden replay fixtures in `packages/integration-tests/test/golden/` covering key CORE-01 mechanics.
+* Validated adjacency, Grassroots conversion, Committee formalization, majority ties, and Hotspot resolution.
+* Generated deterministic state hashes for all new fixtures using the `golden:update` script.
+* Linked these fixtures as implementation evidence in `docs/architecture/CORE-01-OBLIGATIONS.json`.
+* Verified compliance using `pnpm audit:core-obligations` and integration tests.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* TODO (fill during VERIFYING/COMMIT_READY)
+* `pnpm install` (installed dependencies)
+* `pnpm build` (built monorepo)
+* `pnpm -C packages/integration-tests run golden:update` (generated hashes)
+* `pnpm -C packages/integration-tests test -- golden-replay.test.ts` (verified replays pass)
+* `pnpm run audit:core-obligations` (verified registry consistency)
 
 ---
 
