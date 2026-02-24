@@ -20,6 +20,9 @@ describe('Unplaceable draw handling', () => {
         registerTestPacks();
     });
 
+    /** @rule CORE-01-02-03 */
+    /** @rule CORE-01-04-06 */
+    /** @rule CORE-01-04-07 */
     it('discards unplaceable drawn tile, logs notice, forces confirm, then redraws on confirm', () => {
         const ctx = createCtx();
         const G = SetupGame({ ctx });

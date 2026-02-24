@@ -329,7 +329,8 @@
       "class": "NORMATIVE_DATA",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -339,7 +340,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -349,7 +351,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics-draw.ts"
+        "packages/game/src/mechanics-draw.ts",
+        "packages/game/test/unplaceable-draw-redraw.test.ts"
       ],
       "notes": ""
     },
@@ -359,7 +362,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/objects.ts"
+        "packages/rules/src/objects.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -565,7 +569,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/tile-loader.ts"
+        "packages/game/src/packs/core/tile-loader.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -595,7 +600,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/shared.ts"
+        "packages/game/src/moves/shared.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -655,7 +661,9 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/setup.ts"
+        "packages/game/src/setup.ts",
+        "packages/game/test/setup.test.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -680,7 +688,8 @@
         "packages/game/src/engine/atoms/measure.ts",
         "packages/game/src/mechanics-draw.ts",
         "packages/game/src/setup.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -691,7 +700,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics-draw.ts",
-        "packages/game/src/setup.ts"
+        "packages/game/src/setup.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -712,7 +722,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/setup.ts",
-        "packages/game/test/setup.test.ts"
+        "packages/game/test/setup.test.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -722,7 +733,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/setup.ts"
+        "packages/game/src/setup.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -732,7 +744,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/setup.ts"
+        "packages/game/src/setup.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -742,7 +755,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -762,7 +776,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
