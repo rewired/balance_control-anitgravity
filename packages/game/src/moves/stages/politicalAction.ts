@@ -36,6 +36,7 @@ export const PoliticalActionMoves = {
      * Places one influence from supply onto a board tile.
      * @rule CORE-01-04-10
      * @rule CORE-01-04-11
+     * @rule CORE-01-02-17D
      * @deterministic
      * @sideEffects
      */
@@ -51,6 +52,7 @@ export const PoliticalActionMoves = {
         const tile = G.tiles[targetTileId];
 
         if (!tile || !isBoardTile(G, targetTileId)) return INVALID_MOVE;
+        // CORE-01-08-04 / CORE-01-02-17D
         if (tile.type === TileType.StartCommittee) return INVALID_MOVE;
 
         // Generic Prohibition check
@@ -85,6 +87,7 @@ export const PoliticalActionMoves = {
      * @rule CORE-01-04-12B
      * @rule CORE-01-04-12D
      * @rule CORE-01-08-06E
+     * @rule CORE-01-02-17D
      * @deterministic
      * @sideEffects
      */
@@ -183,10 +186,27 @@ export const PoliticalActionMoves = {
     /**
      * Formalizes influence via a committee tile, creating new influence.
      * @rule CORE-01-04-13
+     * @rule CORE-01-04-14
+     * @rule CORE-01-04-14A
+     * @rule CORE-01-04-14B
      * @rule CORE-01-04-15
+     * @rule CORE-01-04-15A
+     * @rule CORE-01-04-16
+     * @rule CORE-01-04-17A
+     * @rule CORE-01-04-18
+     * @rule CORE-01-04-19
+     * @rule CORE-01-08-04
      * @rule CORE-01-08-07
      * @rule CORE-01-08-08
+     * @rule CORE-01-08-08A
+     * @rule CORE-01-08-09
+     * @rule CORE-01-08-10
+     * @rule CORE-01-08-10A
      * @rule CORE-01-08-06A
+     * @rule CORE-01-08-06B
+     * @rule CORE-01-08-06C
+     * @rule CORE-01-08-06C.1
+     * @rule CORE-01-08-06F
      * @rule CORE-01-08-02
      * @rule CORE-01-08-03
      * @rule CORE-01-08-01
@@ -292,7 +312,17 @@ export const PoliticalActionMoves = {
     /**
      * Converts resources via a grassroots tile.
      * @rule CORE-01-04-20
+     * @rule CORE-01-04-21
      * @rule CORE-01-04-22
+     * @rule CORE-01-04-22A
+     * @rule CORE-01-04-22B
+     * @rule CORE-01-04-22C
+     * @rule CORE-01-04-22D
+     * @rule CORE-01-04-22E
+     * @rule CORE-01-04-22G
+     * @rule CORE-01-04-22H
+     * @rule CORE-01-04-22I
+     * @rule CORE-01-04-22J
      * @rule CORE-01-04-22K
      * @rule CORE-01-04-22L
      * @rule CORE-01-04-22L.1

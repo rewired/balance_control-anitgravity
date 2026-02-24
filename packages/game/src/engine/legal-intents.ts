@@ -58,6 +58,7 @@ export interface LegalIntent {
  * Enumerates all legal moves for a player in the current state.
  * @rule CORE-01-04-05A
  * @rule CORE-01-04-09
+ * @rule CORE-01-04-08
  * @deterministic
  * @pure
  */

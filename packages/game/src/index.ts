@@ -178,7 +178,12 @@ export function createBalanceControlGame(): Game<GameState> {
             return computeCoreGameover(G);
         },
 
+        /**
+         * @rule CORE-01-04-01
+         * @rule CORE-01-04-03
+         */
         turn: {
+            /** @rule CORE-01-03-03A */
             order: {
                 first: ({ G }: { G: GameState }) => G.engine.attributes.startingPlayerIndex ?? 0,
                 next: ({ ctx }: { ctx: any }) => (ctx.playOrderPos + 1) % ctx.numPlayers,
@@ -236,7 +241,7 @@ export function createBalanceControlGame(): Game<GameState> {
                     return;
                 }
 
-                // CORE-01-07-02: After last player, Round Settlement
+                // CORE-01-07-01 / CORE-01-07-02: After last player, Round Settlement
                 const startingPlayerIndex = G.engine.attributes.startingPlayerIndex ?? 0;
                 const lastPlayerIndex = (startingPlayerIndex + ctx.numPlayers - 1) % ctx.numPlayers;
                 if (ctx.currentPlayer === String(lastPlayerIndex)) {
@@ -279,6 +284,8 @@ export function createBalanceControlGame(): Game<GameState> {
         },
     };
 }
+
+/** @rule CORE-01-09-02 */
 
 export { EnginePackRegistry } from './expansion-registry';
 export type { EnginePackDefinition, EnginePackId, PackManifest } from './packs/types';

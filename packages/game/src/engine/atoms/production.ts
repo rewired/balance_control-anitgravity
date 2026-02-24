@@ -9,6 +9,16 @@ import { isProhibited } from '../resolver/prohibitions';
 /**
  * Processes production resolution for a single resort tile.
  * @rule CORE-01-06-16
+ * @rule CORE-01-06-09
+ * @rule CORE-01-06-10
+ * @rule CORE-01-06-11
+ * @rule CORE-01-06-12
+ * @rule CORE-01-06-13
+ * @rule CORE-01-06-13A
+ * @rule CORE-01-06-14
+ * @rule CORE-01-06-15
+ * @rule CORE-01-06-16-00
+ * @rule CORE-01-06-17
  * @deterministic
  * @sideEffects
  */

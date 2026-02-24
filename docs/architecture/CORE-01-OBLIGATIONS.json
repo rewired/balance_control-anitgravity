@@ -10,7 +10,9 @@
       "text": "Every game object exists in exactly one zone at any time.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/state.ts"
+      ],
       "notes": ""
     },
     {
@@ -18,7 +20,9 @@
       "text": "Zones are containers; moving an object means transferring it between zones.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/zones.ts"
+      ],
       "notes": ""
     },
     {
@@ -26,7 +30,9 @@
       "text": "PersonalSupply Partition (Canonical): For each player P, exactly one zone PersonalSupply[P] exists. Any Resource in PersonalSupply[P] belongs to player P for all costs/effects.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -34,7 +40,9 @@
       "text": "Influence zones are: PersonalSupply, Board.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/zones.ts"
+      ],
       "notes": ""
     },
     {
@@ -42,7 +50,9 @@
       "text": "Influence Tile Attachment Invariant (Canonical): Each Influence in Board is attached to exactly one Tile in Board (“on that Tile”). An Influence in PersonalSupply is unattached.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -50,7 +60,9 @@
       "text": "Resource zones are: PersonalSupply, Bank, Noise.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/zones.ts"
+      ],
       "notes": ""
     },
     {
@@ -58,7 +70,9 @@
       "text": "Bank Supply Invariant (Canonical): Bank is an unlimited source/sink. When moving N Resources from Bank, the engine MUST be able to materialize them and move them; Bank availability never restricts legality or production.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/resource.ts"
+      ],
       "notes": ""
     },
     {
@@ -66,7 +80,9 @@
       "text": "Tile zones are: DrawPile, Board, DiscardFaceUp.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/zones.ts"
+      ],
       "notes": ""
     },
     {
@@ -74,7 +90,9 @@
       "text": "Ordered Zone Conventions (Canonical): DrawPile and DiscardFaceUp are ordered lists. Top = first element; bottom = last element. Moving a Tile to DiscardFaceUp appends it to the end.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/zones.ts"
+      ],
       "notes": ""
     },
     {
@@ -82,7 +100,9 @@
       "text": "No object may exist in multiple zones simultaneously.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/state.ts"
+      ],
       "notes": ""
     },
     {
@@ -90,7 +110,9 @@
       "text": "The board uses a topology parameter that defines adjacency between Tiles.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/state.ts"
+      ],
       "notes": ""
     },
     {
@@ -98,7 +120,9 @@
       "text": "Any rule that references adjacency uses the current topology’s adjacency definition.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/state.ts"
+      ],
       "notes": ""
     },
     {
@@ -106,7 +130,9 @@
       "text": "A topology attachment must be defined before game start.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/setup.ts"
+      ],
       "notes": ""
     },
     {
@@ -114,7 +140,9 @@
       "text": "The topology attachment specifies how adjacency between Tiles is determined.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/state.ts"
+      ],
       "notes": ""
     },
     {
@@ -122,7 +150,9 @@
       "text": "The topology attachment does not modify any other rule.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/state.ts"
+      ],
       "notes": ""
     },
     {
@@ -130,7 +160,9 @@
       "text": "Expansion-specific zones: If expansions introduce zones, they exist separately per expansion; different expansions do not mix objects unless explicitly defined. (Out of scope here.)",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/state.ts"
+      ],
       "notes": ""
     },
     {
@@ -138,7 +170,9 @@
       "text": "A topology implementation must define Adjacent(TileA, TileB) → Boolean.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/topology.ts"
+      ],
       "notes": ""
     },
     {
@@ -146,7 +180,9 @@
       "text": "Adjacent(TileA, TileB) must be deterministic.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/topology.ts"
+      ],
       "notes": ""
     },
     {
@@ -154,7 +190,9 @@
       "text": "All adjacency-based rules reference Adjacent(TileA, TileB).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/topology.ts"
+      ],
       "notes": ""
     },
     {
@@ -178,7 +216,9 @@
       "text": "Board Position Binding (Canonical): Each Tile in Board is bound to exactly one topology-defined Position. No two Tiles may share a Position.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -186,7 +226,9 @@
       "text": "Neighbor Positions: Define NeighborPositions(Position) → ordered list of adjacent Positions.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/topology.ts"
+      ],
       "notes": ""
     },
     {
@@ -194,7 +236,9 @@
       "text": "Adjacency Consistency (Canonical): For Tiles in Board, Adjacent(A,B) MUST be true iff B.Position ∈ NeighborPositions(A.Position).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/topology.ts"
+      ],
       "notes": ""
     },
     {
@@ -212,7 +256,9 @@
       "text": "StartPosition: Define constant StartPosition. During Setup (CORE-01-03-01), bind the Start Committee tile to StartPosition.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -236,7 +282,9 @@
       "text": "Relative majority enables control.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -244,7 +292,9 @@
       "text": "Tie results in no control.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -252,7 +302,9 @@
       "text": "The game contains exactly one Start Committee tile.",
       "class": "NORMATIVE_DATA",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -260,7 +312,9 @@
       "text": "The Start Committee tile is not part of the DrawPile.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -268,7 +322,9 @@
       "text": "A tile in the DrawPile is drawn only during DrawAndPlaceTile.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics-draw.ts"
+      ],
       "notes": ""
     },
     {
@@ -276,7 +332,9 @@
       "text": "Ownership: Each Influence is owned by exactly one player. A player may move only their own Influence unless explicitly stated otherwise.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/objects.ts"
+      ],
       "notes": ""
     },
     {
@@ -284,7 +342,9 @@
       "text": "Core tile types are: ResortTiles, Committees, Grassroots, Lobbyists, Hotspots.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/tile-loader.ts"
+      ],
       "notes": ""
     },
     {
@@ -292,7 +352,9 @@
       "text": "The core game defines exactly three Resource resorts: DOM, FOR, INF.",
       "class": "NORMATIVE_DATA",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/resources.ts"
+      ],
       "notes": ""
     },
     {
@@ -300,7 +362,9 @@
       "text": "DOM represents Domestic Affairs.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/resources.ts"
+      ],
       "notes": ""
     },
     {
@@ -308,7 +372,9 @@
       "text": "FOR represents Foreign Affairs.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/resources.ts"
+      ],
       "notes": ""
     },
     {
@@ -316,7 +382,9 @@
       "text": "INF represents Information / Media Control.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/resources.ts"
+      ],
       "notes": ""
     },
     {
@@ -324,7 +392,9 @@
       "text": "“Resource type” refers exclusively to {DOM, FOR, INF}.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/resources.ts"
+      ],
       "notes": ""
     },
     {
@@ -332,7 +402,9 @@
       "text": "No additional Resource resorts exist in CORE-01 unless introduced by an explicit expansion (out of scope).",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/resources.ts"
+      ],
       "notes": ""
     },
     {
@@ -340,7 +412,9 @@
       "text": "Each Resource object has exactly one resort attribute.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/resources.ts"
+      ],
       "notes": ""
     },
     {
@@ -348,7 +422,9 @@
       "text": "ResortTiles produce Resources during Round Settlement.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -356,7 +432,9 @@
       "text": "Committees enable the FormalizeInfluence action.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -364,7 +442,9 @@
       "text": "Grassroots enable the ConvertResources action.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -372,7 +452,9 @@
       "text": "Grassroots Type Tag (Normative): Typed Grassroots has printed type tag T ∈ {DOM, FOR, INF}. Untyped Grassroots has no type tag.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -380,7 +462,9 @@
       "text": "Lobbyists contribute virtual Influence for majority calculation only.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -388,7 +472,9 @@
       "text": "Hotspots resolve when fully surrounded.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -396,7 +482,9 @@
       "text": "Core tile counts (DOM ResortTiles): W1×2, W2×4, W3×4, W4×1, W5×1.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/tile-loader.ts"
+      ],
       "notes": ""
     },
     {
@@ -404,7 +492,9 @@
       "text": "Core tile counts (FOR ResortTiles): W1×2, W2×4, W3×4, W4×1, W5×1.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/tile-loader.ts"
+      ],
       "notes": ""
     },
     {
@@ -412,7 +502,9 @@
       "text": "Core tile counts (INF ResortTiles): W1×2, W2×4, W3×4, W4×1, W5×1.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/tile-loader.ts"
+      ],
       "notes": ""
     },
     {
@@ -420,7 +512,9 @@
       "text": "Core tile counts (Committees): ×10.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/tile-loader.ts"
+      ],
       "notes": ""
     },
     {
@@ -428,7 +522,9 @@
       "text": "Core tile counts (Grassroots): ×8.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/tile-loader.ts"
+      ],
       "notes": ""
     },
     {
@@ -436,7 +532,9 @@
       "text": "Grassroots Composition (Normative): Untyped ×2, Typed(DOM) ×2, Typed(FOR) ×2, Typed(INF) ×2. Counts MUST sum to 8.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/tile-loader.ts"
+      ],
       "notes": ""
     },
     {
@@ -444,7 +542,9 @@
       "text": "Core tile counts (Lobbyists): ×9.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/tile-loader.ts"
+      ],
       "notes": ""
     },
     {
@@ -452,7 +552,9 @@
       "text": "Core tile counts (Hotspots): ×8.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/tile-loader.ts"
+      ],
       "notes": ""
     },
     {
@@ -470,7 +572,9 @@
       "text": "Each player has exactly one Meta-Marker (Cooldown Token).",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -478,7 +582,9 @@
       "text": "A Meta-Marker is not Influence, not a Resource, and not an Overlay.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/rules/src/objects.ts"
+      ],
       "notes": ""
     },
     {
@@ -496,7 +602,9 @@
       "text": "A Meta-Marker may not be placed on the Start Committee.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -504,7 +612,9 @@
       "text": "Meta-Marker mode ∈ {None, ReturnPenalty, Convert}; at game start, mode = None.",
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -557,7 +667,9 @@
       "text": "Shuffle Scope (Canonical): Any “shuffle” in this specification (incl. VAR-01-01-05) MUST use CORE-01-03-02A.1 and MUST consume randomness from the same seeded RNG instance.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/setup.ts"
+      ],
       "notes": ""
     },
     {
@@ -606,7 +718,9 @@
       "text": "Turn Order: Turn order is fixed: starting player first, then ascending seat order wrapping around.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -624,7 +738,9 @@
       "text": "For 2 players, assign 4 Influence to each player’s PersonalSupply.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -632,7 +748,9 @@
       "text": "For 3 players, assign 3 Influence to each player’s PersonalSupply.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -640,7 +758,9 @@
       "text": "For 4 players, assign 2 Influence to each player’s PersonalSupply.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/packs/core/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -648,7 +768,9 @@
       "text": "A turn consists of exactly two phases.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -666,7 +788,9 @@
       "text": "Phase 2 is ExactlyOnePoliticalAction.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -726,7 +850,9 @@
       "text": "A tile may be placed only on an unoccupied Position in the current topology.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/legal-intents.ts"
+      ],
       "notes": ""
     },
     {
@@ -856,7 +982,9 @@
       "text": "FormalizeInfluence is performed via a Committee tile.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -864,7 +992,9 @@
       "text": "Start Committee Override: If selected Committee is Start Committee, resolve per CORE-01-08-07..CORE-01-08-10A instead of CORE-01-04-15..CORE-01-04-19.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -872,7 +1002,9 @@
       "text": "Start Committee Formalize — Legality and Failure: Selecting Start Committee is legal only if (a) CORE-01-08-02 satisfied, (b) player has not used Start Committee formalization (CORE-01-08-07), (c) player can fully pay CORE-01-08-08 cost, and (d) Influence Cap Check CORE-01-08-10A passes. If any fail, action is invalid and does not resolve; no state change occurs (CORE-01-06-00-03).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -890,7 +1022,9 @@
       "text": "Declaration + Atomic Payment (Canonical): active player MUST declare the two paid Resources (their resorts) before any Resource movement; declaration is locked. Payment is simultaneous; if full payment cannot be made, FormalizeInfluence fails and does not resolve; no state change occurs (CORE-01-06-00-03).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -898,7 +1032,9 @@
       "text": "On success, move paid Resources from PersonalSupply[activePlayer] to Bank.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -916,7 +1052,9 @@
       "text": "Influence Cap Check: If creating the new Influence would exceed the Influence cap, FormalizeInfluence does not resolve; no state change occurs (CORE-01-04-19).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -924,7 +1062,9 @@
       "text": "FormalizeInfluence fails if required Resources cannot be fully paid.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -932,7 +1072,9 @@
       "text": "If FormalizeInfluence fails, no state change occurs.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -950,7 +1092,9 @@
       "text": "ConvertResources is performed via a Grassroots tile.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -969,7 +1113,9 @@
       "text": "Output Unit: ConvertResources produces exactly 1 Resource as output per successful action, unless the Grassroots tile text explicitly specifies multiple outputs.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -977,7 +1123,9 @@
       "text": "Availability (Control Requirement): ConvertResources is legal only if active player currently controls at least one Grassroots tile in Board; otherwise ConvertResources may not be chosen.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -985,7 +1133,9 @@
       "text": "Repeat Penalty (Meta-Marker): If, when ConvertResources begins resolution, the active player’s Meta-Marker is on any Tile with mode = Convert, increase conversion cost by +1 additional Resource. The player chooses the resort for this +1 as part of locked cost declaration. Applies regardless of which Grassroots tile is used this time.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -993,7 +1143,9 @@
       "text": "Convert Anchor Selection: select exactly one Grassroots tile that the active player currently controls; that tile is the Convert Anchor for this resolution.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1001,7 +1153,9 @@
       "text": "Meta-Marker Placement: after successful ConvertResources, place Meta-Marker onto the Convert Anchor and set mode = Convert (removing it from any prior Tile).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1017,7 +1171,9 @@
       "text": "ConvertRecipe Requirement: Each Grassroots Tile MUST provide a machine-readable ConvertRecipe (inputs + outputs) matching printed text. If selected Grassroots has no ConvertRecipe, ConvertResources is invalid and does not resolve; no state change occurs (CORE-01-06-00-03).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1025,7 +1181,9 @@
       "text": "Core Grassroots Definitions (Normative): CORE-01 MUST include complete normative definition for every Grassroots tile used (incl. ADD56): printed text + ConvertRecipe. If absent, ConvertResources is undefined and may not be executed.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1033,7 +1191,9 @@
       "text": "Grassroots Tile Kinds (Canonical): Each Grassroots is exactly one of (a) Untyped, or (b) Typed with type tag T ∈ {DOM, FOR, INF}. Untyped share CORE-01-04-22K. Typed share CORE-01-04-22L (substitute T).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1041,7 +1201,9 @@
       "text": "Declaration, Payment, Failure (Canonical): active player MUST declare recipe variant and required choices (incl. output resort where applicable), plus any +1 penalty resource (CORE-01-04-22C) before any Resource movement; declaration is locked. If full payment cannot be made, ConvertResources fails and does not resolve; no state change occurs (CORE-01-06-00-03). On success: move paid inputs to Bank, then move output Resource(s) from Bank to PersonalSupply[activePlayer].",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1082,7 +1244,9 @@
       "text": "A player controls a Tile iff computeMajority(Tile) returns that player (CORE-01-05-03A).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -1090,7 +1254,9 @@
       "text": "If computeMajority(Tile) returns None (tie), no player controls that Tile.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -1129,7 +1295,9 @@
       "text": "Lobbyist Bonus Attribution: For target Tile X, each adjacent Lobbyist Tile L contributes +1 to the player who controls L; if L uncontrolled, contributes 0.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -1147,7 +1315,9 @@
       "text": "Lobbyist contribution applies only to majority calculation.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -1155,7 +1325,9 @@
       "text": "Lobbyist contribution does not create or move Influence objects.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics.ts"
+      ],
       "notes": ""
     },
     {
@@ -1163,7 +1335,9 @@
       "text": "Definition — “Effect”: Any rule-defined state change executed by resolving (a) Tile printed behavior (incl. Resort production), (b) triggered Tile behavior (e.g., Hotspot), (c) Political Action, or (d) Measure/Regulation instruction. In CORE-01 without expansions, there are no Measures/Regulations/Overlays/external modifiers beyond this document.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/resolver.ts"
+      ],
       "notes": ""
     },
     {
@@ -1171,7 +1345,9 @@
       "text": "Paying costs, checking prohibitions, and applying modifiers are part of effect resolution.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/resolver.ts"
+      ],
       "notes": ""
     },
     {
@@ -1179,7 +1355,9 @@
       "text": "If an Effect does not resolve, no partial state changes occur unless explicitly stated.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/resolver.ts"
+      ],
       "notes": ""
     },
     {
@@ -1187,7 +1365,9 @@
       "text": "Effect Context (Tile Binding): An effect resolves with exactly one ContextTile (nullable).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/resolver.ts"
+      ],
       "notes": ""
     },
     {
@@ -1195,7 +1375,9 @@
       "text": "ContextTile Assignment (Canonical):",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/resolver.ts"
+      ],
       "notes": ""
     },
     {
@@ -1203,7 +1385,9 @@
       "text": "Multiple-Tile References: If an instruction references multiple Tiles, it must explicitly state which Tile is ContextTile; otherwise the effect is invalid and does not resolve.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/resolver.ts"
+      ],
       "notes": ""
     },
     {
@@ -1211,7 +1395,9 @@
       "text": "A Hotspot is “fully surrounded” when all adjacent positions are occupied by Tiles.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/drawAndPlace.ts"
+      ],
       "notes": ""
     },
     {
@@ -1240,7 +1426,10 @@
       "text": "Multiple Hotspots Order (Canonical): If multiple Hotspots become surrounded from the same placement, resolve them in ascending PositionKey(Hotspot.Position); later Hotspots see updated state.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/hotspot.ts",
+        "packages/game/src/moves/stages/drawAndPlace.ts"
+      ],
       "notes": ""
     },
     {
@@ -1269,7 +1458,9 @@
       "text": "If a player has majority on the Hotspot, place exactly one Influence on that Hotspot for the majority player.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/hotspot.ts"
+      ],
       "notes": ""
     },
     {
@@ -1277,7 +1468,9 @@
       "text": "Hotspot placement moves one Influence from that player’s PersonalSupply to the Hotspot Tile in Board.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/hotspot.ts"
+      ],
       "notes": ""
     },
     {
@@ -1285,7 +1478,9 @@
       "text": "If the majority player has no available Influence in PersonalSupply, placement cannot occur.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/hotspot.ts"
+      ],
       "notes": ""
     },
     {
@@ -1293,7 +1488,9 @@
       "text": "Hotspots do not produce Resources.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/hotspot.ts"
+      ],
       "notes": ""
     },
     {
@@ -1301,7 +1498,9 @@
       "text": "Resort Production is resolved only during Round Settlement.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/production.ts"
+      ],
       "notes": ""
     },
     {
@@ -1309,7 +1508,9 @@
       "text": "Each ResortTile has a printed production value.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/production.ts"
+      ],
       "notes": ""
     },
     {
@@ -1317,7 +1518,9 @@
       "text": "Produced amount is computed by CORE-01-06-16(a); winner(s) by CORE-01-06-16(b)/(c).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/production.ts"
+      ],
       "notes": ""
     },
     {
@@ -1325,7 +1528,9 @@
       "text": "Produced Resources move from Bank to the production winner(s).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/production.ts"
+      ],
       "notes": ""
     },
     {
@@ -1333,7 +1538,9 @@
       "text": "If highest totalInfluence on a ResortTile is 0, produce 0.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/production.ts"
+      ],
       "notes": ""
     },
     {
@@ -1341,7 +1548,9 @@
       "text": "totalInfluence for Production: computed exactly as CORE-01-05-03A step (1) for that ResortTile.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/production.ts"
+      ],
       "notes": ""
     },
     {
@@ -1349,7 +1558,9 @@
       "text": "If tie for highest totalInfluence and highest > 0, split production evenly among tied players.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/production.ts"
+      ],
       "notes": ""
     },
     {
@@ -1357,7 +1568,9 @@
       "text": "Any remainder from tied production is moved to Noise.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/production.ts"
+      ],
       "notes": ""
     },
     {
@@ -1375,7 +1588,9 @@
       "text": "Modifier Collection Step: collect all applicable modifiers for this production instance before applying steps (a)–(c).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/engine/atoms/production.ts"
+      ],
       "notes": ""
     },
     {
@@ -1393,7 +1608,9 @@
       "text": "A round is one complete player cycle in turn order.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/index.ts"
+      ],
       "notes": ""
     },
     {
@@ -1421,7 +1638,9 @@
       "text": "Meta-Marker Round Start: At the beginning of each Round, do not move Meta-Markers.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics-turn.ts"
+      ],
       "notes": ""
     },
     {
@@ -1429,7 +1648,9 @@
       "text": "Meta-Marker Persistence: A Meta-Marker remains at its current location until updated or returned to PersonalSupply by a rule.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics-turn.ts"
+      ],
       "notes": ""
     },
     {
@@ -1437,7 +1658,9 @@
       "text": "Meta-Marker Mode Reset: When a Meta-Marker is returned to PersonalSupply, set mode = None.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/mechanics-turn.ts"
+      ],
       "notes": ""
     },
     {
@@ -1488,7 +1711,9 @@
       "text": "No Influence may be placed on the Start Committee.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1528,7 +1753,9 @@
       "text": "Immunity does not override CORE-01-08-02 and does not allow placing/moving Influence onto the Start Committee.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1536,7 +1763,9 @@
       "text": "Start Committee Connectivity Clarification: Start Committee may be used as connector for adjacency-derived connectivity/paths. This does not allow Influence to enter/remain/be placed on Start Committee.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1544,7 +1773,9 @@
       "text": "Path/Connectivity definitions: A Path is a finite sequence of Tiles where consecutive pairs are Adjacent = true. Two Tiles are connected iff at least one Path exists between them.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1574,7 +1805,9 @@
       "text": "Immunity Interpretation: Immunity applies to effects targeting/modifying Start Committee; it does not prohibit actions via Start Committee as explicitly defined (CORE-01-04-14A / CORE-01-08-07..10A).",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1602,7 +1835,9 @@
       "text": "Declaration + Atomic Payment (Canonical): Apply CORE-01-04-15A using the cost in CORE-01-08-08.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1610,7 +1845,9 @@
       "text": "Move all paid Resources from PersonalSupply[activePlayer] to Bank.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1618,7 +1855,9 @@
       "text": "Create exactly one new Influence in PersonalSupply[activePlayer].",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1626,7 +1865,9 @@
       "text": "Influence Cap Check (Start Committee): If this would exceed the cap, action does not resolve; no state change occurs.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
       "notes": ""
     },
     {
@@ -1658,7 +1899,9 @@
       "text": "After the final Round Settlement completes, the game ends immediately.",
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
-      "evidence": [],
+      "evidence": [
+        "packages/game/src/index.ts"
+      ],
       "notes": ""
     },
     {

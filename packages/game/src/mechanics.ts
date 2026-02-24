@@ -8,6 +8,18 @@ export interface MajorityResult {
 /**
  * Computes the relative majority for a given tile.
  * @rule CORE-01-05-03A
+ * @rule CORE-01-01-03
+ * @rule CORE-01-01-04
+ * @rule CORE-01-02-05
+ * @rule CORE-01-02-06
+ * @rule CORE-01-02-07
+ * @rule CORE-01-02-08
+ * @rule CORE-01-02-09
+ * @rule CORE-01-05-01
+ * @rule CORE-01-05-02
+ * @rule CORE-01-05-04A
+ * @rule CORE-01-05-05
+ * @rule CORE-01-05-06
  * @deterministic
  * @pure
  */

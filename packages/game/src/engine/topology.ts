@@ -15,6 +15,10 @@ import { GameState, TileType } from '@balance-control/rules';
  * @rule CORE-01-04-12D
  * @rule CORE-01-08-06D
  * @rule CORE-01-08-06E
+ * @rule CORE-01-00-T01
+ * @rule CORE-01-00-T02
+ * @rule CORE-01-00-T03
+ * @rule CORE-01-00-T07A
  * @deterministic
  * @pure
  */

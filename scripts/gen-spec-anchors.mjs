@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const RULE_ID_PATTERN = "\\b(?:CORE|EXP|VAR|ADD56)-\\d{2}(?:-(?:\\d{2}[A-Z]?|[A-Z]|T\\d{2}))+(?:\\.\\d+[A-Z]?)*\\b";
+const RULE_ID_PATTERN = "\\b(?:CORE|EXP|VAR|ADD56)-\\d{2}(?:-(?:\\d{2}[A-Z]?|[A-Z]|T\\d{2}[A-Z]?))+(?:\\.\\d+[A-Z]?)*\\b";
 
 const RULE_FILES = [
   "docs/rules/000-core.md",

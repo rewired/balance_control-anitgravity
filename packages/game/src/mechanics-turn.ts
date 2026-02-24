@@ -69,6 +69,9 @@ export function allStartingInfluencePlaced(G: any, ctx: any): boolean {
 /**
  * CORE-01-04-09A: Return Meta-Marker to PersonalSupply and set mode = None when Political Action did not place/update it.
  * @rule CORE-01-04-09A
+ * @rule CORE-01-07-03A
+ * @rule CORE-01-07-03B
+ * @rule CORE-01-07-03C
  * @deterministic
  * @sideEffects
  */

@@ -60,6 +60,10 @@ function handleResourcePay(G: GameState & { engine: EngineState }, atom: any): b
     });
 }
 
+/**
+ * Grants resources to a player.
+ * @rule CORE-01-00-04A
+ */
 function handleResourceGrant(G: GameState, atom: any): void {
     let { playerId, amount, resort, context, missingController } = atom;
 
