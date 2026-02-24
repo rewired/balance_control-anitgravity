@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## 0) Masterplan Guardrails (MUST)
 
@@ -119,7 +119,11 @@
 
 ## 11) Work Summary (3–7 bullets)
 
-* N/A
+* Created `packages/game/test/new-core-setup-obligations.test.ts` to provide executable evidence for CORE-01 setup and component obligations.
+* Verified canonical RNG behavior, including seeded determinism and specific call order (Shuffle before Start Player selection).
+* Asserted Start Committee uniqueness, initial placement at (0,0), and exclusion from the DrawPile.
+* Hardened Grassroots composition evidence (2 untyped, 2 DOM, 2 FOR, 2 INF).
+* Updated `docs/architecture/CORE-01-OBLIGATIONS.json` and existing tests with appropriate `@rule` annotations.
 
 ## 12) Commands Run (with outcomes)
 

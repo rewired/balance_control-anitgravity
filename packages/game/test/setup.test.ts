@@ -36,6 +36,7 @@ describe('SetupGame', () => {
         registerTestPacks();
     });
 
+    /** @rule CORE-01-02-04 */
     it('should generate correct number of core tiles', () => {
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
@@ -62,6 +63,7 @@ describe('SetupGame', () => {
         expect(hotspots.length).toBe(8);
     });
 
+    /** @rule CORE-01-02-04 */
     it('should add ADD56 tiles when 5-6 players', () => {
         const ctx: any = { numPlayers: 5, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
@@ -83,6 +85,7 @@ describe('SetupGame', () => {
         expect(hotspots.length).toBe(10); // 8 + 2
     });
 
+    /** @rule CORE-01-03-01 */
     it('should place Start Committee on Board', () => {
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
@@ -92,6 +95,7 @@ describe('SetupGame', () => {
         expect(G.tiles[board[0]].type).toBe(TileType.StartCommittee);
     });
 
+    /** @rule CORE-01-02-17A */
     it('should create one meta-marker per player in personal supply', () => {
         const ctx: any = { numPlayers: 3, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
@@ -178,6 +182,8 @@ describe('SetupGame', () => {
         expect(enabledA.zones[CoreZoneName.DrawPile].items).not.toEqual(disabled.zones[CoreZoneName.DrawPile].items);
     });
 
+    /** @rule CORE-01-03-03 */
+    /** @rule CORE-01-03-02A.2 */
     it('should determine starting player via canonical RNG and apply handicap (CORE-01-03-02A.2, VAR-01-02-02)', () => {
         // We need a seeded random that we can predict
         // Seed 42 for 2 players:
