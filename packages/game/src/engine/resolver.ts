@@ -266,7 +266,7 @@ export class EffectResolver {
             seq: G.engine.history.length,
             atom: atom.kind,
         };
-        // Capture key context for traceability (CORE-01 compliance evidence support)
+        // Capture key context for traceability (CORE-01-00 compliance evidence support)
         const atomAny = atom as any;
         if (atomAny.tileId) historyEntry.tileId = atomAny.tileId;
         if (atomAny.context?.tileId) historyEntry.tileId = atomAny.context.tileId;
