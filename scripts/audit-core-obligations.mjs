@@ -168,19 +168,17 @@ function main() {
   console.log(`Registry Entries: ${registry.entries.length}`);
   console.log("Class breakdown:", report.summary.totalsByClass);
 
-  if (auditResult.missingInRegistry.length > 0 || auditResult.extraInRegistry.length > 0 || auditResult.invalidEntries.length > 0 || auditResult.duplicateIds.length > 0) {
+  if (auditResult.missingInRegistry.length > 0 || auditResult.extraInRegistry.length > 0 || auditResult.invalidEntries.length > 0 || auditResult.duplicateIds.length > 0 || auditResult.normativeMissingEvidence.length > 0 || auditResult.evidenceOrphans.length > 0) {
     console.warn("\nIssues found:");
     if (auditResult.missingInRegistry.length > 0) console.warn(`- Missing in registry: ${auditResult.missingInRegistry.length}`);
     if (auditResult.extraInRegistry.length > 0) console.warn(`- Extra in registry: ${auditResult.extraInRegistry.length}`);
     if (auditResult.duplicateIds.length > 0) console.warn(`- Duplicate IDs in registry: ${auditResult.duplicateIds.length}`);
     if (auditResult.invalidEntries.length > 0) console.warn(`- Invalid entries: ${auditResult.invalidEntries.length}`);
+    if (auditResult.normativeMissingEvidence.length > 0) console.warn(`- Normative entries missing evidence: ${auditResult.normativeMissingEvidence.length}`);
+    if (auditResult.evidenceOrphans.length > 0) console.warn(`- Evidence orphans: ${auditResult.evidenceOrphans.length}`);
     process.exit(1);
   } else {
-    console.log("\nRegistry is consistent with spec.");
-  }
-
-  if (auditResult.normativeMissingEvidence.length > 0) {
-    console.log(`- Normative entries missing evidence: ${auditResult.normativeMissingEvidence.length}`);
+    console.log("\nRegistry is consistent and all normative obligations have evidence.");
   }
 }
 

@@ -18,7 +18,10 @@ The audit command runs a fixed sequence:
 ## INTERPRETING FAILURES
 - Anchor generation drift: regenerated anchors differ from committed registry.
 - Tripwire failure: a referenced rule ID does not exist in canonical specs.
-- Obligations failure: registry/spec drift or invalid classification schema.
+- Obligations failure:
+    - Registry/spec mismatch: CORE-01-OBLIGATIONS.json is out of sync with 000-core.md.
+    - Normative missing evidence: a NORMATIVE_* rule has no evidence linked.
+    - Evidence orphan: an evidence reference points to a missing file or fixture.
 - Invariants failure: core compliance regression in deterministic tests.
 - Golden replay failure: state hash drift for a canonical replay fixture.
 
