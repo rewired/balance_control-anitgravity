@@ -1,0 +1,741 @@
+{
+  "summary": {
+    "totalCoreIds": 241,
+    "implemented": 41,
+    "tested": 9,
+    "exempt": 14,
+    "missingImplementation": 186,
+    "missingTest": 218
+  },
+  "coverage": {
+    "implementedIds": [
+      "ADD56-01-03-00-01",
+      "CORE-01-00",
+      "CORE-01-00-T08",
+      "CORE-01-02-17C",
+      "CORE-01-03-01",
+      "CORE-01-03-02A",
+      "CORE-01-04-02",
+      "CORE-01-04-04",
+      "CORE-01-04-05",
+      "CORE-01-04-05A",
+      "CORE-01-04-06",
+      "CORE-01-04-07",
+      "CORE-01-04-09",
+      "CORE-01-04-09A",
+      "CORE-01-04-10",
+      "CORE-01-04-11",
+      "CORE-01-04-11A",
+      "CORE-01-04-12",
+      "CORE-01-04-12A",
+      "CORE-01-04-12B",
+      "CORE-01-04-12D",
+      "CORE-01-04-13",
+      "CORE-01-04-15",
+      "CORE-01-04-20",
+      "CORE-01-04-22",
+      "CORE-01-04-22K",
+      "CORE-01-04-22L",
+      "CORE-01-04-22L.1",
+      "CORE-01-05-03A",
+      "CORE-01-05-04",
+      "CORE-01-06-04",
+      "CORE-01-06-16",
+      "CORE-01-08-01",
+      "CORE-01-08-02",
+      "CORE-01-08-03",
+      "CORE-01-08-06A",
+      "CORE-01-08-06D",
+      "CORE-01-08-06E",
+      "CORE-01-08-07",
+      "CORE-01-08-08",
+      "CORE-01-09-01A"
+    ],
+    "testedIds": [
+      "CORE-01-03-02A.2",
+      "CORE-01-04-09A",
+      "CORE-01-04-12A",
+      "CORE-01-04-12B",
+      "CORE-01-04-12D",
+      "CORE-01-06-03B",
+      "CORE-01-08-02",
+      "CORE-01-09-01A",
+      "VAR-01-02-02"
+    ],
+    "exemptIds": [
+      "CORE-01-01",
+      "CORE-01-01-01",
+      "CORE-01-01-02",
+      "CORE-01-01-03",
+      "CORE-01-01-04",
+      "CORE-01-02",
+      "CORE-01-03",
+      "CORE-01-04",
+      "CORE-01-05",
+      "CORE-01-06",
+      "CORE-01-07",
+      "CORE-01-08",
+      "CORE-01-09",
+      "CORE-01-10"
+    ],
+    "missingImplementationIds": [
+      "ADD56-01-01-01",
+      "ADD56-01-01-02",
+      "ADD56-01-01-03",
+      "ADD56-01-01-04",
+      "ADD56-01-01-05",
+      "ADD56-01-01-06",
+      "ADD56-01-01-07",
+      "ADD56-01-01-08",
+      "ADD56-01-01-09",
+      "ADD56-01-01-10",
+      "ADD56-01-01-11",
+      "ADD56-01-01-12",
+      "ADD56-01-01-13",
+      "ADD56-01-01-13A",
+      "ADD56-01-01-14",
+      "ADD56-01-01-15",
+      "ADD56-01-01-16",
+      "ADD56-01-01-16A",
+      "ADD56-01-02-01",
+      "ADD56-01-02-02",
+      "ADD56-01-03-01",
+      "CORE-01-00-01",
+      "CORE-01-00-02",
+      "CORE-01-00-02A",
+      "CORE-01-00-03",
+      "CORE-01-00-03A",
+      "CORE-01-00-04",
+      "CORE-01-00-04A",
+      "CORE-01-00-05",
+      "CORE-01-00-05A",
+      "CORE-01-00-06",
+      "CORE-01-00-07",
+      "CORE-01-00-08",
+      "CORE-01-00-09",
+      "CORE-01-00-10",
+      "CORE-01-00-11",
+      "CORE-01-00-12",
+      "CORE-01-00-T01",
+      "CORE-01-00-T02",
+      "CORE-01-00-T03",
+      "CORE-01-00-T04",
+      "CORE-01-00-T05",
+      "CORE-01-00-T06",
+      "CORE-01-00-T07",
+      "CORE-01-00-T09",
+      "CORE-01-02-01",
+      "CORE-01-02-02",
+      "CORE-01-02-03",
+      "CORE-01-02-03A",
+      "CORE-01-02-04",
+      "CORE-01-02-04A",
+      "CORE-01-02-04B",
+      "CORE-01-02-04C",
+      "CORE-01-02-04D",
+      "CORE-01-02-04E",
+      "CORE-01-02-04F",
+      "CORE-01-02-04G",
+      "CORE-01-02-05",
+      "CORE-01-02-06",
+      "CORE-01-02-07",
+      "CORE-01-02-07A",
+      "CORE-01-02-08",
+      "CORE-01-02-09",
+      "CORE-01-02-10",
+      "CORE-01-02-11",
+      "CORE-01-02-12",
+      "CORE-01-02-13",
+      "CORE-01-02-14",
+      "CORE-01-02-14A",
+      "CORE-01-02-15",
+      "CORE-01-02-16",
+      "CORE-01-02-17",
+      "CORE-01-02-17A",
+      "CORE-01-02-17B",
+      "CORE-01-02-17D",
+      "CORE-01-02-17E",
+      "CORE-01-03-02",
+      "CORE-01-03-02A.1",
+      "CORE-01-03-02A.1A",
+      "CORE-01-03-02A.2",
+      "CORE-01-03-02B",
+      "CORE-01-03-02B.1",
+      "CORE-01-03-03",
+      "CORE-01-03-03A",
+      "CORE-01-03-03B",
+      "CORE-01-03-04",
+      "CORE-01-03-05",
+      "CORE-01-03-06",
+      "CORE-01-04-01",
+      "CORE-01-04-03",
+      "CORE-01-04-08",
+      "CORE-01-04-12C",
+      "CORE-01-04-14",
+      "CORE-01-04-14A",
+      "CORE-01-04-14B",
+      "CORE-01-04-15A",
+      "CORE-01-04-16",
+      "CORE-01-04-17",
+      "CORE-01-04-17A",
+      "CORE-01-04-18",
+      "CORE-01-04-19",
+      "CORE-01-04-21",
+      "CORE-01-04-22A",
+      "CORE-01-04-22B",
+      "CORE-01-04-22C",
+      "CORE-01-04-22D",
+      "CORE-01-04-22E",
+      "CORE-01-04-22F",
+      "CORE-01-04-22G",
+      "CORE-01-04-22H",
+      "CORE-01-04-22I",
+      "CORE-01-04-22J",
+      "CORE-01-05-01",
+      "CORE-01-05-02",
+      "CORE-01-05-03",
+      "CORE-01-05-04A",
+      "CORE-01-05-04B",
+      "CORE-01-05-05",
+      "CORE-01-05-06",
+      "CORE-01-06-00-01",
+      "CORE-01-06-00-02",
+      "CORE-01-06-00-03",
+      "CORE-01-06-00-04",
+      "CORE-01-06-00-05",
+      "CORE-01-06-00-06",
+      "CORE-01-06-01",
+      "CORE-01-06-02",
+      "CORE-01-06-03",
+      "CORE-01-06-03A",
+      "CORE-01-06-03B",
+      "CORE-01-06-05",
+      "CORE-01-06-06",
+      "CORE-01-06-07",
+      "CORE-01-06-08",
+      "CORE-01-06-09",
+      "CORE-01-06-10",
+      "CORE-01-06-11",
+      "CORE-01-06-12",
+      "CORE-01-06-13",
+      "CORE-01-06-13A",
+      "CORE-01-06-14",
+      "CORE-01-06-15",
+      "CORE-01-06-16-00",
+      "CORE-01-06-17",
+      "CORE-01-07-01",
+      "CORE-01-07-02",
+      "CORE-01-07-03",
+      "CORE-01-07-03A",
+      "CORE-01-07-03B",
+      "CORE-01-07-03C",
+      "CORE-01-07-03D",
+      "CORE-01-08-04",
+      "CORE-01-08-05",
+      "CORE-01-08-06",
+      "CORE-01-08-06B",
+      "CORE-01-08-06C",
+      "CORE-01-08-06C.1",
+      "CORE-01-08-06F",
+      "CORE-01-08-08A",
+      "CORE-01-08-09",
+      "CORE-01-08-10",
+      "CORE-01-08-10A",
+      "CORE-01-09-01",
+      "CORE-01-09-02",
+      "CORE-01-09-03",
+      "CORE-01-09-04",
+      "CORE-01-10-01",
+      "CORE-01-10-02",
+      "CORE-01-10-03",
+      "CORE-01-10-04",
+      "VAR-01-01-01",
+      "VAR-01-01-02",
+      "VAR-01-01-03",
+      "VAR-01-01-04",
+      "VAR-01-01-05",
+      "VAR-01-01-06",
+      "VAR-01-01-07",
+      "VAR-01-01-08",
+      "VAR-01-02-01",
+      "VAR-01-02-02",
+      "VAR-01-02-03",
+      "VAR-01-02-04",
+      "VAR-01-02-05",
+      "VAR-01-02-06",
+      "VAR-01-02-07",
+      "VAR-01-02-08"
+    ],
+    "missingTestIds": [
+      "ADD56-01-01-01",
+      "ADD56-01-01-02",
+      "ADD56-01-01-03",
+      "ADD56-01-01-04",
+      "ADD56-01-01-05",
+      "ADD56-01-01-06",
+      "ADD56-01-01-07",
+      "ADD56-01-01-08",
+      "ADD56-01-01-09",
+      "ADD56-01-01-10",
+      "ADD56-01-01-11",
+      "ADD56-01-01-12",
+      "ADD56-01-01-13",
+      "ADD56-01-01-13A",
+      "ADD56-01-01-14",
+      "ADD56-01-01-15",
+      "ADD56-01-01-16",
+      "ADD56-01-01-16A",
+      "ADD56-01-02-01",
+      "ADD56-01-02-02",
+      "ADD56-01-03-00-01",
+      "ADD56-01-03-01",
+      "CORE-01-00",
+      "CORE-01-00-01",
+      "CORE-01-00-02",
+      "CORE-01-00-02A",
+      "CORE-01-00-03",
+      "CORE-01-00-03A",
+      "CORE-01-00-04",
+      "CORE-01-00-04A",
+      "CORE-01-00-05",
+      "CORE-01-00-05A",
+      "CORE-01-00-06",
+      "CORE-01-00-07",
+      "CORE-01-00-08",
+      "CORE-01-00-09",
+      "CORE-01-00-10",
+      "CORE-01-00-11",
+      "CORE-01-00-12",
+      "CORE-01-00-T01",
+      "CORE-01-00-T02",
+      "CORE-01-00-T03",
+      "CORE-01-00-T04",
+      "CORE-01-00-T05",
+      "CORE-01-00-T06",
+      "CORE-01-00-T07",
+      "CORE-01-00-T08",
+      "CORE-01-00-T09",
+      "CORE-01-02-01",
+      "CORE-01-02-02",
+      "CORE-01-02-03",
+      "CORE-01-02-03A",
+      "CORE-01-02-04",
+      "CORE-01-02-04A",
+      "CORE-01-02-04B",
+      "CORE-01-02-04C",
+      "CORE-01-02-04D",
+      "CORE-01-02-04E",
+      "CORE-01-02-04F",
+      "CORE-01-02-04G",
+      "CORE-01-02-05",
+      "CORE-01-02-06",
+      "CORE-01-02-07",
+      "CORE-01-02-07A",
+      "CORE-01-02-08",
+      "CORE-01-02-09",
+      "CORE-01-02-10",
+      "CORE-01-02-11",
+      "CORE-01-02-12",
+      "CORE-01-02-13",
+      "CORE-01-02-14",
+      "CORE-01-02-14A",
+      "CORE-01-02-15",
+      "CORE-01-02-16",
+      "CORE-01-02-17",
+      "CORE-01-02-17A",
+      "CORE-01-02-17B",
+      "CORE-01-02-17C",
+      "CORE-01-02-17D",
+      "CORE-01-02-17E",
+      "CORE-01-03-01",
+      "CORE-01-03-02",
+      "CORE-01-03-02A",
+      "CORE-01-03-02A.1",
+      "CORE-01-03-02A.1A",
+      "CORE-01-03-02B",
+      "CORE-01-03-02B.1",
+      "CORE-01-03-03",
+      "CORE-01-03-03A",
+      "CORE-01-03-03B",
+      "CORE-01-03-04",
+      "CORE-01-03-05",
+      "CORE-01-03-06",
+      "CORE-01-04-01",
+      "CORE-01-04-02",
+      "CORE-01-04-03",
+      "CORE-01-04-04",
+      "CORE-01-04-05",
+      "CORE-01-04-05A",
+      "CORE-01-04-06",
+      "CORE-01-04-07",
+      "CORE-01-04-08",
+      "CORE-01-04-09",
+      "CORE-01-04-10",
+      "CORE-01-04-11",
+      "CORE-01-04-11A",
+      "CORE-01-04-12",
+      "CORE-01-04-12C",
+      "CORE-01-04-13",
+      "CORE-01-04-14",
+      "CORE-01-04-14A",
+      "CORE-01-04-14B",
+      "CORE-01-04-15",
+      "CORE-01-04-15A",
+      "CORE-01-04-16",
+      "CORE-01-04-17",
+      "CORE-01-04-17A",
+      "CORE-01-04-18",
+      "CORE-01-04-19",
+      "CORE-01-04-20",
+      "CORE-01-04-21",
+      "CORE-01-04-22",
+      "CORE-01-04-22A",
+      "CORE-01-04-22B",
+      "CORE-01-04-22C",
+      "CORE-01-04-22D",
+      "CORE-01-04-22E",
+      "CORE-01-04-22F",
+      "CORE-01-04-22G",
+      "CORE-01-04-22H",
+      "CORE-01-04-22I",
+      "CORE-01-04-22J",
+      "CORE-01-04-22K",
+      "CORE-01-04-22L",
+      "CORE-01-04-22L.1",
+      "CORE-01-05-01",
+      "CORE-01-05-02",
+      "CORE-01-05-03",
+      "CORE-01-05-03A",
+      "CORE-01-05-04",
+      "CORE-01-05-04A",
+      "CORE-01-05-04B",
+      "CORE-01-05-05",
+      "CORE-01-05-06",
+      "CORE-01-06-00-01",
+      "CORE-01-06-00-02",
+      "CORE-01-06-00-03",
+      "CORE-01-06-00-04",
+      "CORE-01-06-00-05",
+      "CORE-01-06-00-06",
+      "CORE-01-06-01",
+      "CORE-01-06-02",
+      "CORE-01-06-03",
+      "CORE-01-06-03A",
+      "CORE-01-06-04",
+      "CORE-01-06-05",
+      "CORE-01-06-06",
+      "CORE-01-06-07",
+      "CORE-01-06-08",
+      "CORE-01-06-09",
+      "CORE-01-06-10",
+      "CORE-01-06-11",
+      "CORE-01-06-12",
+      "CORE-01-06-13",
+      "CORE-01-06-13A",
+      "CORE-01-06-14",
+      "CORE-01-06-15",
+      "CORE-01-06-16",
+      "CORE-01-06-16-00",
+      "CORE-01-06-17",
+      "CORE-01-07-01",
+      "CORE-01-07-02",
+      "CORE-01-07-03",
+      "CORE-01-07-03A",
+      "CORE-01-07-03B",
+      "CORE-01-07-03C",
+      "CORE-01-07-03D",
+      "CORE-01-08-01",
+      "CORE-01-08-03",
+      "CORE-01-08-04",
+      "CORE-01-08-05",
+      "CORE-01-08-06",
+      "CORE-01-08-06A",
+      "CORE-01-08-06B",
+      "CORE-01-08-06C",
+      "CORE-01-08-06C.1",
+      "CORE-01-08-06D",
+      "CORE-01-08-06E",
+      "CORE-01-08-06F",
+      "CORE-01-08-07",
+      "CORE-01-08-08",
+      "CORE-01-08-08A",
+      "CORE-01-08-09",
+      "CORE-01-08-10",
+      "CORE-01-08-10A",
+      "CORE-01-09-01",
+      "CORE-01-09-02",
+      "CORE-01-09-03",
+      "CORE-01-09-04",
+      "CORE-01-10-01",
+      "CORE-01-10-02",
+      "CORE-01-10-03",
+      "CORE-01-10-04",
+      "VAR-01-01-01",
+      "VAR-01-01-02",
+      "VAR-01-01-03",
+      "VAR-01-01-04",
+      "VAR-01-01-05",
+      "VAR-01-01-06",
+      "VAR-01-01-07",
+      "VAR-01-01-08",
+      "VAR-01-02-01",
+      "VAR-01-02-03",
+      "VAR-01-02-04",
+      "VAR-01-02-05",
+      "VAR-01-02-06",
+      "VAR-01-02-07",
+      "VAR-01-02-08"
+    ]
+  },
+  "evidence": {
+    "ADD56-01-03-00-01": {
+      "implementation": [
+        "packages/game/src/mechanics-turn.ts"
+      ]
+    },
+    "CORE-01-00": {
+      "implementation": [
+        "packages/game/src/packs/core/index.ts"
+      ]
+    },
+    "CORE-01-00-T08": {
+      "implementation": [
+        "packages/game/src/topology.ts"
+      ]
+    },
+    "CORE-01-02-17C": {
+      "implementation": [
+        "packages/game/src/moves/shared.ts"
+      ]
+    },
+    "CORE-01-03-01": {
+      "implementation": [
+        "packages/game/src/setup.ts"
+      ]
+    },
+    "CORE-01-03-02A": {
+      "implementation": [
+        "packages/game/src/engine/atoms/measure.ts",
+        "packages/game/src/mechanics-draw.ts",
+        "packages/game/src/setup.ts"
+      ]
+    },
+    "CORE-01-03-02A.2": {
+      "test": [
+        "packages/game/test/setup.test.ts"
+      ]
+    },
+    "CORE-01-04-02": {
+      "implementation": [
+        "packages/game/src/moves/stages/drawAndPlace.ts"
+      ]
+    },
+    "CORE-01-04-04": {
+      "implementation": [
+        "packages/game/src/mechanics-draw.ts"
+      ]
+    },
+    "CORE-01-04-05": {
+      "implementation": [
+        "packages/game/src/moves/stages/drawAndPlace.ts"
+      ]
+    },
+    "CORE-01-04-05A": {
+      "implementation": [
+        "packages/game/src/engine/legal-intents.ts"
+      ]
+    },
+    "CORE-01-04-06": {
+      "implementation": [
+        "packages/game/src/mechanics-draw.ts"
+      ]
+    },
+    "CORE-01-04-07": {
+      "implementation": [
+        "packages/game/src/mechanics-draw.ts",
+        "packages/game/src/moves/system/resolveChoice.ts"
+      ]
+    },
+    "CORE-01-04-09": {
+      "implementation": [
+        "packages/game/src/engine/legal-intents.ts"
+      ]
+    },
+    "CORE-01-04-09A": {
+      "implementation": [
+        "packages/game/src/mechanics-turn.ts"
+      ],
+      "test": [
+        "packages/game/test/moves.test.ts"
+      ]
+    },
+    "CORE-01-04-10": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-04-11": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-04-11A": {
+      "implementation": [
+        "packages/game/src/mechanics-turn.ts"
+      ]
+    },
+    "CORE-01-04-12": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-04-12A": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
+      "test": [
+        "packages/game/test/moves.test.ts"
+      ]
+    },
+    "CORE-01-04-12B": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
+      "test": [
+        "packages/game/test/moves.test.ts",
+        "packages/game/test/resolver.test.ts"
+      ]
+    },
+    "CORE-01-04-12D": {
+      "implementation": [
+        "packages/game/src/engine/topology.ts",
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
+      "test": [
+        "packages/game/test/moves.test.ts"
+      ]
+    },
+    "CORE-01-04-13": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-04-15": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-04-20": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-04-22": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-04-22K": {
+      "implementation": [
+        "packages/game/src/mechanics/conversion.ts",
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-04-22L": {
+      "implementation": [
+        "packages/game/src/mechanics/conversion.ts",
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-04-22L.1": {
+      "implementation": [
+        "packages/game/src/mechanics/conversion.ts",
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-05-03A": {
+      "implementation": [
+        "packages/game/src/mechanics.ts"
+      ]
+    },
+    "CORE-01-05-04": {
+      "implementation": [
+        "packages/game/src/public-selectors.ts"
+      ]
+    },
+    "CORE-01-06-03B": {
+      "test": [
+        "packages/game/test/hotspot.test.ts"
+      ]
+    },
+    "CORE-01-06-04": {
+      "implementation": [
+        "packages/game/src/engine/atoms/hotspot.ts"
+      ]
+    },
+    "CORE-01-06-16": {
+      "implementation": [
+        "packages/game/src/engine/atoms/production.ts"
+      ]
+    },
+    "CORE-01-08-01": {
+      "implementation": [
+        "packages/game/src/mechanics-turn.ts",
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-08-02": {
+      "implementation": [
+        "packages/game/src/mechanics-turn.ts",
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ],
+      "test": [
+        "packages/game/test/legal-intents.test.ts"
+      ]
+    },
+    "CORE-01-08-03": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-08-06A": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-08-06D": {
+      "implementation": [
+        "packages/game/src/engine/topology.ts"
+      ]
+    },
+    "CORE-01-08-06E": {
+      "implementation": [
+        "packages/game/src/engine/topology.ts",
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-08-07": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-08-08": {
+      "implementation": [
+        "packages/game/src/moves/stages/politicalAction.ts"
+      ]
+    },
+    "CORE-01-09-01A": {
+      "implementation": [
+        "packages/game/src/mechanics-turn.ts"
+      ],
+      "test": [
+        "packages/game/test/turn.test.ts"
+      ]
+    },
+    "VAR-01-02-02": {
+      "test": [
+        "packages/game/test/setup.test.ts"
+      ]
+    }
+  }
+}

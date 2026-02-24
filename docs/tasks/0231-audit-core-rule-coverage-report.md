@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -124,11 +124,11 @@ N/A
 
 ## 8) Implementation Plan
 
-* [ ] Implement `scripts/audit-core-coverage.mjs` with a small CLI: (a) collect core IDs from `docs/rules/000-core.md`, (b) collect evidence from source trees, (c) apply explicit exemptions, (d) write `docs/architecture/core-coverage.report.json` with stable ordering.
-* [ ] Create `docs/architecture/CORE-01-SPEC-ONLY.json` as an explicit list (start empty or minimal) + include a short schema comment at top describing its purpose.
-* [ ] Add root script `audit:core-coverage` that runs the node script and writes the report.
-* [ ] Update `docs/architecture/SPEC-AUDIT.md` to mention this report as a non-blocking baseline step (for now).
-* [ ] Run `pnpm audit:core-coverage` twice to confirm byte-stable output; commit generated report.
+* [x] Implement `scripts/audit-core-coverage.mjs` with a small CLI: (a) collect core IDs from `docs/rules/000-core.md`, (b) collect evidence from source trees, (c) apply explicit exemptions, (d) write `docs/architecture/core-coverage.report.json` with stable ordering.
+* [x] Create `docs/architecture/CORE-01-SPEC-ONLY.json` as an explicit list (start empty or minimal) + include a short schema comment at top describing its purpose.
+* [x] Add root script `audit:core-coverage` that runs the node script and writes the report.
+* [x] Update `docs/architecture/SPEC-AUDIT.md` to mention this report as a non-blocking baseline step (for now).
+* [x] Run `pnpm audit:core-coverage` twice to confirm byte-stable output; commit generated report.
 
 Notes:
 

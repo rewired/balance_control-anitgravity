@@ -1,0 +1,19 @@
+{
+  "//": "Explicit list of CORE rules that are spec-only (definitions, declarative invariants, or structural placeholders) and do not require code evidence.",
+  "exemptIds": [
+    "CORE-01-01",
+    "CORE-01-02",
+    "CORE-01-03",
+    "CORE-01-04",
+    "CORE-01-05",
+    "CORE-01-06",
+    "CORE-01-07",
+    "CORE-01-08",
+    "CORE-01-09",
+    "CORE-01-10",
+    "CORE-01-01-01",
+    "CORE-01-01-02",
+    "CORE-01-01-03",
+    "CORE-01-01-04"
+  ]
+}

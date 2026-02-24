@@ -17,6 +17,7 @@
     "dev": "pnpm -r --parallel dev",
     "verify:packs": "node scripts/verify-packs.mjs",
     "check:spec-anchors": "node scripts/check-spec-anchors.mjs",
+    "audit:core-coverage": "node scripts/audit-core-coverage.mjs",
     "verify:docs": "node scripts/verify-docs.mjs",
     "verify:task": "node scripts/verify-task.mjs",
     "verify:ui-interaction": "node scripts/verify-ui-interaction.mjs"

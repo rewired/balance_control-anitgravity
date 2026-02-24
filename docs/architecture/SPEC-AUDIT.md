@@ -25,6 +25,15 @@ The audit command runs a fixed sequence:
 - When rules are updated, regenerate anchors and review diffs for removals.
 - If an ID must be retired, record a deliberate replacement in rule text and code references.
 
+## CORE COVERAGE REPORT (Baseline)
+In addition to the strict compliance gate, a coverage audit can be generated to track rule-to-code traceability:
+- Command: `pnpm run audit:core-coverage`
+- Output: `docs/architecture/core-coverage.report.json`
+- Exemptions: `docs/architecture/CORE-01-SPEC-ONLY.json` (for spec-only / definitional rules)
+
+This report provides a non-blocking baseline of implementation and test coverage for all rules defined in `docs/rules/000-core.md`.
+
 ## DEVELOPER WORKFLOW
 - Run locally before PR: pnpm run audit:spec
+- Verify coverage baseline: `pnpm run audit:core-coverage`
 - If audit fails, fix the specific failure class and re-run until clean.
