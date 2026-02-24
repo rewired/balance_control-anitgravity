@@ -2,17 +2,15 @@ import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneName, TileType } from '@balance-control/rules';
 import { computeMajority } from '../../../mechanics';
 import { EffectResolver } from '../../../engine/resolver';
+import { resolveProvidedOrDeterministicResourceIds, validateDistinctCostBuckets } from '../../../engine/cost-bucket-utils';
 import { convertResourcesPayloadSchema, validateMovePayload } from '../../../move-contracts';
 import {
     CostSlot,
     getGrassrootsConversionSpec,
-    hasDuplicateIds,
-    hasOverlap,
     isBoardTile,
     isCoreResort,
     placeMetaMarkerOnTile,
 } from '../../shared';
-import { selectDeterministicCostResourceIds } from '../../../engine/deterministic-cost';
 import { getPlayerMetaMarker } from '../../../state-lookup';
 import { beginPoliticalActionMove, finalizePoliticalActionMove } from './shared';
 
@@ -50,10 +48,6 @@ export const convertResources = ({ G, ctx, events }: any, payload: unknown) => {
     if (!tile || tile.type !== TileType.Grassroots) return INVALID_MOVE;
     if (!isBoardTile(G, grassrootsTileId)) return INVALID_MOVE;
 
-    if (inputResourceIds) {
-        if (hasDuplicateIds(inputResourceIds)) return INVALID_MOVE;
-        if (hasOverlap(inputResourceIds, extraResourceIds)) return INVALID_MOVE;
-    }
     if (!isCoreResort(outputResort)) return INVALID_MOVE;
 
     // Generic Prohibition check
@@ -71,22 +65,25 @@ export const convertResources = ({ G, ctx, events }: any, payload: unknown) => {
     const baseSlots: CostSlot[] = Array.from({ length: conversionSpec.inputSlots }, () => 'ANY');
 
     const extraCostSlots = EffectResolver.getExtraCostSlots(G, pid, 'convertResources', grassrootsTileId);
-    if (extraCostSlots.length > 0 && extraResourceIds && extraResourceIds.length !== extraCostSlots.length) {
-        return INVALID_MOVE;
-    }
+    const resolvedExtraResourceIds = resolveProvidedOrDeterministicResourceIds(
+        G,
+        pid,
+        extraCostSlots,
+        extraResourceIds,
+        new Set(inputResourceIds ?? [])
+    );
+    if (!resolvedExtraResourceIds) return INVALID_MOVE;
 
-    const resolvedExtraResourceIds = extraCostSlots.length === 0
-        ? undefined
-        : (extraResourceIds ?? selectDeterministicCostResourceIds(G, pid, extraCostSlots, new Set(inputResourceIds ?? [])));
-    if (extraCostSlots.length > 0 && !resolvedExtraResourceIds) return INVALID_MOVE;
-
-    const resolvedInputResourceIds = inputResourceIds ?? selectDeterministicCostResourceIds(
+    const resolvedInputResourceIds = resolveProvidedOrDeterministicResourceIds(
         G,
         pid,
         baseSlots,
-        new Set(resolvedExtraResourceIds ?? [])
+        inputResourceIds,
+        new Set(resolvedExtraResourceIds)
     );
     if (!resolvedInputResourceIds) return INVALID_MOVE;
+
+    if (!validateDistinctCostBuckets([resolvedInputResourceIds, resolvedExtraResourceIds])) return INVALID_MOVE;
 
     for (const rid of resolvedInputResourceIds) {
         if (!supply.items.includes(rid)) return INVALID_MOVE;

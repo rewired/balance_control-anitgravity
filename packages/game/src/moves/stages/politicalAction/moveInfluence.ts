@@ -2,9 +2,14 @@ import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneName, TileType } from '@balance-control/rules';
 import { isMoveAdjacent } from '../../../engine/topology';
 import { EffectResolver } from '../../../engine/resolver';
+import {
+    resolveProvidedOrDeterministicResourceIds,
+    splitCombinedResourceIds,
+    validateDistinctCostBuckets,
+} from '../../../engine/cost-bucket-utils';
 import { findObjectZoneId, getPlayerMetaMarker } from '../../../state-lookup';
 import { moveInfluencePayloadSchema, validateMovePayload } from '../../../move-contracts';
-import { hasDuplicateIds, hasOverlap, isBoardTile, placeMetaMarkerOnTile } from '../../shared';
+import { isBoardTile, placeMetaMarkerOnTile } from '../../shared';
 import { returnMetaMarkerToSupply } from '../../../mechanics-turn';
 import { beginPoliticalActionMove, finalizePoliticalActionMove } from './shared';
 
@@ -22,7 +27,7 @@ import { beginPoliticalActionMove, finalizePoliticalActionMove } from './shared'
 export const moveInfluence = ({ G, ctx, events }: any, payload: unknown) => {
     const validated = validateMovePayload('moveInfluence', moveInfluencePayloadSchema, payload);
     if (!validated.ok) return INVALID_MOVE;
-    const { sourceId, targetId, extraResourceIds = [] } = validated.value;
+    const { sourceId, targetId, extraResourceIds } = validated.value;
 
     const pid = beginPoliticalActionMove({ G, ctx }, 'moveInfluence');
     if (pid === INVALID_MOVE) return INVALID_MOVE;
@@ -57,17 +62,28 @@ export const moveInfluence = ({ G, ctx, events }: any, payload: unknown) => {
     }
 
     const extraCostSlots = EffectResolver.getExtraCostSlots(G, pid, 'influence.move', targetId, { includeReturnPenalty: false });
-    const totalSlots = penaltyCount + extraCostSlots.length;
+    const providedBuckets = splitCombinedResourceIds(extraResourceIds, [penaltyCount, extraCostSlots.length]);
+    if (!providedBuckets) return INVALID_MOVE;
 
-    if (totalSlots > 0) {
-        if (!extraResourceIds || extraResourceIds.length !== totalSlots) return INVALID_MOVE;
-        if (hasDuplicateIds(extraResourceIds)) return INVALID_MOVE;
-    }
+    const [providedPenaltyIds, providedExtraCostIds] = providedBuckets;
+    const penaltyResourceIds = resolveProvidedOrDeterministicResourceIds(
+        G,
+        pid,
+        Array.from({ length: penaltyCount }, () => 'ANY'),
+        providedPenaltyIds
+    );
+    if (!penaltyResourceIds) return INVALID_MOVE;
 
-    const penaltyResourceIds = penaltyCount > 0 ? extraResourceIds.slice(0, penaltyCount) : [];
-    const extraCostResourceIds = extraCostSlots.length > 0 ? extraResourceIds.slice(penaltyCount) : [];
+    const extraCostResourceIds = resolveProvidedOrDeterministicResourceIds(
+        G,
+        pid,
+        extraCostSlots,
+        providedExtraCostIds,
+        new Set(penaltyResourceIds)
+    );
+    if (!extraCostResourceIds) return INVALID_MOVE;
 
-    if (hasOverlap(penaltyResourceIds, extraCostResourceIds)) return INVALID_MOVE;
+    if (!validateDistinctCostBuckets([penaltyResourceIds, extraCostResourceIds])) return INVALID_MOVE;
 
     if (penaltyCount > 0) {
         const supplyId = `${CoreZoneName.PersonalSupply}:${pid}`;

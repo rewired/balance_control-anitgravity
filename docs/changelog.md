@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-24: task(0251) Engine/Tests: Add shared cost-bucket helpers (duplicate/overlap validation, semantic list partitioning, deterministic fallback selection) and refactor `moveInfluence` + `convertResources` to use them.
 - 2026-02-24: task(0250) Engine/Tests: Add shared political-action stage+usage guard and canonical finalize helper, wire all four political-action moves through it (with Start Committee usage hook support), and add regression tests for stage/usage/finalization invariants.
 - 2026-02-24: task(0250) Engine: Split political-action moves into per-move modules under `packages/game/src/moves/stages/politicalAction/` with a compatibility `index.ts` export (mechanical refactor; no semantic changes).
 - 2026-02-24: task(0249) Tests/Docs: Close settlement/endgame evidence with explicit immediate-end assertions after final settlement trigger, illegal post-end political-action no-op proof, and deterministic replay revalidation (no runtime logic changes).
