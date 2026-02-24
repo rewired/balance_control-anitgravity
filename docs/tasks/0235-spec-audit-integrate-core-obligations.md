@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -35,9 +35,9 @@ Rules (non-negotiable):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -164,13 +164,19 @@ N/A
 
 ## 11) Work Summary (3–7 bullets)
 
-* TODO (fill during VERIFYING/COMMIT_READY)
+* Updated `docs/architecture/SPEC-AUDIT.md` to document the core obligations audit step and its failure categories.
+* Modified `scripts/audit-core-obligations.mjs` to exit with status code 1 if normative evidence is missing or if evidence orphans are found.
+* Reordered the `audit:spec` script in the root `package.json` to run `audit:core-obligations` after `verify:packs` but before invariant tests.
+* Verified that `pnpm audit:spec` correctly identifies and fails on missing evidence and orphaned evidence.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* TODO (fill during VERIFYING/COMMIT_READY)
+* `pnpm install && pnpm run build`: Success.
+* `pnpm run audit:spec`: Success (initially and after reverts).
+* Manual failure injection and `pnpm run audit:spec`: Success (failed as expected).
+* `pnpm test`: Success.
 
 ---
 
