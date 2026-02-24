@@ -1,8 +1,8 @@
-# Task 0243 — CORE actions/settlement/endgame evidence hardening
+# Task 0238 — CORE actions/settlement/endgame evidence hardening
 
 **Date:** 2026-02-24
 **Owner:** Codex
-**Branch:** `task/0243-core-actions-settlement-endgame-evidence-hardening`
+**Branch:** `task/0238-core-actions-settlement-endgame-evidence-hardening`
 
 ---
 

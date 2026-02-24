@@ -1,8 +1,8 @@
-# Task 0241 — CORE zones + topology evidence hardening
+# Task 0236 — CORE zones + topology evidence hardening
 
 **Date:** 2026-02-24
 **Owner:** Codex
-**Branch:** `task/0241-core-zones-topology-evidence-hardening`
+**Branch:** `task/0236-core-zones-topology-evidence-hardening`
 
 ---
 
