@@ -176,7 +176,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/state.ts"
+        "packages/rules/src/state.ts",
+        "packages/game/test/resolver-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -319,7 +320,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/test/computeMajorirty.test.ts"
       ],
       "notes": ""
     },
@@ -374,7 +376,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/packs/core/tile-loader.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -384,7 +387,8 @@
       "class": "NORMATIVE_DATA",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/resources.ts"
+        "packages/rules/src/resources.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -394,7 +398,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/resources.ts"
+        "packages/rules/src/resources.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -404,7 +409,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/resources.ts"
+        "packages/rules/src/resources.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -414,7 +420,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/resources.ts"
+        "packages/rules/src/resources.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -424,7 +431,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/resources.ts"
+        "packages/rules/src/resources.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -434,7 +442,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/resources.ts"
+        "packages/rules/src/resources.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -444,7 +453,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/resources.ts"
+        "packages/rules/src/resources.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -454,7 +464,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -464,7 +475,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -474,7 +486,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -484,7 +497,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -494,7 +508,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/hotspot.test.ts"
       ],
       "notes": ""
     },
@@ -504,7 +519,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/hotspot.test.ts"
       ],
       "notes": ""
     },
@@ -515,7 +531,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/packs/core/tile-loader.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -526,7 +543,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/packs/core/tile-loader.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -537,7 +555,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/packs/core/tile-loader.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -548,7 +567,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/packs/core/tile-loader.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -580,7 +600,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/tile-loader.ts"
+        "packages/game/src/packs/core/tile-loader.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -590,7 +611,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/tile-loader.ts"
+        "packages/game/src/packs/core/tile-loader.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -611,7 +633,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -621,7 +644,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/rules/src/objects.ts"
+        "packages/rules/src/objects.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -631,7 +655,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/shared.ts"
+        "packages/game/src/moves/shared.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -641,7 +666,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -651,7 +677,8 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -675,7 +702,8 @@
       "evidence": [
         "packages/game/src/engine/atoms/measure.ts",
         "packages/game/src/mechanics-draw.ts",
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -711,7 +739,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/setup.ts"
+        "packages/game/src/setup.ts",
+        "packages/game/test/new-core-setup-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -766,7 +795,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/index.ts"
+        "packages/game/src/index.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -787,7 +817,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -797,7 +828,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -807,7 +839,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/packs/core/index.ts"
+        "packages/game/src/packs/core/index.ts",
+        "packages/game/test/setup.test.ts"
       ],
       "notes": ""
     },
@@ -817,7 +850,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/index.ts"
+        "packages/game/src/index.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -827,7 +861,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/drawAndPlace.ts"
+        "packages/game/src/moves/stages/drawAndPlace.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -837,7 +872,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/index.ts"
+        "packages/game/src/index.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -847,7 +883,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics-draw.ts"
+        "packages/game/src/mechanics-draw.ts",
+        "packages/game/test/unplaceable-draw-redraw.test.ts"
       ],
       "notes": ""
     },
@@ -880,7 +917,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics-draw.ts"
+        "packages/game/src/mechanics-draw.ts",
+        "packages/game/test/unplaceable-draw-redraw.test.ts"
       ],
       "notes": ""
     },
@@ -891,7 +929,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics-draw.ts",
-        "packages/game/src/moves/system/resolveChoice.ts"
+        "packages/game/src/moves/system/resolveChoice.ts",
+        "packages/game/test/unplaceable-draw-redraw.test.ts"
       ],
       "notes": ""
     },
@@ -901,7 +940,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/legal-intents.ts"
+        "packages/game/src/engine/legal-intents.ts",
+        "packages/game/test/legal-intents.test.ts"
       ],
       "notes": ""
     },
@@ -913,7 +953,8 @@
       "evidence": [
         "packages/game/src/engine/legal-intents.ts",
         "packages/game/src/mechanics-turn.ts",
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -947,7 +988,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics-turn.ts",
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -971,7 +1013,8 @@
       "evidence": [
         "packages/game/src/engine/atoms/resource.ts",
         "packages/game/src/engine/legal-intents.ts",
-        "packages/game/src/engine/resolver/costs.ts"
+        "packages/game/src/engine/resolver/costs.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -995,7 +1038,8 @@
       "evidence": [
         "packages/game/src/engine/atoms/resource.ts",
         "packages/game/src/engine/legal-intents.ts",
-        "packages/game/src/engine/resolver/costs.ts"
+        "packages/game/src/engine/resolver/costs.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1015,7 +1059,8 @@
       "evidence": [
         "packages/game/src/engine/legal-intents.ts",
         "packages/game/src/engine/topology.ts",
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1081,7 +1126,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
       ],
       "notes": ""
     },
@@ -1091,7 +1137,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1101,7 +1148,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/influence.ts"
+        "packages/game/src/engine/atoms/influence.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1111,7 +1159,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1121,7 +1170,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1131,7 +1181,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1141,7 +1192,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1151,7 +1203,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1173,7 +1226,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1205,7 +1259,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1215,7 +1270,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1233,7 +1289,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1243,7 +1300,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1253,7 +1311,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1263,7 +1322,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1298,7 +1358,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics/conversion.ts",
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/convert-resources-real-setup.test.ts"
       ],
       "notes": ""
     },
@@ -1319,7 +1380,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1329,7 +1391,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1339,7 +1402,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/computeMajorirty.test.ts"
       ],
       "notes": ""
     },
@@ -1361,7 +1425,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/computeMajorirty.test.ts"
       ],
       "notes": ""
     },
@@ -1371,7 +1436,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/computeMajorirty.test.ts"
       ],
       "notes": ""
     },
@@ -1381,7 +1447,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/computeMajorirty.test.ts"
       ],
       "notes": ""
     },
@@ -1391,7 +1458,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics.ts"
+        "packages/game/src/mechanics.ts",
+        "packages/game/test/computeMajorirty.test.ts"
       ],
       "notes": ""
     },
@@ -1401,7 +1469,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/resolver.ts"
+        "packages/game/src/engine/resolver.ts",
+        "packages/game/test/resolver-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1411,7 +1480,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/resolver.ts"
+        "packages/game/src/engine/resolver.ts",
+        "packages/game/test/resolver-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1432,7 +1502,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/resolver.ts"
+        "packages/game/src/engine/resolver.ts",
+        "packages/game/test/resolver-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1442,7 +1513,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/resolver.ts"
+        "packages/game/src/engine/resolver.ts",
+        "packages/game/test/resolver-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1452,7 +1524,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/resolver.ts"
+        "packages/game/src/engine/resolver.ts",
+        "packages/game/test/resolver-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1497,7 +1570,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/engine/atoms/hotspot.ts",
-        "packages/game/src/moves/stages/drawAndPlace.ts"
+        "packages/game/src/moves/stages/drawAndPlace.ts",
+        "packages/game/test/hotspot.test.ts"
       ],
       "notes": ""
     },
@@ -1529,7 +1603,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/hotspot.ts"
+        "packages/game/src/engine/atoms/hotspot.ts",
+        "packages/game/test/hotspot.test.ts"
       ],
       "notes": ""
     },
@@ -1539,7 +1614,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/hotspot.ts"
+        "packages/game/src/engine/atoms/hotspot.ts",
+        "packages/game/test/hotspot.test.ts"
       ],
       "notes": ""
     },
@@ -1549,7 +1625,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/hotspot.ts"
+        "packages/game/src/engine/atoms/hotspot.ts",
+        "packages/game/test/hotspot.test.ts"
       ],
       "notes": ""
     },
@@ -1559,7 +1636,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/hotspot.ts"
+        "packages/game/src/engine/atoms/hotspot.ts",
+        "packages/game/test/hotspot.test.ts"
       ],
       "notes": ""
     },
@@ -1602,7 +1680,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/production.ts"
+        "packages/game/src/engine/atoms/production.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1612,7 +1691,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/production.ts"
+        "packages/game/src/engine/atoms/production.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1622,7 +1702,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/production.ts"
+        "packages/game/src/engine/atoms/production.ts",
+        "packages/game/test/resolver.test.ts"
       ],
       "notes": ""
     },
@@ -1632,7 +1713,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/production.ts"
+        "packages/game/src/engine/atoms/production.ts",
+        "packages/game/test/resolver.test.ts"
       ],
       "notes": ""
     },
@@ -1642,7 +1724,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/production.ts"
+        "packages/game/src/engine/atoms/production.ts",
+        "packages/game/test/resolver.test.ts"
       ],
       "notes": ""
     },
@@ -1663,7 +1746,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/production.ts"
+        "packages/game/src/engine/atoms/production.ts",
+        "packages/game/test/resolver.test.ts"
       ],
       "notes": ""
     },
@@ -1673,7 +1757,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/atoms/production.ts"
+        "packages/game/src/engine/atoms/production.ts",
+        "packages/game/test/resolver.test.ts"
       ],
       "notes": ""
     },
@@ -1705,7 +1790,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/index.ts"
+        "packages/game/src/index.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -1715,7 +1801,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics-turn.ts"
+        "packages/game/src/mechanics-turn.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -1725,7 +1812,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics-turn.ts"
+        "packages/game/src/mechanics-turn.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -1735,7 +1823,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/mechanics-turn.ts"
+        "packages/game/src/mechanics-turn.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -1828,7 +1917,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1838,7 +1928,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1848,7 +1939,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1858,7 +1950,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1868,7 +1961,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/topology.ts"
+        "packages/game/src/engine/topology.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1880,7 +1974,8 @@
       "evidence": [
         "packages/game/src/engine/legal-intents.ts",
         "packages/game/src/engine/topology.ts",
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/core-compliance-invariants.test.ts"
       ],
       "notes": ""
     },
@@ -1890,7 +1985,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1900,7 +1996,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1910,7 +2007,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1920,7 +2018,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1930,7 +2029,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1940,7 +2040,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts"
+        "packages/game/src/moves/stages/politicalAction.ts",
+        "packages/game/test/moves.test.ts"
       ],
       "notes": ""
     },
@@ -1986,7 +2087,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/index.ts"
+        "packages/game/src/index.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -1996,7 +2098,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/index.ts"
+        "packages/game/src/index.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },
@@ -2006,7 +2109,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/index.ts"
+        "packages/game/src/index.ts",
+        "packages/game/test/turn.test.ts"
       ],
       "notes": ""
     },

@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** COMMIT_READY
 
 ## 0) Masterplan Guardrails (MUST)
 
@@ -84,9 +84,9 @@
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: Define evidence-quality taxonomy and required minimum for NORMATIVE_* classes.
-* [ ] Step 2: Implement WEAK/SUSPECT detection in audit script.
-* [ ] Step 3: Add tests for pass/fail/weak scenarios and document usage.
+* [x] Step 1: Define evidence-quality taxonomy and required minimum for NORMATIVE_* classes.
+* [x] Step 2: Implement WEAK/SUSPECT detection in audit script.
+* [x] Step 3: Add tests for pass/fail/weak scenarios and document usage.
 
 ## 9) Acceptance Criteria
 

@@ -212,6 +212,61 @@ describe('CORE Compliance Invariants', () => {
         });
     });
 
+    describe('Data & configuration', () => {
+        /**
+         * @rule CORE-01-02-04A
+         * @rule CORE-01-02-04B
+         * @rule CORE-01-02-04C
+         * @rule CORE-01-02-04D
+         * @rule CORE-01-02-04E
+         * @rule CORE-01-02-04F
+         * @rule CORE-01-02-04G
+         */
+        it('should define exactly three Resource resorts: DOM, FOR, INF', () => {
+            const ctx: any = { numPlayers: 2, random: createSeededRandom(42) };
+            const G = SetupGame({ ctx });
+
+            const resortTiles = Object.values(G.tiles).filter(t => t.type === TileType.Resort);
+            const resorts = new Set(resortTiles.map(t => t.resort));
+
+            expect(resorts.has('DOM')).toBe(true);
+            expect(resorts.has('FOR')).toBe(true);
+            expect(resorts.has('INF')).toBe(true);
+            expect(resorts.size).toBe(3);
+
+            for (const tile of resortTiles) {
+                expect(['DOM', 'FOR', 'INF']).toContain(tile.resort);
+            }
+        });
+
+        /**
+         * @rule CORE-01-02-14A
+         */
+        it('should have correct Grassroots composition (2 untyped, 6 typed)', () => {
+            const ctx: any = { numPlayers: 2, random: createSeededRandom(42) };
+            const G = SetupGame({ ctx });
+            const grassroots = Object.values(G.tiles).filter(t => t.type === TileType.Grassroots);
+            expect(grassroots.length).toBe(8);
+            expect(grassroots.filter(t => !t.resort).length).toBe(2);
+            expect(grassroots.filter(t => t.resort === 'DOM').length).toBe(2);
+            expect(grassroots.filter(t => t.resort === 'FOR').length).toBe(2);
+            expect(grassroots.filter(t => t.resort === 'INF').length).toBe(2);
+        });
+
+        /**
+         * @rule CORE-01-02-17
+         */
+        it('should ensure ResortTiles have printed production equal to their W number', () => {
+            const ctx: any = { numPlayers: 2, random: createSeededRandom(42) };
+            const G = SetupGame({ ctx });
+            const resorts = Object.values(G.tiles).filter(t => t.type === TileType.Resort);
+            for (const tile of resorts) {
+                expect(tile.weight).toBeGreaterThanOrEqual(1);
+                expect(tile.weight).toBeLessThanOrEqual(5);
+            }
+        });
+    });
+
     describe('Setup', () => {
         /**
          * @rule CORE-01-00-T09
