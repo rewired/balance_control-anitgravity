@@ -284,10 +284,79 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
         client.updatePlayerID(cp0);
         const staging0 = client.getState().G.zones[`staging_${cp0}`]?.items[0];
         client.moves.placeTile({ targetCoord: '1,0' });
-        client.moves.placeInfluence({ targetTileId: staging0 });
 
         const state2 = client.getState();
-        expect(state2.G.roundSettlementDone).toBe(true);
-        expect(state2.ctx.gameover).toBeDefined();
+        expect(state2.ctx.gameover).toBeUndefined();
+        client.moves.placeInfluence({ targetTileId: staging0 });
+        const finalState = client.getState();
+        expect(finalState.G.roundSettlementDone).toBe(true);
+        expect(finalState.ctx.gameover).toBeDefined();
+    });
+
+    /** @rule CORE-01-09-01 */
+    /** @rule CORE-01-09-03 */
+    it('ends game when DrawPile is empty and awards winner by board Influence count [CORE-01-09-01, CORE-01-09-03]', () => {
+        registerTestPacks();
+        const balanceControl = createBalanceControlGame();
+        const client = Client({
+            game: {
+                ...balanceControl,
+                setup: (ctx: any) => {
+                    const G = SetupGame({ ctx });
+                    G.roundSettlementDone = true;
+                    G.zones[CoreZoneName.DrawPile].items = [];
+                    G.zones.board_t1 = { id: 'board_t1', name: 'T1', items: ['inf_0_a', 'inf_0_b'] };
+                    G.zones.board_t2 = { id: 'board_t2', name: 'T2', items: ['inf_1_a'] };
+                    G.zones[CoreZoneName.Board].items.push('board_t1', 'board_t2');
+                    G.tiles.board_t1 = { id: 'board_t1', type: TileType.Committee };
+                    G.tiles.board_t2 = { id: 'board_t2', type: TileType.Committee };
+                    G.objects.inf_0_a = { id: 'inf_0_a', type: 'Influence', owner: '0' } as any;
+                    G.objects.inf_0_b = { id: 'inf_0_b', type: 'Influence', owner: '0' } as any;
+                    G.objects.inf_1_a = { id: 'inf_1_a', type: 'Influence', owner: '1' } as any;
+                    G.objects.inf_supply_1 = { id: 'inf_supply_1', type: 'Influence', owner: '1' } as any;
+                    G.zones['PersonalSupply:1'].items.push('inf_supply_1');
+                    return G;
+                }
+            },
+            numPlayers: 2
+        });
+        client.start();
+
+        expect(client.getState().ctx.gameover).toEqual({ winner: '0' });
+    });
+
+    /** @rule CORE-01-09-04 */
+    it('returns shared victory when top board Influence count is tied [CORE-01-09-04]', () => {
+        registerTestPacks();
+        const balanceControl = createBalanceControlGame();
+        const client = Client({
+            game: {
+                ...balanceControl,
+                setup: (ctx: any) => {
+                    const G = SetupGame({ ctx });
+                    G.roundSettlementDone = true;
+                    G.zones[CoreZoneName.DrawPile].items = [];
+                    G.zones.board_t1 = { id: 'board_t1', name: 'T1', items: ['inf_0_a'] };
+                    G.zones.board_t2 = { id: 'board_t2', name: 'T2', items: ['inf_1_a'] };
+                    G.zones[CoreZoneName.Board].items.push('board_t1', 'board_t2');
+                    G.tiles.board_t1 = { id: 'board_t1', type: TileType.Committee };
+                    G.tiles.board_t2 = { id: 'board_t2', type: TileType.Committee };
+                    G.objects.inf_0_a = { id: 'inf_0_a', type: 'Influence', owner: '0' } as any;
+                    G.objects.inf_1_a = { id: 'inf_1_a', type: 'Influence', owner: '1' } as any;
+                    return G;
+                }
+            },
+            numPlayers: 2
+        });
+        client.start();
+
+        expect(client.getState().ctx.gameover).toEqual({ draw: true });
+    });
+
+    /** @rule CORE-01-10-01 */
+    /** @rule CORE-01-08-04 */
+    it('applies Start Committee tile-specific prohibition over generic placeInfluence action [CORE-01-10-01, CORE-01-08-04]', () => {
+        const result = CoreMoves.placeInfluence({ G, ctx, events }, { targetTileId: 'board_start' });
+        expect(result).toBe(INVALID_MOVE);
     });
 });

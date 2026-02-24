@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## 0) Masterplan Guardrails (MUST)
 ### affected_guardrails
@@ -46,9 +46,9 @@
 * packages/game/test/new-core-settlement-endgame-obligations.test.ts
 * packages/integration-tests/test/golden-replay.test.ts
 ### 5.3 Docs
-* [ ] /docs/changelog.md updated (required if logic/state/resolver changes)
-* [ ] /docs/design-decisions/DD-XXXX-<topic>.md created (only if ambiguity/conflict)
-* [ ] /docs/rules/ERRATA-XXXX.md created (only if rule clarification)
+* [x] /docs/changelog.md updated (required if logic/state/resolver changes)
+* [x] /docs/design-decisions/DD-0244-endgame-legality-proof-hardening.md created
+* [ ] /docs/rules/ERRATA-XXXX.md created (only if rule clarification) — N/A
 
 ## 6) Constraints (Hard)
 * No rule reinterpretation; use explicit spec anchors.
@@ -59,40 +59,48 @@
 * Winner tie-break behavior is deterministic.
 
 ## 8) Implementation Plan
-* [ ] Add explicit assertion-level tests for listed endgame IDs.
-* [ ] Add deterministic replay that exercises immediate settlement edge path.
-* [ ] Run core audits + targeted suites.
+* [x] Add explicit assertion-level tests for listed endgame IDs.
+* [x] Add deterministic replay that exercises immediate settlement edge path.
+* [x] Run core audits + targeted suites.
 
 ## 9) Acceptance Criteria
-* [ ] Listed endgame IDs have direct executable evidence.
-* [ ] `pnpm -C packages/game test -- new-core-settlement-endgame-obligations.test.ts` passes.
-* [ ] `pnpm -C packages/integration-tests test -- golden-replay.test.ts` passes.
+* [x] Listed endgame IDs have direct executable evidence.
+* [x] `pnpm -C packages/game test -- new-core-settlement-endgame-obligations.test.ts` passes.
+* [x] `pnpm -C packages/integration-tests test -- golden-replay.test.ts` passes.
 
 ## 10) PR Checklist (Repo Artifact)
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ## 11) Work Summary (3–7 bullets)
-* N/A
+* Added explicit endgame evidence assertions in `new-core-settlement-endgame-obligations.test.ts` for draw-pile termination winner selection, shared-victory ties, and tile-specific override legality binding.
+* Hardened the existing CORE-01-09-01A test to assert gameover transition across the draw-and-place to settlement edge path.
+* Added integration replay coverage in `golden-replay.test.ts` that replays the immediate-settlement edge flow twice and verifies deterministic hash + gameover parity.
+* Updated `docs/changelog.md` with task(0244) entry documenting evidence hardening scope.
+* Added `docs/design-decisions/DD-0244-endgame-legality-proof-hardening.md` to capture rationale and decision trace for documentation-first auditability.
 
 ## 12) Commands Run (with outcomes)
-* N/A
+* `pnpm -C packages/rules build` → OK
+* `pnpm -C packages/game exec vitest run test/new-core-settlement-endgame-obligations.test.ts` → OK (14 passed)
+* `pnpm -C packages/integration-tests exec vitest run test/golden-replay.test.ts` → OK (11 passed)
+* `pnpm lint` → OK
+* `pnpm test` → OK
 
 ## 13) Postflight Proof (recorded in commit message)
 ### 13.1 Recorded
-* N/A
+* Pending (to be appended in commit message amend)
 
 ## 14) Commit Proof (recorded in commit message)
 ### 14.1 Recorded
-* N/A
+* Pending (to be appended in commit message amend)
 
 ## 15) Amendments (append-only)
 * N/A

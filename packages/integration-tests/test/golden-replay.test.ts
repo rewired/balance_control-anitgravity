@@ -223,4 +223,41 @@ describe('Golden replays (Integration)', () => {
         expect(first.actualPublicSurfaceHash).toBe(second.actualPublicSurfaceHash);
     });
 
+    /** @rule CORE-01-09-01A */
+    /** @rule CORE-01-09-03 */
+    it('deterministically ends immediately when DrawPile empties during draw-and-place [CORE-01-09-01A, CORE-01-09-03]', () => {
+        registerCanonicalPacks();
+        const baseGame = createBalanceControlGame();
+        const tinyDrawPileGame = {
+            ...baseGame,
+            seed: 'core-endgame-immediate-settlement',
+            playerView: ({ G }: any) => G,
+            setup: (ctx: any) => {
+                const G = baseGame.setup(ctx, undefined);
+                G.engine.attributes.startingPlayerIndex = 0;
+                G.zones[CoreZoneName.DrawPile].items = G.zones[CoreZoneName.DrawPile].items.slice(0, 1);
+                return G;
+            },
+        };
+
+        const run = () => {
+            const client = Client({ game: tinyDrawPileGame, numPlayers: 2 });
+            client.start();
+            const state = client.getState();
+            client.updatePlayerID(state.ctx.currentPlayer);
+            client.moves.placeTile({ targetCoord: '1,0' });
+            const tileId = client.getState().G.grid['1,0'];
+            client.moves.placeInfluence({ targetTileId: tileId });
+            return client.getState();
+        };
+
+        const first = run();
+        const second = run();
+
+        expect(first.ctx.gameover).toBeTruthy();
+        expect(first.G.roundSettlementDone).toBe(true);
+        expect(hashState(first.G as any)).toBe(hashState(second.G as any));
+        expect(first.ctx.gameover).toEqual(second.ctx.gameover);
+    });
+
 });
