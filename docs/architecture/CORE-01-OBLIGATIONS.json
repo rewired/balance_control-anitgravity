@@ -122,7 +122,7 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/rules/src/state.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/engine-topology.test.ts"
       ],
       "notes": ""
     },
@@ -894,9 +894,9 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/engine/legal-intents.ts",
         "packages/game/src/moves/stages/drawAndPlace.ts",
-        "packages/integration-tests/test/golden/core_placement_legality.json"
+        "packages/game/src/engine/legal-intents.ts",
+        "packages/game/test/engine-topology.test.ts"
       ],
       "notes": ""
     },
