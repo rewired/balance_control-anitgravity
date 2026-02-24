@@ -173,7 +173,7 @@ describe('Turn Structure (Stages)', () => {
         expect(afterState.ctx.activePlayers[pid]).toBe('politicalAction');
     });
 
-    it('should auto-run final settlement and end game when DrawPile is empty at turn start (CORE-01-09-01A)', () => {
+    it('should immediately end after final settlement when DrawPile empties during draw-and-place (CORE-01-09-01A, CORE-01-09-02)', () => {
         const client = Client({ game: createTinyDrawPileGame(), numPlayers: 2 });
         client.start();
 
@@ -182,12 +182,19 @@ describe('Turn Structure (Stages)', () => {
         expect(stateAfterStart.ctx.gameover).toBeUndefined();
 
         client.moves.placeTile({ targetCoord: '1,0' });
-        client.moves.placeInfluence({ targetTileId: getTileIdAtCoord(client.getState().G, '1,0') });
+        const settledState = client.getState();
 
-        const finalState = client.getState();
-        expect(finalState.G.roundNumber).toBe(1);
-        expect(finalState.G.roundSettlementDone).toBe(true);
-        expect(finalState.ctx.gameover).toBeDefined();
+        expect(settledState.G.roundNumber).toBe(1);
+        expect(settledState.G.roundSettlementDone).toBe(true);
+        expect(settledState.ctx.gameover).toBeDefined();
+
+        const beforeIllegalPoliticalAction = JSON.stringify(settledState.G);
+        const placedTileId = getTileIdAtCoord(settledState.G, '1,0');
+        client.moves.placeInfluence({ targetTileId: placedTileId });
+        const afterIllegalPoliticalAction = client.getState();
+
+        expect(JSON.stringify(afterIllegalPoliticalAction.G)).toBe(beforeIllegalPoliticalAction);
+        expect(afterIllegalPoliticalAction.ctx.gameover).toEqual(settledState.ctx.gameover);
     });
 
     it('should return meta-markers to supply when not updated by Political Action', () => {

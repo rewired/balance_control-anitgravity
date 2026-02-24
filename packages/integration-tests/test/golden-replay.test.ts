@@ -224,8 +224,9 @@ describe('Golden replays (Integration)', () => {
     });
 
     /** @rule CORE-01-09-01A */
+    /** @rule CORE-01-09-02 */
     /** @rule CORE-01-09-03 */
-    it('deterministically ends immediately when DrawPile empties during draw-and-place [CORE-01-09-01A, CORE-01-09-03]', () => {
+    it('deterministically ends immediately when DrawPile empties during draw-and-place [CORE-01-09-01A, CORE-01-09-02, CORE-01-09-03]', () => {
         registerCanonicalPacks();
         const baseGame = createBalanceControlGame();
         const tinyDrawPileGame = {
@@ -246,9 +247,13 @@ describe('Golden replays (Integration)', () => {
             const state = client.getState();
             client.updatePlayerID(state.ctx.currentPlayer);
             client.moves.placeTile({ targetCoord: '1,0' });
-            const tileId = client.getState().G.grid['1,0'];
+            const postSettlement = client.getState();
+            const snapshot = JSON.stringify(postSettlement.G);
+            const tileId = postSettlement.G.grid['1,0'];
             client.moves.placeInfluence({ targetTileId: tileId });
-            return client.getState();
+            const afterIllegalAction = client.getState();
+            expect(JSON.stringify(afterIllegalAction.G)).toBe(snapshot);
+            return afterIllegalAction;
         };
 
         const first = run();

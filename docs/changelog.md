@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-24: task(0249) Tests/Docs: Close settlement/endgame evidence with explicit immediate-end assertions after final settlement trigger, illegal post-end political-action no-op proof, and deterministic replay revalidation (no runtime logic changes).
 - 2026-02-24: task(0248) Tests/Docs: Close resolver + production evidence loop via obligation-audit confirmation, deterministic focused suite reruns, and task artifact completion (no runtime logic changes).
 - 2026-02-24: task(0247) Tests/Docs: Close turn-gating and legal-intent evidence loop via audit/test revalidation and task artifact completion (no runtime logic changes).
 - 2026-02-24: task(0245) Tests/Docs: Close topology evidence gaps with direct Board position-binding and placeTile adjacency assertions; align obligation registry links and add DD trace (no runtime logic changes).
