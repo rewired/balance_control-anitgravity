@@ -60,31 +60,40 @@
 * Replay hash stability preserved.
 
 ## 8) Implementation Plan
-* [ ] Map setup/draw IDs with weakly targeted evidence.
-* [ ] Add targeted tests for each sampled obligation.
-* [ ] Re-run audits and confirm closure.
+* [x] Map setup/draw IDs with weakly targeted evidence.
+* [x] Add targeted tests for each sampled obligation.
+* [x] Re-run audits and confirm closure.
 
 ## 9) Acceptance Criteria
-* [ ] Setup/draw cluster IDs have direct, named executable assertions.
-* [ ] `pnpm -w audit:core-obligations` reports no setup/draw SUSPECT items.
-* [ ] Golden replay unchanged or intentionally updated with explanation.
+* [x] Setup/draw cluster IDs have direct, named executable assertions.
+* [x] `pnpm -w audit:core-obligations` reports no setup/draw SUSPECT items.
+* [x] Golden replay unchanged or intentionally updated with explanation.
 
 ## 10) PR Checklist (Repo Artifact)
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ## 11) Work Summary (3–7 bullets)
-* N/A
+* Verified setup/draw audit status with `pnpm -w audit:core-obligations`; quality stats show `SUSPECT: 0` with strong evidence coverage.
+* Rebuilt workspace packages so vitest can resolve workspace package exports before targeted game-suite execution.
+* Ran targeted setup/draw suites (`setup`, `new-core-setup-obligations`, `unplaceable-draw-redraw`) and confirmed all assertions pass.
+* Ran repository lint and full test pipeline, including spec-anchor checks, interaction tripwire, golden replay integration tests, and full package test matrix.
+* Confirmed no additional code/docs changes were required beyond task-file execution bookkeeping for closure.
 ## 12) Commands Run (with outcomes)
-* N/A
+* `pnpm -w audit:core-obligations` ✅ PASS (SUSPECT: 0).
+* `pnpm vitest run packages/game/test/setup.test.ts packages/game/test/new-core-setup-obligations.test.ts packages/game/test/unplaceable-draw-redraw.test.ts` ⚠️ INITIAL FAIL (workspace package resolution; fixed after build).
+* `pnpm -r build` ✅ PASS.
+* `pnpm vitest run packages/game/test/setup.test.ts packages/game/test/new-core-setup-obligations.test.ts packages/game/test/unplaceable-draw-redraw.test.ts` ✅ PASS (21 tests).
+* `pnpm lint` ✅ PASS.
+* `pnpm test` ✅ PASS.
 ## 13) Postflight Proof (recorded in commit message)
 ### 13.1 Recorded
 Recorded in final commit message (Postflight: block).
@@ -92,4 +101,4 @@ Recorded in final commit message (Postflight: block).
 ### 14.1 Recorded
 Recorded in final commit message (Postflight: block).
 ## 15) Amendments (append-only)
-* N/A
+* 2026-02-24: Task executed in closure mode by re-validating audit and test evidence, then updating Sections 8–12 to reflect final outcomes.
