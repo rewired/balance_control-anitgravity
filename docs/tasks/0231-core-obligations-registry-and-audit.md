@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** COMMIT_READY
 
 ## Task State Machine (Loop-Breaker)
 
@@ -40,9 +40,9 @@ Rules (non-negotiable):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -110,7 +110,7 @@ N/A
 
 * `docs/architecture/CORE-01-OBLIGATIONS.json` (new, canonical registry)
 * `docs/architecture/core-obligations.report.json` (generated, committed baseline)
-* [ ] `docs/architecture/SPEC-AUDIT.md` updated (mention this audit stage as optional baseline; do NOT gate yet)
+* [x] `docs/architecture/SPEC-AUDIT.md` updated (mention this audit stage as optional baseline; do NOT gate yet)
 
 ---
 
@@ -142,12 +142,12 @@ N/A
 
 ## 8) Implementation Plan
 
-* [ ] Define `docs/architecture/CORE-01-OBLIGATIONS.json` schema and content:
+* [x] Define `docs/architecture/CORE-01-OBLIGATIONS.json` schema and content:
 
   * Include `schema_version`, `spec` (path + version), and `entries[]`.
   * Each entry includes: `id`, `text` (verbatim or lightly normalized), `class`, `evidenceRequired`, `evidence[]`, `notes?`, `derivedFrom?`.
 
-* [ ] Implement `scripts/audit-core-obligations.mjs`:
+* [x] Implement `scripts/audit-core-obligations.mjs`:
 
   1) Parse `docs/rules/000-core.md` and extract `(id, text)` pairs (one line per ID).
   2) Load `CORE-01-OBLIGATIONS.json`.
@@ -164,9 +164,9 @@ N/A
      * `normativeMissingEvidence` (IDs)
      * `evidenceOrphans` (evidence refs that point to missing files/fixtures)
 
-* [ ] Add root script `audit:core-obligations` that runs the node script and writes the report.
-* [ ] Update `docs/architecture/SPEC-AUDIT.md` to mention this stage as a *non-blocking* baseline.
-* [ ] Run `pnpm audit:core-obligations` twice to confirm byte-stable output.
+* [x] Add root script `audit:core-obligations` that runs the node script and writes the report.
+* [x] Update `docs/architecture/SPEC-AUDIT.md` to mention this stage as a *non-blocking* baseline.
+* [x] Run `pnpm audit:core-obligations` twice to confirm byte-stable output.
 
 Notes:
 
@@ -179,10 +179,10 @@ Notes:
 
 ## 9) Acceptance Criteria
 
-* [ ] `CORE-01-OBLIGATIONS.json` covers **100%** of CORE-01 IDs (no unclassified IDs).
-* [ ] `pnpm audit:core-obligations` writes `core-obligations.report.json` and prints a deterministic summary.
-* [ ] Running the command twice without changes yields byte-identical report output.
-* [ ] No engine behavior changes; all existing tests still pass.
+* [x] `CORE-01-OBLIGATIONS.json` covers **100%** of CORE-01 IDs (no unclassified IDs).
+* [x] `pnpm audit:core-obligations` writes `core-obligations.report.json` and prints a deterministic summary.
+* [x] Running the command twice without changes yields byte-identical report output.
+* [x] No engine behavior changes; all existing tests still pass.
 
 ---
 
@@ -201,13 +201,21 @@ Notes:
 
 ## 11) Work Summary (3–7 bullets)
 
-* TODO (fill during VERIFYING/COMMIT_READY)
+* Introduced `docs/architecture/CORE-01-OBLIGATIONS.json` as a canonical registry for all 193 CORE-01 rule IDs.
+* Classified all rule IDs into normative (engine, state, data) vs informative/derived categories with required metadata.
+* Implemented `scripts/audit-core-obligations.mjs` to validate registry consistency against the spec and generate a byte-stable report.
+* Integrated the new audit into the root `pnpm audit:spec` pipeline and updated `docs/architecture/SPEC-AUDIT.md`.
+* Provided automation scripts for bootstrapping and initial evidence discovery to streamline future compliance work.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* TODO (fill during VERIFYING/COMMIT_READY)
+* `node scripts/bootstrap-obligations.mjs`: Successfully extracted 193 IDs from spec.
+* `node scripts/classify-obligations.mjs`: Applied initial classifications and metadata.
+* `node scripts/find-initial-evidence.mjs`: Discovered initial evidence for 62 normative entries.
+* `pnpm audit:core-obligations`: Generated `core-obligations.report.json` and verified consistency.
+* `pnpm test && pnpm run audit:spec`: Confirmed overall system stability and successful integration.
 
 ---
 
