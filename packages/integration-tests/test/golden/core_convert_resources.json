@@ -1,0 +1,85 @@
+{
+  "config": {
+    "expansions": {
+      "ex01": false,
+      "ex02": false,
+      "ex03": false
+    }
+  },
+  "expectedFinalHash": "4070bfd8dd7ded9bf5c875d3591216509eb73a8f5d8ffd80ce2dd087b24e077b",
+  "expectedPublicSurfaceHash": "600edc6b6b052ddefdfd3efae43d321594f9ed44b7816c1954db2a14068d2ce8",
+  "id": "core_convert_resources",
+  "moves": [
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "grassrootsCoord": "1,0",
+          "inputCount": 2,
+          "outputResort": "DOM"
+        }
+      ],
+      "move": "convertResources"
+    }
+  ],
+  "numPlayers": 2,
+  "prelude": [
+    {
+      "action": "stackDrawPileByType",
+      "resort": "DOM",
+      "tileType": "Grassroots"
+    },
+    {
+      "action": "seedResources",
+      "count": 3,
+      "playerId": "0",
+      "resort": "FOR"
+    },
+    {
+      "action": "seedResources",
+      "count": 3,
+      "playerId": "0",
+      "resort": "INF"
+    }
+  ],
+  "seed": "golden-core-convert"
+}

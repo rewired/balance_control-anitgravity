@@ -1,0 +1,188 @@
+{
+  "config": {
+    "expansions": {
+      "ex01": false,
+      "ex02": false,
+      "ex03": false
+    }
+  },
+  "expectedFinalHash": "9e199a78ea88400eb47ba69a5d2a901c04aa7fe44fa66aec8755c27246ea9d03",
+  "expectedPublicSurfaceHash": "600edc6b6b052ddefdfd3efae43d321594f9ed44b7816c1954db2a14068d2ce8",
+  "id": "core_formalize_influence",
+  "moves": [
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,-1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,-1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "-1,-1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "2,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "committeeCoord": "1,0",
+          "paymentResourceIds": [
+            "pre_res_0_DOM_1",
+            "pre_res_0_FOR_1"
+          ]
+        }
+      ],
+      "move": "formalizeInfluence"
+    }
+  ],
+  "numPlayers": 2,
+  "prelude": [
+    {
+      "action": "stackDrawPileByType",
+      "tileType": "Committee"
+    },
+    {
+      "action": "seedResources",
+      "count": 2,
+      "playerId": "0",
+      "resort": "DOM"
+    },
+    {
+      "action": "seedResources",
+      "count": 2,
+      "playerId": "0",
+      "resort": "FOR"
+    },
+    {
+      "action": "seedResources",
+      "count": 2,
+      "playerId": "0",
+      "resort": "INF"
+    }
+  ],
+  "seed": "golden-core-formalize"
+}

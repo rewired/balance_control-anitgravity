@@ -1,0 +1,118 @@
+{
+  "config": {
+    "expansions": {
+      "ex01": false,
+      "ex02": false,
+      "ex03": false
+    }
+  },
+  "expectedFinalHash": "a980ac374dfbc06df0a81f56d345548a8e7c06eac896c345aa1d6e83a3e42fe8",
+  "expectedPublicSurfaceHash": "600edc6b6b052ddefdfd3efae43d321594f9ed44b7816c1954db2a14068d2ce8",
+  "id": "core_hotspot_surrounded",
+  "moves": [
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "0,1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "2,0"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "2,0"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "2,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "2,-1"
+        }
+      ],
+      "move": "placeInfluence"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,-1"
+        }
+      ],
+      "move": "placeTile"
+    },
+    {
+      "args": [
+        {
+          "targetCoord": "1,-1"
+        }
+      ],
+      "move": "placeInfluence"
+    }
+  ],
+  "numPlayers": 2,
+  "prelude": [
+    {
+      "action": "stackDrawPileByType",
+      "tileType": "Hotspot"
+    }
+  ],
+  "seed": "golden-core-hotspot"
+}
