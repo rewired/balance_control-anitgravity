@@ -62,31 +62,39 @@
 * Production order and deterministic hashing unchanged except intentional updates.
 
 ## 8) Implementation Plan
-* [ ] Map resolver/production obligations to concrete test assertions.
-* [ ] Add focused tests where obligations are currently incidental.
-* [ ] Re-run golden and obligation audits.
+* [x] Map resolver/production obligations to concrete test assertions.
+* [x] Add focused tests where obligations are currently incidental.
+* [x] Re-run golden and obligation audits.
 
 ## 9) Acceptance Criteria
-* [ ] Listed resolver/production IDs have direct executable evidence.
-* [ ] No WEAK/SUSPECT obligations remain in resolver/production cluster.
-* [ ] Golden replay passes and state hash remains deterministic.
+* [x] Listed resolver/production IDs have direct executable evidence.
+* [x] No WEAK/SUSPECT obligations remain in resolver/production cluster.
+* [x] Golden replay passes and state hash remains deterministic.
 
 ## 10) PR Checklist (Repo Artifact)
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ## 11) Work Summary (3–7 bullets)
-* N/A
+* Confirmed targeted resolver/production evidence is already direct and executable in `resolver.test.ts`, `new-core-production-majority-obligations.test.ts`, and integration golden replay coverage for tie-production determinism.
+* Re-ran obligations audit and confirmed zero WEAK/MISSING/SUSPECT entries for the resolver/production cluster and globally.
+* Rebuilt workspace packages to restore package export resolution before running focused suites.
+* Re-ran focused resolver/production and golden tests, then full lint/test quality gates for deterministic closure evidence.
 ## 12) Commands Run (with outcomes)
-* N/A
+* `pnpm -w audit:core-obligations` ✅ PASS (Quality stats: WEAK 0, MISSING 0, SUSPECT 0).
+* `pnpm vitest run packages/game/test/resolver.test.ts packages/game/test/resolver-invariants.test.ts packages/game/test/new-core-production-majority-obligations.test.ts packages/integration-tests/test/golden-replay.test.ts` ⚠️ INITIAL FAIL (`@balance-control/rules`/`@balance-control/game` export resolution before build).
+* `pnpm -r build` ✅ PASS.
+* `pnpm vitest run packages/game/test/resolver.test.ts packages/game/test/resolver-invariants.test.ts packages/game/test/new-core-production-majority-obligations.test.ts packages/integration-tests/test/golden-replay.test.ts` ✅ PASS (24 tests).
+* `pnpm lint` ✅ PASS.
+* `pnpm test` ✅ PASS.
 ## 13) Postflight Proof (recorded in commit message)
 ### 13.1 Recorded
 Recorded in final commit message (Postflight: block).
@@ -94,4 +102,4 @@ Recorded in final commit message (Postflight: block).
 ### 14.1 Recorded
 Recorded in final commit message (Postflight: block).
 ## 15) Amendments (append-only)
-* N/A
+* 2026-02-24: Executed in closure mode by validating resolver/production evidence coverage, rerunning audits + deterministic suites, and completing task/changelog artifacts.
