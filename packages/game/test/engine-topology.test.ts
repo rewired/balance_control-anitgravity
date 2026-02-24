@@ -112,6 +112,55 @@ describe('Topology Invariants', () => {
     });
 
     /**
+     * @rule CORE-01-00-07
+     * @rule CORE-01-00-T06
+     */
+    it('binds each Board tile to exactly one unique topology position', () => {
+        const ctx: any = {
+            numPlayers: 2,
+            currentPlayer: '0',
+            activePlayers: { '0': 'drawAndPlace' },
+            random: { Die: () => 1 }
+        };
+        const G = SetupGame({ ctx });
+
+        const firstTileId = G.zones[CoreZoneName.DrawPile].items[0];
+        G.zones['staging_0'] = { id: 'staging_0', items: [firstTileId] };
+        DrawAndPlaceMoves.placeTile({ G, ctx }, { targetCoord: '1,0' });
+
+        const secondTileId = G.zones[CoreZoneName.DrawPile].items[1];
+        G.zones['staging_0'] = { id: 'staging_0', items: [secondTileId] };
+        DrawAndPlaceMoves.placeTile({ G, ctx }, { targetCoord: '1,-1' });
+
+        const boardTileIds = G.zones[CoreZoneName.Board].items;
+        const positionedTileIds = Object.values(G.grid);
+
+        expect(new Set(positionedTileIds).size).toBe(positionedTileIds.length);
+        expect(new Set(boardTileIds)).toEqual(new Set(positionedTileIds));
+    });
+
+    /**
+     * @rule CORE-01-04-05
+     */
+    it('enumerates placeTile intents only for topology-adjacent open positions', () => {
+        const ctx: any = {
+            numPlayers: 2,
+            currentPlayer: '0',
+            activePlayers: { '0': 'drawAndPlace' },
+            random: { Die: () => 1 }
+        };
+        const G = SetupGame({ ctx });
+
+        const stagedTileId = G.zones[CoreZoneName.DrawPile].items[0];
+        G.zones['staging_0'] = { id: 'staging_0', items: [stagedTileId] };
+
+        const intents = enumerateLegalIntents(G, ctx, '0').filter(intent => intent.moveType === 'placeTile');
+        const legalCoords = intents.map(intent => intent.payload.targetCoord).sort();
+
+        expect(legalCoords).toEqual(['-1,0', '-1,1', '0,-1', '0,1', '1,-1', '1,0']);
+    });
+
+    /**
      * @rule CORE-01-00-11
      * @rule CORE-01-00-T03
      */

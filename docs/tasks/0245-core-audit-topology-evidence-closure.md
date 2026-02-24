@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** FROZEN
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -24,9 +24,9 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 
 ### compliance_notes (required if affected_guardrails != NONE)
 
-* GR-003: topology tests must be deterministic and replay-stable.
-* GR-004: legal-intent checks must remain engine-owned and pure.
-* GR-009: topology position/adjacency checks must preserve zone consistency.
+* GR-003: Added deterministic topology assertions and reran obligation/test audits with stable outcomes.
+* GR-004: Topology legality evidence remains driven by `enumerateLegalIntents` in engine tests only.
+* GR-009: Added direct Board-position uniqueness assertion to confirm one tile per position and one position per Board tile.
 
 ### guardrail_gate
 
@@ -65,18 +65,18 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 
 ### 5.1 Code
 
-* `packages/game/src/engine/topology.ts` (only if needed for testability seams)
+* `packages/game/src/engine/topology.ts` (only if needed for testability seams) — N/A
 
 ### 5.2 Tests
 
 * `packages/game/test/engine-topology.test.ts`
-* `packages/game/test/legal-intents.test.ts` (if adjacency legality assertions are added there)
+* `packages/game/test/legal-intents.test.ts` (if adjacency legality assertions are added there) — N/A
 
 ### 5.3 Docs
 
 * [x] `/docs/changelog.md` updated (required if logic/state/resolver changes)
-* [ ] `/docs/design-decisions/DD-XXXX-<topic>.md` created (only if ambiguity/conflict)
-* [ ] `/docs/rules/ERRATA-XXXX.md` created (only if rule clarification)
+* [x] `/docs/design-decisions/DD-0245-topology-evidence-closure.md` created
+* [ ] `/docs/rules/ERRATA-XXXX.md` created (only if rule clarification) — N/A
 
 ## 6) Constraints (Hard)
 
@@ -95,49 +95,56 @@ States: **DRAFT → FROZEN → IMPLEMENTING → VERIFYING → COMMIT_READY → D
 
 ## 8) Implementation Plan
 
-* [ ] Step 1: enumerate topology-linked CORE IDs with ambiguous evidence quality.
-* [ ] Step 2: add named tests with direct assertions per ID cluster.
-* [ ] Step 3: rerun `audit:core-obligations` and confirm no topology-linked SUSPECT items remain.
+* [x] Step 1: enumerate topology-linked CORE IDs with ambiguous evidence quality.
+* [x] Step 2: add named tests with direct assertions per ID cluster.
+* [x] Step 3: rerun `audit:core-obligations` and confirm no topology-linked SUSPECT items remain.
 
 ## 9) Acceptance Criteria
 
-* [ ] CORE-01-00-07/08/T01/T07A/04-05 have direct executable assertions.
-* [ ] `pnpm -w audit:core-obligations` reports no SUSPECT for topology cluster.
-* [ ] Golden replay unchanged or intentionally updated with explanation.
+* [x] CORE-01-00-07/08/T01/T07A/04-05 have direct executable assertions.
+* [x] `pnpm -w audit:core-obligations` reports no SUSPECT for topology cluster.
+* [x] Golden replay unchanged or intentionally updated with explanation. (Unchanged; no replay fixture edits.)
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ## 11) Work Summary (3–7 bullets)
 
-* N/A
+* Added explicit topology tests for Board position binding uniqueness (CORE-01-00-07, CORE-01-00-T06).
+* Added explicit legal-intent adjacency test for `placeTile` coordinates (CORE-01-04-05).
+* Kept existing adjacency-consistency and `isMoveAdjacent` tests for CORE-01-00-08 / CORE-01-00-T01 / CORE-01-00-T07A and expanded direct evidence links.
+* Updated CORE obligations registry evidence entries so CORE-01-00-07 and CORE-01-04-05 point to explicit topology evidence tests.
+* Updated changelog and added a design-decision note documenting evidence-closure rationale.
 
 ## 12) Commands Run (with outcomes)
 
-* N/A
+* `pnpm -w audit:core-obligations` → OK
+* `pnpm -C packages/game exec vitest run test/engine-topology.test.ts` → OK
+* `pnpm lint` → OK
+* `pnpm test` → OK
 
 ## 13) Postflight Proof (recorded in commit message)
 
 ### 13.1 Recorded
 
-Recorded in final commit message (Postflight: block).
+* Pending (to be appended in final commit message amend)
 
 ## 14) Commit Proof (recorded in commit message)
 
 ### 14.1 Recorded
 
-Recorded in final commit message (Postflight: block).
+* Pending (to be appended in final commit message amend)
 
 ## 15) Amendments (append-only)
 
-* N/A
+* 2026-02-24: Completed implementation/verification and promoted task state to DONE.
