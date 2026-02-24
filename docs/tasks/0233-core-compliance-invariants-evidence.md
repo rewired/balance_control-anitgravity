@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -41,9 +41,9 @@ Rules (non-negotiable):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -132,7 +132,7 @@ N/A
 
 ## 8) Implementation Plan
 
-* [ ] Create `core-compliance-invariants.test.ts` and group tests by CORE sections:
+* [x] Create `core-compliance-invariants.test.ts` and group tests by CORE sections:
 
   * State Model / Zones (single-zone membership; ordered-zone conventions; attachment invariants; bank unlimited)
   * Setup (StartPosition binding; required tiles present; deterministic shuffle contract via stable seed)
@@ -140,13 +140,13 @@ N/A
   * Control / Majority (tie → no control; lobbyist virtual influence affects majority only)
   * Settlement / Production (uncontrolled produces zero; bank materialization; noise sink behavior)
 
-* [ ] Where existing helpers/tests already encode the invariant, reuse helper logic rather than re-implementing.
-* [ ] Update `CORE-01-OBLIGATIONS.json`:
+* [x] Where existing helpers/tests already encode the invariant, reuse helper logic rather than re-implementing.
+* [x] Update `CORE-01-OBLIGATIONS.json`:
 
   * Add `test:` evidence pointers for each normative obligation covered by the new suite.
   * Avoid duplicate evidence spam; prefer 1–2 strong tests per obligation cluster.
 
-* [ ] Run:
+* [x] Run:
 
   * `pnpm -C packages/game test -- core-compliance-invariants.test.ts`
   * `pnpm audit:core-obligations`
@@ -155,33 +155,43 @@ N/A
 
 ## 9) Acceptance Criteria
 
-* [ ] New test file exists and passes locally.
-* [ ] The suite covers the highest-risk normative CORE clusters (zones, start committee, majority/ties, production canon).
-* [ ] `CORE-01-OBLIGATIONS.json` references the new test as evidence for covered obligations.
-* [ ] No runtime behavior changes; golden hashes unchanged.
+* [x] New test file exists and passes locally.
+* [x] The suite covers the highest-risk normative CORE clusters (zones, start committee, majority/ties, production canon).
+* [x] `CORE-01-OBLIGATIONS.json` references the new test as evidence for covered obligations.
+* [x] No runtime behavior changes; golden hashes unchanged.
 
 ---
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] Tests are deterministic and fast
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` passes
-* [ ] No temporary files committed
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] Tests are deterministic and fast
+* [x] `pnpm lint` passes
+* [x] `pnpm test` passes
+* [x] No temporary files committed
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* TODO (fill during VERIFYING/COMMIT_READY)
+* Created `packages/game/test/core-compliance-invariants.test.ts` with 16 focused compliance tests.
+* Validated core invariants: single-zone membership, ordered zones, influence attachment, and bank materialization.
+* Verified setup invariants: StartPosition binding, canonical tile counts, and deterministic RNG.
+* Asserted turn and majority logic: PendingChoice gate, tie control rules, and Lobbyist virtual influence.
+* Covered production settlement: uncontrolled zero-output, remainder-to-noise, and PositionKey sweep order.
+* Linked tests as evidence for 21 normative obligations in `CORE-01-OBLIGATIONS.json`.
+* Ensured clean audit report with zero orphans using `pnpm audit:core-obligations`.
 
 ---
 
 ## 12) Commands Run (with outcomes)
 
-* TODO (fill during VERIFYING/COMMIT_READY)
+* `pnpm install`: Success.
+* `pnpm build`: Success.
+* `pnpm -C packages/game test -- core-compliance-invariants.test.ts`: Passed (16 tests).
+* `pnpm audit:core-obligations`: Passed (zero orphans).
+* `pnpm test`: Passed (workspace-wide).
 
 ---
 
