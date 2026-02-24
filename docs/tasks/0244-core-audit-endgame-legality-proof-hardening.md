@@ -23,7 +23,7 @@
 * [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ## 1) Primary Spec Anchors (MUST)
-* CORE: CORE-01-09-01, CORE-01-09-03, CORE-01-09-06, CORE-01-09-07, CORE-01-10-01
+* CORE: CORE-01-09-01, CORE-01-09-01A, CORE-01-09-03, CORE-01-09-04, CORE-01-10-01
 * ARCH: ARCH-01:DETERMINISM
 
 ## 2) Goal

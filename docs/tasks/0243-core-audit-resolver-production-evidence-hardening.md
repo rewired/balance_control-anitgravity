@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## 0) Masterplan Guardrails (MUST)
 ### affected_guardrails
@@ -15,9 +15,9 @@
 * GR-011
 
 ### compliance_notes (required if affected_guardrails != NONE)
-* GR-007: Preserve canonical resolver order while improving evidence specificity.
-* GR-010: Keep Start Committee immunity checks explicit.
-* GR-011: Keep production order and distribution canon intact.
+* GR-007: Preserved canonical resolver/CPU ordering and added assertion-level evidence.
+* GR-010: Start Committee immunity remains explicit via formalize test evidence.
+* GR-011: Production order/distribution canon preserved and tie remainder-to-Noise validated.
 
 ### guardrail_gate
 * [x] I read the guardrails file before implementation.
@@ -49,7 +49,7 @@
 * packages/game/test/new-core-production-majority-obligations.test.ts
 * packages/integration-tests/test/golden-replay.test.ts
 ### 5.3 Docs
-* [ ] /docs/changelog.md updated (required if logic/state/resolver changes)
+* [x] /docs/changelog.md updated (required if logic/state/resolver changes)
 * [ ] /docs/design-decisions/DD-XXXX-<topic>.md created (only if ambiguity/conflict)
 * [ ] /docs/rules/ERRATA-XXXX.md created (only if rule clarification)
 
@@ -62,32 +62,41 @@
 * Remainder-to-Noise handling deterministic.
 
 ## 8) Implementation Plan
-* [ ] Add explicit resolver-order assertions tied to rule IDs.
-* [ ] Strengthen production tests for tie and noise remainder obligations.
-* [ ] Regenerate/validate golden replay fixtures if intentionally changed.
+* [x] Add explicit resolver-order assertions tied to rule IDs.
+* [x] Strengthen production tests for tie and noise remainder obligations.
+* [x] Regenerate/validate golden replay fixtures if intentionally changed.
 
 ## 9) Acceptance Criteria
-* [ ] Listed IDs have executable, assertion-level evidence.
-* [ ] `pnpm -C packages/game test -- moves.test.ts new-core-production-majority-obligations.test.ts` passes.
-* [ ] `pnpm -C packages/integration-tests test -- golden-replay.test.ts` passes.
+* [x] Listed IDs have executable, assertion-level evidence.
+* [x] `pnpm -C packages/game test -- moves.test.ts new-core-production-majority-obligations.test.ts` passes.
+* [x] `pnpm -C packages/integration-tests test -- golden-replay.test.ts` passes.
 
 ## 10) PR Checklist (Repo Artifact)
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ## 11) Work Summary (3–7 bullets)
-* N/A
+* Added `packages/game/test/new-core-production-majority-obligations.test.ts` with assertion-level evidence for tied production split and deterministic remainder-to-Noise handling (CORE-01-06-16).
+* Added Start Committee formalize immunity evidence showing prohibitions and extra costs do not block Start Committee resolution (CORE-01-08-04, CORE-01-04-14, CORE-01-04-15).
+* Refactored integration golden replay test with a shared `runFixture` helper for explicit replay execution.
+* Added deterministic rerun assertion for `core_majority_tie_no_control` golden fixture to harden replay/hash stability proof.
+* Updated `docs/changelog.md` with task(0243) entry.
+* Corrected invalid anchor references in task docs (`0244`, `0241`) so spec-anchor tripwire and workspace `pnpm test` pass.
 
 ## 12) Commands Run (with outcomes)
-* N/A
+* `pnpm -C packages/rules build` → OK
+* `pnpm -C packages/game exec vitest run test/moves.test.ts test/new-core-production-majority-obligations.test.ts` → OK (26 passed)
+* `pnpm -C packages/integration-tests exec vitest run test/golden-replay.test.ts` → OK (10 passed)
+* `pnpm lint` → OK
+* `pnpm test` → OK
 
 ## 13) Postflight Proof (recorded in commit message)
 ### 13.1 Recorded

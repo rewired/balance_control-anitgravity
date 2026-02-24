@@ -160,6 +160,34 @@ function buildReplayGame(seed: string | number, numPlayers: number, config?: unk
     };
 }
 
+
+function runFixture(fixture: GoldenFixture): { actualHash: string; actualPublicSurfaceHash: string | undefined } {
+    registerCanonicalPacks();
+
+    const game = buildReplayGame(fixture.seed, fixture.numPlayers, fixture.config, fixture.prelude);
+    const client = Client({
+        game,
+        numPlayers: fixture.numPlayers,
+    });
+    client.start();
+
+    for (const step of fixture.moves) {
+        const state = client.getState();
+        client.updatePlayerID(state!.ctx.currentPlayer);
+        const resolvedArgs = resolveMoveArgs(state!.G, step.move, step.args);
+        const moveFn = (client.moves as any)[step.move];
+        expect(typeof moveFn).toBe('function');
+        moveFn(...resolvedArgs);
+    }
+
+    const state = client.getState();
+    expect(state).toBeTruthy();
+    return {
+        actualHash: hashState(state!.G as any),
+        actualPublicSurfaceHash: state!.G.meta?.publicSurfaceHash,
+    };
+}
+
 describe('Golden replays (Integration)', () => {
     const fixtures = loadGoldenFixtures();
 
@@ -169,29 +197,7 @@ describe('Golden replays (Integration)', () => {
             const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
             try {
-                // Register all canonical packs (real packs)
-                registerCanonicalPacks();
-
-                const game = buildReplayGame(fixture.seed, fixture.numPlayers, fixture.config, fixture.prelude);
-                const client = Client({
-                    game,
-                    numPlayers: fixture.numPlayers,
-                });
-                client.start();
-
-                for (const step of fixture.moves) {
-                    const state = client.getState();
-                    client.updatePlayerID(state!.ctx.currentPlayer);
-                    const resolvedArgs = resolveMoveArgs(state!.G, step.move, step.args);
-                    const moveFn = (client.moves as any)[step.move];
-                    expect(typeof moveFn).toBe('function');
-                    moveFn(...resolvedArgs);
-                }
-
-                const state = client.getState();
-                expect(state).toBeTruthy();
-                const actualHash = hashState(state!.G as any);
-                const actualPublicSurfaceHash = state!.G.meta?.publicSurfaceHash;
+                const { actualHash, actualPublicSurfaceHash } = runFixture(fixture);
 
                 expect(actualHash).toBe(fixture.expectedFinalHash);
                 expect(actualPublicSurfaceHash).toBe(fixture.expectedPublicSurfaceHash);
@@ -203,4 +209,18 @@ describe('Golden replays (Integration)', () => {
             }
         });
     }
+
+    /** @rule CORE-01-06-16 */
+    /** @rule CORE-01-07-03D */
+    it('replays tie-production fixture deterministically across repeated runs [CORE-01-06-16, CORE-01-07-03D]', () => {
+        const tieFixture = fixtures.find((fixture) => fixture.id === 'core_majority_tie_no_control');
+        expect(tieFixture).toBeTruthy();
+
+        const first = runFixture(tieFixture!);
+        const second = runFixture(tieFixture!);
+
+        expect(first.actualHash).toBe(second.actualHash);
+        expect(first.actualPublicSurfaceHash).toBe(second.actualPublicSurfaceHash);
+    });
+
 });
