@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-24: task(0244) Tests/Docs: Harden CORE endgame legality evidence with assertion-level winner/tie checks and deterministic immediate-settlement replay coverage (no runtime logic changes).
 - 2026-02-24: task(0243) Tests/Docs: Harden resolver + production evidence with explicit CORE production tie/noise assertions, Start Committee immunity proof, and deterministic golden replay rerun coverage (no runtime logic changes).
 - 2026-02-24: task(0242) Tests: Harden turn-stage gating and legal-intent evidence (pendingChoice ownership gate + draw/political stage legality assertions; no runtime logic changes).
 - 2026-02-24: task(0241) Tests/Docs: Harden setup + draw-flow obligation evidence with explicit assertion bindings for setup order, canonical shuffle/RNG sequencing, and 2-player starting Influence allocation (no runtime logic changes).
