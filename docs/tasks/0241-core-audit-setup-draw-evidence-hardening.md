@@ -93,7 +93,7 @@
 * `pnpm -C packages/game exec vitest run test/setup.test.ts test/new-core-setup-obligations.test.ts test/unplaceable-draw-redraw.test.ts` → OK (21 passed)
 * `pnpm -w audit:core-obligations` → OK (WEAK=0, SUSPECT=0)
 * `pnpm lint` → OK
-* `pnpm test` → FAIL (pre-existing `docs/tasks/0244...` unknown anchors `CORE-01-09-06`, `CORE-01-09-07`)
+* `pnpm test` → FAIL (pre-existing `docs/tasks/0244...` unknown anchors in task 0244 (resolved later))
 
 ## 13) Postflight Proof (recorded in commit message)
 ### 13.1 Recorded
