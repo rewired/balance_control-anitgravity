@@ -13,6 +13,12 @@
       "NORMATIVE_UI": 0,
       "INFORMATIVE": 6,
       "DERIVED": 4
+    },
+    "qualityStats": {
+      "OK": 183,
+      "WEAK": 0,
+      "MISSING": 0,
+      "SUSPECT": 0
     }
   },
   "results": {
@@ -21,6 +27,7 @@
     "duplicateIds": [],
     "invalidEntries": [],
     "normativeMissingEvidence": [],
+    "weakEvidence": [],
     "evidenceOrphans": []
   }
 }
