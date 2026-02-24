@@ -112,6 +112,25 @@ describe('Turn Structure (Stages)', () => {
         expect(state.ctx.activePlayers[pid]).toBe('politicalAction');
     });
 
+    it('should reject placeInfluence during drawAndPlace stage without mutation', () => {
+        const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
+        client.start();
+
+        const beforeState = client.getState();
+        const beforeG = JSON.stringify(beforeState.G);
+        const beforePlayer = beforeState.ctx.currentPlayer;
+        const beforeStage = beforeState.ctx.activePlayers[beforePlayer];
+
+        const boardTileId = Object.values(beforeState.G.grid)[0] as string;
+        client.moves.placeInfluence({ targetTileId: boardTileId });
+
+        const afterState = client.getState();
+        expect(JSON.stringify(afterState.G)).toBe(beforeG);
+        expect(afterState.ctx.currentPlayer).toBe(beforePlayer);
+        expect(afterState.ctx.activePlayers[beforePlayer]).toBe(beforeStage);
+        expect(afterState.ctx.activePlayers[beforePlayer]).toBe('drawAndPlace');
+    });
+
     it('should end turn after taking a political action', () => {
         const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
         client.start();

@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** READY FOR REVIEW
 
 ## 0) Masterplan Guardrails (MUST)
 ### affected_guardrails
@@ -48,7 +48,7 @@
 * packages/game/test/legal-intents.test.ts
 * packages/game/test/turn.test.ts
 ### 5.3 Docs
-* [ ] /docs/changelog.md updated (required if logic/state/resolver changes)
+* [x] /docs/changelog.md updated (required if logic/state/resolver changes)
 * [ ] /docs/design-decisions/DD-XXXX-<topic>.md created (only if ambiguity/conflict)
 * [ ] /docs/rules/ERRATA-XXXX.md created (only if rule clarification)
 
@@ -61,40 +61,48 @@
 * Turn phase legality is canonical and reproducible.
 
 ## 8) Implementation Plan
-* [ ] Add explicit per-rule tests for legal intent presence/absence.
-* [ ] Add tests proving only ResolveChoice intents are legal under pendingChoice.
-* [ ] Re-run targeted legality tests and obligation audit.
+* [x] Add explicit per-rule tests for legal intent presence/absence.
+* [x] Add tests proving only ResolveChoice intents are legal under pendingChoice.
+* [x] Re-run targeted legality tests and obligation audit.
 
 ## 9) Acceptance Criteria
-* [ ] Listed IDs have assertion-level executable proof.
-* [ ] `pnpm -C packages/game test -- legal-intents.test.ts turn.test.ts` passes.
-* [ ] `pnpm -w audit:core-obligations` has no WEAK/SUSPECT for listed IDs.
+* [x] Listed IDs have assertion-level executable proof.
+* [x] `pnpm -C packages/game test -- legal-intents.test.ts turn.test.ts` passes.
+* [x] `pnpm -w audit:core-obligations` has no WEAK/SUSPECT for listed IDs.
 
 ## 10) PR Checklist (Repo Artifact)
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
 * [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
 
 ## 11) Work Summary (3–7 bullets)
-* N/A
+* Added explicit legal-intent proof for pendingChoice ownership: non-owner receives zero legal intents.
+* Added turn-stage proof that drawAndPlace enumerates placement intents but no political intents.
+* Added turn-engine proof that placeInfluence is rejected and state-stable during drawAndPlace.
+* Re-ran targeted vitest checks for legal intents + turn gating and confirmed pass.
+* Re-ran core obligations audit and confirmed zero WEAK/SUSPECT findings.
 
 ## 12) Commands Run (with outcomes)
-* N/A
+* `pnpm -C packages/rules build` — PASS
+* `pnpm -C packages/game exec vitest run test/legal-intents.test.ts test/turn.test.ts` — PASS
+* `pnpm -w audit:core-obligations` — PASS
+* `pnpm lint` — PASS
+* `pnpm test` — FAIL (pre-existing spec-anchor-tripwire references in tasks 0241/0244: CORE endgame anchors (09-06/09-07))
 
 ## 13) Postflight Proof (recorded in commit message)
 ### 13.1 Recorded
-* N/A
+* Pending
 
 ## 14) Commit Proof (recorded in commit message)
 ### 14.1 Recorded
-* N/A
+* Pending
 
 ## 15) Amendments (append-only)
-* N/A
+* 2026-02-24: Completed implementation with test-only evidence hardening; no engine logic changes required.

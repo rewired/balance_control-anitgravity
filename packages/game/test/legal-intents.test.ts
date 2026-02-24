@@ -224,6 +224,33 @@ describe('enumerateLegalIntents', () => {
         expect(intents).toHaveLength(2);
     });
 
+    it('returns no legal intents when pending choice belongs to another player', () => {
+        const ctx = createCtx('politicalAction');
+        const G = SetupGame({ ctx });
+        G.engine.pendingChoice = {
+            choiceId: 'choice_other_player',
+            sourceId: 'test',
+            player: '1',
+            kind: 'yesNo',
+            spec: { prompt: 'continue?' }
+        };
+
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        expect(intents).toEqual([]);
+    });
+
+    it('does not enumerate political intents during drawAndPlace stage', () => {
+        const ctx = createCtx('drawAndPlace');
+        const G = SetupGame({ ctx });
+        drawTileToStaging(G as any, ctx);
+
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        expect(intents.some((intent) => intent.moveType === 'placeTile')).toBe(true);
+
+        const politicalMoveTypes = new Set(['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources']);
+        expect(intents.some((intent) => politicalMoveTypes.has(intent.moveType))).toBe(false);
+    });
+
     it('emits draw-and-place intents even when ctx.activePlayers is missing (best-effort stage)', () => {
         const ctx = createCtxNoActivePlayers();
         const G = SetupGame({ ctx });
