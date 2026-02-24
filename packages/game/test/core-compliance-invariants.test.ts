@@ -61,24 +61,103 @@ describe('CORE Compliance Invariants', () => {
         });
 
         /**
-         * @rule CORE-01-00-05A
+         * @rule CORE-01-00-02
          */
-        it('should follow ordered zone conventions (top=first, bottom=last)', () => {
+        it('should treat zones as containers where moving means transferring between them', () => {
             const ctx: any = { numPlayers: 2, random: createSeededRandom(42) };
             const G = SetupGame({ ctx });
 
-            const drawPile = G.zones[CoreZoneName.DrawPile].items;
-            expect(drawPile.length).toBeGreaterThan(0);
+            // Ensure an object exists to move
+            const objId = 'test_obj';
+            G.objects[objId] = { id: objId, type: 'Resource', resort: 'DOM' };
+            G.zones[CoreZoneName.Bank].items.push(objId);
 
-            // Convention: Draw from top (shift)
-            const topId = drawPile[0];
-            const drawn = drawPile.shift();
-            expect(drawn).toBe(topId);
+            const sourceZone = G.zones[CoreZoneName.Bank];
+            const targetZone = G.zones[CoreZoneName.Noise];
 
-            // Convention: Discard to bottom (push)
+            expect(sourceZone.items).toContain(objId);
+            expect(targetZone.items).not.toContain(objId);
+
+            // Transfer
+            sourceZone.items = sourceZone.items.filter(id => id !== objId);
+            targetZone.items.push(objId);
+
+            expect(sourceZone.items).not.toContain(objId);
+            expect(targetZone.items).toContain(objId);
+        });
+
+        /**
+         * @rule CORE-01-00-03
+         */
+        it('should restrict Influence objects to PersonalSupply or Board zones', () => {
+            const ctx: any = { numPlayers: 2, random: createSeededRandom(42) };
+            const G = SetupGame({ ctx });
+
+            const influenceIds = Object.keys(G.objects).filter(id => G.objects[id].type === 'Influence');
+            expect(influenceIds.length).toBeGreaterThan(0);
+
+            for (const infId of influenceIds) {
+                const zone = Object.values(G.zones).find(z => z.items.includes(infId));
+                expect(zone).toBeDefined();
+                const isPersonalSupply = zone!.id.startsWith(CoreZoneName.PersonalSupply);
+                const isBoardTile = G.tiles[zone!.id] !== undefined || zone!.id === 'tile_start_committee';
+                expect(isPersonalSupply || isBoardTile).toBe(true);
+            }
+        });
+
+        /**
+         * @rule CORE-01-00-04
+         */
+        it('should restrict Resource objects to PersonalSupply, Bank, or Noise zones', () => {
+            const ctx: any = { numPlayers: 2, random: createSeededRandom(42) };
+            const G = SetupGame({ ctx });
+
+            // Create a resource so we have at least one
+            const testResId = 'res_test_0';
+            G.objects[testResId] = { id: testResId, type: 'Resource', resort: 'DOM' };
+            G.zones[CoreZoneName.Bank].items.push(testResId);
+
+            const resourceIds = Object.keys(G.objects).filter(id => G.objects[id].type === 'Resource');
+            expect(resourceIds.length).toBeGreaterThan(0);
+
+            const allowedZones = [CoreZoneName.Bank, CoreZoneName.Noise];
+
+            for (const rId of resourceIds) {
+                const zone = Object.values(G.zones).find(z => z.items.includes(rId));
+                expect(zone).toBeDefined();
+                const isPersonalSupply = zone!.id.startsWith(CoreZoneName.PersonalSupply);
+                const isAllowedGeneric = allowedZones.includes(zone!.id as CoreZoneName);
+                expect(isPersonalSupply || isAllowedGeneric).toBe(true);
+            }
+        });
+
+        /**
+         * @rule CORE-01-00-05A
+         */
+        it('should follow ordered zone conventions for DrawPile and DiscardFaceUp (top=first, bottom=last)', () => {
+            const ctx: any = { numPlayers: 2, random: createSeededRandom(42) };
+            const G = SetupGame({ ctx });
+
+            const drawPileZone = G.zones[CoreZoneName.DrawPile];
             const discardZone = G.zones[CoreZoneName.DiscardFaceUp];
-            discardZone.items.push(drawn!);
-            expect(discardZone.items[discardZone.items.length - 1]).toBe(topId);
+
+            expect(drawPileZone.items.length).toBeGreaterThan(2);
+            const originalFirst = drawPileZone.items[0];
+            const originalSecond = drawPileZone.items[1];
+
+            // CORE-01-00-05A: Top = first element
+            const top = drawPileZone.items.shift();
+            expect(top).toBe(originalFirst);
+            expect(drawPileZone.items[0]).toBe(originalSecond);
+
+            // CORE-01-00-05A: Moving a Tile to DiscardFaceUp appends it to the end (bottom)
+            discardZone.items.push(top!);
+            expect(discardZone.items[discardZone.items.length - 1]).toBe(top);
+
+            const nextTop = drawPileZone.items.shift();
+            discardZone.items.push(nextTop!);
+            expect(discardZone.items[discardZone.items.length - 2]).toBe(top);
+            expect(discardZone.items[discardZone.items.length - 1]).toBe(nextTop);
         });
 
         /**

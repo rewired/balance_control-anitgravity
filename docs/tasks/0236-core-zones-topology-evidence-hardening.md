@@ -6,7 +6,7 @@
 
 ---
 
-**Task State:** DRAFT
+**Task State:** FROZEN
 
 ## Task State Machine (Loop-Breaker)
 
@@ -46,9 +46,9 @@ Iteration budget (hard stop):
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -119,7 +119,7 @@ Concrete artifacts that must exist after completion.
 
 ### 5.3 Docs
 
-* [ ] `/docs/changelog.md` updated (required if logic/state/resolver changes)
+* [x] `/docs/changelog.md` updated (required if logic/state/resolver changes)
 * [ ] `/docs/design-decisions/DD-XXXX-<topic>.md` created (only if ambiguity/conflict)
 * [ ] `/docs/rules/ERRATA-XXXX.md` created (only if rule clarification)
 
