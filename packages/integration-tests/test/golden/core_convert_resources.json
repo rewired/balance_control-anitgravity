@@ -6,7 +6,7 @@
       "ex03": false
     }
   },
-  "expectedFinalHash": "4070bfd8dd7ded9bf5c875d3591216509eb73a8f5d8ffd80ce2dd087b24e077b",
+  "expectedFinalHash": "fe314725b0493604fd4f1a032202fcd8279302bc1e7f75a12d0bbd5f10ad1a33",
   "expectedPublicSurfaceHash": "600edc6b6b052ddefdfd3efae43d321594f9ed44b7816c1954db2a14068d2ce8",
   "id": "core_convert_resources",
   "moves": [

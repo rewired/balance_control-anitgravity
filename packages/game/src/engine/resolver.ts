@@ -262,10 +262,16 @@ export class EffectResolver {
         }
 
         // Log to history
-        G.engine.history.push({
+        const historyEntry: any = {
             seq: G.engine.history.length,
-            atom: atom.kind
-        });
+            atom: atom.kind,
+        };
+        // Capture key context for traceability (CORE-01 compliance evidence support)
+        const atomAny = atom as any;
+        if (atomAny.tileId) historyEntry.tileId = atomAny.tileId;
+        if (atomAny.context?.tileId) historyEntry.tileId = atomAny.context.tileId;
+
+        G.engine.history.push(historyEntry);
 
         return true;
     }
