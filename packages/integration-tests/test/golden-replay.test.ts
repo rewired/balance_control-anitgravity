@@ -242,11 +242,12 @@ describe('Golden replays (Integration)', () => {
         };
 
         const run = () => {
-            const client = Client({ game: tinyDrawPileGame, numPlayers: 2 });
+            const client = Client({ game: tinyDrawPileGame, numPlayers: 1 });
             client.start();
             const state = client.getState();
             client.updatePlayerID(state.ctx.currentPlayer);
             client.moves.placeTile({ targetCoord: '1,0' });
+            client.events.endTurn();
             const postSettlement = client.getState();
             const snapshot = JSON.stringify(postSettlement.G);
             const tileId = postSettlement.G.grid['1,0'];

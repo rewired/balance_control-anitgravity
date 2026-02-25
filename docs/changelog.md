@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-25: task(0260) Tests/Isolation: Harden game test isolation by resetting per-variant move harness state, adding explicit `EnginePackRegistry.clear()` teardown in move/turn suites, and aligning immediate-end draw-pile tests with deterministic turn-finalization flow (`endTurn`) in game + integration tests.
 - 2026-02-25: task(0259) CI/QA: Identify UI E2E runtime as GitHub Actions `ui_e2e` job and migrate it to `ubuntu-latest`; install Playwright Chromium with Linux deps via `pnpm exec playwright install --with-deps chromium`; document ENV-WARN policy for restrictive containers while keeping lint/unit/coverage hard-fail.
 - 2026-02-25: task(0258) Tooling/QA: Align `vitest` to `^0.34.6` across workspace manifests to avoid mixed runner binaries, keep `@vitest/coverage-v8` aligned for client coverage, and reaffirm `coverage.provider: 'v8'` in Vite config.
 - 2026-02-25: task(0257) UI/Build: Fix `HotseatShell` state ID typing by routing E2E snapshot stateID reads through a typed adapter (removes invalid `Ctx` property access, restores strict build).
