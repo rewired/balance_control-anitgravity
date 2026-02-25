@@ -167,4 +167,4 @@ Recorded in final commit message (Postflight: block).
 
 ## 15) Amendments (append-only)
 
-N/A
+- 2026-02-25 (Codex): Added hard precondition in `registerTestPacks()` to fail fast if `core` registration does not yield non-empty `moves`; added explicit precondition assertion in `moves.test.ts` before resolver-driven `moveInfluence` path; audited `EnginePackRegistry.clear()` callsites and standardized additional registry suites to symmetric `beforeEach` + `afterEach` cleanup lifecycle.

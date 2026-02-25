@@ -1,10 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { makeTestPack } from './_helpers/makeTestPack';
 import type { GameConfig, GameState } from '@balance-control/rules';
 
 describe('Pack Disablement Isolation', () => {
     beforeEach(() => {
+        EnginePackRegistry.clear();
+    });
+
+    afterEach(() => {
         EnginePackRegistry.clear();
     });
 

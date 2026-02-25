@@ -1,9 +1,13 @@
-import { describe, expect, it, beforeEach } from 'vitest';
+import { afterEach, describe, expect, it, beforeEach } from 'vitest';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { assemblePacks } from '../src/move-assembly';
 
 describe('Pack Registry Setup Hooks', () => {
     beforeEach(() => {
+        EnginePackRegistry.clear();
+    });
+
+    afterEach(() => {
         EnginePackRegistry.clear();
     });
 

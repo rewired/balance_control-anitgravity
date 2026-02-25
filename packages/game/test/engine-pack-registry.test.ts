@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { GameConfig, ExpansionFlags } from '@balance-control/rules';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { buildMovesForConfig } from '../src/move-assembly';
@@ -35,6 +35,10 @@ function pack(id: EnginePackId, name: string, moves?: Record<string, (...args: a
 
 describe('EnginePackRegistry', () => {
     beforeEach(() => {
+        EnginePackRegistry.clear();
+    });
+
+    afterEach(() => {
         EnginePackRegistry.clear();
     });
 
