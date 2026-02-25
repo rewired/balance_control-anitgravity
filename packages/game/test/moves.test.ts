@@ -4,6 +4,7 @@ import { GameState, TileType, CoreZoneName } from '@balance-control/rules';
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { registerTestPacks } from './_helpers/registerPacks';
 import { EnginePackRegistry } from '../src/expansion-registry';
+import { getInfluenceCap } from '../src/mechanics-turn';
 
 describe('Moves', () => {
     let G: GameState;
@@ -78,7 +79,8 @@ describe('Moves', () => {
     };
 
     const seedPlayerInfluenceAtCap = () => {
-        for (let i = 2; i <= 7; i++) {
+        const cap = getInfluenceCap(ctx);
+        for (let i = 2; i <= cap; i++) {
             const infId = `inf_cap_${i}`;
             G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
             G.zones.board_t1.items.push(infId);
@@ -144,13 +146,13 @@ describe('Moves', () => {
     it('moveInfluence should remain legal at cap because it only relocates markers', () => {
         seedPlayerInfluenceAtCap();
         const beforeCount = countOwnedInfluence();
+        const cap = getInfluenceCap(ctx);
         const queueBefore = G.engine.effectQueue.length;
         const historyBefore = G.engine.history.length;
         const sourceBefore = G.zones.board_t1.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
         const targetBefore = G.zones.board_t2.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
 
-        expect(sourceBefore).toBe(6);
-        expect(targetBefore).toBe(0);
+        expect(beforeCount).toBe(cap);
         expect(queueBefore).toBe(0);
         expect(historyBefore).toBe(0);
 
@@ -162,8 +164,8 @@ describe('Moves', () => {
         expect(G.engine.history[historyBefore]).toMatchObject({ atom: 'influence.move' });
         const sourceInfluence = G.zones.board_t1.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
         const targetInfluence = G.zones.board_t2.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
-        expect(sourceInfluence).toBe(5);
-        expect(targetInfluence).toBe(1);
+        expect(sourceInfluence).toBe(sourceBefore - 1);
+        expect(targetInfluence).toBe(targetBefore + 1);
         expect(countOwnedInfluence()).toBe(beforeCount);
     });
 
