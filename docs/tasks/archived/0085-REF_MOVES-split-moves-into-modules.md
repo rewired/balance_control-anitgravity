@@ -201,7 +201,7 @@ packages/game test:  ✓ test/exp01-controller-grants-no-throw.test.ts  (1 test)
 packages/game test: stdout | test/exp01-controller-grants-no-throw.test.ts > EXP-01 controller grants with no controller > should not throw and should SKIP grant when controller is missing
 packages/game test: Expansion registered: exp01
 packages/game test: EXP-01 Setup Complete.
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 9ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 9ms
 packages/game test:  ✓ test/exp02-controller-grants-no-throw.test.ts  (2 tests) 12ms
 packages/game test: stdout | test/exp02-controller-grants-no-throw.test.ts > EXP-02 controller grants with no controller > should require explicit SKIP policy on all EXP-02 CONTROLLER grants
 packages/game test: Expansion registered: exp02

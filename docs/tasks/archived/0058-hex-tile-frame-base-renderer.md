@@ -242,7 +242,7 @@ packages/game test: ERROR: invalid move: placeInfluence args: [object Object]
 packages/game test: stdout | test/golden-replay.test.ts > Golden replays > should match golden hash for core_plus_ex01_small
 packages/game test: Expansion registered: EXP-01 Economy & Labor
 packages/game test: EXP-01 Setup Complete.
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 10ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 10ms
 packages/game test:  ✓ test/exp03-controller-grants-no-throw.test.ts  (2 tests) 17ms
 packages/game test: stdout | test/exp03-controller-grants-no-throw.test.ts > EXP-03 controller grants with no controller > should require explicit SKIP policy on all EXP-03 CONTROLLER grants
 packages/game test: Expansion registered: EXP-03 Climate & Future

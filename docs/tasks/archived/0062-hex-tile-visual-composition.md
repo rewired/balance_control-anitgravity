@@ -295,7 +295,7 @@ packages/game test: stdout | test/exp03-controller-grants-no-throw.test.ts > EXP
 packages/game test: Expansion registered: EXP-03 Climate & Future
 packages/game test: stdout | test/exp03-controller-grants-no-throw.test.ts > EXP-03 controller grants with no controller > should not throw and should not grant to Noise for uncontrolled EXP-03 effect path
 packages/game test: Expansion registered: EXP-03 Climate & Future
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 6ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 6ms
 packages/game test:  ✓ test/expansion.test.ts  (2 tests) 5ms
 packages/game test: stdout | test/expansion.test.ts > Expansion System > should register an expansion
 packages/game test: Expansion registered: TestExp

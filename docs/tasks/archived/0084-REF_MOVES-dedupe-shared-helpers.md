@@ -197,7 +197,7 @@ packages/game test: Expansion registered: exp03
 packages/game test: stdout | test/exp03-controller-grants-no-throw.test.ts > EXP-03 controller grants with no controller > should not throw and should not grant to Noise for uncontrolled EXP-03 effect path
 packages/game test: Expansion registered: exp03
 packages/game test:  ✓ test/exp03-controller-grants-no-throw.test.ts  (2 tests) 39ms
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 9ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 9ms
 packages/game test:  ✓ test/resolver-invariants.test.ts  (5 tests) 18ms
 packages/game test:  ✓ test/exp02-hotspot-ids.test.ts  (1 test) 9ms
 packages/game test: stdout | test/exp02-hotspot-ids.test.ts > EXP-02 Inner Order hotspot id consistency > should resolve HOTSPOT_RESOLUTION for the setup Inner Order tile id

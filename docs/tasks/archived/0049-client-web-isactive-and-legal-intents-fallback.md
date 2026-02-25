@@ -191,7 +191,7 @@ Update `packages/game/test/legal-intents.test.ts`:
   packages/game test: Expansion registered: EXP-01 Economy & Labor
   packages/game test: EXP-01 Setup Complete.
   packages/game test:  ✓ test/tripwire-controller-grants-policy.test.ts  (1 test) 254ms
-  packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 11ms
+  packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 11ms
   packages/game test: stdout | test/exp01-controller-grants-no-throw.test.ts > EXP-01 controller grants with no controller > should not throw and should SKIP grant when controller is missing
   packages/game test: Expansion registered: EXP-01 Economy & Labor
   packages/game test: EXP-01 Setup Complete.

@@ -236,7 +236,7 @@ packages/game test:  ✓ test/exp02-hotspot-ids.test.ts  (1 test) 6ms
 packages/game test: stdout | test/exp02-hotspot-ids.test.ts > EXP-02 Inner Order hotspot id consistency > should resolve HOTSPOT_RESOLUTION for the setup Inner Order tile id
 packages/game test: Expansion registered: EXP-02 Security & Order
 packages/game test: EXP-02 Setup Complete.
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 8ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 8ms
 packages/game test:  ✓ test/production-uncontrolled.test.ts  (1 test) 5ms
 packages/game test:  Test Files  22 passed (22)
 packages/game test:       Tests  89 passed (89)

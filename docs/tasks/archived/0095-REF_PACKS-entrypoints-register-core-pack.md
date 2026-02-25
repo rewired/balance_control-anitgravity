@@ -247,7 +247,7 @@ Keep it minimal and deterministic.
 │  ✓ test/controller-fallback-hardening.test.ts  (3 tests) 6ms
 │  ✓ test/convert-resources-real-setup.test.ts  (2 tests) 12ms
 │  ✓ test/exp03-controller-grants-no-throw.test.ts  (2 tests) 9ms
-│  ✓ test/computeMajorirty.test.ts  (5 tests) 13ms
+│  ✓ test/computeMajority.test.ts  (5 tests) 13ms
 │  ✓ test/engine-pack-registry.test.ts  (5 tests) 7ms
 │  ✓ test/engine-module-registry.test.ts  (1 test) 5ms
 │  ✓ test/expansion.test.ts  (3 tests) 6ms

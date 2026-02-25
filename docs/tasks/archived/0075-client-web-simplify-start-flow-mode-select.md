@@ -262,7 +262,7 @@ Scope: 9 of 10 workspace projects
 packages/game test$ vitest run
 packages/game test:  RUN  v0.30.1 D:/__DEV/balance_control-anitgravity/packages/game
 packages/game test:  ✓ test/spec-anchor-tripwire.test.ts  (1 test) 88ms
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 26ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 26ms
 packages/game test: stdout | test/exp02-controller-grants-no-throw.test.ts > EXP-02 controller grants with no controller > should require explicit SKIP policy on all EXP-02 CONTROLLER grants
 packages/game test: Expansion registered: EXP-02 Security & Order
 packages/game test: EXP-02 Setup Complete.

@@ -296,7 +296,7 @@ packages/game test: stdout | test/golden-replay.test.ts > Golden replays > shoul
 packages/game test: Expansion registered: EXP-01 Economy & Labor
 packages/game test: EXP-01 Setup Complete.
 packages/game test:  ✓ test/golden-replay.test.ts  (5 tests) 239ms
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 12ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 12ms
 packages/game test:  ✓ test/expansion.test.ts  (2 tests) 10ms
 packages/game test: stdout | test/expansion.test.ts > Expansion System > should register an expansion
 packages/game test: Expansion registered: TestExp

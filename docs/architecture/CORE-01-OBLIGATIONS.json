@@ -321,7 +321,7 @@
       "evidence": [
         "packages/game/src/mechanics.ts",
         "packages/game/test/core-compliance-invariants.test.ts",
-        "packages/game/test/computeMajorirty.test.ts"
+        "packages/game/test/computeMajority.test.ts"
       ],
       "notes": ""
     },
@@ -1410,7 +1410,7 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics.ts",
-        "packages/game/test/computeMajorirty.test.ts"
+        "packages/game/test/computeMajority.test.ts"
       ],
       "notes": ""
     },
@@ -1433,7 +1433,7 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics.ts",
-        "packages/game/test/computeMajorirty.test.ts"
+        "packages/game/test/computeMajority.test.ts"
       ],
       "notes": ""
     },
@@ -1444,7 +1444,7 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics.ts",
-        "packages/game/test/computeMajorirty.test.ts"
+        "packages/game/test/computeMajority.test.ts"
       ],
       "notes": ""
     },
@@ -1455,7 +1455,7 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics.ts",
-        "packages/game/test/computeMajorirty.test.ts"
+        "packages/game/test/computeMajority.test.ts"
       ],
       "notes": ""
     },
@@ -1466,7 +1466,7 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics.ts",
-        "packages/game/test/computeMajorirty.test.ts"
+        "packages/game/test/computeMajority.test.ts"
       ],
       "notes": ""
     },

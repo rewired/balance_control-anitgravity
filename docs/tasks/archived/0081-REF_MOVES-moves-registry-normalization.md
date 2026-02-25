@@ -109,7 +109,7 @@ Outcome: pass (exit 0)
 Scope: 9 of 10 workspace projects
 packages/game test$ vitest run
 packages/game test:  RUN  v0.30.1 D:/__DEV/balance_control-anitgravity/packages/game
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 16ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 16ms
 packages/game test:  ✓ test/spec-anchor-tripwire.test.ts  (1 test) 95ms
 packages/game test: stdout | test/measure-deck-provider.test.ts > Measure deck provider lookup > routes EXP-02 measure object ids to the EXP-02 measure zones
 packages/game test: Expansion registered: exp02

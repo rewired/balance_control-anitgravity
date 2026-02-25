@@ -273,7 +273,7 @@ packages/game test: Expansion registered: EXP-02 Security & Order
 packages/game test: EXP-02 Setup Complete.
 packages/game test:  ✓ test/convert-resources-real-setup.test.ts  (2 tests) 16ms
 packages/game test:  ✓ test/tripwire-controller-grants-policy.test.ts  (1 test) 336ms
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 5ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 5ms
 packages/game test:  ✓ test/expansion.test.ts  (2 tests) 6ms
 packages/game test: stdout | test/expansion.test.ts > Expansion System > should register an expansion
 packages/game test: Expansion registered: TestExp

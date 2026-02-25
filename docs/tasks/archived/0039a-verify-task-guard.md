@@ -300,7 +300,7 @@ Create **one** meaningful commit for this task:
   │ Expansion registered: TestExp
   │ stdout | test/expansion.test.ts > Expansion System > should apply production modifiers
   │ Expansion registered: ModExp
-  │  ✓ test/computeMajorirty.test.ts  (4 tests) 5ms
+  │  ✓ test/computeMajority.test.ts  (4 tests) 5ms
   │  ✓ test/production-uncontrolled.test.ts  (1 test) 3ms
   │  Test Files  20 passed (20)
   │       Tests  74 passed (74)

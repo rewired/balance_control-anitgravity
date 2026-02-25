@@ -135,7 +135,7 @@ This is dangerous:
   packages/game test$ vitest run
   packages/game test: [7m[1m[36m RUN [39m[22m[27m [36mv0.30.1[39m [90mD:/__DEV/balance_control-anitgravity/packages/game[39m
   packages/game test:  [32m✓[39m test/spec-anchor-tripwire.test.ts [2m ([22m[2m1 test[22m[2m)[22m[90m 81[2mms[22m[39m
-  packages/game test:  [32m✓[39m test/computeMajorirty.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 11[2mms[22m[39m
+  packages/game test:  [32m✓[39m test/computeMajority.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 11[2mms[22m[39m
   packages/game test: [90mstdout[2m | test/measure-deck-provider.test.ts[2m > [22m[2mMeasure deck provider lookup[2m > [22m[2mroutes EXP-02 measure object ids to the EXP-02 measure zones[22m[39m
   packages/game test: Expansion registered: exp02
   packages/game test: Expansion registered: exp03
@@ -290,7 +290,7 @@ This is dangerous:
   packages/game test: stdout | test/exp03-controller-grants-no-throw.test.ts > EXP-03 controller grants with no controller > should not throw and should not grant to Noise for uncontrolled EXP-03 effect path
   packages/game test: Expansion registered: exp03
   packages/game test:  ✓ test/tripwire-controller-grants-policy.test.ts  (1 test) 464ms
-  packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 6ms
+  packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 6ms
   packages/game test:  ✓ test/engine-module-registry.test.ts  (1 test) 3ms
   packages/game test: stderr | test/resolver.test.ts > EffectResolver cost and production behavior > should not mutate state when resource.pay cannot be fully paid
   packages/game test: [resolver:resource.pay] insufficient resources for cost

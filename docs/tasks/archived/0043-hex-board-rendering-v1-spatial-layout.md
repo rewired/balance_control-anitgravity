@@ -181,7 +181,7 @@ Add tests (no DOM measurement needed):
   packages/game test$ vitest run
   │ EXP-01 Setup Complete.
   │  ✓ test/exp01-controller-grants-no-throw.test.ts  (1 test) 9ms
-  │  ✓ test/computeMajorirty.test.ts  (5 tests) 5ms
+  │  ✓ test/computeMajority.test.ts  (5 tests) 5ms
   │  ✓ test/controller-fallback-hardening.test.ts  (3 tests) 4ms
   │  ✓ test/production-uncontrolled.test.ts  (1 test) 3ms
   │  ✓ test/player-view.test.ts  (2 tests) 5ms

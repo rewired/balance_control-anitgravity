@@ -267,7 +267,7 @@ packages/game test: Expansion registered: TestExp
 packages/game test: stdout | test/expansion.test.ts > Expansion System > should apply production modifiers
 packages/game test: Expansion registered: ModExp
 packages/game test:  ✓ test/unplaceable-draw-redraw.test.ts  (2 tests) 13ms
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 4ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 4ms
 packages/game test:  ✓ test/production-uncontrolled.test.ts  (1 test) 3ms
 packages/game test:  Test Files  23 passed (23)
 packages/game test:       Tests  91 passed (91)
