@@ -1,38 +1,16 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { CoreMoves } from '../src/moves';
 import { GameState, TileType, CoreZoneName } from '@balance-control/rules';
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { registerTestPacks } from './_helpers/registerPacks';
+import { EnginePackRegistry } from '../src/expansion-registry';
 
 describe('Moves', () => {
     let G: GameState;
     let ctx: any;
     let events: any;
 
-    const seedPlayerInfluenceAtCap = () => {
-        for (let i = 2; i <= 7; i++) {
-            const infId = `inf_cap_${i}`;
-            G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
-            G.zones.board_t1.items.push(infId);
-        }
-    };
-
-    const countOwnedInfluence = () =>
-        Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === 'p1').length;
-
-    const assertZoneExclusivity = (state: GameState) => {
-        const membership: Record<string, number> = {};
-        for (const zone of Object.values(state.zones)) {
-            for (const itemId of zone.items) {
-                membership[itemId] = (membership[itemId] || 0) + 1;
-            }
-        }
-        for (const objectId of Object.keys(state.objects)) {
-            expect(membership[objectId]).toBe(1);
-        }
-    };
-
-    beforeEach(() => {
+    const resetHarness = () => {
         registerTestPacks();
         events = { endTurn: () => { }, endStage: () => { } };
         G = {
@@ -97,6 +75,37 @@ describe('Moves', () => {
             numPlayers: 2,
             activePlayers: { p1: 'politicalAction' }
         };
+    };
+
+    const seedPlayerInfluenceAtCap = () => {
+        for (let i = 2; i <= 7; i++) {
+            const infId = `inf_cap_${i}`;
+            G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
+            G.zones.board_t1.items.push(infId);
+        }
+    };
+
+    const countOwnedInfluence = () =>
+        Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === 'p1').length;
+
+    const assertZoneExclusivity = (state: GameState) => {
+        const membership: Record<string, number> = {};
+        for (const zone of Object.values(state.zones)) {
+            for (const itemId of zone.items) {
+                membership[itemId] = (membership[itemId] || 0) + 1;
+            }
+        }
+        for (const objectId of Object.keys(state.objects)) {
+            expect(membership[objectId]).toBe(1);
+        }
+    };
+
+    beforeEach(() => {
+        resetHarness();
+    });
+
+    afterEach(() => {
+        EnginePackRegistry.clear();
     });
 
     it('placeInfluence should work on a non-Lobbyist board tile', () => {
@@ -441,17 +450,29 @@ describe('Moves', () => {
     });
 
     it('political actions should reject when not in POLITICAL_ACTION_STAGE', () => {
+        const setMoveSeedState = (move: 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources') => {
+            if (move === 'moveInfluence') {
+                G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+                G.zones.board_t1.items.push('inf_1');
+            }
+
+            if (move === 'convertResources') {
+                G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1'];
+                G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+                G.zones.board_gr.items.push('inf_1');
+            }
+        };
+
         const run = (move: 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources') => {
             const localEvents = { endTurn: vi.fn(), endStage: vi.fn() };
             ctx.activePlayers = { p1: 'drawAndPlace' };
+            setMoveSeedState(move);
             const before = JSON.stringify(G);
 
             if (move === 'placeInfluence') {
                 return { result: CoreMoves.placeInfluence({ G, ctx, events: localEvents }, { targetTileId: 'board_t2' }), before, localEvents };
             }
             if (move === 'moveInfluence') {
-                G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
-                G.zones.board_t1.items.push('inf_1');
                 return { result: CoreMoves.moveInfluence({ G, ctx, events: localEvents }, { sourceId: 'board_t1', targetId: 'board_t2' }), before, localEvents };
             }
             if (move === 'formalizeInfluence') {
@@ -464,9 +485,6 @@ describe('Moves', () => {
                     localEvents
                 };
             }
-            G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1'];
-            G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
-            G.zones.board_gr.items.push('inf_1');
             return {
                 result: CoreMoves.convertResources(
                     { G, ctx, events: localEvents },
@@ -478,6 +496,7 @@ describe('Moves', () => {
         };
 
         for (const move of ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources'] as const) {
+            resetHarness();
             const { result, before, localEvents } = run(move);
             expect(result).toBe(INVALID_MOVE);
             expect(JSON.stringify(G)).toBe(before);

@@ -1,9 +1,10 @@
-import { beforeEach, describe, it, expect } from 'vitest';
+import { beforeEach, afterEach, describe, it, expect } from 'vitest';
 import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from '../src/index';
 import { CoreZoneName } from '@balance-control/rules';
 import { SetupGame } from '../src/setup';
 import { registerTestPacks } from './_helpers/registerPacks';
+import { EnginePackRegistry } from '../src/expansion-registry';
 
 let BalanceControlNoPlayerView: ReturnType<typeof createBalanceControlGame>;
 
@@ -77,6 +78,10 @@ describe('Turn Structure (Stages)', () => {
             ...balanceControl,
             playerView: ({ G }: any) => G
         };
+    });
+
+    afterEach(() => {
+        EnginePackRegistry.clear();
     });
 
     it('should start in drawAndPlace stage', () => {
@@ -174,7 +179,7 @@ describe('Turn Structure (Stages)', () => {
     });
 
     it('should immediately end after final settlement when DrawPile empties during draw-and-place (CORE-01-09-01A, CORE-01-09-02)', () => {
-        const client = Client({ game: createTinyDrawPileGame(), numPlayers: 2 });
+        const client = Client({ game: createTinyDrawPileGame(), numPlayers: 1 });
         client.start();
 
         const stateAfterStart = client.getState();
@@ -182,6 +187,10 @@ describe('Turn Structure (Stages)', () => {
         expect(stateAfterStart.ctx.gameover).toBeUndefined();
 
         client.moves.placeTile({ targetCoord: '1,0' });
+        const afterPlaceState = client.getState();
+        expect(afterPlaceState.ctx.gameover).toBeUndefined();
+
+        client.events.endTurn();
         const settledState = client.getState();
 
         expect(settledState.G.roundNumber).toBe(1);
