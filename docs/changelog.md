@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-25: task(0263) Tests: Decouple `moveInfluence` ReturnPenalty semantics from registry preconditions by removing in-test core-pack assertions, preserving `beforeEach(resetHarness)`, and adding a dedicated `_helpers/registerPacks` registry-invariant test.
 - 2026-02-25: task(0262) Tests: Make `moveInfluence` cap-relocation proof derive source/target deltas from pre-move snapshot, and bind cap setup to `getInfluenceCap(ctx)` instead of hardcoded marker counts.
 - 2026-02-25: task(0260) Tests/Isolation: Add fail-fast core-pack registration precondition (`core` present + non-empty moves) in shared test harness, add explicit core-registration precondition in `moves.test.ts` resolver path, and standardize extra registry suites to symmetric setup/teardown clearing.
 - 2026-02-25: task(0261) Engine/Tests: Harden `moveInfluence` atom proof by asserting cap-test queue/history pre/post state, requiring resolver history evidence that `influence.move` executed, and making `handleInfluenceMove` fail explicitly instead of silent no-op when movement preconditions are missing.

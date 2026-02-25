@@ -90,15 +90,6 @@ describe('Moves', () => {
     const countOwnedInfluence = () =>
         Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === 'p1').length;
 
-    const expectCorePackRegistered = () => {
-        const corePack = EnginePackRegistry.getRegisteredPacks().find((pack) => pack.id === 'core');
-        expect(corePack, 'Precondition: expected EnginePackRegistry to include core pack').toBeDefined();
-        expect(
-            Object.keys(corePack?.moves ?? {}).length,
-            'Precondition: expected core pack to expose non-empty moves before resolver-driven move tests',
-        ).toBeGreaterThan(0);
-    };
-
     const assertZoneExclusivity = (state: GameState) => {
         const membership: Record<string, number> = {};
         for (const zone of Object.values(state.zones)) {
@@ -111,9 +102,7 @@ describe('Moves', () => {
         }
     };
 
-    beforeEach(() => {
-        resetHarness();
-    });
+    beforeEach(resetHarness);
 
     afterEach(() => {
         EnginePackRegistry.clear();
@@ -170,8 +159,6 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should set ReturnPenalty mode when meta-marker starts on destination', () => {
-        expectCorePackRegistered();
-
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'meta_p1');
