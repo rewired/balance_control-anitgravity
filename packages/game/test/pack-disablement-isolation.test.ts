@@ -4,15 +4,20 @@ import { makeTestPack } from './_helpers/makeTestPack';
 import type { GameConfig, GameState } from '@balance-control/rules';
 
 describe('Pack Disablement Isolation', () => {
-    beforeEach(() => {
+    const resetRegistry = () => {
         EnginePackRegistry.clear();
+    };
+
+    beforeEach(() => {
+        resetRegistry();
     });
 
     afterEach(() => {
-        EnginePackRegistry.clear();
+        resetRegistry();
     });
 
     it('should not leak moves from disabled packs', () => {
+        resetRegistry();
         const pack = makeTestPack({
             id: 'exp01',
             moves: {
@@ -42,6 +47,7 @@ describe('Pack Disablement Isolation', () => {
     });
 
     it('should not leak deck descriptors from disabled packs', () => {
+        resetRegistry();
         const pack = makeTestPack({
             id: 'exp01',
             measureDecks: [{ id: 'test-deck', name: 'Test Deck' } as any],
@@ -73,6 +79,7 @@ describe('Pack Disablement Isolation', () => {
     });
 
     it('should not leak production modifiers from disabled packs', () => {
+        resetRegistry();
         let modifierCalled = false;
         const pack = makeTestPack({
             id: 'exp01',
@@ -105,6 +112,7 @@ describe('Pack Disablement Isolation', () => {
     });
 
     it('should not leak effects from disabled packs', () => {
+        resetRegistry();
         let effectCalled = false;
         const pack = makeTestPack({
             id: 'exp01',
@@ -135,6 +143,7 @@ describe('Pack Disablement Isolation', () => {
     });
 
     it('should not leak measure atoms from disabled packs', () => {
+        resetRegistry();
         const pack = makeTestPack({
             id: 'exp01',
             getMeasureAtoms: (G: any, measureId: string, payload: any) => {

@@ -3,15 +3,20 @@ import { EnginePackRegistry } from '../src/expansion-registry';
 import { assemblePacks } from '../src/move-assembly';
 
 describe('Pack Registry Setup Hooks', () => {
-    beforeEach(() => {
+    const resetRegistry = () => {
         EnginePackRegistry.clear();
+    };
+
+    beforeEach(() => {
+        resetRegistry();
     });
 
     afterEach(() => {
-        EnginePackRegistry.clear();
+        resetRegistry();
     });
 
     it('invokes core preShuffle via registry (proves no direct CorePack import)', () => {
+        resetRegistry();
         let sentinelTriggered = false;
 
         EnginePackRegistry.registerPack({
@@ -50,6 +55,7 @@ describe('Pack Registry Setup Hooks', () => {
     });
 
     it('invokes core postShuffle via registry', () => {
+        resetRegistry();
         let sentinelTriggered = false;
 
         EnginePackRegistry.registerPack({

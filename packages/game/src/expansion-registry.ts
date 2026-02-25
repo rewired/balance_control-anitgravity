@@ -360,4 +360,16 @@ class EnginePackRegistryImpl {
     // ... other hooks
 }
 
-export const EnginePackRegistry = new EnginePackRegistryImpl();
+const ENGINE_PACK_REGISTRY_SINGLETON_KEY = '__BALANCE_CONTROL_ENGINE_PACK_REGISTRY__';
+
+type GlobalRegistryHost = typeof globalThis & {
+    [ENGINE_PACK_REGISTRY_SINGLETON_KEY]?: EnginePackRegistryImpl;
+};
+
+const globalRegistryHost = globalThis as GlobalRegistryHost;
+
+if (!globalRegistryHost[ENGINE_PACK_REGISTRY_SINGLETON_KEY]) {
+    globalRegistryHost[ENGINE_PACK_REGISTRY_SINGLETON_KEY] = new EnginePackRegistryImpl();
+}
+
+export const EnginePackRegistry = globalRegistryHost[ENGINE_PACK_REGISTRY_SINGLETON_KEY] as EnginePackRegistryImpl;

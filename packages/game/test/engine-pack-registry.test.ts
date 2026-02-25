@@ -34,15 +34,20 @@ function pack(id: EnginePackId, name: string, moves?: Record<string, (...args: a
 }
 
 describe('EnginePackRegistry', () => {
-    beforeEach(() => {
+    const resetRegistry = () => {
         EnginePackRegistry.clear();
+    };
+
+    beforeEach(() => {
+        resetRegistry();
     });
 
     afterEach(() => {
-        EnginePackRegistry.clear();
+        resetRegistry();
     });
 
     it('returns registered packs in canonical order (independent of registration order)', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(pack('exp03', 'E3'));
         EnginePackRegistry.registerPack(pack('exp01', 'E1'));
 
@@ -50,6 +55,7 @@ describe('EnginePackRegistry', () => {
     });
 
     it('fails when core pack is missing', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(pack('exp01', 'E1'));
         expect(() => EnginePackRegistry.getEnabledPacks(undefined, cfg({ ex01: false }))).toThrowError(
             'EnginePackRegistry: pack "core" is not registered.'
@@ -57,6 +63,7 @@ describe('EnginePackRegistry', () => {
     });
 
     it('rejects duplicate pack id registrations deterministically', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(pack('exp01', 'E1'));
         expect(() => EnginePackRegistry.registerPack(pack('exp01', 'E1b'))).toThrowError(
             'EnginePackRegistry: pack "exp01" already registered.'
@@ -64,6 +71,7 @@ describe('EnginePackRegistry', () => {
     });
 
     it('rejects duplicate move ids across packs deterministically (no silent overwrite)', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(CorePack);
         EnginePackRegistry.registerPack(pack('exp01', 'E1', { 'tripwire.dupe.pack': () => null }));
         EnginePackRegistry.registerPack(pack('exp02', 'E2', { 'tripwire.dupe.pack': () => null }));
@@ -78,6 +86,7 @@ describe('EnginePackRegistry', () => {
     });
 
     it('returns pack manifests in deterministic order', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(pack('exp02', 'E2'));
         EnginePackRegistry.registerPack(pack('exp01', 'E1'));
 
@@ -85,6 +94,7 @@ describe('EnginePackRegistry', () => {
     });
 
     it('rejects unknown pack ids in enabled pack selection', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(CorePack);
         expect(() =>
             EnginePackRegistry.getEnabledPacks(undefined, {
@@ -95,6 +105,7 @@ describe('EnginePackRegistry', () => {
     });
 
     it('validates pinned pack versions deterministically', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(CorePack);
         EnginePackRegistry.registerPack(pack('exp01', 'E1'));
 

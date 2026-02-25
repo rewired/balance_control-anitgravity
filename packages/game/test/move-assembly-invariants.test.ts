@@ -17,11 +17,16 @@ function cfg(expansions: Partial<ExpansionFlags>): GameConfig {
 }
 
 describe('Move assembly invariants', () => {
-    beforeEach(() => {
+    const resetRegistry = () => {
         registerTestPacks();
+    };
+
+    beforeEach(() => {
+        resetRegistry();
     });
 
     it('disabled expansion contributes no move modules', () => {
+        resetRegistry();
         const mockPack = makeTestPack({
             id: 'exp01',
             name: 'Mock EX01',
@@ -37,6 +42,7 @@ describe('Move assembly invariants', () => {
     });
 
     it('module ordering equals canonical order filtered by enablement (independent of registration order)', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(
             makeTestPack({
                 id: 'exp03',
@@ -58,6 +64,7 @@ describe('Move assembly invariants', () => {
     });
 
     it('duplicate move keys fail deterministically', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(
             makeTestPack({
                 id: 'exp02',
@@ -82,6 +89,7 @@ describe('Move assembly invariants', () => {
     });
 
     it('factory-built Game keeps expansion moves stage-scoped (not root-exposed)', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(
             makeTestPack({
                 id: 'exp01',
@@ -99,6 +107,7 @@ describe('Move assembly invariants', () => {
     });
 
     it('factory-built Game throws deterministically on duplicate move ids (superset)', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(
             makeTestPack({
                 id: 'exp02',
@@ -124,6 +133,7 @@ describe('Move assembly invariants', () => {
     });
 
     it('factory-built Game throws when core pack is missing', () => {
+        resetRegistry();
         EnginePackRegistry.clear();
         expect(() => createBalanceControlGame()).toThrowError(
             'Core pack not registered. Register CorePack before calling createBalanceControlGame().'

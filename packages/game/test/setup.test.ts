@@ -32,8 +32,12 @@ const EXPECTED_CORE_VERSION = 'v1.1.0';
 const EXPECTED_SPEC_ANCHOR_HASH = '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3';
 
 describe('SetupGame', () => {
-    beforeEach(() => {
+    const resetRegistry = () => {
         registerTestPacks();
+    };
+
+    beforeEach(() => {
+        resetRegistry();
     });
 
     /** @rule CORE-01-02-04 */
@@ -128,6 +132,7 @@ describe('SetupGame', () => {
     });
 
     it('should not apply ex01 setup when ex01 flag is disabled', () => {
+        resetRegistry();
         const mockPack = makeTestPack({
             id: 'exp01',
             name: 'EXP-01 Economy & Labor',
@@ -149,6 +154,7 @@ describe('SetupGame', () => {
     });
 
     it('should apply ex01 setup when enabled and keep deterministic deck composition', () => {
+        resetRegistry();
         const mockPack = makeTestPack({
             id: 'exp01',
             name: 'EXP-01 Economy & Labor',

@@ -7,11 +7,16 @@ import { makeTestPack } from './_helpers/makeTestPack';
 
 describe('Expansion System', () => {
 
-    beforeEach(() => {
+    const resetRegistry = () => {
         registerTestPacks();
+    };
+
+    beforeEach(() => {
+        resetRegistry();
     });
 
     it('should register an expansion', () => {
+        resetRegistry();
         const mockPack = makeTestPack({ id: 'exp01', name: 'TestPack' });
         EnginePackRegistry.registerPack(mockPack);
         const all = EnginePackRegistry.getRegisteredPacks().map((pack) => pack.id);
@@ -19,6 +24,7 @@ describe('Expansion System', () => {
     });
 
     it('should return expansions in deterministic canonical order', () => {
+        resetRegistry();
         EnginePackRegistry.registerPack(makeTestPack({ id: 'exp03', name: 'E3' }));
         EnginePackRegistry.registerPack(makeTestPack({ id: 'exp01', name: 'E1' }));
         EnginePackRegistry.registerPack(makeTestPack({ id: 'exp02', name: 'E2' }));
@@ -27,6 +33,7 @@ describe('Expansion System', () => {
     });
 
     it('should apply production modifiers', () => {
+        resetRegistry();
         // Setup State
         const G: GameState & { engine: any } = {
             zones: {
