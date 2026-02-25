@@ -416,7 +416,12 @@ describe('Moves', () => {
 
     it('formalizeInfluence should allow up to cap for 5 players', () => {
         ctx.numPlayers = 5;
-        seedPlayerInfluenceAtCap();
+        const cap = getInfluenceCap(ctx);
+        for (let i = 2; i <= cap - 1; i++) {
+            const infId = `inf_cap_${i}`;
+            G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
+            G.zones.board_t1.items.push(infId);
+        }
 
         const result = CoreMoves.formalizeInfluence(
             { G, ctx, events },
@@ -424,7 +429,7 @@ describe('Moves', () => {
         );
 
         expect(result).not.toBe(INVALID_MOVE);
-        expect(countOwnedInfluence()).toBe(8);
+        expect(countOwnedInfluence()).toBe(cap);
     });
 
     it('formalizeInfluence should reject at cap for 5 players without mutation', () => {
