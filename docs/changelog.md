@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-25: task(0277) CI/Tooling: Remove `actions/setup-node@v4` `cache: pnpm` configuration in all CI jobs so setup-node no longer requires a preinstalled pnpm binary; keep Corepack-pinned pnpm activation as the canonical bootstrap path.
 - 2026-02-25: task(0275) Tests/Engine Registry: stabilize pack-registry isolation by using a deterministic global singleton registry instance and explicit per-test registry/harness resets across game suites, eliminating duplicate registration leakage in workspace test runs.
 - 2026-02-25: task(0274) Tooling/Test: Add expansion package `pretest` hooks to build `@balance-control/rules` before Vitest so workspace tests resolve package entrypoints from a clean repo state.
 - 2026-02-25: task(0272) Tests: Silence expected invalid-stage `console.error` noise in `moves.test.ts` via scoped `vi.spyOn(console, 'error')`, keep rejection/no-mutation assertions unchanged, assert error emission, and restore the spy after the test.
