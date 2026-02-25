@@ -10,6 +10,8 @@ describe('Moves', () => {
     let G: GameState;
     let ctx: any;
     let events: any;
+    const PLAYER_ID = '0';
+    const personalSupplyZoneId = (pid: string) => `${CoreZoneName.PersonalSupply}:${pid}`;
 
     const resetHarness = () => {
         registerTestPacks();
@@ -17,7 +19,11 @@ describe('Moves', () => {
         G = {
             zones: {
                 [CoreZoneName.Board]: { id: CoreZoneName.Board, name: 'Board', items: ['board_t1', 'board_t2', 'board_gr', 'board_start'] },
-                'PersonalSupply:p1': { id: 'PersonalSupply:p1', name: 'PS', items: ['meta_p1', 'inf_1', 'res_dom', 'res_dom_2', 'res_for', 'res_inf'] },
+                [personalSupplyZoneId(PLAYER_ID)]: {
+                    id: personalSupplyZoneId(PLAYER_ID),
+                    name: 'PS',
+                    items: ['meta_p1', 'inf_1', 'res_dom', 'res_dom_2', 'res_for', 'res_inf']
+                },
                 board_t1: { id: 'board_t1', name: 'T1', items: [] },
                 board_t2: { id: 'board_t2', name: 'T2', items: [] },
                 board_gr: { id: 'board_gr', name: 'GR', items: [] },
@@ -40,12 +46,12 @@ describe('Moves', () => {
                 offboard_t: { id: 'offboard_t', type: TileType.Lobbyist }
             },
             objects: {
-                meta_p1: { id: 'meta_p1', type: 'MetaMarker', owner: 'p1' },
-                inf_1: { id: 'inf_1', type: 'Influence', owner: 'p1' },
-                res_dom: { id: 'res_dom', type: 'Resource', owner: 'p1', resort: 'DOM' },
-                res_dom_2: { id: 'res_dom_2', type: 'Resource', owner: 'p1', resort: 'DOM' },
-                res_for: { id: 'res_for', type: 'Resource', owner: 'p1', resort: 'FOR' },
-                res_inf: { id: 'res_inf', type: 'Resource', owner: 'p1', resort: 'INF' },
+                meta_p1: { id: 'meta_p1', type: 'MetaMarker', owner: '0' },
+                inf_1: { id: 'inf_1', type: 'Influence', owner: '0' },
+                res_dom: { id: 'res_dom', type: 'Resource', owner: '0', resort: 'DOM' },
+                res_dom_2: { id: 'res_dom_2', type: 'Resource', owner: '0', resort: 'DOM' },
+                res_for: { id: 'res_for', type: 'Resource', owner: '0', resort: 'FOR' },
+                res_inf: { id: 'res_inf', type: 'Resource', owner: '0', resort: 'INF' },
                 res_inf_bank: { id: 'res_inf_bank', type: 'Resource', resort: 'INF' }
             },
             adjacency: {
@@ -72,17 +78,31 @@ describe('Moves', () => {
         } as any;
 
         ctx = {
-            currentPlayer: 'p1',
+            currentPlayer: PLAYER_ID,
             numPlayers: 2,
-            activePlayers: { p1: 'politicalAction' }
+            activePlayers: { [PLAYER_ID]: 'politicalAction' }
         };
     };
 
+    const ensureAllStartingInfluencePlaced = (numPlayers: number) => {
+        ctx.numPlayers = numPlayers;
+        ctx.currentPlayer = PLAYER_ID;
+        ctx.activePlayers = { [PLAYER_ID]: 'politicalAction' };
+
+        for (let i = 0; i < numPlayers; i++) {
+            const pid = i.toString();
+            const supplyId = personalSupplyZoneId(pid);
+            if (!G.zones[supplyId]) {
+                G.zones[supplyId] = { id: supplyId, name: `PS:${pid}`, items: [] } as any;
+            }
+        }
+    };
+
     const seedPlayerInfluenceToCount = (targetCount: number) => {
-        const currentCount = Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === 'p1').length;
+        const currentCount = Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === PLAYER_ID).length;
         for (let i = currentCount + 1; i <= targetCount; i++) {
             const infId = `inf_cap_${i}`;
-            G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
+            G.objects[infId] = { id: infId, type: 'Influence', owner: PLAYER_ID } as any;
             G.zones.board_t1.items.push(infId);
         }
     };
@@ -92,7 +112,7 @@ describe('Moves', () => {
     };
 
     const countOwnedInfluence = () =>
-        Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === 'p1').length;
+        Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === PLAYER_ID).length;
 
     const assertZoneExclusivity = (state: GameState) => {
         const membership: Record<string, number> = {};
@@ -115,7 +135,7 @@ describe('Moves', () => {
     it('placeInfluence should work on a non-Lobbyist board tile', () => {
         CoreMoves.placeInfluence({ G, ctx, events }, { targetTileId: 'board_t2' });
 
-        expect(G.zones['PersonalSupply:p1'].items.includes('inf_1')).toBe(false);
+        expect(G.zones['PersonalSupply:0'].items.includes('inf_1')).toBe(false);
         expect(G.zones.board_t2.items).toContain('inf_1');
     });
 
@@ -127,7 +147,7 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should reject non-board targets without mutation', () => {
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
 
         const before = JSON.stringify(G);
@@ -164,12 +184,12 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should set ReturnPenalty mode when meta-marker starts on destination', () => {
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'meta_p1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'meta_p1');
         G.zones.board_t2.items.push('meta_p1');
 
-        expect(ctx.activePlayers.p1).toBe('politicalAction');
+        expect(ctx.activePlayers[PLAYER_ID]).toBe('politicalAction');
 
         const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
 
@@ -183,9 +203,9 @@ describe('Moves', () => {
         G.roundNumber = 1;
         (G.zones as any).Noise = { id: 'Noise', name: 'Noise', items: [] };
 
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'meta_p1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'meta_p1');
         G.zones.board_t2.items.push('meta_p1');
         (G.objects.meta_p1 as any).mode = 'ReturnPenalty';
 
@@ -201,18 +221,18 @@ describe('Moves', () => {
 
         expect(result).not.toBe(INVALID_MOVE);
         expect(G.zones.Noise.items).toEqual(expect.arrayContaining(['res_dom', 'res_for']));
-        expect(G.zones['PersonalSupply:p1'].items).not.toContain('res_dom');
-        expect(G.zones['PersonalSupply:p1'].items).not.toContain('res_for');
+        expect(G.zones['PersonalSupply:0'].items).not.toContain('res_dom');
+        expect(G.zones['PersonalSupply:0'].items).not.toContain('res_for');
         expect(G.zones.board_t2.items).toContain('inf_1');
         expect(G.zones.board_t1.items).toContain('meta_p1');
         expect(G.zones.board_t2.items).not.toContain('meta_p1');
     });
 
     it('moveInfluence should set ReturnPenalty mode when source is ResortTile (CORE-01-04-12A)', () => {
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
 
-        expect(ctx.activePlayers.p1).toBe('politicalAction');
+        expect(ctx.activePlayers[PLAYER_ID]).toBe('politicalAction');
 
         const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
 
@@ -222,7 +242,7 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should preserve zone exclusivity', () => {
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
 
         const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
@@ -232,7 +252,7 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should reject Start Committee as source or destination', () => {
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_start.items.push('inf_1');
         const beforeSource = JSON.stringify(G);
         const resultSource = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_start', targetId: 'board_t2' });
@@ -255,7 +275,7 @@ describe('Moves', () => {
             board_start: ['board_t1', 'board_t2']
         };
 
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
 
         const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
@@ -273,13 +293,13 @@ describe('Moves', () => {
         const result = CoreMoves.placeInfluence({ G, ctx, events }, { targetTileId: 'board_t2' });
 
         expect(result).not.toBe(INVALID_MOVE);
-        expect(G.zones['PersonalSupply:p1'].items.includes('inf_1')).toBe(false);
+        expect(G.zones['PersonalSupply:0'].items.includes('inf_1')).toBe(false);
         expect(G.zones.board_t2.items).toContain('inf_1');
         expect(countOwnedInfluence()).toBe(beforeCount);
     });
 
     it('formalizeInfluence should enforce different-resort cost on standard Committee', () => {
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_dom_2'];
+        G.zones['PersonalSupply:0'].items = ['res_dom', 'res_dom_2'];
 
         const before = JSON.stringify(G);
         const result = CoreMoves.formalizeInfluence(
@@ -305,7 +325,7 @@ describe('Moves', () => {
     });
 
     it('formalizeInfluence should enforce Start Committee special cost', () => {
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'res_inf', 'res_dom_2'];
+        G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'res_inf', 'res_dom_2'];
 
         const beforeFail = JSON.stringify(G);
         const fail = CoreMoves.formalizeInfluence(
@@ -325,13 +345,13 @@ describe('Moves', () => {
         expect(G.zones.Bank.items).toContain('res_inf');
         expect(G.zones.Bank.items).toContain('res_dom_2');
         // CORE-01-04-09A: formalizeInfluence returns Meta-Marker to supply → 2 items (new Influence + meta)
-        expect(G.zones['PersonalSupply:p1'].items).toHaveLength(2);
-        const infIds = G.zones['PersonalSupply:p1'].items.filter((id: string) => G.objects[id]?.type === 'Influence');
+        expect(G.zones['PersonalSupply:0'].items).toHaveLength(2);
+        const infIds = G.zones['PersonalSupply:0'].items.filter((id: string) => G.objects[id]?.type === 'Influence');
         expect(infIds).toHaveLength(1);
     });
 
     it('formalizeInfluence should ignore prohibitions on Start Committee', () => {
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'res_inf', 'res_dom_2'];
+        G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'res_inf', 'res_dom_2'];
         G.engine.attributes.prohibitions = { 'influence.formalize': true };
 
         const result = CoreMoves.formalizeInfluence(
@@ -347,8 +367,8 @@ describe('Moves', () => {
     });
 
     it('convertResources should follow grassroots conversion spec without formalizing influence', () => {
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1'];
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'inf_1'];
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_1');
         G.zones.board_gr.items.push('inf_1');
 
         CoreMoves.convertResources(
@@ -356,14 +376,14 @@ describe('Moves', () => {
             { grassrootsTileId: 'board_gr', inputResourceIds: ['res_dom', 'res_for'], outputResort: 'INF' }
         );
 
-        expect(G.zones['PersonalSupply:p1'].items).toHaveLength(1);
-        const grantedId = G.zones['PersonalSupply:p1'].items[0];
+        expect(G.zones['PersonalSupply:0'].items).toHaveLength(1);
+        const grantedId = G.zones['PersonalSupply:0'].items[0];
         expect(G.objects[grantedId].type).toBe('Resource');
         expect(G.objects[grantedId].resort).toBe('INF');
     });
 
     it('convertResources should reject when no controlled Grassroots tile exists', () => {
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for'];
+        G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for'];
         const before = JSON.stringify(G);
 
         const result = CoreMoves.convertResources(
@@ -377,9 +397,9 @@ describe('Moves', () => {
 
     it('convertResources should auto-pay extra cost when meta-marker is in Convert mode', () => {
         G.roundNumber = 2;
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'res_inf', 'inf_1', 'meta_p1'];
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'meta_p1');
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'res_inf', 'inf_1', 'meta_p1'];
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'meta_p1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_1');
         G.zones.board_gr.items.push('inf_1');
         G.zones.board_t1.items.push('meta_p1');
         G.objects.meta_p1.mode = 'Convert';
@@ -394,12 +414,12 @@ describe('Moves', () => {
         );
 
         expect(result).not.toBe(INVALID_MOVE);
-        expect(G.zones['PersonalSupply:p1'].items).not.toContain('res_inf'); // auto-paid extra cost
+        expect(G.zones['PersonalSupply:0'].items).not.toContain('res_inf'); // auto-paid extra cost
     });
 
     it('convertResources should place meta-marker on the anchor with Convert mode', () => {
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1', 'meta_p1'];
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'inf_1', 'meta_p1'];
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_1');
         G.zones.board_gr.items.push('inf_1');
 
         CoreMoves.convertResources(
@@ -412,9 +432,9 @@ describe('Moves', () => {
     });
 
     it('convertResources should preserve zone exclusivity', () => {
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1', 'meta_p1'];
+        G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'inf_1', 'meta_p1'];
         G.zones.Bank.items = ['res_inf_bank', 'res_dom_2', 'res_inf'];
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_1');
         G.zones.board_gr.items.push('inf_1');
 
         const result = CoreMoves.convertResources(
@@ -427,7 +447,7 @@ describe('Moves', () => {
     });
 
     it('formalizeInfluence should allow up to cap for 5 players', () => {
-        ctx.numPlayers = 5;
+        ensureAllStartingInfluencePlaced(5);
         const cap = getInfluenceCap(ctx);
         seedPlayerInfluenceToCount(cap - 1);
 
@@ -441,7 +461,7 @@ describe('Moves', () => {
     });
 
     it('formalizeInfluence should reject at cap for 5 players without mutation', () => {
-        ctx.numPlayers = 5;
+        ensureAllStartingInfluencePlaced(5);
         seedPlayerInfluenceToCount(getInfluenceCap(ctx));
 
         const before = JSON.stringify(G);
@@ -463,7 +483,7 @@ describe('Moves', () => {
     });
 
     it('placeInfluence should be rejected when PersonalSupply has no Influence', () => {
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => G.objects[id]?.type !== 'Influence');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => G.objects[id]?.type !== 'Influence');
         const before = JSON.stringify(G);
         const result = CoreMoves.placeInfluence({ G, ctx, events }, { targetTileId: 'board_t1' });
 
@@ -474,20 +494,20 @@ describe('Moves', () => {
     it('political actions should reject when not in POLITICAL_ACTION_STAGE', () => {
         const setMoveSeedState = (move: 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources') => {
             if (move === 'moveInfluence') {
-                G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+                G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
                 G.zones.board_t1.items.push('inf_1');
             }
 
             if (move === 'convertResources') {
-                G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1'];
-                G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+                G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'inf_1'];
+                G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_1');
                 G.zones.board_gr.items.push('inf_1');
             }
         };
 
         const run = (move: 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources') => {
             const localEvents = { endTurn: vi.fn(), endStage: vi.fn() };
-            ctx.activePlayers = { p1: 'drawAndPlace' };
+            ctx.activePlayers = { [PLAYER_ID]: 'drawAndPlace' };
             setMoveSeedState(move);
             const before = JSON.stringify(G);
 
@@ -528,13 +548,13 @@ describe('Moves', () => {
 
     it('political actions should reject when usage is exhausted', () => {
         G.engine.attributes.limits.politicalAction = 1;
-        G.engine.attributes.usage = { p1: { politicalAction: 1 }, politicalAction: 1 } as any;
+        G.engine.attributes.usage = { [PLAYER_ID]: { politicalAction: 1 }, politicalAction: 1 } as any;
 
         const localEvents = { endTurn: vi.fn(), endStage: vi.fn() };
 
         expect(CoreMoves.placeInfluence({ G, ctx, events: localEvents }, { targetTileId: 'board_t2' })).toBe(INVALID_MOVE);
 
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
         expect(CoreMoves.moveInfluence({ G, ctx, events: localEvents }, { sourceId: 'board_t1', targetId: 'board_t2' })).toBe(INVALID_MOVE);
 
@@ -545,8 +565,8 @@ describe('Moves', () => {
             )
         ).toBe(INVALID_MOVE);
 
-        G.zones['PersonalSupply:p1'].items = ['res_dom', 'res_for', 'inf_1'];
-        G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter(id => id !== 'inf_1');
+        G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'inf_1'];
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_1');
         G.zones.board_gr.items.push('inf_1');
         expect(
             CoreMoves.convertResources(
@@ -556,7 +576,7 @@ describe('Moves', () => {
         ).toBe(INVALID_MOVE);
 
         expect(localEvents.endTurn).not.toHaveBeenCalled();
-        expect(G.engine.attributes.usage.p1.politicalAction).toBe(1);
+        expect(G.engine.attributes.usage[PLAYER_ID].politicalAction).toBe(1);
     });
 
     it('political action success should increment usage and end turn', () => {
@@ -565,7 +585,7 @@ describe('Moves', () => {
         const result = CoreMoves.placeInfluence({ G, ctx, events: localEvents }, { targetTileId: 'board_t2' });
 
         expect(result).not.toBe(INVALID_MOVE);
-        expect(G.engine.attributes.usage.p1.politicalAction).toBe(1);
+        expect(G.engine.attributes.usage[PLAYER_ID].politicalAction).toBe(1);
         expect(G.engine.attributes.usage.politicalAction).toBe(1);
         expect(localEvents.endTurn).toHaveBeenCalledTimes(1);
     });
