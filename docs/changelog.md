@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-25: task(0272) Tests: Silence expected invalid-stage `console.error` noise in `moves.test.ts` via scoped `vi.spyOn(console, 'error')`, keep rejection/no-mutation assertions unchanged, assert error emission, and restore the spy after the test.
 - 2026-02-25: task(0271) Engine/Tests: Make `placeMetaMarkerOnTile` remove `marker.id` from all zone item lists before destination placement, preserving `marker.mode` assignment and adding explicit `meta_p1` single-zone exclusivity assertion in the ReturnPenalty destination test.
 - 2026-02-25: task(0270) Tooling/Test: Add `packages/game` `pretest` to build transitive workspace dependencies (`@balance-control/rules`, `@balance-control/shared`) before isolated Vitest runs, so `pnpm -C packages/game test` works from a clean dist state without manual build steps.
 - 2026-02-25: task(0269) Tests: Normalize `moves.test.ts` fixture player identity to canonical numeric IDs (`"0"`), add explicit 5-player `allStartingInfluencePlaced` setup helper, and stabilize formalize cap boundary tests via fixture-only changes.
