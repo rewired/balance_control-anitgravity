@@ -78,13 +78,17 @@ describe('Moves', () => {
         };
     };
 
-    const seedPlayerInfluenceAtCap = () => {
-        const cap = getInfluenceCap(ctx);
-        for (let i = 2; i <= cap; i++) {
+    const seedPlayerInfluenceToCount = (targetCount: number) => {
+        const currentCount = Object.values(G.objects).filter((obj: any) => obj.type === 'Influence' && obj.owner === 'p1').length;
+        for (let i = currentCount + 1; i <= targetCount; i++) {
             const infId = `inf_cap_${i}`;
             G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
             G.zones.board_t1.items.push(infId);
         }
+    };
+
+    const seedPlayerInfluenceToCap = () => {
+        seedPlayerInfluenceToCount(getInfluenceCap(ctx));
     };
 
     const countOwnedInfluence = () =>
@@ -133,7 +137,8 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should remain legal at cap because it only relocates markers', () => {
-        seedPlayerInfluenceAtCap();
+        // CORE-01-04-12: relocation remains legal at cap because legality is checked before mutation and no new Influence is created.
+        seedPlayerInfluenceToCap();
         const beforeCount = countOwnedInfluence();
         const cap = getInfluenceCap(ctx);
         const queueBefore = G.engine.effectQueue.length;
@@ -255,7 +260,8 @@ describe('Moves', () => {
     });
 
     it('placeInfluence should remain legal at cap because it uses existing supply marker', () => {
-        seedPlayerInfluenceAtCap();
+        // CORE-01-04-11: relocation from PersonalSupply remains legal at cap because this move repositions an existing marker instead of creating one.
+        seedPlayerInfluenceToCap();
         const beforeCount = countOwnedInfluence();
 
         const result = CoreMoves.placeInfluence({ G, ctx, events }, { targetTileId: 'board_t2' });
@@ -280,7 +286,7 @@ describe('Moves', () => {
     });
 
     it('formalizeInfluence should be rejected at cap without partial mutation', () => {
-        seedPlayerInfluenceAtCap();
+        seedPlayerInfluenceToCount(getInfluenceCap(ctx));
         const before = JSON.stringify(G);
 
         const result = CoreMoves.formalizeInfluence(
@@ -417,11 +423,7 @@ describe('Moves', () => {
     it('formalizeInfluence should allow up to cap for 5 players', () => {
         ctx.numPlayers = 5;
         const cap = getInfluenceCap(ctx);
-        for (let i = 2; i <= cap - 1; i++) {
-            const infId = `inf_cap_${i}`;
-            G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
-            G.zones.board_t1.items.push(infId);
-        }
+        seedPlayerInfluenceToCount(cap - 1);
 
         const result = CoreMoves.formalizeInfluence(
             { G, ctx, events },
@@ -434,13 +436,10 @@ describe('Moves', () => {
 
     it('formalizeInfluence should reject at cap for 5 players without mutation', () => {
         ctx.numPlayers = 5;
-        for (let i = 2; i <= 8; i++) {
-            const infId = `inf_cap_${i}`;
-            G.objects[infId] = { id: infId, type: 'Influence', owner: 'p1' } as any;
-            G.zones.board_t1.items.push(infId);
-        }
+        seedPlayerInfluenceToCount(getInfluenceCap(ctx));
 
         const before = JSON.stringify(G);
+        // CORE-01-04-09: creation at cap is illegal because cap legality is validated before the move would create a new Influence.
         const result = CoreMoves.formalizeInfluence(
             { G, ctx, events },
             { committeeTileId: 'board_t2', paymentResourceIds: ['res_dom', 'res_for'] }
