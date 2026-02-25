@@ -1,5 +1,4 @@
 import { CoreZoneName } from '@balance-control/rules';
-import { findObjectZoneId } from '../state-lookup';
 
 export const DRAW_AND_PLACE_STAGE = 'drawAndPlace';
 export const POLITICAL_ACTION_STAGE = 'politicalAction';
@@ -66,16 +65,12 @@ export * from '../mechanics/conversion';
  * @sideEffects
  */
 export function placeMetaMarkerOnTile(G: any, marker: any, tileId: string, mode: 'ReturnPenalty' | 'Convert') {
-    const currentZoneId = findObjectZoneId(G, marker.id);
-    if (currentZoneId && currentZoneId !== tileId) {
-        const currentZone = G.zones[currentZoneId];
-        if (currentZone) {
-            currentZone.items = currentZone.items.filter((id: string) => id !== marker.id);
-        }
+    for (const zone of Object.values(G.zones) as Array<{ items: string[] }>) {
+        zone.items = zone.items.filter((id: string) => id !== marker.id);
     }
 
     const targetZone = G.zones[tileId];
-    if (targetZone && !targetZone.items.includes(marker.id)) {
+    if (targetZone) {
         targetZone.items.push(marker.id);
     }
 
