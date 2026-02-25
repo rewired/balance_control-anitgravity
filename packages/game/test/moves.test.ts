@@ -157,6 +157,7 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should remain legal at cap because it only relocates markers', () => {
+        resetHarness();
         // CORE-01-04-12: relocation remains legal at cap because legality is checked before mutation and no new Influence is created.
         seedPlayerInfluenceToCap();
         const beforeCount = countOwnedInfluence();
@@ -184,6 +185,7 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should set ReturnPenalty mode when meta-marker starts on destination', () => {
+        resetHarness();
         G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
         G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'meta_p1');
@@ -244,6 +246,7 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should preserve zone exclusivity', () => {
+        resetHarness();
         G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
 
@@ -270,6 +273,7 @@ describe('Moves', () => {
     });
 
     it('moveInfluence should allow Start-Bridge move (A -> Start -> B) (CORE-01-04-12D)', () => {
+        resetHarness();
         // Setup: board_t1 and board_t2 are NOT directly adjacent, but both adjacent to board_start
         G.adjacency = {
             board_t1: ['board_start'],
@@ -288,6 +292,7 @@ describe('Moves', () => {
     });
 
     it('placeInfluence should remain legal at cap because it uses existing supply marker', () => {
+        resetHarness();
         // CORE-01-04-11: relocation from PersonalSupply remains legal at cap because this move repositions an existing marker instead of creating one.
         seedPlayerInfluenceToCap();
         const beforeCount = countOwnedInfluence();
@@ -327,6 +332,7 @@ describe('Moves', () => {
     });
 
     it('formalizeInfluence should enforce Start Committee special cost', () => {
+        resetHarness();
         G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'res_inf', 'res_dom_2'];
 
         const beforeFail = JSON.stringify(G);
@@ -353,6 +359,7 @@ describe('Moves', () => {
     });
 
     it('formalizeInfluence should ignore prohibitions on Start Committee', () => {
+        resetHarness();
         G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'res_inf', 'res_dom_2'];
         G.engine.attributes.prohibitions = { 'influence.formalize': true };
 
@@ -369,6 +376,7 @@ describe('Moves', () => {
     });
 
     it('convertResources should follow grassroots conversion spec without formalizing influence', () => {
+        resetHarness();
         G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'inf_1'];
         G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_1');
         G.zones.board_gr.items.push('inf_1');
@@ -398,6 +406,7 @@ describe('Moves', () => {
     });
 
     it('convertResources should auto-pay extra cost when meta-marker is in Convert mode', () => {
+        resetHarness();
         G.roundNumber = 2;
         G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'res_inf', 'inf_1', 'meta_p1'];
         G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'meta_p1');
@@ -434,6 +443,7 @@ describe('Moves', () => {
     });
 
     it('convertResources should preserve zone exclusivity', () => {
+        resetHarness();
         G.zones['PersonalSupply:0'].items = ['res_dom', 'res_for', 'inf_1', 'meta_p1'];
         G.zones.Bank.items = ['res_inf_bank', 'res_dom_2', 'res_inf'];
         G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_1');
@@ -449,6 +459,7 @@ describe('Moves', () => {
     });
 
     it('formalizeInfluence should allow up to cap for 5 players', () => {
+        resetHarness();
         ensureAllStartingInfluencePlaced(5);
         const cap = getInfluenceCap(ctx);
         seedPlayerInfluenceToCount(cap - 1);
@@ -589,6 +600,7 @@ describe('Moves', () => {
     });
 
     it('political action success should increment usage and end turn', () => {
+        resetHarness();
         const localEvents = { endTurn: vi.fn(), endStage: vi.fn() };
 
         const result = CoreMoves.placeInfluence({ G, ctx, events: localEvents }, { targetTileId: 'board_t2' });

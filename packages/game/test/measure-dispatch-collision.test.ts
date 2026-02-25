@@ -10,8 +10,12 @@ describe('Measure Dispatch Collision', () => {
     let G: GameState;
     let effectQueue: any[];
 
-    beforeEach(() => {
+    const resetRegistry = () => {
         EnginePackRegistry.clear();
+    };
+
+    beforeEach(() => {
+        resetRegistry();
 
         // Register minimal Core pack
         const corePack = makeTestPack({
@@ -51,10 +55,23 @@ describe('Measure Dispatch Collision', () => {
     });
 
     afterEach(() => {
-        EnginePackRegistry.clear();
+        resetRegistry();
     });
 
     it('should dispatch M01 to the correct expansion based on object ID prefix', () => {
+        resetRegistry();
+
+        const corePack = makeTestPack({
+            id: 'core',
+            manifest: {
+                id: 'core',
+                required: true,
+                packVersion: '0.0.0',
+                rulesetAnchor: 'CORE-01 v0.0.0'
+            }
+        });
+        EnginePackRegistry.registerPack(corePack);
+
         // Register Pack A (simulating EXP-01-00)
         const packA = makeTestPack({
             id: 'exp01',
@@ -123,6 +140,22 @@ describe('Measure Dispatch Collision', () => {
     });
 
     it('should throw deterministic error if measure ID is unknown to the target expansion', () => {
+        resetRegistry();
+
+        const corePack = makeTestPack({
+            id: 'core',
+            manifest: {
+                id: 'core',
+                required: true,
+                packVersion: '0.0.0',
+                rulesetAnchor: 'CORE-01 v0.0.0'
+            }
+        });
+        EnginePackRegistry.registerPack(corePack);
+
+        effectQueue = [];
+        G.engine = { effectQueue } as any;
+
         // Disable exp02 for this test to avoid "pack not registered" error
         G.meta.cfg!.expansions!.ex02 = false;
 
@@ -158,6 +191,22 @@ describe('Measure Dispatch Collision', () => {
     });
 
     it('should throw if expansion is not enabled/found', () => {
+        resetRegistry();
+
+        const corePack = makeTestPack({
+            id: 'core',
+            manifest: {
+                id: 'core',
+                required: true,
+                packVersion: '0.0.0',
+                rulesetAnchor: 'CORE-01 v0.0.0'
+            }
+        });
+        EnginePackRegistry.registerPack(corePack);
+
+        effectQueue = [];
+        G.engine = { effectQueue } as any;
+
         // Disable exp02
         G.meta.cfg!.expansions!.ex02 = false;
 

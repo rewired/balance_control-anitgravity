@@ -233,6 +233,10 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
 
     /** @rule CORE-01-08-02 */
     it('enforces formalize timing gate: all starting influence must be on Board [CORE-01-08-02]', () => {
+        ctx.currentPlayer = '0';
+        ctx.activePlayers = { '0': 'politicalAction' };
+        G.engine.attributes.usage = {};
+
         (G.objects.inf_0_1 as any).isStarting = true;
         const fail = CoreMoves.formalizeInfluence({ G, ctx, events }, {
             committeeTileId: 'board_t2',
@@ -249,6 +253,10 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
         expect(fail2).toBe(INVALID_MOVE);
         G.zones['PersonalSupply:1'].items = G.zones['PersonalSupply:1'].items.filter(id => id !== 'inf_1_1');
         G.zones.board_t1.items.push('inf_1_1');
+
+        G.objects.inf_0_2 = { id: 'inf_0_2', type: 'Influence', owner: '0' } as any;
+        G.zones['PersonalSupply:0'].items.push('inf_0_2');
+
         const success = CoreMoves.formalizeInfluence({ G, ctx, events }, {
             committeeTileId: 'board_t2',
             paymentResourceIds: ['res_dom', 'res_for']
