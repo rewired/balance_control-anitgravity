@@ -133,5 +133,8 @@ jobs:
       - name: Install Playwright browsers (Chromium)
         run: pnpm exec playwright install chromium
 
+      - name: ARCH-06 contract e2e
+        run: pnpm run test:ui:e2e:arch06
+
       - name: Frontend gate — UI E2E (Playwright)
         run: pnpm run test:ui:e2e
