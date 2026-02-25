@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-25: task(0267) Engine/Legal Intents: Make stage resolution authoritative from `ctx.activePlayers[playerID]`, limit best-effort inference to missing `ctx.activePlayers`, and default ambiguous snapshots conservatively to `drawAndPlace` to prevent draw-stage political/`convertResources` intents.
 - 2026-02-25: task(0266) Engine/Move Surface: Restrict root `moves` exposure to systemic actions (`resolveChoice`), keep political actions (`placeInfluence`, `moveInfluence`, `formalizeInfluence`, `convertResources`) stage-bound under `turn.stages.politicalAction.moves`, and align integration tests with non-root political exposure.
 - 2026-02-25: task(0265) Tests: Split Influence cap seed helper into `seedPlayerInfluenceToCap` + `seedPlayerInfluenceToCount(targetCount)`, switch `formalizeInfluence` creation-path cases to explicit cap/count setup, remove 5-player hardcoded cap literals, and document relocation-vs-creation cap legality rationale in test comments.
 - 2026-02-25: task(0264) Tests: Adjust `formalizeInfluence` 5-player positive-path setup to seed owned Influence only to `getInfluenceCap(ctx) - 1`, then assert post-move owned count equals computed `cap` (removes hardcoded `8`).

@@ -72,7 +72,7 @@ export function enumerateLegalIntents(G: GameState, ctx: any, playerID: string):
         return sortIntents(intents);
     }
 
-    const stage = ctx.activePlayers?.[playerID] ?? inferStageBestEffort(G, playerID);
+    const stage = resolvePlayerStage(G, ctx, playerID);
     const intents: LegalIntent[] = [];
 
     if (stage === 'drawAndPlace') {
@@ -138,12 +138,33 @@ function buildResolveChoiceIntents(G: GameState, ctx: any, pendingChoice: any): 
     }));
 }
 
+function resolvePlayerStage(G: GameState, ctx: any, playerID: string): string {
+    const activePlayers = ctx?.activePlayers;
+
+    // Prefer the boardgame.io stage authority whenever it exists.
+    if (activePlayers && typeof activePlayers === 'object') {
+        const explicitStage = (activePlayers as Record<string, string | undefined>)[playerID];
+        if (explicitStage === 'drawAndPlace' || explicitStage === 'politicalAction') {
+            return explicitStage;
+        }
+
+        // Conservative fallback for ambiguous stage snapshots: suppress political intents.
+        return 'drawAndPlace';
+    }
+
+    return inferStageBestEffort(G, playerID);
+}
+
 function inferStageBestEffort(G: GameState, playerID: string): string {
     const stagingId = `staging_${playerID}`;
     const stagedTileId = G.zones[stagingId]?.items?.[0];
     if (stagedTileId) return 'drawAndPlace';
+    if (G.engine?.attributes?.noLegalPlacements) return 'drawAndPlace';
+    if (G.engine?.attributes?.endedByNoLegalPlacements) return 'drawAndPlace';
     if (G.engine?.attributes?.drawPileEmptyAtTurnStart) return 'drawAndPlace';
-    return 'politicalAction';
+
+    // In uncertainty, default to drawAndPlace to avoid emitting political intents early.
+    return 'drawAndPlace';
 }
 
 function getChoiceSelections(G: GameState, ctx: any, pendingChoice: any): any[] {
