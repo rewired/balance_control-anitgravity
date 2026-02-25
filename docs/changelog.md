@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-25: task(0253) UI/QA: Add client-web Vitest coverage gate (v8 + text/lcov) with baseline thresholds, add `test:coverage` + root `test:ui:coverage`, bind coverage into `test:ui:all`, and document ratcheting policy in QA/DD docs.
 - 2026-02-24: task(0252) Tooling/CI: Add dedicated root UI QA scripts (`test:ui:unit`, `test:ui:e2e`, `test:ui:all`) and split frontend CI gates into explicit UI-unit and UI-E2E jobs for faster failure attribution.
 - 2026-02-24: task(0251) Engine/Tests: Add shared cost-bucket helpers (duplicate/overlap validation, semantic list partitioning, deterministic fallback selection) and refactor `moveInfluence` + `convertResources` to use them.
 - 2026-02-24: task(0250) Engine/Tests: Add shared political-action stage+usage guard and canonical finalize helper, wire all four political-action moves through it (with Start Committee usage hook support), and add regression tests for stage/usage/finalization invariants.

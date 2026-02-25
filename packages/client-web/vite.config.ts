@@ -20,6 +20,16 @@ export default defineConfig({
         }
     },
     test: {
-        environment: 'jsdom'
+        environment: 'jsdom',
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'lcov'],
+            thresholds: {
+                branches: 45,
+                functions: 55,
+                lines: 60,
+                statements: 60
+            }
+        }
     }
 })
