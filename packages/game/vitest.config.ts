@@ -10,6 +10,8 @@ export default defineConfig({
             '@balance-control/expansion-01': path.resolve(__dirname, '../expansion-01/src/index.ts'),
             '@balance-control/expansion-02': path.resolve(__dirname, '../expansion-02/src/index.ts'),
             '@balance-control/expansion-03': path.resolve(__dirname, '../expansion-03/src/index.ts'),
+            '@balance-control/rules': path.resolve(__dirname, '../rules/src/index.ts'),
+            '@balance-control/shared': path.resolve(__dirname, '../shared/src/index.ts'),
         },
     },
 });
