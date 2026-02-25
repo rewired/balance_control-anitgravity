@@ -666,8 +666,9 @@
       "class": "NORMATIVE_STATE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/placeInfluence.ts",
+        "packages/game/src/moves/stages/politicalAction/moveInfluence.ts"
       ],
       "notes": ""
     },
@@ -953,8 +954,11 @@
       "evidence": [
         "packages/game/src/engine/legal-intents.ts",
         "packages/game/src/mechanics-turn.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/src/moves/stages/politicalAction/placeInfluence.ts",
+        "packages/game/src/moves/stages/politicalAction/moveInfluence.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -965,8 +969,11 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics-turn.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/placeInfluence.ts",
+        "packages/game/src/moves/stages/politicalAction/moveInfluence.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -976,8 +983,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/src/moves/stages/politicalAction/placeInfluence.ts"
       ],
       "notes": ""
     },
@@ -988,8 +995,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics-turn.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/placeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1000,8 +1007,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics-turn.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts",
+        "packages/game/src/moves/stages/politicalAction/placeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1025,8 +1032,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/engine/legal-intents.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/moveInfluence.ts"
       ],
       "notes": ""
     },
@@ -1059,8 +1066,8 @@
       "evidence": [
         "packages/game/src/engine/legal-intents.ts",
         "packages/game/src/engine/topology.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/moveInfluence.ts"
       ],
       "notes": ""
     },
@@ -1070,8 +1077,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/integration-tests/test/golden/core_formalize_influence.json"
+        "packages/integration-tests/test/golden/core_formalize_influence.json",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1081,8 +1088,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/integration-tests/test/golden/core_formalize_influence.json"
+        "packages/integration-tests/test/golden/core_formalize_influence.json",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1092,8 +1099,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/integration-tests/test/golden/core_formalize_influence.json"
+        "packages/integration-tests/test/golden/core_formalize_influence.json",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1103,9 +1110,9 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
         "packages/integration-tests/test/golden/core_convert_resources.json",
-        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1115,8 +1122,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/integration-tests/test/golden/core_convert_resources.json"
+        "packages/integration-tests/test/golden/core_convert_resources.json",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1126,8 +1133,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1137,8 +1144,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1159,8 +1166,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1170,8 +1177,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1181,8 +1188,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1192,8 +1199,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1203,8 +1210,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1215,8 +1222,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics/conversion.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/integration-tests/test/golden/core_convert_resources.json"
+        "packages/integration-tests/test/golden/core_convert_resources.json",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1226,8 +1233,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1237,8 +1244,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1248,8 +1255,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1259,8 +1266,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1270,8 +1277,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1289,8 +1296,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1300,8 +1307,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1311,8 +1318,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1322,8 +1329,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1334,8 +1341,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics/conversion.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/integration-tests/test/golden/core_convert_resources.json"
+        "packages/integration-tests/test/golden/core_convert_resources.json",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1346,8 +1353,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics/conversion.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/integration-tests/test/golden/core_convert_resources.json"
+        "packages/integration-tests/test/golden/core_convert_resources.json",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1358,8 +1365,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics/conversion.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/convert-resources-real-setup.test.ts"
+        "packages/game/test/convert-resources-real-setup.test.ts",
+        "packages/game/src/moves/stages/politicalAction/convertResources.ts"
       ],
       "notes": ""
     },
@@ -1846,8 +1853,8 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics-turn.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1858,10 +1865,10 @@
       "evidenceRequired": true,
       "evidence": [
         "packages/game/src/mechanics-turn.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
         "packages/game/test/legal-intents.test.ts",
         "packages/integration-tests/test/golden/core_formalize_influence.json",
-        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1871,8 +1878,9 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/src/mechanics-turn.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1882,8 +1890,9 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts",
+        "packages/game/src/moves/stages/politicalAction/placeInfluence.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1906,8 +1915,8 @@
       "evidence": [
         "packages/game/src/engine/legal-intents.ts",
         "packages/game/src/engine/topology.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1917,8 +1926,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1928,8 +1937,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1939,8 +1948,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1950,8 +1959,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1974,8 +1983,8 @@
       "evidence": [
         "packages/game/src/engine/legal-intents.ts",
         "packages/game/src/engine/topology.ts",
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/core-compliance-invariants.test.ts"
+        "packages/game/test/core-compliance-invariants.test.ts",
+        "packages/game/src/moves/stages/politicalAction/moveInfluence.ts"
       ],
       "notes": ""
     },
@@ -1985,8 +1994,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -1996,8 +2005,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -2007,8 +2016,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -2018,8 +2027,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -2029,8 +2038,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -2040,8 +2049,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/moves.test.ts"
+        "packages/game/test/moves.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },
@@ -2051,8 +2060,8 @@
       "class": "NORMATIVE_ENGINE",
       "evidenceRequired": true,
       "evidence": [
-        "packages/game/src/moves/stages/politicalAction.ts",
-        "packages/game/test/new-core-settlement-endgame-obligations.test.ts"
+        "packages/game/test/new-core-settlement-endgame-obligations.test.ts",
+        "packages/game/src/moves/stages/politicalAction/formalizeInfluence.ts"
       ],
       "notes": ""
     },

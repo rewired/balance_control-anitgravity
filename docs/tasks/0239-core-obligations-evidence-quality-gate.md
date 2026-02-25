@@ -24,8 +24,8 @@
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
 * [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ## 1) Primary Spec Anchors (MUST)
@@ -96,24 +96,28 @@
 
 ## 10) PR Checklist (Repo Artifact)
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
 * [ ] Expansion isolation preserved (if touched)
 * [ ] `pnpm lint` passes
 * [ ] `pnpm test` (or `pnpm vitest run`) passes
 * [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
+* [x] No temporary files committed
 * [ ] `/docs/changelog.md` updated if required
 
 ## 11) Work Summary (3–7 bullets)
 
-* N/A
+* Rebound obligation evidence paths from removed `packages/game/src/moves/stages/politicalAction.ts` to the split political-action move modules.
+* Updated the targeted obligation bands: `CORE-01-02-17D`, `CORE-01-04-09*`, `CORE-01-04-10..22L.1`, and `CORE-01-08-*`.
+* Kept stage/meta obligations tied to canonical engine modules (`legal-intents.ts` / `mechanics-turn.ts`) where applicable.
+* Preserved executable evidence coverage by retaining existing test/golden evidence entries for each obligation.
+* Re-ran the obligations audit and verified orphan evidence is now zero.
 
 ## 12) Commands Run (with outcomes)
 
-* N/A
+* `pnpm run audit:core-obligations` ✅ (passes; quality stats show WEAK/MISSING/SUSPECT = 0)
 
 ## 13) Postflight Proof (recorded in commit message)
 
@@ -135,3 +139,10 @@ Recorded in final commit message (Postflight: block).
 * Change: <what changed (describe, don’t rewrite earlier sections)>
 * Spec anchors: <added/changed anchors>
 * Guardrails: <GR-xxx impacted>
+
+### A-02 — Political-action evidence rebinding after module split
+
+* Reason: `packages/game/src/moves/stages/politicalAction.ts` was removed; obligation evidence needed rebinding to live modules to avoid stale evidence/orphan signals.
+* Change: Updated `CORE-01-02-17D`, `CORE-01-04-09*`, `CORE-01-04-10..22L.1`, and `CORE-01-08-*` evidence paths to `placeInfluence.ts`, `moveInfluence.ts`, `formalizeInfluence.ts`, `convertResources.ts` and kept stage/meta bindings on `legal-intents.ts` / `mechanics-turn.ts` where required.
+* Spec anchors: CORE-01-02-17D; CORE-01-04-09..22L.1; CORE-01-08-01..10A.
+* Guardrails: GR-003, GR-008.
