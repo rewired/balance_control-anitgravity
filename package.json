@@ -24,7 +24,8 @@
     "check:spec-anchors": "node scripts/check-spec-anchors.mjs",
     "verify:docs": "node scripts/verify-docs.mjs",
     "verify:task": "node scripts/verify-task.mjs",
-    "verify:ui-interaction": "node scripts/verify-ui-interaction.mjs"
+    "verify:ui-interaction": "node scripts/verify-ui-interaction.mjs",
+    "test:ui:e2e:arch06": "playwright test e2e/client-web/arch06-*.spec.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

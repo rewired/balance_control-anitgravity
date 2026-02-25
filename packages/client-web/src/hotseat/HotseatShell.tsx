@@ -8,6 +8,13 @@ import type { DispatchTripwireInfo } from '../ui/interaction/types';
 
 type SeatID = '0' | '1';
 
+type HotseatE2EApi = {
+    getStateID: () => number | null;
+    getPendingChoiceKind: () => string | null;
+    setPendingChoice: (pendingChoice: { kind: string; spec?: Record<string, unknown>; player?: string }) => void;
+    clearPendingChoice: () => void;
+};
+
 const MATCH_ID = 'local-hotseat-2p';
 
 /**
@@ -51,10 +58,65 @@ export const HotseatShell: React.FC = () => {
         setClientState(client.getState());
     }, [activeSeat, client]);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        if (!(window as any).__BC_ENABLE_E2E_HOOKS__) return;
+
+        let choiceSeq = 0;
+
+        const refreshClientState = () => {
+            const snapshot = { ...(client.getState() ?? {}) };
+            (window as any).__BC_HOTSEAT_E2E_STATE__ = snapshot;
+            setClientState(snapshot);
+        };
+
+        const api: HotseatE2EApi = {
+            getStateID: () => {
+                const s = client.getState();
+                return s?.ctx?._stateID ?? s?.ctx?.stateID ?? s?._stateID ?? null;
+            },
+            getPendingChoiceKind: () => {
+                const s = client.getState();
+                return s?.G?.engine?.pendingChoice?.kind ?? null;
+            },
+            setPendingChoice: ({ kind, spec, player }) => {
+                const s = client.getState();
+                if (!s?.G?.engine) return;
+                const targetPlayer = player ?? s.ctx?.currentPlayer ?? activeSeat;
+                const choiceId = `e2e_choice_${choiceSeq++}`;
+                s.G.engine.pendingChoice = {
+                    choiceId,
+                    sourceId: 'e2e_injected_pending_choice',
+                    player: targetPlayer,
+                    kind,
+                    spec: spec ?? {},
+                    resumeToken: choiceId,
+                };
+                refreshClientState();
+            },
+            clearPendingChoice: () => {
+                const s = client.getState();
+                if (!s?.G?.engine) return;
+                s.G.engine.pendingChoice = undefined;
+                refreshClientState();
+            }
+        };
+
+        (window as any).__BC_HOTSEAT_E2E__ = api;
+        (window as any).__BC_HOTSEAT_E2E_STATE__ = client.getState();
+
+        return () => {
+            if ((window as any).__BC_HOTSEAT_E2E__ === api) {
+                delete (window as any).__BC_HOTSEAT_E2E__;
+            }
+            delete (window as any).__BC_HOTSEAT_E2E_STATE__;
+        };
+    }, [activeSeat, client]);
+
     // Render and dispatch moves from the same Client state authority.
     const G = clientState?.G;
     const ctx = clientState?.ctx;
-    
+
     const currentPlayer: string | null = ctx?.currentPlayer ?? null;
     const gameover = Boolean(ctx?.gameover);
     const isMyTurn = currentPlayer === activeSeat;
