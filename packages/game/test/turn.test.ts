@@ -117,7 +117,7 @@ describe('Turn Structure (Stages)', () => {
         expect(state.ctx.activePlayers[pid]).toBe('politicalAction');
     });
 
-    it('should reject placeInfluence during drawAndPlace stage without mutation', () => {
+    it('should reject political moves during drawAndPlace stage without mutation', () => {
         const client = Client({ game: BalanceControlNoPlayerView, numPlayers: 2 });
         client.start();
 
@@ -125,9 +125,12 @@ describe('Turn Structure (Stages)', () => {
         const beforeG = JSON.stringify(beforeState.G);
         const beforePlayer = beforeState.ctx.currentPlayer;
         const beforeStage = beforeState.ctx.activePlayers[beforePlayer];
-
         const boardTileId = Object.values(beforeState.G.grid)[0] as string;
+
         client.moves.placeInfluence({ targetTileId: boardTileId });
+        client.moves.moveInfluence({ sourceId: boardTileId, targetId: boardTileId });
+        client.moves.formalizeInfluence({ targetTileId: boardTileId });
+        client.moves.convertResources({ targetTileId: boardTileId, from: ['DOM'], to: 'FOR' });
 
         const afterState = client.getState();
         expect(JSON.stringify(afterState.G)).toBe(beforeG);

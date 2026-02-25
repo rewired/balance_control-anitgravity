@@ -81,7 +81,7 @@ describe('Move assembly invariants', () => {
         );
     });
 
-    it('factory-built Game includes registered expansion moves (superset, no import-time assembly)', () => {
+    it('factory-built Game keeps expansion moves stage-scoped (not root-exposed)', () => {
         EnginePackRegistry.registerPack(
             makeTestPack({
                 id: 'exp01',
@@ -91,8 +91,11 @@ describe('Move assembly invariants', () => {
         );
 
         const game = createBalanceControlGame() as any;
-        expect(typeof game.moves?.['tripwire.ex01.only']).toBe('function');
+        expect(typeof game.moves?.resolveChoice).toBe('function');
+        expect(game.moves?.['tripwire.ex01.only']).toBeUndefined();
+        expect(game.moves?.placeInfluence).toBeUndefined();
         expect(typeof game.turn?.stages?.politicalAction?.moves?.['tripwire.ex01.only']).toBe('function');
+        expect(typeof game.turn?.stages?.politicalAction?.moves?.placeInfluence).toBe('function');
     });
 
     it('factory-built Game throws deterministically on duplicate move ids (superset)', () => {
