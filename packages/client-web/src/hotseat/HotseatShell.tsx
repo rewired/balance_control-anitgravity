@@ -15,6 +15,22 @@ type HotseatE2EApi = {
     clearPendingChoice: () => void;
 };
 
+type ClientStateSnapshot = ReturnType<ReturnType<typeof Client>['getState']>;
+
+type StateIDCarrier = {
+    _stateID?: number;
+    stateID?: number;
+    ctx?: {
+        _stateID?: number;
+        stateID?: number;
+    };
+};
+
+const readStateID = (snapshot: ClientStateSnapshot): number | null => {
+    const carrier = snapshot as StateIDCarrier | null;
+    return carrier?._stateID ?? carrier?.stateID ?? carrier?.ctx?._stateID ?? carrier?.ctx?.stateID ?? null;
+};
+
 const MATCH_ID = 'local-hotseat-2p';
 
 /**
@@ -72,8 +88,7 @@ export const HotseatShell: React.FC = () => {
 
         const api: HotseatE2EApi = {
             getStateID: () => {
-                const s = client.getState();
-                return s?.ctx?._stateID ?? s?.ctx?.stateID ?? s?._stateID ?? null;
+                return readStateID(client.getState());
             },
             getPendingChoiceKind: () => {
                 const s = client.getState();

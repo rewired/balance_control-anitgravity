@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-25: task(0257) UI/Build: Fix `HotseatShell` state ID typing by routing E2E snapshot stateID reads through a typed adapter (removes invalid `Ctx` property access, restores strict build).
 - 2026-02-25: task(0256) Tooling/Docs: Rename the misspelled computeMajority test filename to `computeMajority.test.ts`, update `audit:spec`, and normalize remaining repository references.
 - 2026-02-25: task(0255) Docs/QA: Add canonical frontend QA runbook (`docs/testing/frontend-qa.md`) with mandatory lint→unit→coverage→e2e order, pass/fail criteria, ARCH-06 checklist mapping, required PR artifacts (logs + UI-change screenshots), add template references, and record DD-0255.
 - 2026-02-25: task(0254) UI/E2E: Add ARCH-06 contract Playwright scenarios (no-auto-commit, explicit confirm, pendingChoice hard-gate modal/selectTile, draft invalidation disabling confirm), add hotseat test hooks for deterministic contract assertions, and expose dedicated CI block `ARCH-06 contract e2e`.
