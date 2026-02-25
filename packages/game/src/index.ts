@@ -9,7 +9,8 @@ import { assemblePacks, buildStageMoveMap, type MoveMap } from './move-assembly'
 import { ensureCorePackRegistered } from './packs/register-core';
 import { validateSurfaceHash } from './surface';
 
-const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources', 'resolveChoice'] as const;
+const ROOT_SYSTEM_MOVE_IDS = ['resolveChoice'] as const;
+const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources'] as const;
 const DRAW_AND_PLACE_MOVE_IDS = ['placeTile'] as const;
 
 function selectMoves(mergedMoves: MoveMap, moveIds: readonly string[], stageName: string): MoveMap {
@@ -156,6 +157,7 @@ export function createBalanceControlGame(): Game<GameState> {
     const moveModules = packAssembly.moveModules;
     const mergedMoves = packAssembly.moves;
     const expansionModules = packAssembly.expansionMoveModules;
+    const rootSystemMoves = selectMoves(mergedMoves, ROOT_SYSTEM_MOVE_IDS, 'root/system');
     const politicalCoreMoves = selectMoves(mergedMoves, CORE_POLITICAL_MOVE_IDS, 'politicalAction');
     const drawAndPlaceMoves = selectMoves(mergedMoves, DRAW_AND_PLACE_MOVE_IDS, 'drawAndPlace');
     const politicalActionMoves = buildStageMoveMap(politicalCoreMoves, expansionModules);
@@ -163,7 +165,7 @@ export function createBalanceControlGame(): Game<GameState> {
     return {
         name: 'balance-control',
         setup: (ctx: any, setupData: unknown) => SetupGame({ ctx, setupData }),
-        moves: mergedMoves as any,
+        moves: rootSystemMoves as any,
         playerView: ({ G, playerID }: { G: GameState; playerID: string | null }) => {
             return buildPlayerView(G, playerID);
         },
