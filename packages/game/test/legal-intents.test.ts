@@ -251,6 +251,29 @@ describe('enumerateLegalIntents', () => {
         expect(intents.some((intent) => politicalMoveTypes.has(intent.moveType))).toBe(false);
     });
 
+    it('keeps drawAndPlace conservative when no staged tile is present', () => {
+        const ctx = createCtx('drawAndPlace');
+        const G = SetupGame({ ctx });
+
+        // No drawTileToStaging call: staging remains empty, but stage authority is drawAndPlace.
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        const politicalMoveTypes = new Set(['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources']);
+
+        expect(intents.some((intent) => politicalMoveTypes.has(intent.moveType))).toBe(false);
+        expect(intents.some((intent) => intent.moveType === 'convertResources')).toBe(false);
+    });
+
+    it('emits political intents when stage authority is politicalAction', () => {
+        const ctx = createCtx('politicalAction');
+        const G = SetupGame({ ctx });
+        const committeeId = Object.values(G.tiles).find(tile => tile.type === TileType.Committee)?.id as string;
+        G.zones[CoreZoneName.Board].items.push(committeeId);
+        G.grid['1,0'] = committeeId;
+
+        const intents = enumerateLegalIntents(G as any, ctx, '0');
+        expect(intents.some((intent) => intent.moveType === 'placeInfluence')).toBe(true);
+    });
+
     it('emits draw-and-place intents even when ctx.activePlayers is missing (best-effort stage)', () => {
         const ctx = createCtxNoActivePlayers();
         const G = SetupGame({ ctx });
