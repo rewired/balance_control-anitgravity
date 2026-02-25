@@ -35,17 +35,19 @@ function handleInfluenceFormalize(G: GameState & { engine: EngineState }, ctx: a
     supply.items.push(infId);
 }
 
-function handleInfluenceMove(G: GameState & { engine: EngineState }, atom: any): void {
+function handleInfluenceMove(G: GameState & { engine: EngineState }, atom: any): boolean {
     applyModifiers(G, null, 'beforeAction', atom);
     const { playerId, sourceTileId, targetTileId } = atom;
     const srcZone = G.zones[sourceTileId];
     const dstZone = G.zones[targetTileId];
+    if (!srcZone || !dstZone) return false;
 
     const idx = srcZone.items.findIndex(id => G.objects[id]?.owner === playerId && G.objects[id].type === 'Influence');
-    if (idx >= 0) {
-        const iid = srcZone.items.splice(idx, 1)[0];
-        dstZone.items.push(iid);
-    }
+    if (idx < 0) return false;
+
+    const iid = srcZone.items.splice(idx, 1)[0];
+    dstZone.items.push(iid);
+    return true;
 }
 
 export const coreInfluenceAtoms: AtomRegistration[] = [
