@@ -169,8 +169,11 @@ describe('Moves', () => {
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'meta_p1');
         G.zones.board_t2.items.push('meta_p1');
 
-        CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+        expect(ctx.activePlayers.p1).toBe('politicalAction');
 
+        const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+
+        expect(result).not.toBe(INVALID_MOVE);
         expect(G.zones.board_t1.items).toContain('meta_p1');
         expect(G.zones.board_t2.items).not.toContain('meta_p1');
         expect(G.objects.meta_p1.mode).toBe('ReturnPenalty');
@@ -209,8 +212,11 @@ describe('Moves', () => {
         G.zones['PersonalSupply:p1'].items = G.zones['PersonalSupply:p1'].items.filter((id: string) => id !== 'inf_1');
         G.zones.board_t1.items.push('inf_1');
 
-        CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+        expect(ctx.activePlayers.p1).toBe('politicalAction');
 
+        const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
+
+        expect(result).not.toBe(INVALID_MOVE);
         expect(G.zones.board_t1.items).toContain('meta_p1');
         expect(G.objects.meta_p1.mode).toBe('ReturnPenalty');
     });
