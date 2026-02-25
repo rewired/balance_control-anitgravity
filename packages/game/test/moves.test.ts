@@ -494,7 +494,7 @@ describe('Moves', () => {
     });
 
     it('political actions should reject when not in POLITICAL_ACTION_STAGE', () => {
-        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         const setMoveSeedState = (move: 'placeInfluence' | 'moveInfluence' | 'formalizeInfluence' | 'convertResources') => {
             if (move === 'moveInfluence') {
                 G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter((id: string) => id !== 'inf_1');

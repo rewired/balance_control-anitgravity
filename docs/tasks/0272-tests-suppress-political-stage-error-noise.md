@@ -152,4 +152,4 @@ Recorded in final commit message (Postflight: block).
 
 ## 15) Amendments (append-only)
 
-* N/A
+* 2026-02-25 (follow-up): Normalized `mockImplementation(() => {})` formatting in `moves.test.ts` while preserving the same `console.error` spy semantics, existing invalid-move assertions, and guaranteed `mockRestore()` cleanup path.
