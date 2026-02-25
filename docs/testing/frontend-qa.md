@@ -23,6 +23,16 @@ If one step fails, stop and treat the QA gate as failed.
 - **FAIL:** at least one command exits non-zero.
 - **WARN (environment only):** only allowed if failure is caused by container/OS limits (e.g. missing Playwright system libs). Must be documented in PR artifacts.
 
+### 2.3 Gate strictness
+
+- `pnpm lint`, `pnpm run test:ui:unit`, and `pnpm run test:ui:coverage` remain **hard FAIL** gates.
+- `pnpm run test:ui:e2e` may be marked **WARN** only for verifiable environment restrictions (missing system libs, blocked sandbox capabilities, browser launch restriction).
+- WARN classification must include:
+  - failing command
+  - exact environment (CI image or dev container)
+  - error excerpt
+  - remediation or follow-up issue/task reference
+
 ### 2.2 Criteria by command
 
 - `pnpm lint`
@@ -74,3 +84,15 @@ Every PR that touches UI behavior, client interaction flows, or QA setup MUST in
 
 Result: PASS / FAIL / WARN (with reason)
 ```
+
+## 6) E2E runtime environment baseline
+
+- **CI environment:** `.github/workflows/ci.yml` job `ui_e2e` on `ubuntu-latest`.
+- **CI dependency provision:** run `pnpm exec playwright install --with-deps chromium` before `pnpm run test:ui:e2e`.
+- **Local/dev container expectation:** if Playwright Chromium fails with missing Linux shared libs (e.g. `libatk-1.0.so.0`), first run:
+
+  ```bash
+  pnpm exec playwright install --with-deps chromium
+  ```
+
+  If that is blocked by environment policy (no root / restricted container), record E2E as **WARN** and keep unit+coverage gates hard-failing.
