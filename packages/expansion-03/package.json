@@ -11,7 +11,8 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run --no-threads --sequence.concurrent false",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "pretest": "pnpm -C ../rules build"
   },
   "dependencies": {
     "@balance-control/rules": "workspace:*"
