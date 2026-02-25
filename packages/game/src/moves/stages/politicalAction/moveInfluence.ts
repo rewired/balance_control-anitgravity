@@ -105,6 +105,8 @@ export const moveInfluence = ({ G, ctx, events }: any, payload: unknown) => {
         }
     }
 
+    const historyBefore = G.engine.history.length;
+
     G.engine.effectQueue.push({
         kind: 'influence.move',
         playerId: pid,
@@ -113,6 +115,11 @@ export const moveInfluence = ({ G, ctx, events }: any, payload: unknown) => {
     });
 
     if (!EffectResolver.resolve(G, ctx)) return INVALID_MOVE;
+
+    const handledInfluenceMove = G.engine.history
+        .slice(historyBefore)
+        .some((entry: { atom?: string }) => entry.atom === 'influence.move');
+    if (!handledInfluenceMove) return INVALID_MOVE;
 
     // CORE-01-04-12A: Only place Meta-Marker when source is ResortTile; set mode = ReturnPenalty
     if (marker && sourceTile?.type === TileType.Resort) {

@@ -135,10 +135,22 @@ describe('Moves', () => {
     it('moveInfluence should remain legal at cap because it only relocates markers', () => {
         seedPlayerInfluenceAtCap();
         const beforeCount = countOwnedInfluence();
+        const queueBefore = G.engine.effectQueue.length;
+        const historyBefore = G.engine.history.length;
+        const sourceBefore = G.zones.board_t1.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
+        const targetBefore = G.zones.board_t2.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
+
+        expect(sourceBefore).toBe(6);
+        expect(targetBefore).toBe(0);
+        expect(queueBefore).toBe(0);
+        expect(historyBefore).toBe(0);
 
         const result = CoreMoves.moveInfluence({ G, ctx, events }, { sourceId: 'board_t1', targetId: 'board_t2' });
 
         expect(result).not.toBe(INVALID_MOVE);
+        expect(G.engine.effectQueue).toHaveLength(0);
+        expect(G.engine.history).toHaveLength(historyBefore + 1);
+        expect(G.engine.history[historyBefore]).toMatchObject({ atom: 'influence.move' });
         const sourceInfluence = G.zones.board_t1.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
         const targetInfluence = G.zones.board_t2.items.filter((id: string) => G.objects[id]?.type === 'Influence').length;
         expect(sourceInfluence).toBe(5);
