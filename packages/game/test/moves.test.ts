@@ -197,6 +197,8 @@ describe('Moves', () => {
         expect(G.zones.board_t1.items).toContain('meta_p1');
         expect(G.zones.board_t2.items).not.toContain('meta_p1');
         expect(G.objects.meta_p1.mode).toBe('ReturnPenalty');
+        const metaMarkerZoneCount = Object.values(G.zones).filter(zone => zone.items.includes('meta_p1')).length;
+        expect(metaMarkerZoneCount).toBe(1);
     });
 
     it('moveInfluence should require and apply Return Penalty resources to Noise (CORE-01-04-12B)', () => {
