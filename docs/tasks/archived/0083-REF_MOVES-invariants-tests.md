@@ -173,7 +173,7 @@ packages/game test: Expansion registered: exp03
 packages/game test: Expansion registered: exp01
 packages/game test: EXP-02 Setup Complete.
 packages/game test:  ✓ test/exp02-controller-grants-no-throw.test.ts  (2 tests) 23ms
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 8ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 8ms
 packages/game test:  ✓ test/resolver-invariants.test.ts  (5 tests) 15ms
 packages/game test:  ✓ test/resolver.test.ts  (6 tests) 21ms
 packages/game test: stderr | test/resolver.test.ts > EffectResolver cost and production behavior > should not mutate state when resource.pay cannot be fully paid

@@ -299,7 +299,7 @@ packages/game test: [90mstdout[2m | test/golden-replay.test.ts[2m > [22m[2m
 packages/game test: Expansion registered: EXP-01 Economy & Labor
 packages/game test: EXP-01 Setup Complete.
 packages/game test:  [32m✓[39m test/golden-replay.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 219[2mms[22m[39m
-packages/game test:  [32m✓[39m test/computeMajorirty.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 9[2mms[22m[39m
+packages/game test:  [32m✓[39m test/computeMajority.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 9[2mms[22m[39m
 packages/game test:  [32m✓[39m test/exp01-controller-grants-no-throw.test.ts [2m ([22m[2m1 test[22m[2m)[22m[90m 12[2mms[22m[39m
 packages/game test: [90mstdout[2m | test/exp01-controller-grants-no-throw.test.ts[2m > [22m[2mEXP-01 controller grants with no controller[2m > [22m[2mshould not throw and should SKIP grant when controller is missing[22m[39m
 packages/game test: Expansion registered: EXP-01 Economy & Labor

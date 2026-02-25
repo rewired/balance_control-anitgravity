@@ -246,7 +246,7 @@ packages/game test: stdout | test/golden-replay.test.ts > Golden replays > shoul
 packages/game test: Expansion registered: EXP-01 Economy & Labor
 packages/game test: EXP-01 Setup Complete.
 packages/game test:  ✓ test/golden-replay.test.ts  (5 tests) 324ms
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 9ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 9ms
 packages/game test: stdout | test/exp01-controller-grants-no-throw.test.ts > EXP-01 controller grants with no controller > should not throw and should SKIP grant when controller is missing
 packages/game test: Expansion registered: EXP-01 Economy & Labor
 packages/game test: EXP-01 Setup Complete.

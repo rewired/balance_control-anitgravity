@@ -255,7 +255,7 @@ packages/game test: stdout | test/golden-replay.test.ts > Golden replays > shoul
 packages/game test: Expansion registered: EXP-01 Economy & Labor
 packages/game test: EXP-01 Setup Complete.
 packages/game test:  ✓ test/tripwire-controller-grants-policy.test.ts  (1 test) 318ms
-packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 10ms
+packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 10ms
 packages/game test:  ✓ test/resolver.test.ts  (6 tests) 15ms
 packages/game test: stderr | test/resolver.test.ts > EffectResolver cost and production behavior > should not mutate state when resource.pay cannot be fully paid
 packages/game test: [resolver:resource.pay] insufficient resources for cost

@@ -166,7 +166,7 @@ Update `packages/game/src/engine/resolver.ts`:
   packages/game test: Expansion registered: EXP-01 Economy & Labor
   packages/game test: EXP-01 Setup Complete.
   packages/game test:  ✓ test/tripwire-controller-grants-policy.test.ts  (1 test) 196ms
-  packages/game test:  ✓ test/computeMajorirty.test.ts  (5 tests) 9ms
+  packages/game test:  ✓ test/computeMajority.test.ts  (5 tests) 9ms
   packages/game test:  ✓ test/controller-fallback-hardening.test.ts  (3 tests) 10ms
   packages/game test:  ✓ test/exp02-hotspot-ids.test.ts  (1 test) 7ms
   packages/game test: stdout | test/exp02-hotspot-ids.test.ts > EXP-02 Inner Order hotspot id consistency > should resolve HOTSPOT_RESOLUTION for the setup Inner Order tile id

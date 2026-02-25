@@ -288,7 +288,7 @@ packages/game test: ERROR: invalid move: placeInfluence args: [object Object]
 packages/game test: [90mstdout[2m | test/golden-replay.test.ts[2m > [22m[2mGolden replays[2m > [22m[2mshould match golden hash for core_plus_ex01_small[22m[39m
 packages/game test: Expansion registered: EXP-01 Economy & Labor
 packages/game test: EXP-01 Setup Complete.
-packages/game test:  [32m✓[39m test/computeMajorirty.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 4[2mms[22m[39m
+packages/game test:  [32m✓[39m test/computeMajority.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 4[2mms[22m[39m
 packages/game test:  [32m✓[39m test/tripwire-controller-grants-policy.test.ts [2m ([22m[2m1 test[22m[2m)[22m[90m 197[2mms[22m[39m
 packages/game test:  [32m✓[39m test/convert-resources-real-setup.test.ts [2m ([22m[2m2 tests[22m[2m)[22m[90m 14[2mms[22m[39m
 packages/game test:  [32m✓[39m test/controller-fallback-hardening.test.ts [2m ([22m[2m3 tests[22m[2m)[22m[90m 5[2mms[22m[39m

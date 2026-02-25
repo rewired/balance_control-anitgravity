@@ -17,7 +17,7 @@
     "lint": "eslint \"packages/**/*.{ts,tsx,js,cjs,mjs}\" \"scripts/**/*.{js,cjs,mjs}\" \"*.{js,cjs,mjs}\"",
     "check:encoding": "node scripts/check-encoding.mjs",
     "gen:spec-anchors": "node scripts/gen-spec-anchors.mjs",
-    "audit:spec": "pnpm run gen:spec-anchors && pnpm run check:spec-anchors && pnpm run verify:packs && pnpm run audit:core-obligations && pnpm -C packages/game test -- spec-anchor-tripwire.test.ts && pnpm -C packages/game test -- computeMajorirty.test.ts moves.test.ts hotspot.test.ts && pnpm -C packages/integration-tests test -- golden-replay.test.ts",
+    "audit:spec": "pnpm run gen:spec-anchors && pnpm run check:spec-anchors && pnpm run verify:packs && pnpm run audit:core-obligations && pnpm -C packages/game test -- spec-anchor-tripwire.test.ts && pnpm -C packages/game test -- computeMajority.test.ts moves.test.ts hotspot.test.ts && pnpm -C packages/integration-tests test -- golden-replay.test.ts",
     "audit:core-obligations": "node scripts/audit-core-obligations.mjs",
     "dev": "pnpm -r --parallel dev",
     "verify:packs": "node scripts/verify-packs.mjs",

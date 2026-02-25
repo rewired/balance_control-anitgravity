@@ -252,7 +252,7 @@ packages/game test: [resolver:resource.pay] insufficient resources for cost
 packages/game test:  [32m✓[39m test…281 chars truncated… should SKIP grant when controller is missing[22m[39m
 packages/game test: EXP-01 Setup Complete.
 packages/game test:  [32m✓[39m test/tripwire-controller-grants-policy.test.ts [2m ([22m[2m1 test[22m[2m)[22m[33m 396[2mms[22m[39m
-packages/game test:  [32m✓[39m test/computeMajorirty.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+packages/game test:  [32m✓[39m test/computeMajority.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 8[2mms[22m[39m
 packages/game test:  [32m✓[39m test/unplaceable-draw-redraw.test.ts [2m ([22m[2m2 tests[22m[2m)[22m[90m 15[2mms[22m[39m
 packages/game test:  [32m✓[39m test/expansion.test.ts [2m ([22m[2m3 tests[22m[2m)[22m[90m 7[2mms[22m[39m
 packages/game test:  [32m✓[39m test/resolver-invariants.test.ts [2m ([22m[2m5 tests[22m[2m)[22m[90m 11[2mms[22m[39m

@@ -93,7 +93,7 @@ No gut feeling, no "works on my machine".
 ### pnpm run audit:spec
 ```
 > balance-control-monorepo@0.0.0 audit:spec D:\__DEV\balance_control-anitgravity
-> pnpm run gen:spec-anchors && pnpm -C packages/game test -- spec-anchor-tripwire.test.ts && pnpm -C packages/game test -- computeMajorirty.test.ts moves.test.ts hotspot.test.ts && pnpm -C packages/game test -- golden-replay.test.ts
+> pnpm run gen:spec-anchors && pnpm -C packages/game test -- spec-anchor-tripwire.test.ts && pnpm -C packages/game test -- computeMajority.test.ts moves.test.ts hotspot.test.ts && pnpm -C packages/game test -- golden-replay.test.ts
 
 Test Files  20 passed (20)
 Tests       81 passed (81)
