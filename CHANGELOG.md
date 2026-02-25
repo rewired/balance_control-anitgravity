@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- CI: replace `pnpm/action-setup` with Corepack-pinned pnpm bootstrap + setup-node pnpm cache to avoid UI unit self-installer failures.
 - Engine: Rename Meta-Marker mode `PingPong` to `ReturnPenalty` (CORE rename and serialization change).
 - Engine: add deterministic measure deck providers for EXP-02/EXP-03 and remove prefix-based measure zone routing from core resolver.
 - Engine: add deterministic `EngineModuleRegistry` for effect-atom dispatch; forbid module overrides and gate EXP-02/EXP-03 handlers by match config flags.
