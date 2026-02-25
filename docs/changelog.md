@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-25: task(0270) Tooling/Test: Add `packages/game` `pretest` to build transitive workspace dependencies (`@balance-control/rules`, `@balance-control/shared`) before isolated Vitest runs, so `pnpm -C packages/game test` works from a clean dist state without manual build steps.
 - 2026-02-25: task(0269) Tests: Normalize `moves.test.ts` fixture player identity to canonical numeric IDs (`"0"`), add explicit 5-player `allStartingInfluencePlaced` setup helper, and stabilize formalize cap boundary tests via fixture-only changes.
 - 2026-02-25: task(0268) Tests: Harden `moveInfluence` ReturnPenalty assertions by asserting political-action stage + non-`INVALID_MOVE` result before marker-position/mode checks (including the adjacent ResortTile ReturnPenalty test).
 - 2026-02-25: task(0267) Engine/Legal Intents: Make stage resolution authoritative from `ctx.activePlayers[playerID]`, limit best-effort inference to missing `ctx.activePlayers`, and default ambiguous snapshots conservatively to `drawAndPlace` to prevent draw-stage political/`convertResources` intents.
