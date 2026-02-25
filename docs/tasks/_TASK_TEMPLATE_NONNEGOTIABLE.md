@@ -98,6 +98,14 @@ Concrete starting points: files, existing functions, state shape, fixtures.
 
   * <what happens today>
 
+### 4.1 QA Runbook Baseline (mandatory for UI/prozess tasks)
+
+If the task touches client-web UX, UI interaction contract checks, or frontend QA process, bind this task to:
+
+* `docs/testing/frontend-qa.md`
+
+The command order and artifact policy from that runbook are mandatory unless this task explicitly states N/A with reason.
+
 ---
 
 ## 5) Outputs
@@ -181,6 +189,7 @@ This section MUST be completed in this task file before declaring done.
 * [ ] Determinism verified (golden replay/state hash)
 * [ ] No temporary files committed
 * [ ] `/docs/changelog.md` updated if required
+* [ ] Frontend QA runbook followed or marked N/A with explicit reason (`docs/testing/frontend-qa.md`)
 
 ---
 
@@ -198,6 +207,17 @@ Paste exact commands and short outcomes.
 * `pnpm lint` → <ok/fail + details>
 * `pnpm test` → <ok/fail + details>
 * (optional) `pnpm vitest run <pattern>` → <ok/fail + details>
+
+### 12.1 Frontend QA command order (required for UI/prozess scope)
+
+Reference: `docs/testing/frontend-qa.md`
+
+* `pnpm lint` → <ok/fail + details>
+* `pnpm run test:ui:unit` → <ok/fail + details>
+* `pnpm run test:ui:coverage` → <ok/fail + details>
+* `pnpm run test:ui:e2e` → <ok/fail + details>
+
+If not applicable, write explicit `N/A` with reason.
 
 ---
 
