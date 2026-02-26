@@ -7,10 +7,10 @@
 
 `packages/client-web/vite.config.ts` must enforce these minimum thresholds via `test.coverage.thresholds`:
 
-* **Branches:** `45`
-* **Functions:** `55`
-* **Lines:** `60`
-* **Statements:** `60`
+* **Branches:** `75`
+* **Functions:** `80`
+* **Lines:** `90`
+* **Statements:** `90`
 
 Coverage reporting is required to use:
 

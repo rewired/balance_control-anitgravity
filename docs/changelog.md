@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: docs(0253) Sync UI coverage baseline documentation to active Vitest gate values (branches 75, functions 80, lines 90, statements 90) across QA policy and DD-0253.
 - 2026-02-26: task(0281) Client-web tests: add quit failure UI regression (retain game screen + show `quit-error`) and debug replay clipboard copy assertion validating JSON payload fields (`moves`, `seed`, `config`).
 - 2026-02-26: task(0279) Tests/UI: Extend `hotseat-shell.smoke` with E2E hook setup/cleanup branch tests, loading fallback coverage for null/incomplete snapshots, parameterized `getStateID` fallback assertions, and explicit per-test window-global reset hygiene.
 - 2026-02-25: task(0278) Tests/UI: Add dedicated `dispatchIntent` unit coverage for missing move, exception, success path, and DEV tripwire mismatch/no-mismatch behavior with explicit `console.error`/`console.warn` spies.
