@@ -2,6 +2,7 @@ import { describe, expect, it, vi, afterEach } from 'vitest';
 import React from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { HotseatShell } from '../src/hotseat/HotseatShell';
+import { buildIntentViewModel, getPendingChoiceKindForPlayer } from '../src/ui/useIntentViewModel';
 
 const clientInstances: Array<{ config: any; stop: ReturnType<typeof vi.fn>; updatePlayerID: ReturnType<typeof vi.fn> }> = [];
 
@@ -192,6 +193,7 @@ describe('HotseatShell', () => {
         const api = (window as any).__BC_HOTSEAT_E2E__;
         expect(api.getPendingChoiceKind()).toBeNull();
 
+        const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
         api.setPendingChoice({ kind: 'selectTile', spec: { tileId: 'tile_A' } });
 
         expect(api.getPendingChoiceKind()).toBe('selectTile');
@@ -199,11 +201,23 @@ describe('HotseatShell', () => {
             sourceId: 'e2e_injected_pending_choice',
             player: '1',
             kind: 'selectTile',
-            spec: { tileId: 'tile_A' },
+            spec: { tileIds: ['tile_alpha', 'tile_beta'], tileId: 'tile_A' },
         });
+        expect(infoSpy).toHaveBeenCalledWith(
+            '[BC:E2E] setPendingChoice',
+            expect.objectContaining({
+                kind: 'selectTile',
+                pendingPlayer: '1',
+                activePlayerID: '0',
+                matchesActivePlayer: false,
+                isComplete: true,
+                choiceId: 'e2e_choice_0',
+            }),
+        );
 
         api.clearPendingChoice();
         expect(api.getPendingChoiceKind()).toBeNull();
+        infoSpy.mockRestore();
     });
 
     it('uses activeSeat fallback player and increments pendingChoice ids', () => {
@@ -227,6 +241,79 @@ describe('HotseatShell', () => {
         expect(firstChoice.choiceId).toBe('e2e_choice_0');
         expect(secondChoice.choiceId).toBe('e2e_choice_1');
         expect(secondChoice.player).toBe('1');
+    });
+
+    it('builds deterministic full pendingChoice fixtures for known kind matrix', () => {
+        (window as any).__BC_ENABLE_E2E_HOOKS__ = true;
+        mockClientState = {
+            ...mockClientState,
+            G: { engine: { pendingChoice: null } },
+            ctx: { ...mockClientState.ctx, currentPlayer: '0' },
+        };
+
+        render(<HotseatShell />);
+        const api = (window as any).__BC_HOTSEAT_E2E__;
+
+        const optionFixture = api.buildPendingChoiceFixture({ kind: 'selectOption' });
+        const tileFixture = api.buildPendingChoiceFixture({ kind: 'selectTile' });
+        const resourceFixture = api.buildPendingChoiceFixture({ kind: 'selectResource' });
+        const playerFixture = api.buildPendingChoiceFixture({ kind: 'selectPlayer' });
+
+        expect(optionFixture.spec).toEqual({ options: ['A', 'B'] });
+        expect(tileFixture.spec).toEqual({ tileIds: ['tile_alpha', 'tile_beta'] });
+        expect(resourceFixture.spec).toEqual({ resourceIds: ['resource_DOM_0', 'resource_FOR_0'] });
+        expect(playerFixture.spec).toEqual({ playerIds: ['0', '1'] });
+        expect(optionFixture.choiceId).toBe('e2e_choice_0');
+        expect(tileFixture.choiceId).toBe('e2e_choice_1');
+    });
+
+    it('keeps hard-gate off when seat differs from pendingChoice player', () => {
+        (window as any).__BC_ENABLE_E2E_HOOKS__ = true;
+        mockClientState = {
+            ...mockClientState,
+            G: { engine: { pendingChoice: null } },
+            ctx: { ...mockClientState.ctx, currentPlayer: '0' },
+        };
+
+        render(<HotseatShell />);
+        const api = (window as any).__BC_HOTSEAT_E2E__;
+        const pendingChoice = api.buildPendingChoiceFixture({ kind: 'selectOption', player: '1' });
+
+        const vm = buildIntentViewModel({
+            intents: [],
+            selectedTileId: null,
+            stagedTileId: null,
+            politicalActionUsageCount: 0,
+            activeStage: 'drawAndPlace',
+            pendingChoiceKind: getPendingChoiceKindForPlayer(pendingChoice, '0'),
+        });
+
+        expect(vm.hasPendingChoice).toBe(false);
+    });
+
+    it('keeps hard-gate on when seat owns pendingChoice and intents are empty', () => {
+        (window as any).__BC_ENABLE_E2E_HOOKS__ = true;
+        mockClientState = {
+            ...mockClientState,
+            G: { engine: { pendingChoice: null } },
+            ctx: { ...mockClientState.ctx, currentPlayer: '0' },
+        };
+
+        render(<HotseatShell />);
+        const api = (window as any).__BC_HOTSEAT_E2E__;
+        const pendingChoice = api.buildPendingChoiceFixture({ kind: 'selectOption', player: '0' });
+
+        const vm = buildIntentViewModel({
+            intents: [],
+            selectedTileId: null,
+            stagedTileId: null,
+            politicalActionUsageCount: 0,
+            activeStage: 'drawAndPlace',
+            pendingChoiceKind: getPendingChoiceKindForPlayer(pendingChoice, '0'),
+        });
+
+        expect(vm.hasPendingChoice).toBe(true);
+        expect(vm.pendingChoice.resolveChoice).toEqual([]);
     });
 
     it('ignores pendingChoice mutation when state has no engine object', () => {
