@@ -5,7 +5,8 @@
   "scripts": {
     "test": "vitest run --no-threads --sequence.concurrent false",
     "golden:update": "node scripts/update-golden.mjs --write",
-    "golden:check": "node scripts/update-golden.mjs --check"
+    "golden:check": "node scripts/update-golden.mjs --check",
+    "test:matrix": "vitest run --no-threads --sequence.concurrent false test/cross-expansion-matrix.test.ts"
   },
   "dependencies": {
     "@balance-control/game": "workspace:*",
