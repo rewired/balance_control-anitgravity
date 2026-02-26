@@ -40,3 +40,7 @@ packages/**/tmp/**
 # Playwright
 playwright-report/
 test-results/
+
+# Replay logs
+var/replays/**
+*.replay.ndjson

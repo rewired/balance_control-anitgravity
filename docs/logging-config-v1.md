@@ -64,6 +64,20 @@ The following namespaces are reserved in v1 and MUST NOT be treated as errors if
 - `maxFileSizeMB`: integer >= 1
 - `rotate`: string (`match` in v1 baseline)
 
+Default for v1 baseline:
+
+- `logging.replay.directory` defaults to `./var/replays`.
+
+Replay filename convention:
+
+- `<matchId>-<yyyyMMddTHHmmssZ>-<seed>.replay.ndjson`
+
+Normative path guidance:
+
+- `logging.replay.directory` MUST remain configurable per environment (local development, CI, server).
+- Runtime operators SHOULD point this path to writable runtime storage.
+- The configured replay directory SHOULD NOT point into `docs/` or `packages/`.
+
 ## 5. Forward-Compatibility Rule
 
 Unknown fields are allowed for forward compatibility.
