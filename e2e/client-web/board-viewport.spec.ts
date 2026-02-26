@@ -27,6 +27,50 @@ async function waitForViewportBaseline(page: any) {
     });
 }
 
+async function readViewportSnapshot(page: any) {
+    return await page.evaluate(() => {
+        const el = document.querySelector('[data-testid="board-viewport"]') as HTMLElement | null;
+        if (!el) return null;
+        const scale = Number(el.dataset.scale);
+        const tx = Number(el.dataset.tx);
+        const ty = Number(el.dataset.ty);
+        const baselineScale = Number(el.dataset.baselineScale);
+        const baselineTx = Number(el.dataset.baselineTx);
+        const baselineTy = Number(el.dataset.baselineTy);
+
+        return {
+            scale: Number.isFinite(scale) ? scale : null,
+            tx: Number.isFinite(tx) ? tx : null,
+            ty: Number.isFinite(ty) ? ty : null,
+            baselineScale: Number.isFinite(baselineScale) ? baselineScale : null,
+            baselineTx: Number.isFinite(baselineTx) ? baselineTx : null,
+            baselineTy: Number.isFinite(baselineTy) ? baselineTy : null,
+        };
+    });
+}
+
+async function assertBaselineAttributesReady(page: any, timeoutMs = VIEWPORT_POLL_TIMEOUT_MS) {
+    await expect
+        .poll(
+            async () => {
+                const snapshot = await readViewportSnapshot(page);
+                if (!snapshot) return null;
+                const {
+                    baselineScale,
+                    baselineTx,
+                    baselineTy,
+                } = snapshot;
+                if (baselineScale === null || baselineTx === null || baselineTy === null) return null;
+                return snapshot;
+            },
+            {
+                timeout: timeoutMs,
+                message: 'Expected viewport baseline data attributes to be initialized.',
+            },
+        )
+        .not.toBeNull();
+}
+
 async function readViewportTransform(page: any) {
     return await page.evaluate(() => {
         const el = document.querySelector('[data-testid="board-viewport"]') as HTMLElement | null;
@@ -71,18 +115,27 @@ async function assertScaleChanged(
     const timeoutMs = opts.timeoutMs ?? VIEWPORT_POLL_TIMEOUT_MS;
     const target = direction === 'increase' ? threshold : -threshold;
 
-    const poll = expect.poll(
-        async () => {
-            const current = await readViewportTransform(page);
-            if (!current) return null;
-            return current.scale - baselineScale;
-        },
-        { timeout: timeoutMs },
-    );
-    if (direction === 'increase') {
-        await poll.toBeGreaterThan(target);
-    } else {
-        await poll.toBeLessThan(target);
+    try {
+        const poll = expect.poll(async () => {
+            const snapshot = await readViewportSnapshot(page);
+            if (!snapshot || snapshot.scale === null) return null;
+            return snapshot.scale - baselineScale;
+        }, {
+            timeout: timeoutMs,
+            message: `Expected viewport scale to ${direction} from baseline=${baselineScale}.`,
+        });
+        if (direction === 'increase') {
+            await poll.toBeGreaterThan(target);
+        } else {
+            await poll.toBeLessThan(target);
+        }
+    } catch (error) {
+        const snapshot = await readViewportSnapshot(page);
+        throw new Error(
+            `Scale assertion failed (${direction}, baseline=${baselineScale}, threshold=${threshold}). `
+            + `Snapshot=${JSON.stringify(snapshot)}. `
+            + `Cause=${error instanceof Error ? error.message : String(error)}`,
+        );
     }
 }
 
@@ -93,16 +146,23 @@ async function assertTranslationChanged(
 ) {
     const threshold = opts.threshold ?? VIEWPORT_TRANSLATION_THRESHOLD;
     const timeoutMs = opts.timeoutMs ?? VIEWPORT_POLL_TIMEOUT_MS;
-    await expect
-        .poll(
-            async () => {
-                const current = await readViewportTransform(page);
-                if (!current) return null;
-                return Math.abs(current.tx - baseline.tx) + Math.abs(current.ty - baseline.ty);
-            },
-            { timeout: timeoutMs },
-        )
-        .toBeGreaterThan(threshold);
+    try {
+        await expect.poll(async () => {
+            const snapshot = await readViewportSnapshot(page);
+            if (!snapshot || snapshot.tx === null || snapshot.ty === null) return null;
+            return Math.abs(snapshot.tx - baseline.tx) + Math.abs(snapshot.ty - baseline.ty);
+        }, {
+            timeout: timeoutMs,
+            message: `Expected viewport translation to change from baseline tx=${baseline.tx}, ty=${baseline.ty}.`,
+        }).toBeGreaterThan(threshold);
+    } catch (error) {
+        const snapshot = await readViewportSnapshot(page);
+        throw new Error(
+            `Translation assertion failed (baselineTx=${baseline.tx}, baselineTy=${baseline.ty}, threshold=${threshold}). `
+            + `Snapshot=${JSON.stringify(snapshot)}. `
+            + `Cause=${error instanceof Error ? error.message : String(error)}`,
+        );
+    }
 }
 
 async function zoomWithRetry(
@@ -152,6 +212,7 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     const matchID = createdMatchJson?.matchID;
     expect(matchID).toBeTruthy();
 
+    await expect(page.getByTestId(`lobby-match-${matchID}`)).toBeVisible({ timeout: 15_000 });
     const joinButton = page.getByTestId(`lobby-join-${matchID}-0`);
     await expect(joinButton).toBeVisible({ timeout: 15_000 });
     await joinButton.click();
@@ -168,6 +229,7 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     await page.getByTestId('btn-fit-to-board').click();
     await waitForViewportTransform(page);
     await waitForViewportBaseline(page);
+    await assertBaselineAttributesReady(page);
     await expect
         .poll(async () => await readViewportDeltaToBaseline(page))
         .toBeLessThan(1);
@@ -229,6 +291,11 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     });
     await page.mouse.up();
     await assertTranslationChanged(page, { tx: zoomedIn!.tx, ty: zoomedIn!.ty });
+
+    await expect.poll(async () => await readViewportSnapshot(page), {
+        timeout: VIEWPORT_POLL_TIMEOUT_MS,
+        message: 'Expected viewport transform snapshot to remain readable after pan interaction.',
+    }).not.toBeNull();
 
     // Fit-to-board returns to baseline framing.
     await page.getByTestId('btn-fit-to-board').click();
