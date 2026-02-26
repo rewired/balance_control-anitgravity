@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0302) Tooling/Docs: add `pnpm run check:housekeeping` with root markdown whitelist enforcement, canonical `docs/changelog.md` path checks, and guards against legacy changelog paths in newly added task docs; document scope and intentional limits in `docs/qa/housekeeping-checks.md`.
 - 2026-02-26: task(0301) Governance/Docs: add normative document precedence file (`SEC > DD > TDD > AGENTS > VISION`), link it from `AGENTS.md` and the non-negotiable task template, add DD-0301 for ADR traceability, and extend `scripts/verify-task.mjs` to require precedence reference in section `0) Masterplan Guardrails`.
 - 2026-02-26: task(0300) Docs: tighten task template and contributor guidance so only `docs/changelog.md` is named as the canonical changelog target, and explicitly note archived task files may retain legacy changelog-path wording as historical context.
 - 2026-02-26: task(0299) Tooling/Docs: extend `scripts/verify-docs.mjs` with a canonical changelog guard that only allows `docs/changelog.md`, fail on any additional changelog filename variants, wire docs verification into `pnpm test` and early CI, document the housekeeping guard in `AGENTS.md`, and remove root `CHANGELOG.md`.
