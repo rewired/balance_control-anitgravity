@@ -77,6 +77,31 @@ describe('interaction helpers', () => {
             expect(o1Variants[1].payload.extraResourceIds).toEqual(['Z']);
             expect(o1Variants[2].payload.inputCount).toBe(3);
         });
+
+        it('ignores invalid and unrelated intents while preserving fallback sorting', () => {
+            const intents: LegalIntent[] = [
+                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputResourceIds: ['R1', 'R2'] }),
+                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputCount: '3', inputResourceIds: ['R1'] }),
+                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputCount: 4 }),
+                intent('convertResources', { grassrootsTileId: 'T1', inputCount: 2 }), // missing outputResort
+                intent('convertResources', { outputResort: 'O2', inputCount: 1 }), // missing grassrootsTileId
+                intent('convertResources', { grassrootsTileId: 'T2', outputResort: 'O2', inputCount: 1 }),
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['A'] }),
+            ];
+
+            const groupsMap = groupConvertIntents(intents);
+
+            expect(Array.from(groupsMap.keys())).toEqual(['T1', 'T2']);
+            const t1Outputs = groupsMap.get('T1')?.outputs ?? [];
+            expect(t1Outputs.map((output) => output.outputResort)).toEqual(['O1']);
+
+            const o1Variants = t1Outputs[0]?.variants ?? [];
+            expect(o1Variants.map((variant) => variant.payload)).toEqual([
+                { grassrootsTileId: 'T1', outputResort: 'O1', inputCount: '3', inputResourceIds: ['R1'] },
+                { grassrootsTileId: 'T1', outputResort: 'O1', inputResourceIds: ['R1', 'R2'] },
+                { grassrootsTileId: 'T1', outputResort: 'O1', inputCount: 4 },
+            ]);
+        });
     });
 
     describe('groupMeasureIntents', () => {
@@ -100,6 +125,49 @@ describe('interaction helpers', () => {
             // canonicalJsonStringify("m2") -> "\"m2\""
             expect(groups[0].intents[0].payload).toBe('m1');
             expect(groups[0].intents[1].payload).toBe('m2');
+        });
+
+        it('ignores non-measure and malformed moveType formats', () => {
+            const intents: LegalIntent[] = [
+                intent('takeMeasure', 'core-like-no-prefix'),
+                intent('exp01.takeMeasure', ''),
+                intent('exp01.takeMeasure', 'm2'),
+                intent('exp01.takeMeasure', 'm1'),
+                intent('exp02.takeMeasure', {}),
+                intent('exp02.takeMeasure', null),
+                intent('exp03.takeMeasure.extra', 'not-a-match'),
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['A'] }),
+            ];
+
+            const groups = groupMeasureIntents(intents);
+
+            expect(groups.map((group) => group.expansionId)).toEqual(['exp01', 'exp02']);
+            expect(groups[0]?.intents.map((entry) => entry.payload)).toEqual(['', 'm1', 'm2']);
+            expect(groups[1]?.intents.map((entry) => entry.payload)).toEqual([{}, null]);
+        });
+    });
+
+    describe('groupFormalizeIntents', () => {
+        it('ignores invalid formalize intents and keeps deterministic payment grouping', () => {
+            const intents: LegalIntent[] = [
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['B', 'A'], extraResourceIds: ['Z'] }),
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['A', 'B'], extraResourceIds: ['Y'] }),
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['C'] }),
+                intent('formalizeInfluence', { committeeTileId: 'C1' }), // missing paymentResourceIds
+                intent('formalizeInfluence', { paymentResourceIds: ['D'] }), // missing committeeTileId
+                intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputCount: 1 }),
+            ];
+
+            const groupsMap = groupFormalizeIntents(intents);
+
+            expect(Array.from(groupsMap.keys())).toEqual(['C1']);
+            const c1Groups = groupsMap.get('C1') ?? [];
+            expect(c1Groups.map((group) => group.paymentKey)).toEqual(['', 'A|B', 'C']);
+            expect(c1Groups[0]?.variants.map((variant) => variant.payload)).toEqual([{ committeeTileId: 'C1' }]);
+            expect(c1Groups[1]?.variants.map((variant) => variant.payload)).toEqual([
+                { committeeTileId: 'C1', paymentResourceIds: ['A', 'B'], extraResourceIds: ['Y'] },
+                { committeeTileId: 'C1', paymentResourceIds: ['B', 'A'], extraResourceIds: ['Z'] },
+            ]);
         });
     });
 });
