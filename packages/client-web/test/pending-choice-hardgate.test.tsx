@@ -194,5 +194,89 @@ describe('PendingChoice Hard-Gate Regression', () => {
             expect(resolveChoice).toHaveBeenCalledTimes(1);
             expect(resolveChoice).toHaveBeenCalledWith({ choiceId: 'c1', selection: 'tile_alpha' });
         });
+
+        it('returns to normal inspect/action flow after successful resolveChoice', () => {
+            ensureResizeObserver();
+            const resolveChoice = vi.fn();
+
+            const pendingState = createState({
+                player: '0',
+                kind: 'selectTile',
+                resolveChoice: [
+                    { moveType: 'resolveChoice', payload: { choiceId: 'c1', selection: 'tile_alpha' } }
+                ]
+            });
+
+            const normalState = createState(null);
+            const pendingCtx = { currentPlayer: '0', activePlayers: { '0': 'resolveChoice' } };
+            const normalCtx = { currentPlayer: '0', activePlayers: null };
+
+            mockEnumerateLegalIntents
+                .mockReturnValueOnce(pendingState.engine.pendingChoice.resolveChoice)
+                .mockReturnValue([]);
+
+            const { rerender } = render(
+                <I18nProvider>
+                    <GameLayout
+                        G={pendingState}
+                        ctx={pendingCtx}
+                        moves={{ resolveChoice }}
+                        playerID={'0'}
+                        isActive={true}
+                    />
+                </I18nProvider>
+            );
+
+            fireEvent.click(screen.getByTestId('hex-tile-0_0'));
+
+            expect(resolveChoice).toHaveBeenCalledTimes(1);
+            expect(resolveChoice).toHaveBeenCalledWith({ choiceId: 'c1', selection: 'tile_alpha' });
+
+            rerender(
+                <I18nProvider>
+                    <GameLayout
+                        G={normalState}
+                        ctx={normalCtx}
+                        moves={{ resolveChoice }}
+                        playerID={'0'}
+                        isActive={true}
+                    />
+                </I18nProvider>
+            );
+
+            expect(screen.queryByTestId('pending-choice-overlay')).toBeNull();
+
+            fireEvent.click(screen.getByTestId('hex-tile-1_0'));
+            expect(screen.getByTestId('inspector-coord').textContent).toContain('1,0');
+        });
+
+        it('shows a visible notice when resolveChoice dispatch fails', async () => {
+            ensureResizeObserver();
+            const state = createState({
+                player: '0',
+                kind: 'selectTile',
+                resolveChoice: [
+                    { moveType: 'resolveChoice', payload: { choiceId: 'c1', selection: 'tile_alpha' } }
+                ]
+            });
+
+            mockEnumerateLegalIntents.mockReturnValue(state.engine.pendingChoice.resolveChoice);
+
+            render(
+                <I18nProvider>
+                    <GameLayout
+                        G={state}
+                        ctx={baseCtx}
+                        moves={{}}
+                        playerID={'0'}
+                        isActive={true}
+                    />
+                </I18nProvider>
+            );
+
+            fireEvent.click(screen.getByTestId('hex-tile-0_0'));
+
+            expect(await screen.findByTestId('ui-toast-dispatch.rejected')).not.toBeNull();
+        });
     });
 });
