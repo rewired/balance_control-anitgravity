@@ -8,6 +8,7 @@ import { EffectResolver } from './engine/resolver';
 import { assemblePacks, buildStageMoveMap, type MoveMap } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
 import { validateSurfaceHash } from './surface';
+import { withReplaySink, type ReplayHookOptions } from './engine/replay-sink';
 
 const ROOT_SYSTEM_MOVE_IDS = ['resolveChoice'] as const;
 const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources'] as const;
@@ -152,11 +153,33 @@ function shouldAutoFinalSettlement(G: GameState, ctx: any): boolean {
  * @pure
  */
 export function createBalanceControlGame(): Game<GameState> {
+    return createBalanceControlGameWithHooks();
+}
+
+/**
+ * Factory for creating the Balance Control game configuration with optional infrastructure hooks.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @sideEffects
+ */
+export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions): Game<GameState> {
     ensureCorePackRegistered();
     const packAssembly = assemblePacks({ mode: 'registered' });
     const moveModules = packAssembly.moveModules;
-    const mergedMoves = packAssembly.moves;
-    const expansionModules = packAssembly.expansionMoveModules;
+    const mergedMoves = withReplaySink(packAssembly.moves, replayHook);
+    const expansionModules = moveModules.filter((module) => module.moduleId !== 'core').map((module) => {
+        const wrappedModuleMoves: MoveMap = {};
+        for (const moveId of Object.keys(module.moves)) {
+            const wrappedMove = mergedMoves[moveId];
+            if (typeof wrappedMove === 'function') {
+                wrappedModuleMoves[moveId] = wrappedMove;
+            }
+        }
+        return {
+            ...module,
+            moves: wrappedModuleMoves,
+        };
+    });
     const rootSystemMoves = selectMoves(mergedMoves, ROOT_SYSTEM_MOVE_IDS, 'root/system');
     const politicalCoreMoves = selectMoves(mergedMoves, CORE_POLITICAL_MOVE_IDS, 'politicalAction');
     const drawAndPlaceMoves = selectMoves(mergedMoves, DRAW_AND_PLACE_MOVE_IDS, 'drawAndPlace');
