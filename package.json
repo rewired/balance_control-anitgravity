@@ -13,7 +13,7 @@
     "test:ui:coverage": "pnpm -C packages/client-web test:coverage",
     "test:ui:e2e": "pnpm -w e2e",
     "test:ui:all": "pnpm run test:ui:coverage && pnpm run test:ui:e2e",
-    "test": "pnpm run check:spec-anchors && pnpm run verify:ui-interaction && pnpm -r --if-present test",
+    "test": "pnpm run check:spec-anchors && pnpm run verify:docs && pnpm run verify:ui-interaction && pnpm -r --if-present test",
     "lint": "eslint \"packages/**/*.{ts,tsx,js,cjs,mjs}\" \"scripts/**/*.{js,cjs,mjs}\" \"*.{js,cjs,mjs}\"",
     "check:encoding": "node scripts/check-encoding.mjs",
     "gen:spec-anchors": "node scripts/gen-spec-anchors.mjs",

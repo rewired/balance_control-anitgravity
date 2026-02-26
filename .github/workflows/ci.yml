@@ -27,14 +27,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Run documentation verification (includes canonical changelog path)
+        run: pnpm run verify:docs
+
       - name: Build workspace packages
         run: pnpm -w build
 
       - name: Run spec audit
         run: pnpm run audit:spec
-
-      - name: Run documentation verification
-        run: pnpm run verify:docs
 
       - name: Check spec-anchor compliance
         run: pnpm run check:spec-anchors
