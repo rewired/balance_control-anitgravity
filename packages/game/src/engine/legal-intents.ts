@@ -300,8 +300,10 @@ function enumerateFormalize(G: GameState, ctx: any, playerID: string): LegalInte
         if (countPlayerInfluence(G, playerID) >= getInfluenceCap(ctx)) continue;
         const isStartCommittee = tile.type === TileType.StartCommittee;
 
+        // CORE-01-08-02/03: formalize timing gate applies to all committees, including Start Committee.
+        if (!allStartingInfluencePlaced(G, ctx)) continue;
+
         if (isStartCommittee) {
-            if (!allStartingInfluencePlaced(G, ctx)) continue;
             if (!EffectResolver.checkUsageLimit(G as any, 'startCommittee', playerID)) continue;
         } else {
             if (EffectResolver.isProhibited(G as any, 'influence.formalize', playerID, tileId)) continue;

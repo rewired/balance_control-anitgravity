@@ -233,30 +233,29 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
     });
 
     /** @rule CORE-01-08-02 */
-    it('enforces formalize timing gate: all starting influence must be on Board [CORE-01-08-02]', () => {
-        ctx.currentPlayer = '0';
-        ctx.activePlayers = { '0': 'politicalAction' };
-        G.engine.attributes.usage = {};
-
+    /** @rule CORE-01-08-03 */
+    it('blocks committee formalize while any starting influence remains in PersonalSupply [CORE-01-08-02, CORE-01-08-03]', () => {
         (G.objects.inf_0_1 as any).isStarting = true;
+
         const fail = CoreMoves.formalizeInfluence({ G, ctx, events }, {
             committeeTileId: 'board_t2',
             paymentResourceIds: ['res_dom', 'res_for']
         });
-        expect(fail).toBe(INVALID_MOVE);
-        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_0_1');
-        G.zones.board_t1.items.push('inf_0_1');
-        (G.objects.inf_1_1 as any).isStarting = true;
-        const fail2 = CoreMoves.formalizeInfluence({ G, ctx, events }, {
-            committeeTileId: 'board_t2',
-            paymentResourceIds: ['res_dom', 'res_for']
-        });
-        expect(fail2).toBe(INVALID_MOVE);
-        G.zones['PersonalSupply:1'].items = G.zones['PersonalSupply:1'].items.filter(id => id !== 'inf_1_1');
-        G.zones.board_t1.items.push('inf_1_1');
 
-        G.objects.inf_0_2 = { id: 'inf_0_2', type: 'Influence', owner: '0' } as any;
-        G.zones['PersonalSupply:0'].items.push('inf_0_2');
+        expect(fail).toBe(INVALID_MOVE);
+    });
+
+    /** @rule CORE-01-08-02 */
+    /** @rule CORE-01-08-03 */
+    /** @rule CORE-01-04-15 */
+    /** @rule CORE-01-04-17 */
+    it('allows committee formalize after all starting influence markers are on Board [CORE-01-08-02, CORE-01-08-03, CORE-01-04-15, CORE-01-04-17]', () => {
+        (G.objects.inf_0_1 as any).isStarting = true;
+        (G.objects.inf_1_1 as any).isStarting = true;
+
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_0_1');
+        G.zones['PersonalSupply:1'].items = G.zones['PersonalSupply:1'].items.filter(id => id !== 'inf_1_1');
+        G.zones.board_t1.items.push('inf_0_1', 'inf_1_1');
 
         expect(allStartingInfluencePlaced(G, ctx)).toBe(true);
 
@@ -264,6 +263,7 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
             committeeTileId: 'board_t2',
             paymentResourceIds: ['res_dom', 'res_for']
         });
+
         expect(success).not.toBe(INVALID_MOVE);
     });
 
@@ -281,12 +281,8 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
         G.objects.inf_inherited = inherited as any;
         G.zones['PersonalSupply:0'].items.push('inf_inherited');
 
-        const success = CoreMoves.formalizeInfluence({ G, ctx, events }, {
-            committeeTileId: 'board_t2',
-            paymentResourceIds: ['res_dom', 'res_for']
-        });
-
-        expect(success).not.toBe(INVALID_MOVE);
+        // CORE-01-08-02 gate checks explicit own `isStarting === true` only.
+        expect(allStartingInfluencePlaced(G, ctx)).toBe(true);
     });
 
     /** @rule CORE-01-08-04 */

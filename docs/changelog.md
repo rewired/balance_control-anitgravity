@@ -1,3 +1,4 @@
+- 2026-02-26: task(0305) Engine/Tests: enforce CORE-01 formalize timing gate (CORE-01-08-02/08-03) during legal-intent committee enumeration, split timing regression into explicit blocked/allowed boundary tests, and keep inherited `isStarting` prototype flags non-blocking via explicit-own-property gate checks.
 # Changelog — BALANCE // CONTROL
 
 ## Unreleased
