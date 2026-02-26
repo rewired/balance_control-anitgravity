@@ -287,6 +287,9 @@ const CurrentActionPanel: React.FC<{ G: GameState; controller: InteractionContro
 
             {interactionState === 'draftReady' && draft.intent && (
                 <div className="action-panel-draft" data-testid="action-dock-draft" style={{ marginTop: '12px' }}>
+                    {draft.key && (
+                        <span data-testid="draft-key" hidden>{draft.key}</span>
+                    )}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px' }}>
                         {draft.intent.moveType === 'placeTile' && (
                             <button className="btn-secondary btn-small" onClick={editDraftTarget} data-testid="btn-edit-placement">
