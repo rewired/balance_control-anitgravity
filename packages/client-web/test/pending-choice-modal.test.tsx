@@ -32,7 +32,7 @@ const ensureResizeObserver = () => {
     }
 };
 
-const createState = () => {
+const createState = (pendingChoice?: any) => {
     return {
         zones: {
             'PersonalSupply:0': { id: 'PersonalSupply:0', name: 'PS', items: [] },
@@ -51,7 +51,7 @@ const createState = () => {
         objects: {},
         adjacency: {},
         grid: { '0,0': 'tile_alpha', '1,0': 'tile_beta' },
-        engine: { idSeq: 0, effectQueue: [], activeModifiers: [], history: [], attributes: {} }
+        engine: { idSeq: 0, effectQueue: [], activeModifiers: [], history: [], attributes: {}, pendingChoice }
     } as any;
 };
 
@@ -66,7 +66,7 @@ describe('PendingChoiceModal', () => {
         render(
             <I18nProvider>
                 <GameLayout
-                    G={createState()}
+                    G={createState({ player: '0', kind: 'confirm', resolveChoice: [] })}
                     ctx={baseCtx}
                     moves={{ resolveChoice: vi.fn() }}
                     playerID={'0'}
@@ -88,7 +88,7 @@ describe('PendingChoiceModal', () => {
         render(
             <I18nProvider>
                 <GameLayout
-                    G={createState()}
+                    G={createState({ player: '0', kind: 'confirm', resolveChoice: [] })}
                     ctx={baseCtx}
                     moves={{ resolveChoice: vi.fn(), placeInfluence: vi.fn() }}
                     playerID={'0'}
@@ -110,7 +110,7 @@ describe('PendingChoiceModal', () => {
         render(
             <I18nProvider>
                 <GameLayout
-                    G={createState()}
+                    G={createState({ player: '0', kind: 'confirm', resolveChoice: [] })}
                     ctx={baseCtx}
                     moves={{ resolveChoice }}
                     playerID={'0'}
