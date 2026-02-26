@@ -76,3 +76,5 @@ Running `pnpm -w test` includes these replay/hash checks along with the rest of 
 - No rules drift: if behavior changes, anchor it to `docs/rules/*`.
 - Keep changes deterministic (no time-based or non-seeded randomness in rules logic).
 - CI must be green before merge (`.github/workflows/ci.yml`).
+- Changelog updates must target only `docs/changelog.md` (canonical path).
+- `docs/tasks/archived/**` may contain historical legacy path references; archival text is not normative for current changelog path policy.
