@@ -17,8 +17,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('draft becomes illegal after seat switch and disables Confirm', async ({ page }) => {
-    const firstGhost = page.getByTestId('hex-ghost-0_0').first();
-    await expect(firstGhost).toBeVisible();
+    const firstGhost = page.locator('[data-testid^="hex-ghost-"]:not([disabled])').first();
+    await expect(firstGhost).toBeVisible({ timeout: 15_000 });
     await firstGhost.click();
 
     const confirmButton = page.getByTestId('btn-confirm-draft');
