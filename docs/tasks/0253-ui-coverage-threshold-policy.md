@@ -246,3 +246,11 @@ Format (append one block per amendment):
 * Change: <what changed (describe, don’t rewrite earlier sections)>
 * Spec anchors: <added/changed anchors>
 * Guardrails: <GR-xxx impacted>
+
+
+### A-02 — Baseline docs resync to active gate
+
+* Reason: `packages/client-web/vite.config.ts` enforces stronger coverage thresholds (75/80/90/90) than the originally documented baseline (45/55/60/60), creating policy drift.
+* Change: Updated `docs/qa/ui-coverage-threshold-policy.md` Baseline Gate and `docs/design-decisions/DD-0253-ui-coverage-threshold-ratcheting.md` Decision thresholds; added changelog note for the documentation resync.
+* Spec anchors: ARCH-05-DOCUMENTATION-CONTRACT
+* Guardrails: GR-014

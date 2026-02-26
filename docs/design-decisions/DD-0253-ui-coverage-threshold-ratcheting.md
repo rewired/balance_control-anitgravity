@@ -14,10 +14,10 @@ The UI package (`packages/client-web`) had test execution but no enforceable cov
    * provider: `v8`
    * reporters: `text`, `lcov`
 2. Set initial realistic minimum thresholds:
-   * branches `45`
-   * functions `55`
-   * lines `60`
-   * statements `60`
+   * branches `75`
+   * functions `80`
+   * lines `90`
+   * statements `90`
 3. Add `test:coverage` to `packages/client-web/package.json`.
 4. Bind coverage to root QA by adding root script `test:ui:coverage` and making `test:ui:all` run coverage before UI E2E.
 5. Publish a binding team policy in `docs/qa/ui-coverage-threshold-policy.md`, including ratcheting rules and no-decrease default.
