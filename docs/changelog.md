@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0294) Client-web intent ViewModel: make `hasPendingChoice` owner-scoped from `pendingChoiceKind` (hard-gate authority) while retaining `resolveChoice` intents for rendering/targets; add unit and UI regression updates documenting the invariant.
 - 2026-02-26: task(0293) Engine/Tests: Harden `allStartingInfluencePlaced` to treat only explicit own `isStarting === true` markers as blockers for formalize timing gate (`CORE-01-08-02`), plus regression coverage for inherited-property false positives.
 - 2026-02-26: task(0231) Tooling: refresh `pnpm-lock.yaml` to include `@balance-control/rules` in `packages/bot-llm` importer so CI `pnpm install --frozen-lockfile` succeeds without `ERR_PNPM_OUTDATED_LOCKFILE`.
 - 2026-02-26: task(0292) Integration tests: revise `smoke.test.ts` by replacing TODO placeholders with deterministic assertions for expansion zone presence, stable/non-empty measure deck descriptor projections for enabled packs, and explicit disabled-pack negative checks (no descriptors, no zones) using fixed setup RNG hooks (ARCH-01:DETERMINISM, ARCH-02:EXPANSION_ZONES).

@@ -63,6 +63,7 @@ export function getPendingChoiceKindForPlayer(pendingChoice: any, playerID: stri
 /**
  * @remarks
  * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
+ * Hard-Gate authority is pendingChoice ownership, not transient legality enumeration.
  * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
  */
 export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<IntentViewModel, 'intents'> {
@@ -72,7 +73,7 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
         .filter((intent) => intent.moveType === 'resolveChoice')
         .slice()
         .sort((a, b) => canonicalJsonStringify(a.payload ?? {}).localeCompare(canonicalJsonStringify(b.payload ?? {})));
-    const hasPendingChoice = resolveChoice.length > 0;
+    const hasPendingChoice = input.pendingChoiceKind !== null;
 
     const placeTile = input.intents.filter((intent) => intent.moveType === 'placeTile');
     const formalizeInfluence = input.intents.filter((intent) => intent.moveType === 'formalizeInfluence');

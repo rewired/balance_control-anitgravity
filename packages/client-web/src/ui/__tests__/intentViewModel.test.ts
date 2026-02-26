@@ -99,6 +99,34 @@ describe('intent view model', () => {
         expect(vm.political.others.map((i) => i.moveType)).toEqual([]);
     });
 
+    it('treats owned pendingChoice kind as hard-gate even when intents are empty', () => {
+        const vm = buildIntentViewModel({
+            ctx: { activePlayers: { '0': 'politicalAction' } },
+            playerID: '0',
+            intents: [],
+            selectedTileId: null,
+            stagedTileId: null,
+            pendingChoiceKind: 'selectTile'
+        });
+
+        expect(vm.hasPendingChoice).toBe(true);
+        expect(vm.pendingChoice.resolveChoice).toEqual([]);
+    });
+
+    it('does not hard-gate from resolveChoice intents when pendingChoice kind is null', () => {
+        const vm = buildIntentViewModel({
+            ctx: { activePlayers: { '0': 'politicalAction' } },
+            playerID: '0',
+            intents: [intent('resolveChoice', { choiceId: 'c1', selection: 'x' })],
+            selectedTileId: null,
+            stagedTileId: null,
+            pendingChoiceKind: null
+        });
+
+        expect(vm.hasPendingChoice).toBe(false);
+        expect(vm.pendingChoice.resolveChoice).toHaveLength(1);
+    });
+
     it('sorts others deterministically by moveType and canonical payload', () => {
         const intents: LegalIntent[] = [
             intent('z.move', { b: 1, a: 2 }),

@@ -32,7 +32,7 @@ const ensureResizeObserver = () => {
     }
 };
 
-const createState = () => {
+const createState = (pendingChoice?: any) => {
     return {
         zones: {
             'PersonalSupply:0': { id: 'PersonalSupply:0', name: 'PS', items: [] },
@@ -60,7 +60,8 @@ const createState = () => {
             history: [],
             attributes: {
                 publicLog: [{ id: 'log_1', kind: 'tile.unplaceable', playerId: '0', tileId: 'tile_beta' }]
-            }
+            },
+            pendingChoice
         }
     } as any;
 };
@@ -99,7 +100,7 @@ describe('PublicNoticeOverlay (unplaceable draw)', () => {
         render(
             <I18nProvider>
                 <GameLayout
-                    G={createState()}
+                    G={createState({ player: '0', kind: 'confirm', resolveChoice: [] })}
                     ctx={baseCtx}
                     moves={{ resolveChoice: vi.fn() }}
                     playerID={'0'}
