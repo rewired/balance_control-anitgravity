@@ -1,12 +1,12 @@
-# Task <TASK_ID> — <MEANINGFUL_TITLE>
+# Task 0300 — Docs canonical changelog path + archive legacy note
 
-**Date:** <YYYY-MM-DD>
-**Owner:** <name/role>
-**Branch:** `task/<TASK_ID>-<slug>`
+**Date:** 2026-02-26
+**Owner:** Codex (GPT-5.2-Codex)
+**Branch:** `task/0300-docs-canonical-changelog-path-and-archive-note`
 
 ---
 
-**Task State:** DRAFT
+**Task State:** DONE
 
 ## Task State Machine (Loop-Breaker)
 
@@ -34,21 +34,17 @@ Iteration budget (hard stop):
 
 ### affected_guardrails
 
-* <GR-xxx>
-* <GR-yyy>
-
-*(OR write exactly: `NONE`)*
+* NONE
 
 ### compliance_notes (required if affected_guardrails != NONE)
 
-* <GR-xxx>: <1–3 bullets explaining how this task stays compliant>
-* <GR-yyy>: <1–3 bullets explaining how this task stays compliant>
+* N/A
 
 ### guardrail_gate
 
-* [ ] I read the guardrails file before implementation.
-* [ ] I can explain compliance for every affected GR-xxx.
-* [ ] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
+* [x] I read the guardrails file before implementation.
+* [x] I can explain compliance for every affected GR-xxx.
+* [x] If any GR-xxx would be violated: I STOP, create a DD doc, and do not implement.
 
 ---
 
@@ -56,11 +52,11 @@ Iteration budget (hard stop):
 
 List the exact normative anchors that justify this task.
 
-* CORE: <e.g. CORE-01-06-16(a)(3)>
-* EXP-01: <optional>
-* EXP-02: <optional>
-* EXP-03: <optional>
-* ARCH: <e.g. ARCH-03:RESOLUTION_ORDER>
+* CORE: N/A (docs-only housekeeping)
+* EXP-01: N/A
+* EXP-02: N/A
+* EXP-03: N/A
+* ARCH: ARCH-05 documentation contract; AGENTS changelog housekeeping guard.
 
 Rule:
 
@@ -72,8 +68,9 @@ Rule:
 
 Describe the user-visible and/or engine-visible outcome in 2–6 bullets.
 
-* <goal bullet>
-* <goal bullet>
+* Ensure task template explicitly states `docs/changelog.md` is the only valid changelog target.
+* Add a central contributor note that archived task files may keep legacy changelog paths.
+* Avoid forcing historical rewrites in `docs/tasks/archived/**`.
 
 ---
 
@@ -81,8 +78,9 @@ Describe the user-visible and/or engine-visible outcome in 2–6 bullets.
 
 Explicitly list what this task does NOT do (prevents scope creep).
 
-* <non-goal>
-* <non-goal>
+* No edits to archived task file contents.
+* No engine/client/game logic changes.
+* No CI/test pipeline behavior changes.
 
 ---
 
@@ -92,11 +90,12 @@ Concrete starting points: files, existing functions, state shape, fixtures.
 
 * Repo areas:
 
-  * <path>
-  * <path>
+  * `docs/tasks/_TASK_TEMPLATE_NONNEGOTIABLE.md`
+  * `README.md`
+  * `docs/changelog.md`
 * Existing behavior summary (current):
 
-  * <what happens today>
+  * Canonical changelog path was already enforced in tooling, but docs wording needed stronger explicitness for template usage and archive handling.
 
 ### 4.1 QA Runbook Baseline (mandatory for UI/prozess tasks)
 
@@ -106,6 +105,8 @@ If the task touches client-web UX, UI interaction contract checks, or frontend Q
 
 The command order and artifact policy from that runbook are mandatory unless this task explicitly states N/A with reason.
 
+* N/A — docs-only changes, no client-web UX/process updates.
+
 ---
 
 ## 5) Outputs
@@ -114,22 +115,18 @@ Concrete artifacts that must exist after completion.
 
 ### 5.1 Code
 
-* <file path(s) to be modified/added>
+* `docs/tasks/_TASK_TEMPLATE_NONNEGOTIABLE.md`
+* `README.md`
 
 ### 5.2 Tests
 
-* <test file(s) to be modified/added>
+* N/A
 
 ### 5.3 Docs
 
-* [ ] `/docs/changelog.md` updated (required if logic/state/resolver changes; this is the only canonical changelog path)
+* [x] `/docs/changelog.md` updated (required if logic/state/resolver changes)
 * [ ] `/docs/design-decisions/DD-XXXX-<topic>.md` created (only if ambiguity/conflict)
 * [ ] `/docs/rules/ERRATA-XXXX.md` created (only if rule clarification)
-
-Changelog path policy (hard):
-
-* Do not target `CHANGELOG.md` (root or any alternate path/case variant).
-* Historical archived task files may reference legacy changelog paths; do not rewrite archive content solely for path wording.
 
 ---
 
@@ -160,9 +157,9 @@ Changelog path policy (hard):
 
 Write the plan as a checklist. Each item should be small and verifiable.
 
-* [ ] Step 1: <what>
-* [ ] Step 2: <what>
-* [ ] Step 3: <what>
+* [x] Step 1: Update task template wording to explicitly prohibit non-canonical changelog paths.
+* [x] Step 2: Add central contributor note clarifying archived tasks may keep legacy changelog references.
+* [x] Step 3: Record this docs change in `docs/changelog.md` and run docs verification.
 
 Notes:
 
@@ -174,9 +171,10 @@ Notes:
 
 Write pass/fail criteria; avoid vague language.
 
-* [ ] <criterion>
-* [ ] <criterion>
-* [ ] Golden replay unchanged or updated intentionally with explanation.
+* [x] Template explicitly names only `docs/changelog.md` as valid target.
+* [x] Central contributor docs include archive legacy-path note.
+* [x] No `docs/tasks/archived/**` files are edited.
+* [x] Golden replay unchanged or updated intentionally with explanation. (Unchanged; docs-only task)
 
 ---
 
@@ -184,24 +182,27 @@ Write pass/fail criteria; avoid vague language.
 
 This section MUST be completed in this task file before declaring done.
 
-* [ ] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
-* [ ] Normative anchors cited for all changes
-* [ ] No implicit rules introduced
-* [ ] No phantom moves introduced
-* [ ] Expansion isolation preserved (if touched)
-* [ ] `pnpm lint` passes
-* [ ] `pnpm test` (or `pnpm vitest run`) passes
-* [ ] Determinism verified (golden replay/state hash)
-* [ ] No temporary files committed
-* [ ] `/docs/changelog.md` updated if required (never `CHANGELOG.md`)
-* [ ] Frontend QA runbook followed or marked N/A with explicit reason (`docs/testing/frontend-qa.md`)
+* [x] Guardrails: affected GR-xxx listed (or NONE) and compliance demonstrated
+* [x] Normative anchors cited for all changes
+* [x] No implicit rules introduced
+* [x] No phantom moves introduced
+* [x] Expansion isolation preserved (if touched)
+* [x] `pnpm lint` passes
+* [x] `pnpm test` (or `pnpm vitest run`) passes
+* [x] Determinism verified (golden replay/state hash)
+* [x] No temporary files committed
+* [x] `/docs/changelog.md` updated if required
+* [x] Frontend QA runbook followed or marked N/A with explicit reason (`docs/testing/frontend-qa.md`)
 
 ---
 
 ## 11) Work Summary (3–7 bullets)
 
-* <what changed>
-* <why>
+* Hardened `_TASK_TEMPLATE_NONNEGOTIABLE.md` changelog instructions to declare `docs/changelog.md` as the only canonical target.
+* Added explicit warning in template not to use `CHANGELOG.md` or alternate changelog path variants.
+* Added template note that archived task files may include historical legacy path references and should not be rewritten solely for wording.
+* Added central contributor note in `README.md` that the archive can contain legacy path text while current policy remains canonical.
+* Added changelog entry documenting task 0300 documentation hardening.
 
 ---
 
@@ -209,20 +210,15 @@ This section MUST be completed in this task file before declaring done.
 
 Paste exact commands and short outcomes.
 
-* `pnpm lint` → <ok/fail + details>
-* `pnpm test` → <ok/fail + details>
-* (optional) `pnpm vitest run <pattern>` → <ok/fail + details>
+* `pnpm lint` → ok
+* `pnpm test` → ok
+* `pnpm run verify:docs` → ok
 
 ### 12.1 Frontend QA command order (required for UI/prozess scope)
 
 Reference: `docs/testing/frontend-qa.md`
 
-* `pnpm lint` → <ok/fail + details>
-* `pnpm run test:ui:unit` → <ok/fail + details>
-* `pnpm run test:ui:coverage` → <ok/fail + details>
-* `pnpm run test:ui:e2e` → <ok/fail + details>
-
-If not applicable, write explicit `N/A` with reason.
+* N/A — docs-only task.
 
 ---
 
@@ -262,9 +258,4 @@ Use only if something in Sections 0–9 must change after freezing the task.
 
 Format (append one block per amendment):
 
-### A-01 — <short title>
-
-* Reason: <why the change is necessary>
-* Change: <what changed (describe, don’t rewrite earlier sections)>
-* Spec anchors: <added/changed anchors>
-* Guardrails: <GR-xxx impacted>
+* N/A
