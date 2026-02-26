@@ -216,6 +216,88 @@ describe('ActionDock', () => {
         expect(proposeIntent).toHaveBeenCalledWith(intents[0]);
     });
 
+
+    it('keeps draft key but disables Confirm after seat-context revalidation marks draft illegal', () => {
+        const draftedIntent = { moveType: 'placeInfluence', payload: { targetTileId: 'tile_alpha' } };
+        const draftKey = JSON.stringify(draftedIntent);
+        const G = { objects: {} } as any;
+
+        const { rerender } = renderWithI18n(
+            <ActionDock
+                isActive={true}
+                G={G}
+                controller={{
+                    vm: {
+                        ...buildIntentViewModel({
+                            ctx: { currentPlayer: '0', activePlayers: { '0': 'politicalAction' } },
+                            playerID: '0',
+                            intents: [draftedIntent],
+                            selectedTileId: null,
+                            stagedTileId: null,
+                            pendingChoiceKind: null
+                        }),
+                        intents: [draftedIntent],
+                        G
+                    },
+                    interactionState: 'draftReady',
+                    actionMode: 'none',
+                    draft: { intent: draftedIntent, key: draftKey, isLegalNow: true },
+                    confirmDraft: vi.fn(),
+                    cancelDraft: vi.fn(),
+                    editDraftSource: vi.fn(),
+                    editDraftDestination: vi.fn(),
+                    editDraftTarget: vi.fn(),
+                    editDraftVariant: vi.fn(),
+                    editPinnedTile: vi.fn(),
+                    moveInfluenceSourceId: null,
+                    pinnedCommitteeTileId: null,
+                    pinnedGrassrootsTileId: null,
+                } as any}
+            />
+        );
+
+        expect(screen.getByTestId('draft-key').textContent).toBe(draftKey);
+        expect((screen.getByTestId('btn-confirm-draft') as HTMLButtonElement).disabled).toBe(false);
+
+        rerender(
+            <I18nProvider>
+                <ActionDock
+                    isActive={true}
+                    G={G}
+                    controller={{
+                        vm: {
+                            ...buildIntentViewModel({
+                                ctx: { currentPlayer: '1', activePlayers: { '1': 'politicalAction' } },
+                                playerID: '1',
+                                intents: [],
+                                selectedTileId: null,
+                                stagedTileId: null,
+                                pendingChoiceKind: null
+                            }),
+                            intents: [],
+                            G
+                        },
+                        interactionState: 'draftReady',
+                        actionMode: 'none',
+                        draft: { intent: draftedIntent, key: draftKey, isLegalNow: false },
+                        confirmDraft: vi.fn(),
+                        cancelDraft: vi.fn(),
+                        editDraftSource: vi.fn(),
+                        editDraftDestination: vi.fn(),
+                        editDraftTarget: vi.fn(),
+                        editDraftVariant: vi.fn(),
+                        editPinnedTile: vi.fn(),
+                        moveInfluenceSourceId: null,
+                        pinnedCommitteeTileId: null,
+                        pinnedGrassrootsTileId: null,
+                    } as any}
+                />
+            </I18nProvider>
+        );
+
+        expect(screen.getByTestId('draft-key').textContent).toBe(draftKey);
+        expect((screen.getByTestId('btn-confirm-draft') as HTMLButtonElement).disabled).toBe(true);
+    });
     it('shows confirmation UI in Current Action Panel when interactionState is draftReady', () => {
         const confirmDraft = vi.fn();
         const cancelDraft = vi.fn();

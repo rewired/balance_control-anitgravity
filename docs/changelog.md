@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0297) ARCH-06/UI: document immediate draft revalidation on hotseat `playerID`/seat switch (disable Confirm when illegal in new seat context), expose non-visual ActionDock `draft-key` test hook, and harden E2E/component assertions for key retention + no-auto-commit on seat switch.
 - 2026-02-26: task(0296) ARCH-06/UI tests: add explicit pending-choice postcondition (`resolveChoice` success => `G.engine.pendingChoice` cleared in next state), extend hard-gate regression to prove post-dispatch return to normal inspect flow, and add visible dispatch-error notice coverage for failed `resolveChoice` dispatches.
 - 2026-02-26: task(0295) Client-web hotseat E2E API: add deterministic `buildPendingChoiceFixture` defaults for known choice kinds, route `setPendingChoice` through fixture generation, log seat-ownership/completeness diagnostics, and extend smoke coverage for owner/non-owner pendingChoice hard-gate regressions.
 - 2026-02-26: task(0294) Client-web intent ViewModel: make `hasPendingChoice` owner-scoped from `pendingChoiceKind` (hard-gate authority) while retaining `resolveChoice` intents for rendering/targets; add unit and UI regression updates documenting the invariant.

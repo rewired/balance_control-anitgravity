@@ -74,6 +74,7 @@ No ad-hoc move construction is permitted in the client.
 - No auto-commit is allowed for normal moves.
 - Draft parameter changes are dock-only (Edit source/destination/variant).
 - During `draftReady`, board clicks are inspect-only and must not change the draft.
+- Bei Wechsel von `playerID`/Seat wird ein bestehender Draft sofort revalidiert; falls nicht legal im neuen Seat-Kontext: Confirm disabled.
 
 Under-variants:
 - Formalize/Convert under-variants are shown only after a valid tile was selected.
