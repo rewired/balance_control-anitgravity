@@ -11,6 +11,14 @@ type SeatID = '0' | '1';
 type HotseatE2EApi = {
     getStateID: () => number | null;
     getPendingChoiceKind: () => string | null;
+    buildPendingChoiceFixture: (input: { kind: string; player?: string; choiceId?: string; spec?: Record<string, unknown> }) => {
+        choiceId: string;
+        sourceId: string;
+        player: string;
+        kind: string;
+        spec: Record<string, unknown>;
+        resumeToken: string;
+    };
     setPendingChoice: (pendingChoice: { kind: string; spec?: Record<string, unknown>; player?: string }) => void;
     clearPendingChoice: () => void;
 };
@@ -32,6 +40,29 @@ const readStateID = (snapshot: ClientStateSnapshot): number | null => {
 };
 
 const MATCH_ID = 'local-hotseat-2p';
+
+const pendingChoiceSpecMatrix: Readonly<Record<string, Record<string, unknown>>> = Object.freeze({
+    selectOption: Object.freeze({ options: ['A', 'B'] }),
+    selectTile: Object.freeze({ tileIds: ['tile_alpha', 'tile_beta'] }),
+    selectResource: Object.freeze({ resourceIds: ['resource_DOM_0', 'resource_FOR_0'] }),
+    selectPlayer: Object.freeze({ playerIds: ['0', '1'] }),
+    yesNo: Object.freeze({ options: [true, false] }),
+});
+
+const isPendingChoiceFixtureComplete = (pendingChoice: {
+    choiceId?: string;
+    kind?: string;
+    spec?: Record<string, unknown>;
+}): boolean => {
+    if (!pendingChoice.choiceId || !pendingChoice.kind || !pendingChoice.spec) return false;
+    const requiredSpec = pendingChoiceSpecMatrix[pendingChoice.kind] ?? {};
+    for (const requiredKey of Object.keys(requiredSpec)) {
+        if (!(requiredKey in pendingChoice.spec)) {
+            return false;
+        }
+    }
+    return true;
+};
 
 /**
  * @remarks
@@ -94,19 +125,36 @@ export const HotseatShell: React.FC = () => {
                 const s = client.getState();
                 return s?.G?.engine?.pendingChoice?.kind ?? null;
             },
+            buildPendingChoiceFixture: ({ kind, player, choiceId, spec }) => {
+                const snapshot = client.getState();
+                const resolvedChoiceId = choiceId ?? `e2e_choice_${choiceSeq++}`;
+                const defaultSpec = pendingChoiceSpecMatrix[kind] ?? {};
+
+                return {
+                    choiceId: resolvedChoiceId,
+                    sourceId: 'e2e_injected_pending_choice',
+                    player: player ?? snapshot?.ctx?.currentPlayer ?? activeSeat,
+                    kind,
+                    spec: { ...defaultSpec, ...(spec ?? {}) },
+                    resumeToken: resolvedChoiceId,
+                };
+            },
             setPendingChoice: ({ kind, spec, player }) => {
                 const s = client.getState();
                 if (!s?.G?.engine) return;
-                const targetPlayer = player ?? s.ctx?.currentPlayer ?? activeSeat;
-                const choiceId = `e2e_choice_${choiceSeq++}`;
-                s.G.engine.pendingChoice = {
-                    choiceId,
-                    sourceId: 'e2e_injected_pending_choice',
-                    player: targetPlayer,
-                    kind,
-                    spec: spec ?? {},
-                    resumeToken: choiceId,
-                };
+                s.G.engine.pendingChoice = api.buildPendingChoiceFixture({ kind, spec, player });
+
+                const pendingChoice = s.G.engine.pendingChoice;
+                const matchesActivePlayer = pendingChoice.player === activeSeat;
+                const isComplete = isPendingChoiceFixtureComplete(pendingChoice);
+                console.info('[BC:E2E] setPendingChoice', {
+                    kind: pendingChoice.kind,
+                    pendingPlayer: pendingChoice.player,
+                    activePlayerID: activeSeat,
+                    matchesActivePlayer,
+                    isComplete,
+                    choiceId: pendingChoice.choiceId,
+                });
                 refreshClientState();
             },
             clearPendingChoice: () => {
