@@ -108,6 +108,60 @@ Normative path guidance:
 - Runtime operators SHOULD point this path to writable runtime storage.
 - The configured replay directory SHOULD NOT point into `docs/` or `packages/`.
 
+
+## 4A. Verbindlicher Minimalvertrag für `logging.replay` (v1)
+
+Dieser Abschnitt ist **normativ** und priorisiert für Implementierungen, die nur Replay-Logging benötigen.
+
+### Root
+
+- `configVersion` (**Pflichtfeld**): string, kanonischer Wert `"1"`.
+
+### Namespace
+
+- `logging.replay` (**Pflicht-Namespace** in v1).
+
+### Feldmatrix (`logging.replay`)
+
+| Feld | Status | Typ | v1-Regel |
+| --- | --- | --- | --- |
+| `enabled` | Pflicht | boolean | Muss als boolean validieren. |
+| `directory` | Pflicht | string | Muss ein String-Pfad sein; empfohlen: beschreibbarer Runtime-Pfad. |
+| `format` | Pflicht | string literal | Muss exakt `ndjson` sein. |
+| `includeStateHash` | Optional | boolean | Falls nicht gesetzt, wird Default verwendet. |
+| `flushEveryEvents` | Optional | integer | Falls gesetzt: ganzzahlig und `>= 1`. |
+
+### Defaults (v1)
+
+- `logging.replay.directory`: `./var/replays`
+- `logging.replay.includeStateHash`: `true`
+- `logging.replay.flushEveryEvents`: `1`
+
+### Override-Reihenfolge (kanonisch)
+
+1. CLI
+2. ENV
+3. `conf.json`
+4. Defaults
+
+### ENV-Mapping (kanonische Beispiele)
+
+- `BC_LOGGING__REPLAY__ENABLED`
+- `BC_LOGGING__REPLAY__DIRECTORY`
+- `BC_LOGGING__REPLAY__FORMAT`
+- `BC_LOGGING__REPLAY__INCLUDESTATEHASH`
+- `BC_LOGGING__REPLAY__FLUSHEVERYEVENTS`
+
+### Fehlerverhalten (fail-fast)
+
+Ungültige Werte in bekannten Feldern sind **Startup-fatal** und müssen mit klarer Meldung abbrechen.
+
+Beispiele für erwartete Fehlertexte:
+
+- `Invalid literal for logging.replay.format: expected "ndjson".`
+- `Invalid integer for BC_LOGGING__REPLAY__FLUSHEVERYEVENTS: expected >= 1.`
+- `Invalid boolean for BC_LOGGING__REPLAY__ENABLED: expected true|false.`
+
 ## 5. Forward-Compatibility Rule
 
 Unknown fields are allowed for forward compatibility.
