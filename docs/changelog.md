@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0292) Integration tests: revise `smoke.test.ts` by replacing TODO placeholders with deterministic assertions for expansion zone presence, stable/non-empty measure deck descriptor projections for enabled packs, and explicit disabled-pack negative checks (no descriptors, no zones) using fixed setup RNG hooks (ARCH-01:DETERMINISM, ARCH-02:EXPANSION_ZONES).
 - 2026-02-26: task(0291) Integration tests: add dedicated cross-expansion matrix suite (`cross-expansion-matrix.test.ts`) with exact 8 CORE/EXP combinations, fixed-seed deterministic setup/hash checks, No Dead State isolation assertions for disabled packs, and stack checks for baseline cost, EXP-02 prohibition, EXP-03 climate costs, and EXP-02+EXP-03 additive climate+regulation costs (ARCH-01:DETERMINISM, ARCH-02:EXPANSION_ZONES, EXP-02-04-B, EXP-03-06-03, EXP-03-10-02).
 - 2026-02-26: task(0290) Bot/LLM: Implement strict ARCH-04 adapter in `packages/bot-llm` with deterministic legal-intent enumeration (`enumerateLegalIntents` index surface only), strict zod `{ selectedIndex: number }` validation, index/stale-selection guardrails, and deterministic fallback to first legal move (CORE-01-04-09, ARCH-04:INTERACTION_MODEL/RESTRICTIONS/DETERMINISM).
 - 2026-02-26: task(0289) Tests/UI: Split `board-viewport` E2E into explicit lobby-create readiness (response + `lobby-match-<id>` + join visibility), enforce baseline viewport data-attribute readiness before interactions, and enrich transform poll failures with scale/tx/ty snapshot diagnostics.
