@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0289) Tests/UI: Split `board-viewport` E2E into explicit lobby-create readiness (response + `lobby-match-<id>` + join visibility), enforce baseline viewport data-attribute readiness before interactions, and enrich transform poll failures with scale/tx/ty snapshot diagnostics.
 - 2026-02-26: task(0288) Tests/UI: Make CSS E2E assertions normalization-robust by switching overlay pseudo-element width/height checks to numeric tolerance, relaxing dashed border style matching, and replacing strict ghost-button appearance equality with cross-browser-safe reset indicators.
 - 2026-02-26: task(0287) Tests/UI (ARCH-06): Harden `arch06-pending-choice-hardgate` selectTile E2E flow by deriving a deterministic tileId→coord map from `__BC_HOTSEAT_E2E_STATE__.G.grid`, injecting a concrete allowed `tileIds` list, and clicking the matching `hex-tile-<coord>` target instead of `.first()`.
 - 2026-02-26: task(0286) Tests/UI (ARCH-06): Replace fixed `hex-ghost-0_0` E2E selectors with prefix-based actionable ghost locators (`[data-testid^="hex-ghost-"]:not([disabled])`) and explicit visibility guards before click for deterministic interaction.
