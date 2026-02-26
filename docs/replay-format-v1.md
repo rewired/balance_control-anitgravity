@@ -125,3 +125,18 @@ A Replay v1 file is valid iff:
 {"recordType":"checkpoint","afterSeq":1,"stateHash":"sha256:abc..."}
 {"recordType":"footer","finalStateHash":"sha256:def...","totalActions":1}
 ```
+
+## 7. Operational Verification CLI (Quick Repro)
+
+Repository provides a fail-fast verifier for fast bug ticket reproduction:
+
+- command: `pnpm replay:verify -- <path-to-replay.ndjson>`
+- optional: `--verify-checkpoints`
+- optional: `--verify-final-hash`
+
+Behavior:
+
+1. read `header` and initialize the match with identical seed/config
+2. execute `action` records in strict sequence
+3. optionally verify checkpoint/footer hashes
+4. abort at first divergence with sequence number and diagnosis
