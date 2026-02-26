@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0299) Tooling/Docs: extend `scripts/verify-docs.mjs` with a canonical changelog guard that only allows `docs/changelog.md`, fail on any additional changelog filename variants, wire docs verification into `pnpm test` and early CI, document the housekeeping guard in `AGENTS.md`, and remove root `CHANGELOG.md`.
 - 2026-02-26: task(0298) Docs: declare `docs/changelog.md` as canonical changelog source, migrate any remaining relevant root changelog context into docs canonical history, and convert root `CHANGELOG.md` into a compatibility stub that points to `docs/changelog.md`.
 - 2026-02-26: task(0297) ARCH-06/UI: document immediate draft revalidation on hotseat `playerID`/seat switch (disable Confirm when illegal in new seat context), expose non-visual ActionDock `draft-key` test hook, and harden E2E/component assertions for key retention + no-auto-commit on seat switch.
 - 2026-02-26: task(0296) ARCH-06/UI tests: add explicit pending-choice postcondition (`resolveChoice` success => `G.engine.pendingChoice` cleared in next state), extend hard-gate regression to prove post-dispatch return to normal inspect flow, and add visible dispatch-error notice coverage for failed `resolveChoice` dispatches.

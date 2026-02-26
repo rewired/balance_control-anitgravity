@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const PACKAGES_DIR = path.resolve('packages');
 const GAME_SRC_DIR = path.resolve('packages/game/src');
+const CANONICAL_CHANGELOG_PATH = path.resolve('docs/changelog.md');
 
 let failCount = 0;
 
@@ -39,6 +40,51 @@ function checkMathRandom() {
                 logFail(path.relative(process.cwd(), file), `Line ${i + 1} contains Math.random()`);
             }
         });
+    }
+}
+
+function getAllRepoFiles(dirPath, arrayOfFiles = []) {
+    const entries = fs.readdirSync(dirPath);
+
+    entries.forEach((entry) => {
+        const fullPath = path.join(dirPath, entry);
+        const stat = fs.statSync(fullPath);
+        if (stat.isDirectory()) {
+            if (entry === '.git' || entry === 'node_modules' || entry === 'dist' || entry.startsWith('.')) {
+                return;
+            }
+            getAllRepoFiles(fullPath, arrayOfFiles);
+            return;
+        }
+        arrayOfFiles.push(fullPath);
+    });
+
+    return arrayOfFiles;
+}
+
+function checkCanonicalChangelogLocation() {
+    console.log('Checking canonical changelog location...');
+
+    if (!fs.existsSync(CANONICAL_CHANGELOG_PATH)) {
+        logFail('docs/changelog.md', 'Canonical changelog file is missing.');
+        return;
+    }
+
+    const changelogCandidates = getAllRepoFiles(path.resolve('.')).filter((filePath) =>
+        path.basename(filePath).toLowerCase() === 'changelog.md'
+    );
+
+    const invalidCandidates = changelogCandidates.filter(
+        (filePath) => path.resolve(filePath) !== CANONICAL_CHANGELOG_PATH
+    );
+
+    if (invalidCandidates.length > 0) {
+        invalidCandidates
+            .map((filePath) => path.relative(process.cwd(), filePath))
+            .sort()
+            .forEach((filePath) => {
+                logFail(filePath, 'Only docs/changelog.md is allowed as changelog location.');
+            });
     }
 }
 
@@ -160,6 +206,7 @@ function verifyGameDocs() {
 console.log('Starting verification...');
 checkMathRandom();
 verifyGameDocs();
+checkCanonicalChangelogLocation();
 
 if (failCount > 0) {
     console.error(`\nVerification failed with ${failCount} errors.`);

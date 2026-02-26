@@ -586,6 +586,11 @@ Must include:
 
 No code-only PRs.
 
+Housekeeping guardrail:
+
+* The only allowed changelog file path is `/docs/changelog.md`.
+* Any additional changelog variants (e.g. `/CHANGELOG.md`, mixed-case duplicates, or alternate locations) are forbidden and must fail docs verification.
+
 ---
 
 ## 6.2 PR Checklist (Always)
