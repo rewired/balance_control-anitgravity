@@ -102,6 +102,20 @@ function ensureNonEmptySection(md, title) {
   return sec;
 }
 
+
+function verifyDocumentPrecedenceReference(md) {
+  const sec0 = extractSection(md, /^#{2,6}\s+0\)\s+Masterplan Guardrails\b.*$/im);
+  if (!sec0) fail('Missing required section: "0) Masterplan Guardrails".');
+
+  const hasRule = /SEC\s*>\s*DD\s*>\s*TDD\s*>\s*AGENTS\s*>\s*VISION/i.test(sec0);
+  const hasDocRef = /docs\/governance\/document-precedence\.md/i.test(sec0);
+  if (!hasRule && !hasDocRef) {
+    fail('Section "0) Masterplan Guardrails" must reference document precedence ("SEC > DD > TDD > AGENTS > VISION" or docs/governance/document-precedence.md).');
+  }
+
+  ok('Document precedence reference present in guardrails/assumptions area.');
+}
+
 function verifyChecklist(md) {
   const sec = extractSection(md, /^#{2,6}\s+(\d+\)\s+)?PR\s+Checklist\b.*$/im);
   if (!sec) fail("Missing required section: \"PR Checklist\".");
@@ -197,6 +211,7 @@ function main() {
   const md = readUtf8(taskFile);
 
   verifyChecklist(md);
+  verifyDocumentPrecedenceReference(md);
   ensureNonEmptySection(md, "Work Summary");
   ensureNonEmptySection(md, "Commands Run");
   verifyCommit(resolvedId, taskFile);

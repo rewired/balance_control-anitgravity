@@ -21,6 +21,10 @@ Primary Architecture Contracts:
 * /docs/architecture/ARCH-06-UI-INTERACTION-CONTRACT.md
 * /docs/architecture/TECH-01-BIG-PICTURE.md
 
+Governance precedence (always apply for doc conflicts):
+
+* /docs/governance/document-precedence.md (`SEC > DD > TDD > AGENTS > VISION`)
+
 ---
 
 ### Machine-readable contract index
