@@ -94,6 +94,10 @@ Reserved top-level namespaces MUST be accepted in v1 even when they are empty ob
 - `maxFileSizeMB`: integer >= 1
 - `rotate`: string (`match` in v1 baseline)
 
+Replay payload schema contract (record types + deterministic serialization):
+
+- See `docs/replay-format-v1.md` (normative for Replay Format v1).
+
 Default for v1 baseline:
 
 - `logging.replay.directory` defaults to `./var/replays`.
