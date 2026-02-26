@@ -45,7 +45,17 @@ vi.mock('boardgame.io/client', async () => {
 
 vi.mock('../src/Board', () => {
     return {
-        Board: () => <div data-testid="board-stub" />
+        Board: ({ onTripwireMismatch }: { onTripwireMismatch: (info: { moveType: string }) => void }) => (
+            <div data-testid="board-stub">
+                <button
+                    type="button"
+                    data-testid="board-tripwire-trigger"
+                    onClick={() => onTripwireMismatch({ moveType: 'placeInfluence' })}
+                >
+                    trigger tripwire
+                </button>
+            </div>
+        )
     };
 });
 
@@ -167,5 +177,79 @@ describe('HotseatShell', () => {
         render(<HotseatShell />);
 
         expect((window as any).__BC_HOTSEAT_E2E__.getStateID()).toBe(expected);
+    });
+
+    it('sets and clears injected pendingChoice through E2E hooks', () => {
+        (window as any).__BC_ENABLE_E2E_HOOKS__ = true;
+        mockClientState = {
+            ...mockClientState,
+            G: { engine: { pendingChoice: null } },
+            ctx: { ...mockClientState.ctx, currentPlayer: '1' },
+        };
+
+        render(<HotseatShell />);
+
+        const api = (window as any).__BC_HOTSEAT_E2E__;
+        expect(api.getPendingChoiceKind()).toBeNull();
+
+        api.setPendingChoice({ kind: 'selectTile', spec: { tileId: 'tile_A' } });
+
+        expect(api.getPendingChoiceKind()).toBe('selectTile');
+        expect(mockClientState.G.engine.pendingChoice).toMatchObject({
+            sourceId: 'e2e_injected_pending_choice',
+            player: '1',
+            kind: 'selectTile',
+            spec: { tileId: 'tile_A' },
+        });
+
+        api.clearPendingChoice();
+        expect(api.getPendingChoiceKind()).toBeNull();
+    });
+
+    it('uses activeSeat fallback player and increments pendingChoice ids', () => {
+        (window as any).__BC_ENABLE_E2E_HOOKS__ = true;
+        mockClientState = {
+            ...mockClientState,
+            G: { engine: { pendingChoice: null } },
+            ctx: { ...mockClientState.ctx, currentPlayer: undefined },
+        };
+
+        render(<HotseatShell />);
+        fireEvent.click(screen.getByTestId('hotseat-switch-1'));
+
+        const api = (window as any).__BC_HOTSEAT_E2E__;
+        api.setPendingChoice({ kind: 'firstChoice' });
+        const firstChoice = mockClientState.G.engine.pendingChoice;
+        api.setPendingChoice({ kind: 'secondChoice' });
+        const secondChoice = mockClientState.G.engine.pendingChoice;
+
+        expect(firstChoice.player).toBe('1');
+        expect(firstChoice.choiceId).toBe('e2e_choice_0');
+        expect(secondChoice.choiceId).toBe('e2e_choice_1');
+        expect(secondChoice.player).toBe('1');
+    });
+
+    it('ignores pendingChoice mutation when state has no engine object', () => {
+        (window as any).__BC_ENABLE_E2E_HOOKS__ = true;
+        mockClientState = { G: {}, ctx: { currentPlayer: '0' } };
+
+        render(<HotseatShell />);
+        const api = (window as any).__BC_HOTSEAT_E2E__;
+
+        expect(() => api.setPendingChoice({ kind: 'selectTile' })).not.toThrow();
+        expect(() => api.clearPendingChoice()).not.toThrow();
+        expect(api.getPendingChoiceKind()).toBeNull();
+    });
+
+    it('shows a tripwire desync badge after board reports a mismatch', () => {
+        render(<HotseatShell />);
+
+        expect(screen.queryByTestId('hotseat-tripwire')).toBeNull();
+
+        fireEvent.click(screen.getByTestId('board-tripwire-trigger'));
+
+        const badge = screen.getByTestId('hotseat-tripwire');
+        expect(badge.textContent).toContain('DESYNC');
+        expect(badge.getAttribute('title')).toContain('placeInfluence');
     });
 });

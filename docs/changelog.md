@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0285) Tests/UI: Expand `hotseat-shell.smoke` coverage for E2E pendingChoice hook branches (`getPendingChoiceKind`, set/clear including fallback/no-engine guards) and DEV tripwire DESYNC badge rendering via board callback trigger.
 - 2026-02-26: task(0284) Client-web interaction controller: add deterministic regression coverage for hard-gate blocked actions, stage/seat/Escape transient resets, convert auto-selection/autopropose branching, and UI notice timeout/unmount timer cleanup; align stage-change effect to clear all transient UI state.
 - 2026-02-26: task(0283) Tests/UI: Expand `interactionHelpers` grouping coverage with negative/fallback intents (missing fields, non-numeric counts, malformed measure moveType forms), explicit ignore-path assertions, and deterministic sorted-output expectations.
 - 2026-02-26: docs(0253) Sync UI coverage baseline documentation to active Vitest gate values (branches 75, functions 80, lines 90, statements 90) across QA policy and DD-0253.
