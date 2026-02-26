@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0316) Docs/ADR: **Replay Logging MVP** — ergänze DD-0316 als konsolidierte Begründung für den Namespace `logging.replay`, NDJSON als Replay-v1-Format sowie die kanonische Konfig-Priorität (`CLI > ENV > conf.json > Defaults`) inkl. Sicherheitsregeln für Replay-Logpfade.
 - 2026-02-26: task(0315) Game/Replay: ergänze einen fail-fast NDJSON-Replay-Verifier inkl. CLI (`pnpm replay:verify`), der Match-Setup aus `header` (Seed + Match-Config) übernimmt, `action`-Records strikt sequentiell ausführt, bei erster Abweichung mit `seq`+Diagnose abbricht und optional `checkpoint`-/`footer`-Hashes über Flags (`--verify-checkpoints`, `--verify-final-hash`) prüft; DD-0315 dokumentiert die ADR-Entscheidung.
 - 2026-02-26: task(0314) Server/Replay: verdrahte Replay-Datei-Logging im Server mit `ReplaySink`-Dateiausgabe, Default-Pfad `./var/replays` (ENV-override `BC_REPLAY_DIRECTORY`), Start-up-Verzeichniserzeugung, fail-fast Pfadvalidierung ohne relative Path-Traversal-Segmente (`..`) und Dateinamenkonvention `<matchId>-<seed>-<yyyyMMddTHHmmssZ>.replay.ndjson`; ergänze ADR DD-0314.
 - 2026-02-26: task(0313) Engine/Replay: füge in `packages/game` einen einzelnen Post-Move-Hook (`ReplaySink`) ein, der nur erfolgreich ausgeführte Aktionen loggt, monotone `seq` vergibt, optional `stateHash` mitschreibt und Logging-Fehler best-effort über einen Fehlerkanal kapselt, ohne Spielzustandsänderungen zu beeinflussen; DD-0313 dokumentiert die ADR-Entscheidung.
