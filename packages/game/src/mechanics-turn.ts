@@ -58,7 +58,12 @@ export function allStartingInfluencePlaced(G: any, ctx: any): boolean {
         if (!supply) continue;
         for (const itemId of supply.items) {
             const obj = G.objects[itemId];
-            if (obj && obj.type === 'Influence' && obj.isStarting) {
+            if (
+                obj
+                && obj.type === 'Influence'
+                && Object.prototype.hasOwnProperty.call(obj, 'isStarting')
+                && obj.isStarting === true
+            ) {
                 return false;
             }
         }

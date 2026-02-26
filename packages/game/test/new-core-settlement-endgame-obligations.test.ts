@@ -7,6 +7,7 @@ import { positionKeyFromCoordString } from '../src/topology';
 import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from '../src/index';
 import { SetupGame } from '../src/setup';
+import { allStartingInfluencePlaced } from '../src/mechanics-turn';
 
 describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
     let G: GameState;
@@ -257,10 +258,34 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
         G.objects.inf_0_2 = { id: 'inf_0_2', type: 'Influence', owner: '0' } as any;
         G.zones['PersonalSupply:0'].items.push('inf_0_2');
 
+        expect(allStartingInfluencePlaced(G, ctx)).toBe(true);
+
         const success = CoreMoves.formalizeInfluence({ G, ctx, events }, {
             committeeTileId: 'board_t2',
             paymentResourceIds: ['res_dom', 'res_for']
         });
+        expect(success).not.toBe(INVALID_MOVE);
+    });
+
+    /** @rule CORE-01-08-02 */
+    it('treats only explicit starting markers as gate blockers [CORE-01-08-02]', () => {
+        G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_0_1');
+        G.zones.board_t1.items.push('inf_0_1');
+        G.zones['PersonalSupply:1'].items = G.zones['PersonalSupply:1'].items.filter(id => id !== 'inf_1_1');
+        G.zones.board_t1.items.push('inf_1_1');
+
+        const inherited = Object.create({ isStarting: true });
+        inherited.id = 'inf_inherited';
+        inherited.type = 'Influence';
+        inherited.owner = '0';
+        G.objects.inf_inherited = inherited as any;
+        G.zones['PersonalSupply:0'].items.push('inf_inherited');
+
+        const success = CoreMoves.formalizeInfluence({ G, ctx, events }, {
+            committeeTileId: 'board_t2',
+            paymentResourceIds: ['res_dom', 'res_for']
+        });
+
         expect(success).not.toBe(INVALID_MOVE);
     });
 
