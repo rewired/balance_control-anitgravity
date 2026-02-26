@@ -1,5 +1,10 @@
-import { createBotGame } from './boot';
-
-const BalanceControl = createBotGame();
-console.log('Bot adapter loaded for', BalanceControl.name);
-// TODO: Implement LLM adapter contracts
+export { createBotGame, registerBotPacks } from './boot';
+export {
+    LLMSelectionSchema,
+    enumerateDeterministicLegalMoves,
+    parseLLMSelection,
+    selectIntentFromLLMResponse,
+    type BotSelectionResult,
+    type LegalMoveOption,
+    type LLMSelection
+} from './adapter';

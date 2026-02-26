@@ -3,16 +3,21 @@
   "version": "0.0.1",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest run",
+    "pretest": "pnpm -C ../rules build && pnpm -C ../shared build && pnpm -C ../game build"
   },
   "dependencies": {
     "@balance-control/expansion-01": "workspace:*",
     "@balance-control/expansion-02": "workspace:*",
     "@balance-control/expansion-03": "workspace:*",
     "@balance-control/game": "workspace:*",
-    "@balance-control/packs": "workspace:*"
+    "@balance-control/packs": "workspace:*",
+    "zod": "^3.0.0",
+    "@balance-control/rules": "workspace:*"
   },
   "devDependencies": {
-     "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.6"
   }
 }

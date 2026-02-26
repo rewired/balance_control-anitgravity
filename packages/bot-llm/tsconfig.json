@@ -1,16 +1,14 @@
 {
-    "extends": "../../tsconfig.json",
-    "compilerOptions": {
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "baseUrl": ".",
-        "paths": {
-            "@balance-control/packs": [
-                "../packs/dist/index.d.ts"
-            ]
-        }
-    },
-    "include": [
-        "src/**/*"
-    ]
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@balance-control/packs": ["../packs/dist/index.d.ts"],
+      "@balance-control/game": ["../game/dist/index.d.ts"],
+      "@balance-control/rules": ["../rules/dist/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*"]
 }

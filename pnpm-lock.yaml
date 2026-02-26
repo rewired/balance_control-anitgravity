@@ -56,10 +56,16 @@ importers:
       '@balance-control/packs':
         specifier: workspace:*
         version: link:../packs
+      zod:
+        specifier: ^3.0.0
+        version: 3.25.76
     devDependencies:
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(jsdom@28.0.0(@noble/hashes@1.8.0))(playwright@1.58.2)
 
   packages/client-web:
     dependencies:
