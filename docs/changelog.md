@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0307) Docs/Config: define deterministic logging config resolution precedence (CLI > ENV > `conf.json` > defaults), standardize ENV key mapping with `BC_` + double-underscore path segments, and specify per-source type conversion plus startup-fatal validation behavior for invalid known-field values; add DD-0307 for ADR traceability.
 - 2026-02-26: task(0306) Docs/Config: add `docs/logging-config-v1.md` specifying top-level `logging` and `logging.replay`, reserve `logging.console`/`logging.file`/`logging.redaction`, require forward-compatible unknown-field tolerance with informational logging, and constrain `logging.replay.format` to `ndjson` in v1; add DD-0306 for ADR traceability.
 - 2026-02-26: task(0304) Tooling/Docs: extend `scripts/verify-task.mjs` to parse `### assumptions_precedence` under `0) Masterplan Guardrails`, require checked assumptions checkboxes, and require either a brief `no conflicts` note or a conflict-resolution note referencing `docs/governance/document-precedence.md`.
 - 2026-02-26: task(0303) Governance/Docs: clarify document-precedence applicability with an explicit missing-class skip rule, add canonical class-to-path scope mapping, and mirror class presence/absence recording requirements in the non-negotiable task template assumptions section.
