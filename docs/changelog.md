@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0306) Docs/Config: add `docs/logging-config-v1.md` specifying top-level `logging` and `logging.replay`, reserve `logging.console`/`logging.file`/`logging.redaction`, require forward-compatible unknown-field tolerance with informational logging, and constrain `logging.replay.format` to `ndjson` in v1; add DD-0306 for ADR traceability.
 - 2026-02-26: task(0304) Tooling/Docs: extend `scripts/verify-task.mjs` to parse `### assumptions_precedence` under `0) Masterplan Guardrails`, require checked assumptions checkboxes, and require either a brief `no conflicts` note or a conflict-resolution note referencing `docs/governance/document-precedence.md`.
 - 2026-02-26: task(0303) Governance/Docs: clarify document-precedence applicability with an explicit missing-class skip rule, add canonical class-to-path scope mapping, and mirror class presence/absence recording requirements in the non-negotiable task template assumptions section.
 - 2026-02-26: task(0302) Tooling/Docs: add `pnpm run check:housekeeping` with root markdown whitelist enforcement, canonical `docs/changelog.md` path checks, and guards against legacy changelog paths in newly added task docs; document scope and intentional limits in `docs/qa/housekeeping-checks.md`.
