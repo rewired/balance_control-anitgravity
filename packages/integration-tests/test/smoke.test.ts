@@ -4,13 +4,36 @@ import {
     EnginePackRegistry,
 } from '@balance-control/game';
 import {
-    CorePack,
-    Exp01Pack,
-    Exp02Pack,
-    Exp03Pack,
     registerCanonicalPacks
 } from '@balance-control/packs';
 import { CoreZoneName } from '@balance-control/rules';
+
+const EXP01_ZONES = ['MeasureDrawPile', 'MeasureRecyclePile', 'MeasureFinalDiscard', 'OpenMeasures'] as const;
+const EXP02_ZONES = [
+    'RegulationSupply',
+    'BoardAttached',
+    'EXP02_MeasureDrawPile',
+    'EXP02_MeasureRecyclePile',
+    'EXP02_MeasureFinalDiscard',
+    'EXP02_OpenMeasures',
+] as const;
+const EXP03_ZONES = [
+    'CountdownSupply',
+    'EXP03_MeasureDrawPile',
+    'EXP03_MeasureRecyclePile',
+    'EXP03_MeasureFinalDiscard',
+    'EXP03_OpenMeasures',
+] as const;
+
+const setupCtx = {
+    numPlayers: 2,
+    playOrder: ['0', '1'],
+    random: {
+        Shuffle: <T>(arr: T[]) => [...arr],
+        Die: () => 1,
+    },
+    events: {},
+};
 
 describe('Integration: Real Pack Combinations', () => {
     beforeEach(() => {
@@ -36,18 +59,8 @@ describe('Integration: Real Pack Combinations', () => {
         expect(game.name).toBe('balance-control');
 
         // Mock context for setup
-        const ctx = {
-            numPlayers: 2,
-            playOrder: ['0', '1'],
-            random: {
-                Shuffle: (arr: any[]) => [...arr], // No-op shuffle
-                Die: (n: number) => 1
-            },
-            events: {},
-        };
-
         // Setup with all expansions enabled
-        const state = game.setup(ctx as any, {
+        const state = game.setup(setupCtx as any, {
             packs: { enabledPacks: ['core', 'exp01', 'exp02', 'exp03'] }
         });
 
@@ -60,10 +73,9 @@ describe('Integration: Real Pack Combinations', () => {
         expect(state.zones[CoreZoneName.DrawPile]).toBeDefined();
         expect(state.zones[CoreZoneName.Board]).toBeDefined();
 
-        // Verify Expansion-specific state/logic if applicable
-        // This confirms that the expansion modules were actually loaded and executed
-        // e.g., if Exp02 adds specific zones or resources, we could check them.
-        // For now, just ensuring no throw during setup is a good start.
+        for (const zoneId of [...EXP01_ZONES, ...EXP02_ZONES, ...EXP03_ZONES]) {
+            expect(state.zones[zoneId], `expected expansion zone ${zoneId} to exist`).toBeDefined();
+        }
     });
 
     it('dispatches measures correctly across expansions', () => {
@@ -71,22 +83,96 @@ describe('Integration: Real Pack Combinations', () => {
          registerCanonicalPacks();
 
          const game = createBalanceControlGame();
-         const ctx = {
-             numPlayers: 2,
-             playOrder: ['0', '1'],
-             random: { Shuffle: (arr: any[]) => [...arr] },
-             events: {},
-         };
-
-         const state = game.setup(ctx as any, {
+         const state = game.setup(setupCtx as any, {
              packs: { enabledPacks: ['core', 'exp01', 'exp02', 'exp03'] }
          });
 
-         // Verify we can retrieve measure deck descriptors from the registry
-         // This confirms that expansion packs are correctly wired into the measure system
          const decks = EnginePackRegistry.getMeasureDeckDescriptors(state);
+         const stableProjection = decks.map(({ expansionId, deck }) => ({
+             expansionId,
+             deckId: deck.id,
+             objectIdPrefix: deck.objectIdPrefix,
+             zones: deck.zones,
+         }));
 
-         // We expect decks from enabled expansions (if they have any)
-         // EXP-02-00 and EXP-03-00 usually have measure decks.
+         expect(stableProjection.length).toBeGreaterThan(0);
+         expect(stableProjection).toEqual([
+             {
+                 expansionId: 'exp01',
+                 deckId: 'measures',
+                 objectIdPrefix: 'exp01_measure_',
+                 zones: {
+                     drawPileId: 'MeasureDrawPile',
+                     openZoneId: 'OpenMeasures',
+                     recyclePileId: 'MeasureRecyclePile',
+                     finalDiscardId: 'MeasureFinalDiscard',
+                 },
+             },
+             {
+                 expansionId: 'exp02',
+                 deckId: 'measures',
+                 objectIdPrefix: 'exp02_measure_',
+                 zones: {
+                     drawPileId: 'EXP02_MeasureDrawPile',
+                     openZoneId: 'EXP02_OpenMeasures',
+                     recyclePileId: 'EXP02_MeasureRecyclePile',
+                     finalDiscardId: 'EXP02_MeasureFinalDiscard',
+                 },
+             },
+             {
+                 expansionId: 'exp03',
+                 deckId: 'measures',
+                 objectIdPrefix: 'exp03_measure_',
+                 zones: {
+                     drawPileId: 'EXP03_MeasureDrawPile',
+                     openZoneId: 'EXP03_OpenMeasures',
+                     recyclePileId: 'EXP03_MeasureRecyclePile',
+                     finalDiscardId: 'EXP03_MeasureFinalDiscard',
+                 },
+             },
+         ]);
+
+         const secondCallProjection = EnginePackRegistry.getMeasureDeckDescriptors(state).map(({ expansionId, deck }) => ({
+             expansionId,
+             deckId: deck.id,
+             objectIdPrefix: deck.objectIdPrefix,
+             zones: deck.zones,
+         }));
+
+         expect(secondCallProjection).toEqual(stableProjection);
+    });
+
+    it('omits deck descriptors and zones for disabled packs', () => {
+         registerCanonicalPacks();
+
+         const game = createBalanceControlGame();
+         const state = game.setup(setupCtx as any, {
+             packs: { enabledPacks: ['core', 'exp02'] }
+         });
+
+         const descriptors = EnginePackRegistry.getMeasureDeckDescriptors(state).map(({ expansionId, deck }) => ({
+             expansionId,
+             deckId: deck.id,
+             objectIdPrefix: deck.objectIdPrefix,
+         }));
+
+         expect(descriptors).toEqual([
+             {
+                 expansionId: 'exp02',
+                 deckId: 'measures',
+                 objectIdPrefix: 'exp02_measure_',
+             },
+         ]);
+
+         for (const zoneId of EXP02_ZONES) {
+             expect(state.zones[zoneId], `expected enabled zone ${zoneId} to exist`).toBeDefined();
+         }
+
+         for (const zoneId of [...EXP01_ZONES, ...EXP03_ZONES]) {
+             expect(state.zones[zoneId], `expected disabled zone ${zoneId} to be absent`).toBeUndefined();
+         }
+
+         expect(descriptors.some((entry) => entry.expansionId === 'exp01')).toBe(false);
+         expect(descriptors.some((entry) => entry.expansionId === 'exp03')).toBe(false);
     });
 });
