@@ -88,6 +88,9 @@ Policy:
 - `kind === selectTile`: board-driven selection; clicking a valid choice target commits `resolveChoice` directly.
 - otherwise: modal-driven; resolveChoice requires modal confirmation (misclick-safe).
 
+Postcondition:
+- After a successful `resolveChoice` dispatch, `G.engine.pendingChoice` MUST be `null`/`undefined` in the next state.
+
 ## 6. I18N (MINIMUM)
 - Default locale: `en`
 - Supported locales: `en`, `de`
