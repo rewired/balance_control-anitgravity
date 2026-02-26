@@ -243,3 +243,10 @@ Format (append one block per amendment):
 * Change: N/A
 * Spec anchors: N/A
 * Guardrails: N/A
+
+### A-02 — Hotseat E2E hook readiness poll
+
+* Reason: E2E flakes can occur when `__BC_HOTSEAT_E2E__` is not initialized before helper acquisition.
+* Change: Added explicit `page.waitForFunction(() => Boolean((window as any).__BC_HOTSEAT_E2E__))` in both ARCH-06 Playwright helper wrappers before `evaluateHandle`.
+* Spec anchors: ARCH-06 §2.1, §5
+* Guardrails: GR-002, GR-006, GR-014
