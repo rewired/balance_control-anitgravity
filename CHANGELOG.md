@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Tests: ARCH-06 Playwright specs now explicitly wait for `window.__BC_HOTSEAT_E2E__` before reading the hotseat E2E API handle to reduce startup race flakes.
 - CI: replace `pnpm/action-setup` with Corepack-pinned pnpm bootstrap + setup-node pnpm cache to avoid UI unit self-installer failures.
 - Engine: Rename Meta-Marker mode `PingPong` to `ReturnPenalty` (CORE rename and serialization change).
 - Engine: add deterministic measure deck providers for EXP-02/EXP-03 and remove prefix-based measure zone routing from core resolver.

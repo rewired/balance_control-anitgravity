@@ -14,7 +14,14 @@ type HotseatE2EApi = {
 };
 
 async function getHotseatApi(page: any) {
-    return await page.evaluateHandle(() => (window as any).__BC_HOTSEAT_E2E__ as HotseatE2EApi);
+    await page.waitForFunction(() => Boolean((window as any).__BC_HOTSEAT_E2E__), undefined, {
+        timeout: 10_000,
+    });
+    const hotseatApi = await page.evaluateHandle(() => (window as any).__BC_HOTSEAT_E2E__ as HotseatE2EApi);
+    if ((await hotseatApi.evaluate((api: HotseatE2EApi | null) => api === null)) === true) {
+        throw new Error('ARCH-06 E2E hook missing: window.__BC_HOTSEAT_E2E__ is null after wait timeout.');
+    }
+    return hotseatApi;
 }
 
 test.beforeEach(async ({ page }) => {
