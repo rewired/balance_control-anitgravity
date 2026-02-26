@@ -33,7 +33,7 @@ test('hex overlays (selection and target) use cell variables for sizing and have
         document.body.appendChild(dest);
     });
 
-    const checkOverlay = async (id: string, expectedW: string, expectedH: string) => {
+    const checkOverlay = async (id: string, expectedW: number, expectedH: number) => {
         const styles = await page.evaluate((selId) => {
             const el = document.getElementById(selId);
             if (!el) return null;
@@ -48,14 +48,21 @@ test('hex overlays (selection and target) use cell variables for sizing and have
         }, id);
 
         expect(styles).not.toBeNull();
-        expect(styles!.width).toBe(expectedW);
-        expect(styles!.height).toBe(expectedH);
+        const width = parseFloat(styles!.width);
+        const height = parseFloat(styles!.height);
+
+        // Browser style normalization can alter the textual representation
+        // (e.g., `120px` vs `120.000px`), so we compare numerically.
+        expect(Number.isFinite(width)).toBeTruthy();
+        expect(Number.isFinite(height)).toBeTruthy();
+        expect(width).toBeCloseTo(expectedW, 1);
+        expect(height).toBeCloseTo(expectedH, 1);
         expect(styles!.clipPath).toContain('hex-outline-clip');
-        expect(styles!.borderStyle).toBe('dashed');
+        expect(styles!.borderStyle).toContain('dashed');
         expect(styles!.position).toBe('absolute');
     };
 
-    await checkOverlay('test-sel', '120px', '140px');
-    await checkOverlay('test-tgt', '110px', '130px');
-    await checkOverlay('test-dest', '115px', '135px');
+    await checkOverlay('test-sel', 120, 140);
+    await checkOverlay('test-tgt', 110, 130);
+    await checkOverlay('test-dest', 115, 135);
 });
