@@ -54,6 +54,8 @@ Iteration budget (hard stop):
 ### assumptions_precedence
 
 * [ ] I applied the document precedence rule: `SEC > DD > TDD > AGENTS > VISION`.
+* [ ] I applied the missing-class rule: if a class had no applicable artifact, I skipped it and used the next available class in order.
+* [ ] I documented class presence/absence for this task (SEC/DD/TDD/AGENTS/VISION): <present/absent per class>.
 * [ ] If assumptions conflicted, I resolved them using `/docs/governance/document-precedence.md` and documented it.
 
 ---
