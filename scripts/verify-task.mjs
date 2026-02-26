@@ -114,6 +114,33 @@ function verifyDocumentPrecedenceReference(md) {
   }
 
   ok('Document precedence reference present in guardrails/assumptions area.');
+
+  verifyAssumptionsPrecedenceSubsection(sec0);
+}
+
+function verifyAssumptionsPrecedenceSubsection(sec0) {
+  const subsection = extractSection(sec0, /^#{3,6}\s+assumptions_precedence\b.*$/im);
+  if (!subsection) {
+    fail('Section "0) Masterplan Guardrails" must include subsection anchor "### assumptions_precedence".');
+  }
+
+  if (!/I applied the document precedence rule/i.test(subsection)) {
+    fail('Subsection "assumptions_precedence" must include the template anchor "I applied the document precedence rule".');
+  }
+
+  const unchecked = subsection.match(/^[\t >]*[-*]\s+\[\s\]\s+/gm) || [];
+  if (unchecked.length > 0) {
+    fail(`Subsection "assumptions_precedence" has ${unchecked.length} unchecked checkbox item(s). Example:\n${unchecked.slice(0, 5).join("\n")}`);
+  }
+
+  const hasNoConflictsStatement = /\bno\s+conflicts\b/i.test(subsection);
+  const hasConflictResolutionNote = /docs\/governance\/document-precedence\.md/i.test(subsection);
+
+  if (!hasNoConflictsStatement && !hasConflictResolutionNote) {
+    fail('Subsection "assumptions_precedence" must include either a brief "no conflicts" statement or a conflict-resolution note referencing docs/governance/document-precedence.md.');
+  }
+
+  ok('Subsection "assumptions_precedence" is complete (all checkboxes checked + conflict/no-conflict note present).');
 }
 
 function verifyChecklist(md) {
