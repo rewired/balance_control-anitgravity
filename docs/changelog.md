@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0287) Tests/UI (ARCH-06): Harden `arch06-pending-choice-hardgate` selectTile E2E flow by deriving a deterministic tileId→coord map from `__BC_HOTSEAT_E2E_STATE__.G.grid`, injecting a concrete allowed `tileIds` list, and clicking the matching `hex-tile-<coord>` target instead of `.first()`.
 - 2026-02-26: task(0286) Tests/UI (ARCH-06): Replace fixed `hex-ghost-0_0` E2E selectors with prefix-based actionable ghost locators (`[data-testid^="hex-ghost-"]:not([disabled])`) and explicit visibility guards before click for deterministic interaction.
 - 2026-02-26: task(0285) Tests/UI: Expand `hotseat-shell.smoke` coverage for E2E pendingChoice hook branches (`getPendingChoiceKind`, set/clear including fallback/no-engine guards) and DEV tripwire DESYNC badge rendering via board callback trigger.
 - 2026-02-26: task(0284) Client-web interaction controller: add deterministic regression coverage for hard-gate blocked actions, stage/seat/Escape transient resets, convert auto-selection/autopropose branching, and UI notice timeout/unmount timer cleanup; align stage-change effect to clear all transient UI state.

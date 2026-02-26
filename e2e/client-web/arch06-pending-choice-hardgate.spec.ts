@@ -59,24 +59,39 @@ test('pendingChoice.selectTile stays board-driven and does not render blocking m
 
     const stateIDBefore = await api.evaluate((h: HotseatE2EApi) => h.getStateID());
 
-    const selectableTile = page.locator('[data-testid^="hex-tile-"]').first();
-    await expect(selectableTile).toBeVisible();
+    const selectedTile = await page.evaluate(() => {
+        const grid = (window as any).__BC_HOTSEAT_E2E_STATE__?.G?.grid;
+        if (grid == null || typeof grid !== 'object') {
+            return null;
+        }
 
-    const selectableTileTestId = await selectableTile.getAttribute('data-testid');
-    expect(selectableTileTestId).toBeTruthy();
-    const coordToken = selectableTileTestId!.replace('hex-tile-', '');
-    const coord = coordToken.replace('_', ',');
+        const tileIdToCoord = Object.entries(grid).reduce<Record<string, string>>((acc, [coord, tileId]) => {
+            if (typeof tileId === 'string') {
+                acc[tileId] = coord;
+            }
+            return acc;
+        }, {});
 
-    const selectedTileId = await page.evaluate((coordValue) => {
-        return (window as any).__BC_HOTSEAT_E2E_STATE__?.G?.grid?.[coordValue] ?? null;
-    }, coord);
-    expect(selectedTileId).toBeTruthy();
+        const [tileId] = Object.keys(tileIdToCoord).sort();
+        if (tileId == null) {
+            return null;
+        }
+
+        return { tileId, coord: tileIdToCoord[tileId] };
+    });
+    expect(selectedTile).toBeTruthy();
+    if (selectedTile == null) {
+        throw new Error('Expected at least one tileId→coord mapping entry from __BC_HOTSEAT_E2E_STATE__.G.grid.');
+    }
 
     await api.evaluate((h: HotseatE2EApi, tileId: string) => {
         h.setPendingChoice({ kind: 'selectTile', spec: { tileIds: [tileId] } });
-    }, selectedTileId as string);
+    }, selectedTile.tileId);
 
     await expect(page.getByTestId('pending-choice-overlay')).toHaveCount(0);
+
+    const targetCoordToken = selectedTile.coord.replace(',', '_');
+    const selectableTile = page.getByTestId(`hex-tile-${targetCoordToken}`);
 
     await expect(selectableTile).toBeVisible();
     await selectableTile.click();
