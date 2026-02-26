@@ -250,14 +250,17 @@ export function useGameInteractionController({
         }
     }, [moves, renderStateKey, getDispatchStateKey, onTripwireMismatch, pushNotice, myPid, ctx?.currentPlayer]);
 
-    // Reset action mode when phase changes
+    // Reset transient interaction state when phase changes
     const stage = vm.stage;
     useEffect(() => {
+        setProposedIntent(null);
         setActionMode('none');
         setMoveInfluenceSourceId(null);
         setPinnedCommitteeTileId(null);
         setPinnedGrassrootsTileId(null);
         setSelectedConvertFamily(null);
+        setSelectedTileId(null);
+        setSelectedCoord(null);
     }, [stage]);
 
     // ConvertResources: auto-select single-option steps (ARCH-06).
