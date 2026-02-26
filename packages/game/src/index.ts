@@ -329,3 +329,5 @@ export { EffectResolver } from './engine/resolver';
 export { lookupMeasureDeckForObjectId } from './engine/measure-deck-provider';
 export { exp02RegulationAtoms } from './engine/atoms/regulation';
 export { exp03CountdownAtoms } from './engine/atoms/countdown';
+
+export type { ReplayActionRecord, ReplaySink, ReplayHookOptions } from './engine/replay-sink';
