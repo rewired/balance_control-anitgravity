@@ -10,6 +10,8 @@ export type ReplayActionRecord = Readonly<{
     turn?: number;
     phase?: string;
     stateHash?: string;
+    matchId?: string;
+    seed?: string;
 }>;
 
 export interface ReplaySink {
@@ -28,6 +30,12 @@ export type ReplayHookOptions = Readonly<{
     onError?: ReplaySinkErrorChannel;
     includeStateHash?: boolean;
 }>;
+
+
+function resolveReplaySeed(context: any): string | undefined {
+    const seedCandidate = context?.G?.engine?.seed ?? context?.G?.engine?.attributes?.seed;
+    return typeof seedCandidate === 'string' ? seedCandidate : undefined;
+}
 
 /**
  * Wraps move handlers with a best-effort post-success replay hook.
@@ -57,6 +65,8 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                 turn: context?.ctx?.turn,
                 phase: context?.ctx?.phase,
                 stateHash: options.includeStateHash ? hashState(context.G) : undefined,
+                matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
+                seed: resolveReplaySeed(context),
             };
 
             seq += 1;

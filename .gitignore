@@ -41,6 +41,6 @@ packages/**/tmp/**
 playwright-report/
 test-results/
 
-# Replay logs
+# Replay logs (default runtime output)
 var/replays/**
 *.replay.ndjson

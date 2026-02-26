@@ -104,12 +104,13 @@ Default for v1 baseline:
 
 Replay filename convention:
 
-- `<matchId>-<yyyyMMddTHHmmssZ>-<seed>.replay.ndjson`
+- `<matchId>-<seed>-<yyyyMMddTHHmmssZ>.replay.ndjson`
 
 Normative path guidance:
 
 - `logging.replay.directory` MUST remain configurable per environment (local development, CI, server).
 - Runtime operators SHOULD point this path to writable runtime storage.
+- Implementations MUST reject relative path traversal segments (`..`) for replay directory inputs with clear startup error messages.
 - The configured replay directory SHOULD NOT point into `docs/` or `packages/`.
 
 
