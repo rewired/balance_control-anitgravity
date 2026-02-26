@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-02-26: task(0281) Client-web tests: add quit failure UI regression (retain game screen + show `quit-error`) and debug replay clipboard copy assertion validating JSON payload fields (`moves`, `seed`, `config`).
 - 2026-02-26: task(0279) Tests/UI: Extend `hotseat-shell.smoke` with E2E hook setup/cleanup branch tests, loading fallback coverage for null/incomplete snapshots, parameterized `getStateID` fallback assertions, and explicit per-test window-global reset hygiene.
 - 2026-02-25: task(0278) Tests/UI: Add dedicated `dispatchIntent` unit coverage for missing move, exception, success path, and DEV tripwire mismatch/no-mismatch behavior with explicit `console.error`/`console.warn` spies.
 - 2026-02-25: task(0277) CI/Tooling: Remove `actions/setup-node@v4` `cache: pnpm` configuration in all CI jobs so setup-node no longer requires a preinstalled pnpm binary; keep Corepack-pinned pnpm activation as the canonical bootstrap path.

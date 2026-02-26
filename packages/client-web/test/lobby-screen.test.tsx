@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import App from '../src/App';
 import { clearLastSession } from '../src/lobby/session';
 
 const clientInstances: Array<{ config: any; stop: ReturnType<typeof vi.fn> }> = [];
@@ -29,11 +28,18 @@ vi.mock('boardgame.io/client', async () => {
                 start: vi.fn(),
                 stop: vi.fn(),
                 getState: vi.fn(() => ({
-                    G: {},
+                    G: {
+                        engine: {
+                            attributes: {
+                                enabledExpansions: ['exp01'],
+                            },
+                        },
+                    },
                     ctx: {
                         numPlayers: 2,
                         currentPlayer: '0',
                         activePlayers: { '0': 'drawAndPlace' },
+                        randomSeed: 'seed-test-123',
                         gameover: null,
                     },
                     isConnected: true,
@@ -59,10 +65,19 @@ describe('LobbyScreen flow', () => {
 
     let matches: any[] = [];
     let fetchMock: ReturnType<typeof vi.fn>;
+    let leaveShouldFail: boolean;
+
+    async function renderApp({ enableDebugReplay = false }: { enableDebugReplay?: boolean } = {}) {
+        vi.resetModules();
+        vi.stubEnv('VITE_DEBUG_REPLAY', enableDebugReplay ? '1' : '0');
+        const { default: App } = await import('../src/App');
+        render(<App />);
+    }
 
     beforeEach(() => {
         clientInstances.splice(0, clientInstances.length);
         clearLastSession();
+        leaveShouldFail = false;
 
         matches = [
             {
@@ -102,6 +117,9 @@ describe('LobbyScreen flow', () => {
 
             const leaveMatch = url.match(new RegExp(`^${serverUrl}/games/${gameName}/([^/]+)/leave$`));
             if (leaveMatch && method === 'POST') {
+                if (leaveShouldFail) {
+                    return jsonResponse({ error: 'leave failed' }, 500);
+                }
                 return jsonResponse({});
             }
 
@@ -114,11 +132,12 @@ describe('LobbyScreen flow', () => {
     afterEach(() => {
         cleanup();
         vi.clearAllMocks();
+        vi.unstubAllEnvs();
         clearLastSession();
     });
 
     it('lists matches and renders seat join buttons', async () => {
-        render(<App />);
+        await renderApp();
         fireEvent.click(screen.getByTestId('start-online-lobby'));
 
         await screen.findByTestId('lobby-match-m1');
@@ -131,7 +150,7 @@ describe('LobbyScreen flow', () => {
     });
 
     it('joins a seat and transitions to the game screen using credentials', async () => {
-        render(<App />);
+        await renderApp();
         fireEvent.click(screen.getByTestId('start-online-lobby'));
 
         await screen.findByTestId('lobby-match-m1');
@@ -159,7 +178,7 @@ describe('LobbyScreen flow', () => {
     });
 
     it('quits the game via leaveMatch and returns to the lobby', async () => {
-        render(<App />);
+        await renderApp();
         fireEvent.click(screen.getByTestId('start-online-lobby'));
 
         await screen.findByTestId('lobby-match-m1');
@@ -176,5 +195,56 @@ describe('LobbyScreen flow', () => {
         expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith('/leave'))).toBe(true);
 
         await waitFor(() => expect(clientInstances[0]?.stop).toHaveBeenCalledTimes(1));
+    });
+
+    it('shows quit error and stays in game screen when leaveMatch fails', async () => {
+        leaveShouldFail = true;
+        await renderApp();
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
+
+        await screen.findByTestId('lobby-match-m1');
+
+        fireEvent.change(screen.getByTestId('lobby-player-name'), { target: { value: 'Bob' } });
+        const joinBtn = screen.getByTestId('lobby-join-m1-1') as HTMLButtonElement;
+        await waitFor(() => expect(joinBtn.disabled).toBe(false));
+        fireEvent.click(joinBtn);
+        await screen.findByTestId('game-screen');
+
+        fireEvent.click(screen.getByTestId('quit-game'));
+
+        await screen.findByTestId('quit-error');
+        expect(screen.queryByTestId('start-screen')).toBeNull();
+        expect(screen.getByTestId('game-screen')).not.toBeNull();
+    });
+
+    it('copies replay payload JSON via clipboard in debug mode', async () => {
+        const writeTextMock = vi.fn(async () => undefined);
+        Object.defineProperty(globalThis.navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText: writeTextMock },
+        });
+
+        await renderApp({ enableDebugReplay: true });
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
+
+        await screen.findByTestId('lobby-match-m1');
+
+        fireEvent.change(screen.getByTestId('lobby-player-name'), { target: { value: 'Bob' } });
+        const joinBtn = screen.getByTestId('lobby-join-m1-1') as HTMLButtonElement;
+        await waitFor(() => expect(joinBtn.disabled).toBe(false));
+        fireEvent.click(joinBtn);
+        await screen.findByTestId('game-screen');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Copy replay JSON' }));
+
+        await waitFor(() => expect(writeTextMock).toHaveBeenCalledTimes(1));
+        const copiedPayload = writeTextMock.mock.calls[0]?.[0];
+        expect(() => JSON.parse(copiedPayload)).not.toThrow();
+        const replay = JSON.parse(copiedPayload);
+        expect(replay).toMatchObject({
+            seed: 'seed-test-123',
+            config: { expansions: ['exp01'] },
+            moves: [],
+        });
     });
 });
