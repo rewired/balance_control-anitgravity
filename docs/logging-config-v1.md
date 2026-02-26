@@ -8,9 +8,17 @@ This document defines the v1 configuration contract for logging.
 
 ### 2.1 Top-Level
 
-The root logging object is:
+The root configuration object in v1 is:
 
+- `configVersion`
 - `logging`
+
+Additional top-level namespaces reserved for forward-compatible expansion:
+
+- `server`
+- `client`
+- `matchmaking`
+- `bot`
 
 ### 2.2 Defined v1 Subtree
 
@@ -30,6 +38,11 @@ The following namespaces are reserved in v1 and MUST NOT be treated as errors if
 
 ```json
 {
+  "configVersion": "1",
+  "server": {},
+  "client": {},
+  "matchmaking": {},
+  "bot": {},
   "logging": {
     "enabled": true,
     "level": "info",
@@ -48,13 +61,30 @@ The following namespaces are reserved in v1 and MUST NOT be treated as errors if
 
 ## 4. Field Contract (v1)
 
-### 4.1 `logging`
+### 4.1 `configVersion`
+
+- string
+- required for v1 producers, with canonical value `"1"`
+- if missing, loader MUST treat the input as legacy v0 and run the v0→v1 migration path
+- if set to an unknown higher version, loader MUST fail fast and emit a clear error listing supported versions (`0` via legacy migration path, `1` native)
+
+### 4.2 Reserved Top-Level Namespaces
+
+- `server`: reserved for future server-runtime settings
+- `client`: reserved for future client runtime settings
+- `matchmaking`: reserved for future lobby/matchmaking settings
+- `bot`: reserved for future bot configuration
+- `logging`: active namespace in v1
+
+Reserved top-level namespaces MUST be accepted in v1 even when they are empty objects.
+
+### 4.3 `logging`
 
 - `enabled`: boolean
 - `level`: string (implementation-defined level vocabulary in v1)
 - `replay`: object (see section 4.2)
 
-### 4.2 `logging.replay`
+### 4.4 `logging.replay`
 
 - `enabled`: boolean
 - `format`: string, **MUST be `ndjson` in v1**
@@ -88,14 +118,26 @@ Normative behavior:
 2. Unknown fields MUST be logged as informational compatibility notices.
 3. Known fields retain strict type/value validation as defined by this v1 contract.
 
-## 6. Version Constraint Notes
+`logging.replay` remains backward-compatible under this rule while top-level reserved namespaces are added in v1.
+
+## 6. Version Migration Rule
+
+Configuration loaders MUST implement this deterministic version gate:
+
+1. `configVersion` missing → treat as legacy v0 input and apply the v0→v1 upgrade path.
+2. `configVersion === "1"` → parse as native v1.
+3. `configVersion` is present but unsupported (for example `"2"`) → fail fast with an error indicating supported versions.
+
+The v0→v1 upgrade path MUST preserve `logging.replay` semantics and only inject missing v1-compatible root structure.
+
+## 7. Version Constraint Notes
 
 - `logging.replay.format` is intentionally constrained to `ndjson` for v1 to ensure deterministic replay-log parsing contracts and a single canonical interchange shape.
 - Additional formats may be introduced in future versions with explicit versioned documentation updates.
 
-## 7. Source Precedence and Merge Semantics (v1)
+## 8. Source Precedence and Merge Semantics (v1)
 
-### 7.1 Canonical Resolution Order
+### 8.1 Canonical Resolution Order
 
 When a runtime value is present from multiple sources, the winner MUST be chosen by this strict order (highest precedence first):
 
@@ -106,16 +148,16 @@ When a runtime value is present from multiple sources, the winner MUST be chosen
 
 The final effective configuration is the deterministic merge result of this order.
 
-### 7.2 Source Behavior by Layer
+### 8.2 Source Behavior by Layer
 
 - **CLI flags:** sparse override layer; only explicitly provided flags override lower layers.
-- **Environment variables:** sparse override layer mapped into config paths via section 8.
+- **Environment variables:** sparse override layer mapped into config paths via section 9.
 - **`conf.json`:** baseline persisted configuration source.
 - **Internal defaults:** fallback values for all unspecified fields.
 
-## 8. Environment Mapping Convention (v1)
+## 9. Environment Mapping Convention (v1)
 
-### 8.1 Path Encoding Rule
+### 9.1 Path Encoding Rule
 
 Environment variable names MUST use the prefix `BC_` and encode nested object paths with a double underscore (`__`) separator.
 
@@ -123,23 +165,23 @@ Environment variable names MUST use the prefix `BC_` and encode nested object pa
 - Case convention: uppercase segments
 - Example path: `logging.replay.includeStateHash` → `BC_LOGGING__REPLAY__INCLUDESTATEHASH`
 
-### 8.2 Canonical Examples
+### 9.2 Canonical Examples
 
 - `BC_LOGGING__REPLAY__ENABLED`
 - `BC_LOGGING__REPLAY__DIRECTORY`
 - `BC_LOGGING__REPLAY__INCLUDESTATEHASH`
 
-## 9. Type Conversion and Failure Policy (v1)
+## 10. Type Conversion and Failure Policy (v1)
 
 Type conversion MUST happen independently per source before merge completion. Conversion failures are startup-fatal for known fields.
 
-### 9.1 Internal Defaults
+### 10.1 Internal Defaults
 
 - Source form: native typed values.
 - Conversion: none (already typed).
 - Failure behavior: implementation bug; startup MUST fail with a clear message naming the invalid default key.
 
-### 9.2 `conf.json`
+### 10.2 `conf.json`
 
 - Source form: JSON primitives.
 - Conversion: JSON parser value type MUST match the contract type.
@@ -147,7 +189,7 @@ Type conversion MUST happen independently per source before merge completion. Co
   - Invalid JSON syntax: startup MUST fail with parse error and file location context.
   - Known key with wrong type/range/value: startup MUST fail with clear key-specific validation message.
 
-### 9.3 Environment Variables
+### 10.3 Environment Variables
 
 - Source form: strings.
 - Conversion rules:
@@ -158,7 +200,7 @@ Type conversion MUST happen independently per source before merge completion. Co
   - Invalid boolean (for example `maybe`) MUST fail startup with an error like `Invalid boolean for BC_LOGGING__REPLAY__ENABLED`.
   - Invalid integer or out-of-range value MUST fail startup with an error naming the exact env key and expected constraint.
 
-### 9.4 CLI Flags
+### 10.4 CLI Flags
 
 - Source form: parser-provided tokens.
 - Conversion rules: same target-type constraints as environment variables and `conf.json`.
@@ -166,7 +208,7 @@ Type conversion MUST happen independently per source before merge completion. Co
   - Unknown flag: startup MUST fail with usage help.
   - Known flag with invalid value/type: startup MUST fail with clear flag-specific validation message.
 
-### 9.5 Unknown Keys by Source
+### 10.5 Unknown Keys by Source
 
 - Unknown `logging.*` keys from CLI/ENV/`conf.json` remain non-fatal and MUST be logged as informational compatibility notices.
 - Unknown keys MUST NOT silently override known typed fields.
