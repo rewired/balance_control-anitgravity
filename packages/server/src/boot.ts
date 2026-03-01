@@ -10,5 +10,9 @@ export function createServerGame() {
     registerServerPacks();
 
     const replaySink = createReplaySink({ replayDirectory: readReplayDirectoryFromEnv() });
-    return createBalanceControlGameWithHooks({ sink: replaySink, includeStateHash: true });
+    return createBalanceControlGameWithHooks({
+        sink: replaySink,
+        includeStateHash: true,
+        onError: ({ error, record }) => console.error(`[ReplayLogger] Failed to save replay for match ${record.matchId ?? 'unknown'}`, error)
+    });
 }
