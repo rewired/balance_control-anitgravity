@@ -7,6 +7,7 @@ import { StartScreen } from './components/StartScreen';
 import { LobbyScreen, type LobbyJoinPayload } from './components/LobbyScreen';
 import { clearLastSession, writeLastSession } from './lobby/session';
 import { buildValidatedSetupData, type StartSeatMode } from './config/matchConfig';
+import { dispatchIntentToMoves, runBotOrchestratorForSnapshot } from './bot/orchestratorBridge';
 
 type MoveLogEntry = {
     timestamp?: number;
@@ -110,6 +111,7 @@ const App: React.FC = () => {
     }, [session]);
 
     const [state, setState] = useState<any>(null);
+    const [botRunInFlight, setBotRunInFlight] = useState(false);
     const [moveLog, setMoveLog] = useState<MoveLogEntry[]>([]);
     const pendingMovesRef = useRef<MoveLogEntry[]>([]);
     const wasConnectedRef = useRef(false);
@@ -163,6 +165,28 @@ const App: React.FC = () => {
         }
         return wrapped;
     }, [client, session?.playerID]);
+
+    useEffect(() => {
+        if (!client || !state?.G || !state?.ctx || state.ctx.gameover || botRunInFlight) {
+            return;
+        }
+
+        setBotRunInFlight(true);
+        void runBotOrchestratorForSnapshot({
+            snapshot: { G: state.G, ctx: state.ctx },
+            dispatchIntentToMoves: async (intent, _playerID) => {
+                dispatchIntentToMoves(moves as Record<string, (...args: any[]) => unknown>, intent);
+            },
+            getLatestSnapshot: () => {
+                const latest = client.getState();
+                return { G: latest?.G, ctx: latest?.ctx };
+            }
+        })
+            .catch((error) => {
+                console.warn('[App] bot orchestrator stopped with error', error);
+            })
+            .finally(() => setBotRunInFlight(false));
+    }, [botRunInFlight, client, moves, state?.G, state?.ctx]);
 
     const replayPayload = useMemo(() => {
         return {

@@ -36,6 +36,13 @@ type ExpansionFlags = {
     ex03: boolean;
 };
 
+function getSeatRole(setupData: unknown, seatID: string): 'human' | 'bot' | null {
+    if (!setupData || typeof setupData !== 'object') return null;
+    const seats = (setupData as { seats?: Record<string, { role?: unknown }> }).seats;
+    const role = seats?.[seatID]?.role;
+    return role === 'human' || role === 'bot' ? role : null;
+}
+
 function getExpansionsLabel(setupData: unknown): string {
     if (!setupData || typeof setupData !== 'object') return 'None';
     const source = setupData as Record<string, unknown>;
@@ -361,13 +368,16 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
                                     <div className="lobby-seats">
                                         {players.map((p) => {
                                             const seatId = String(p.id);
+                                            const seatRole = getSeatRole(match.setupData, seatId);
+                                            const isBotSeat = seatRole === 'bot';
                                             const occupied = typeof p.name === 'string' && p.name.trim().length > 0;
                                             const isJoining = joiningSeat?.matchID === match.matchID && joiningSeat?.playerID === seatId;
+                                            const seatLabel = occupied ? p.name : isBotSeat ? 'Bot (auto)' : 'Empty';
                                             return (
                                                 <div key={seatId} className="lobby-seat" data-testid={`lobby-seat-${match.matchID}-${seatId}`}>
                                                     <div className="lobby-seat-label">Seat {seatId}</div>
-                                                    <div className="lobby-seat-value">{occupied ? p.name : 'Empty'}</div>
-                                                    {!occupied && (
+                                                    <div className="lobby-seat-value">{seatLabel}</div>
+                                                    {!occupied && !isBotSeat && (
                                                         <button
                                                             className="btn-primary"
                                                             onClick={() => void handleJoinSeat(match.matchID, seatId)}
