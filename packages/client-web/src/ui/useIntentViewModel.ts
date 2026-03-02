@@ -133,7 +133,10 @@ export function buildIntentViewModel(input: BuildIntentViewModelInput): Omit<Int
  */
 export function useIntentViewModel({ G, ctx, playerID, selectedTileId, stagedTileId }: IntentViewModelInput): IntentViewModel {
     const pid = playerID ?? ctx?.currentPlayer ?? '0';
-    const intents = useMemo(() => enumerateLegalIntents(G, ctx, pid), [G, ctx, pid]);
+    const intents = useMemo(() => {
+        const res = enumerateLegalIntents(G, ctx, pid);
+        return res;
+    }, [G, ctx, pid]);
 
     const vmWithoutIntents = useMemo(() => {
         const pendingChoice = G?.engine?.pendingChoice;

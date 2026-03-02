@@ -49,7 +49,7 @@ const FIT_PADDING = 48;
  */
 export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
     const viewportRef = useRef<HTMLDivElement | null>(null);
-    const setTransformRef = useRef<((x: number, y: number, scale: number) => void) | null>(null);
+    const setTransformRef = useRef<((x: number, y: number, scale: number, animationTime?: number) => void) | null>(null);
     const baselineTransformRef = useRef<{ x: number; y: number; scale: number } | null>(null);
     const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
@@ -90,6 +90,9 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
         return computeBoardLayout(allCoords, hexSize);
     }, [allCoords, hexSize]);
 
+    const isE2E = useMemo(() => typeof window !== 'undefined' && Boolean((window as any).__BC_ENABLE_E2E_HOOKS__), []);
+    const animationTime = isE2E ? 0 : 200;
+
     const applyFit = useCallback(() => {
         if (!setTransformRef.current) return;
         if (!viewportSize.width || !viewportSize.height) return;
@@ -101,14 +104,14 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
             node.dataset.baselineTx = String(transform.x);
             node.dataset.baselineTy = String(transform.y);
         }
-        setTransformRef.current(transform.x, transform.y, transform.scale);
-    }, [layout.contentBounds, viewportSize]);
+        setTransformRef.current(transform.x, transform.y, transform.scale, animationTime);
+    }, [layout.contentBounds, viewportSize, animationTime]);
 
     const resetView = useCallback(() => {
         const baseline = baselineTransformRef.current;
         if (!setTransformRef.current || !baseline) return;
-        setTransformRef.current(baseline.x, baseline.y, baseline.scale);
-    }, []);
+        setTransformRef.current(baseline.x, baseline.y, baseline.scale, animationTime);
+    }, [animationTime]);
 
     const handleTransformed = useCallback((_ref: any, state: { scale: number; positionX: number; positionY: number }) => {
         const node = viewportRef.current;
@@ -127,6 +130,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
             <TransformWrapper
                 minScale={0.25}
                 maxScale={2.5}
+                limitToBounds={false}
                 wheel={{ step: 0.1, excluded: ['board-viewport-controls'] }}
                 panning={{ disabled: false, excluded: ['board-viewport-controls'] }}
                 doubleClick={{ disabled: true }}

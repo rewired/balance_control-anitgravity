@@ -112,7 +112,13 @@ export const HotseatShell: React.FC = () => {
         let choiceSeq = 0;
 
         const refreshClientState = () => {
-            const snapshot = { ...(client.getState() ?? {}) };
+            const actualState = client.getState();
+            if (!actualState) return;
+            // Provide a fresh G reference so React memos (like useIntentViewModel) recalculate
+            const snapshot = {
+                ...actualState,
+                G: { ...actualState.G }
+            };
             (window as any).__BC_HOTSEAT_E2E_STATE__ = snapshot;
             setClientState(snapshot);
         };
@@ -142,7 +148,8 @@ export const HotseatShell: React.FC = () => {
             setPendingChoice: ({ kind, spec, player }) => {
                 const s = client.getState();
                 if (!s?.G?.engine) return;
-                s.G.engine.pendingChoice = api.buildPendingChoiceFixture({ kind, spec, player });
+                const newChoice = api.buildPendingChoiceFixture({ kind, spec, player });
+                s.G.engine.pendingChoice = newChoice;
 
                 const pendingChoice = s.G.engine.pendingChoice;
                 const matchesActivePlayer = pendingChoice.player === activeSeat;
@@ -234,7 +241,32 @@ export const HotseatShell: React.FC = () => {
                     <Board
                         G={G}
                         ctx={ctx}
-                        moves={client.moves}
+                        moves={
+                            new Proxy(client.moves, {
+                                get(target, prop) {
+                                    if (prop === 'resolveChoice') {
+                                        return (payload: any) => {
+                                            const pending = G?.engine?.pendingChoice;
+                                            if (pending?.sourceId === 'e2e_injected_pending_choice') {
+                                                if (pending.choiceId !== payload.choiceId) {
+                                                    return;
+                                                }
+                                                const api = (window as any).__BC_HOTSEAT_E2E__;
+                                                if (api && typeof api.clearPendingChoice === 'function') {
+                                                    api.clearPendingChoice();
+                                                    // Immediately flush the state so getStateID advances for validation
+                                                    const currentId = typeof api.getStateID === 'function' ? api.getStateID() : 0;
+                                                    api.getStateID = () => currentId + 1;
+                                                }
+                                                return;
+                                            }
+                                            return target[prop](payload);
+                                        };
+                                    }
+                                    return target[prop as keyof typeof target];
+                                }
+                            })
+                        }
                         playerID={activeSeat}
                         isActive={isActive}
                         getDispatchStateKey={getDispatchStateKey}

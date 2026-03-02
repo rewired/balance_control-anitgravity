@@ -111,11 +111,11 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
 
     const placementIntents = useMemo(() => {
         if (vm.hasPendingChoice) {
-             // Filter resolveChoice intents that are spatial
-             return vm.pendingChoice.resolveChoice.filter(intent => {
-                 const sel = (intent.payload as any)?.selection;
-                 return typeof sel === 'string' && /^-?\d+,-?\d+$/.test(sel);
-             });
+            // Filter resolveChoice intents that are spatial
+            return vm.pendingChoice.resolveChoice.filter(intent => {
+                const sel = (intent.payload as any)?.selection;
+                return typeof sel === 'string' && /^-?\d+,-?\d+$/.test(sel);
+            });
         }
         return vm.drawAndPlace.placeTile;
     }, [vm.hasPendingChoice, vm.pendingChoice.resolveChoice, vm.drawAndPlace.placeTile]);
@@ -151,13 +151,13 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
     const toggleLeftPanel = () => {
         const newValue = !showLeftPanel;
         setShowLeftPanel(newValue);
-        try { localStorage.setItem('bc_ui_showLeftPanel', String(newValue)); } catch {}
+        try { localStorage.setItem('bc_ui_showLeftPanel', String(newValue)); } catch { }
     };
 
     const toggleRightPanel = () => {
         const newValue = !showRightPanel;
         setShowRightPanel(newValue);
-        try { localStorage.setItem('bc_ui_showRightPanel', String(newValue)); } catch {}
+        try { localStorage.setItem('bc_ui_showRightPanel', String(newValue)); } catch { }
     };
 
     const gridTemplateColumns = `${showLeftPanel ? '280px' : '0px'} 1fr ${showRightPanel ? '280px' : '0px'}`;
@@ -254,7 +254,12 @@ export const GameLayout: React.FC<GameLayoutProps> = ({ G, ctx, moves, playerID,
                     canInspect={canInspect}
                     selectedTileId={selectedTileId}
                     selectedCoord={selectedCoord}
-                    onSelectTile={isSelectTilePending ? undefined : handleSelectTile}
+                    onSelectTile={isSelectTilePending ? (tileId, coordStr) => {
+                        const intent = vm.pendingChoice.resolveChoice.find(i =>
+                            (i.payload as any).selection === tileId || (i.payload as any).selection === coordStr
+                        );
+                        if (intent) resolveChoice(intent);
+                    } : handleSelectTile}
                     onProposeMove={isSelectTilePending ? undefined : proposeIntent}
                     onResolveChoice={isSelectTilePending ? resolveChoice : undefined}
                     pendingTile={pendingTile}
