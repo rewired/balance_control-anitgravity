@@ -63,6 +63,9 @@ importers:
         specifier: ^3.0.0
         version: 3.25.76
     devDependencies:
+      boardgame.io:
+        specifier: ^0.50.0
+        version: 0.50.2
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
