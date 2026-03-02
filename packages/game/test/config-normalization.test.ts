@@ -39,4 +39,38 @@ describe('normalizeGameConfig', () => {
         expect(config.expansions.ex01).toBe(true);
         expect(config.packs?.enabledPacks).toEqual(['exp01']);
     });
+
+    it('should accept canonical seat bot/human setup', () => {
+        const config = normalizeGameConfig({
+            seats: {
+                '0': { role: 'human' },
+                '1': {
+                    role: 'bot',
+                    provider: 'ollama',
+                    model: 'llama3.1:8b',
+                    decoding: { temperature: 0.2 },
+                    timeouts: { requestMs: 5_000 },
+                }
+            }
+        });
+
+        expect(config.seats).toEqual({
+            '0': { role: 'human' },
+            '1': {
+                role: 'bot',
+                provider: 'ollama',
+                model: 'llama3.1:8b',
+                decoding: { temperature: 0.2 },
+                timeouts: { requestMs: 5_000 },
+            }
+        });
+    });
+
+    it('should throw on invalid seat schema', () => {
+        expect(() => normalizeGameConfig({
+            seats: {
+                '0': { role: 'bot', provider: 'openai', model: 'gpt' }
+            }
+        })).toThrow('Invalid seat configuration');
+    });
 });

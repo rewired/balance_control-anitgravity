@@ -1,4 +1,5 @@
 import type { ExpansionFlags, GameConfig, ExpansionId, PackSelection } from '@balance-control/rules';
+import { z } from 'zod';
 export type { ExpansionFlags, GameConfig } from '@balance-control/rules';
 
 export const DEFAULT_EXPANSION_FLAGS: ExpansionFlags = {
@@ -15,6 +16,29 @@ export const DEFAULT_GAME_CONFIG: GameConfig = {
     tileRecycling: false,
     firstPlayerHandicap: false,
 };
+
+const SeatHumanSchema = z.object({
+    role: z.literal('human'),
+}).strict();
+
+const SeatBotSchema = z.object({
+    role: z.literal('bot'),
+    provider: z.literal('ollama'),
+    model: z.string().min(1),
+    decoding: z.object({
+        temperature: z.number().finite().optional(),
+        topP: z.number().finite().optional(),
+        topK: z.number().finite().optional(),
+        maxTokens: z.number().int().positive().optional(),
+    }).strict().optional(),
+    timeouts: z.object({
+        requestMs: z.number().int().positive().optional(),
+        turnMs: z.number().int().positive().optional(),
+    }).strict().optional(),
+}).strict();
+
+const SeatSchema = z.union([SeatHumanSchema, SeatBotSchema]);
+const SeatMapSchema = z.record(z.string().regex(/^\d+$/), SeatSchema);
 
 function readExpansionConfigCandidate(setupData: unknown): unknown {
     if (!setupData || typeof setupData !== 'object') return undefined;
@@ -94,6 +118,41 @@ function readVariantConfigCandidate(setupData: unknown): Record<string, unknown>
     return source;
 }
 
+function readSeatConfigCandidate(setupData: unknown): unknown {
+    if (!setupData || typeof setupData !== 'object') return undefined;
+    const source = setupData as Record<string, unknown>;
+    if (source.seats && typeof source.seats === 'object') {
+        return source.seats;
+    }
+    if (source.config && typeof source.config === 'object') {
+        const nested = source.config as Record<string, unknown>;
+        if (nested.seats && typeof nested.seats === 'object') {
+            return nested.seats;
+        }
+    }
+    return undefined;
+}
+
+/**
+ * Normalizes per-seat bot/human configuration from setup data.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
+export function normalizeSeatConfig(setupData: unknown): NonNullable<GameConfig['seats']> {
+    const candidate = readSeatConfigCandidate(setupData) ?? {};
+    const parsed = SeatMapSchema.safeParse(candidate);
+    if (!parsed.success) {
+        throw new Error(`Invalid seat configuration: ${parsed.error.message}`);
+    }
+    return parsed.data;
+}
+
+function normalizeOptionalSeatConfig(setupData: unknown): GameConfig['seats'] {
+    const seats = normalizeSeatConfig(setupData);
+    return Object.keys(seats).length > 0 ? seats : undefined;
+}
+
 function normalizeEnabledPacks(candidate: Record<string, unknown> | undefined): ExpansionId[] {
     if (!candidate) return [];
     const raw = candidate.enabledPacks;
@@ -138,6 +197,7 @@ export function normalizeGameConfig(setupData: unknown): GameConfig {
     const candidate = (expansionsCandidate ?? {}) as Record<string, unknown>;
     const packCandidate = readPackConfigCandidate(setupData);
     const variantCandidate = readVariantConfigCandidate(setupData);
+    const seats = normalizeOptionalSeatConfig(setupData);
 
     const expansionsFromFlags: ExpansionFlags = {
         ex01: candidate.ex01 === true,
@@ -178,5 +238,6 @@ export function normalizeGameConfig(setupData: unknown): GameConfig {
         },
         tileRecycling: variantCandidate?.tileRecycling === true,
         firstPlayerHandicap: variantCandidate?.firstPlayerHandicap === true,
+        seats,
     };
 }

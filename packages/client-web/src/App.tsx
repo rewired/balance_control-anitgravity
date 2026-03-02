@@ -6,6 +6,7 @@ import { Board } from './Board';
 import { StartScreen } from './components/StartScreen';
 import { LobbyScreen, type LobbyJoinPayload } from './components/LobbyScreen';
 import { clearLastSession, writeLastSession } from './lobby/session';
+import { buildValidatedSetupData, type StartSeatMode } from './config/matchConfig';
 
 type MoveLogEntry = {
     timestamp?: number;
@@ -64,6 +65,9 @@ const App: React.FC = () => {
     const [session, setSession] = useState<LobbyJoinPayload | null>(null);
     const [leaveError, setLeaveError] = useState<string | null>(null);
     const [isLeaving, setIsLeaving] = useState(false);
+    const [hotseatSetupData, setHotseatSetupData] = useState<unknown>(() =>
+        buildValidatedSetupData({ seatMode: 'human-vs-human', model: 'llama3.1:8b' })
+    );
 
     const devScene = useMemo(() => {
         if (!import.meta.env.DEV) return null;
@@ -225,7 +229,10 @@ const App: React.FC = () => {
             <>
                 <HexSilhouette />
                 <StartScreen
-                    onSelectHotseat={() => setMode('hotseat')}
+                    onSelectHotseat={({ seatMode, model }: { seatMode: StartSeatMode; model: string }) => {
+                        setHotseatSetupData(buildValidatedSetupData({ seatMode, model }));
+                        setMode('hotseat');
+                    }}
                     onSelectOnlineLobby={() => setMode('onlineLobby')}
                     onResumeOnlineSession={(stored) => {
                         setLeaveError(null);
@@ -251,7 +258,7 @@ const App: React.FC = () => {
                     </button>
                 </div>
                 <Suspense fallback={<div className="glass-panel" style={{ padding: 16 }}>Loading hotseat…</div>}>
-                    <HotseatShell />
+                    <HotseatShell setupData={hotseatSetupData} />
                 </Suspense>
             </>
         );

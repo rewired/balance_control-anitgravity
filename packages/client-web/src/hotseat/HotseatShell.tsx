@@ -69,7 +69,7 @@ const isPendingChoiceFixtureComplete = (pendingChoice: {
  * Presentation-only. Must not compute legality/cost/majority/modifiers (ARCH-01).
  * @see /docs/architecture/ARCH-01-ENGINE-CONTRACT.md
  */
-export const HotseatShell: React.FC = () => {
+export const HotseatShell: React.FC<{ setupData?: unknown }> = ({ setupData }) => {
     const [activeSeat, setActiveSeat] = useState<SeatID>('0');
     const [tripwireMismatch, setTripwireMismatch] = useState<DispatchTripwireInfo | null>(null);
 
@@ -81,10 +81,11 @@ export const HotseatShell: React.FC = () => {
             numPlayers: 2,
             matchID: MATCH_ID,
             playerID: '0',
+            setupData,
             multiplayer: localMultiplayer,
             debug: false,
         });
-    }, [localMultiplayer]);
+    }, [localMultiplayer, setupData]);
 
     const [clientState, setClientState] = useState<any>(null);
 
