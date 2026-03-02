@@ -11,3 +11,5 @@ export {
 } from './adapter';
 
 export { requestOllamaSelection, type OllamaRequestConfig } from './ollama-client';
+
+export { runTurnOrchestrator, type TurnOrchestratorConfig, type TurnOrchestratorDispatchContext, type TurnOrchestratorParams, type TurnOrchestratorReport, type TurnOrchestratorSnapshot } from './turn-orchestrator';
