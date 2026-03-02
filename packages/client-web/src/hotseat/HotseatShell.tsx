@@ -5,6 +5,7 @@ import { BalanceControlGame } from '../game';
 import { Board } from '../Board';
 import { computeUiStateKey } from '../ui/interaction/diagnostics';
 import type { DispatchTripwireInfo } from '../ui/interaction/types';
+import { dispatchIntentToMoves, runBotOrchestratorForSnapshot } from '../bot/orchestratorBridge';
 
 type SeatID = '0' | '1';
 
@@ -88,6 +89,7 @@ export const HotseatShell: React.FC<{ setupData?: unknown }> = ({ setupData }) =
     }, [localMultiplayer, setupData]);
 
     const [clientState, setClientState] = useState<any>(null);
+    const [botRunInFlight, setBotRunInFlight] = useState(false);
 
     useEffect(() => {
         client.start();
@@ -105,6 +107,31 @@ export const HotseatShell: React.FC<{ setupData?: unknown }> = ({ setupData }) =
         // updatePlayerID may not emit a state subscription update when only the playerView changes.
         setClientState(client.getState());
     }, [activeSeat, client]);
+
+    useEffect(() => {
+        const snapshot = client.getState();
+        if (!snapshot?.G || !snapshot?.ctx || snapshot.ctx.gameover || botRunInFlight) {
+            return;
+        }
+
+        setBotRunInFlight(true);
+        void runBotOrchestratorForSnapshot({
+            snapshot: { G: snapshot.G, ctx: snapshot.ctx },
+            dispatchIntentToMoves: async (intent, playerID) => {
+                client.updatePlayerID(playerID);
+                dispatchIntentToMoves(client.moves as Record<string, (...args: any[]) => unknown>, intent);
+                client.updatePlayerID(activeSeat);
+            },
+            getLatestSnapshot: () => {
+                const latest = client.getState();
+                return { G: latest?.G, ctx: latest?.ctx };
+            }
+        })
+            .catch((error) => {
+                console.warn('[HotseatShell] bot orchestrator stopped with error', error);
+            })
+            .finally(() => setBotRunInFlight(false));
+    }, [activeSeat, botRunInFlight, client, clientState?.ctx?.currentPlayer, clientState?.ctx?.gameover, clientState?.G]);
 
     useEffect(() => {
         if (typeof window === 'undefined') return;

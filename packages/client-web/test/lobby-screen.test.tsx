@@ -149,6 +149,30 @@ describe('LobbyScreen flow', () => {
         expect(joinBtn.disabled).toBe(true);
     });
 
+    it('does not require joining bot seats in lobby list', async () => {
+        matches = [
+            {
+                matchID: 'm2',
+                gameName,
+                players: [{ id: 0 }, { id: 1 }],
+                setupData: {
+                    seats: {
+                        '0': { role: 'human' },
+                        '1': { role: 'bot', provider: 'ollama', model: 'llama3.1:8b' }
+                    }
+                },
+            },
+        ];
+
+        await renderApp();
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
+
+        await screen.findByTestId('lobby-match-m2');
+
+        expect(screen.getByTestId('lobby-seat-m2-1').textContent).toContain('Bot (auto)');
+        expect(screen.queryByTestId('lobby-join-m2-1')).toBeNull();
+    });
+
     it('joins a seat and transitions to the game screen using credentials', async () => {
         await renderApp();
         fireEvent.click(screen.getByTestId('start-online-lobby'));
