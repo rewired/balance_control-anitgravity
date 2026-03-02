@@ -66,6 +66,7 @@ describe('LobbyScreen flow', () => {
     let matches: any[] = [];
     let fetchMock: ReturnType<typeof vi.fn>;
     let leaveShouldFail: boolean;
+    let modelsResponse: { status: number; body: any };
 
     async function renderApp({ enableDebugReplay = false }: { enableDebugReplay?: boolean } = {}) {
         vi.resetModules();
@@ -78,6 +79,7 @@ describe('LobbyScreen flow', () => {
         clientInstances.splice(0, clientInstances.length);
         clearLastSession();
         leaveShouldFail = false;
+        modelsResponse = { status: 200, body: { models: [{ name: 'llama3.1:8b' }] } };
 
         matches = [
             {
@@ -95,6 +97,11 @@ describe('LobbyScreen flow', () => {
 
             if (url === `${serverUrl}/games/${gameName}` && method === 'GET') {
                 return jsonResponse({ matches });
+            }
+
+
+            if (url === 'http://localhost:11434/api/tags' && method === 'GET') {
+                return jsonResponse(modelsResponse.body, modelsResponse.status);
             }
 
             if (url === `${serverUrl}/games/${gameName}/create` && method === 'POST') {
@@ -215,6 +222,22 @@ describe('LobbyScreen flow', () => {
         await screen.findByTestId('quit-error');
         expect(screen.queryByTestId('start-screen')).toBeNull();
         expect(screen.getByTestId('game-screen')).not.toBeNull();
+    });
+
+
+
+    it('shows model error and disables create for bot seat mode when no models are available', async () => {
+        modelsResponse = { status: 200, body: { models: [] } };
+
+        await renderApp();
+        fireEvent.click(screen.getByTestId('start-online-lobby'));
+
+        await screen.findByTestId('lobby-match-m1');
+        fireEvent.change(screen.getByTestId('lobby-seat-mode'), { target: { value: 'human-vs-ai' } });
+
+        expect((await screen.findByTestId('lobby-model-error')).textContent).toContain('No Ollama models found');
+        expect(screen.getByTestId('lobby-refresh-models')).toBeTruthy();
+        expect((screen.getByTestId('lobby-create-match') as HTMLButtonElement).disabled).toBe(true);
     });
 
     it('copies replay payload JSON via clipboard in debug mode', async () => {

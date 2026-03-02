@@ -3,6 +3,7 @@ import { LobbyClient } from 'boardgame.io/client';
 import { GAME_NAME } from '../game';
 import { clearLastSession, readLastSession, type LastSession } from '../lobby/session';
 import { buildValidatedSetupData, type StartSeatMode } from '../config/matchConfig';
+import { fetchOllamaModels } from '../ollama/models';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
 
@@ -73,7 +74,10 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
     const [numPlayers, setNumPlayers] = useState(2);
     const [expansions, setExpansions] = useState<ExpansionFlags>({ ex01: false, ex02: false, ex03: false });
     const [seatMode, setSeatMode] = useState<StartSeatMode>('human-vs-human');
-    const [botModel, setBotModel] = useState('llama3.1:8b');
+    const [botModel, setBotModel] = useState('');
+    const [availableModels, setAvailableModels] = useState<string[]>([]);
+    const [modelsError, setModelsError] = useState<string | null>(null);
+    const [isLoadingModels, setIsLoadingModels] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [joiningSeat, setJoiningSeat] = useState<{ matchID: string; playerID: string } | null>(null);
 
@@ -92,9 +96,35 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
         }
     }, [lobbyClient]);
 
+
+    const loadModels = useCallback(async () => {
+        setIsLoadingModels(true);
+        setModelsError(null);
+        try {
+            const loadedModels = await fetchOllamaModels();
+            setAvailableModels(loadedModels);
+            if (loadedModels.length === 0) {
+                setBotModel('');
+                setModelsError('No Ollama models found. Please pull a model and refresh.');
+                return;
+            }
+            setBotModel((current) => (loadedModels.includes(current) ? current : loadedModels[0]));
+        } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            setAvailableModels([]);
+            setBotModel('');
+            setModelsError(message);
+        } finally {
+            setIsLoadingModels(false);
+        }
+    }, []);
     useEffect(() => {
         void loadMatches();
     }, [loadMatches]);
+
+    useEffect(() => {
+        void loadModels();
+    }, [loadModels]);
 
     const handleCreateMatch = async () => {
         setIsCreating(true);
@@ -104,7 +134,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
         if (expansions.ex02) enabledPacks.push('exp02');
         if (expansions.ex03) enabledPacks.push('exp03');
         try {
-            const setupData = buildValidatedSetupData({ enabledPacks, seatMode, model: botModel });
+            const setupData = buildValidatedSetupData({ enabledPacks, seatMode, model: botModel, availableModels });
             await lobbyClient.createMatch(GAME_NAME, {
                 numPlayers,
                 setupData
@@ -314,15 +344,40 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
                         </div>
 
                         {seatMode !== 'human-vs-human' && (
-                            <label className="lobby-field">
+                            <div className="lobby-field">
                                 <span className="lobby-label">KI-Modell (Ollama)</span>
-                                <input
+                                <select
                                     className="lobby-input"
                                     value={botModel}
                                     onChange={(e) => setBotModel(e.target.value)}
                                     data-testid="lobby-bot-model"
-                                />
-                            </label>
+                                    disabled={availableModels.length === 0 || isLoadingModels}
+                                >
+                                    {availableModels.length === 0 ? (
+                                        <option value="">No models available</option>
+                                    ) : (
+                                        availableModels.map((entry) => (
+                                            <option key={entry} value={entry}>
+                                                {entry}
+                                            </option>
+                                        ))
+                                    )}
+                                </select>
+                                {modelsError && (
+                                    <div className="lobby-error" data-testid="lobby-model-error">
+                                        {modelsError}
+                                    </div>
+                                )}
+                                <button
+                                    className="btn-secondary"
+                                    type="button"
+                                    onClick={() => void loadModels()}
+                                    disabled={isLoadingModels}
+                                    data-testid="lobby-refresh-models"
+                                >
+                                    {isLoadingModels ? 'Refreshing models...' : 'Refresh models'}
+                                </button>
+                            </div>
                         )}
 
                         <div className="lobby-field">
@@ -333,7 +388,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
                         <button
                             className="btn-primary"
                             onClick={handleCreateMatch}
-                            disabled={isCreating}
+                            disabled={isCreating || (seatMode !== 'human-vs-human' && !availableModels.includes(botModel))}
                             data-testid="lobby-create-match"
                         >
                             {isCreating ? 'Creating...' : 'Create match'}
