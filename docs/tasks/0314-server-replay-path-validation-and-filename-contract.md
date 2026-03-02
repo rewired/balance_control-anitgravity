@@ -44,7 +44,7 @@
 
 ## 2) Goal
 
-* Set runtime default replay output path to `./var/replays` (configurable via environment override).
+* Set runtime default replay output path to `./log/replays` (configurable via environment override).
 * Implement replay filename contract containing matchId/seed/timestamp.
 * Ensure replay directory exists automatically at server startup.
 * Add robust replay path validation with clear no-traversal error messages.
@@ -108,7 +108,7 @@
 
 ## 9) Acceptance Criteria
 
-* [x] Default replay path resolves to `./var/replays`.
+* [x] Default replay path resolves to `./log/replays`.
 * [x] Path override remains configurable.
 * [x] Relative traversal (`..`) is rejected with clear error.
 * [x] Replay filename includes `matchId`, `seed`, and timestamp.

@@ -76,7 +76,7 @@ Rule:
 
 Describe the user-visible and/or engine-visible outcome in 2–6 bullets.
 
-* Set and document `logging.replay.directory` default as `./var/replays`.
+* Set and document `logging.replay.directory` default as `./log/replays`.
 * Define and document canonical replay filename convention.
 * Add robust `.gitignore` patterns for replay log artifacts.
 * Document that replay directory remains configurable per runtime environment.
@@ -167,7 +167,7 @@ Write the plan as a checklist. Each item should be small and verifiable.
 
 Write pass/fail criteria; avoid vague language.
 
-* [x] `logging.replay.directory` default is documented as `./var/replays`.
+* [x] `logging.replay.directory` default is documented as `./log/replays`.
 * [x] Replay filename convention is documented as `<matchId>-<yyyyMMddTHHmmssZ>-<seed>.replay.ndjson`.
 * [x] Documentation states replay directory remains configurable for local, CI, and server usage.
 * [x] Documentation states replay directory should not target `docs/` or `packages/`.
@@ -195,7 +195,7 @@ This section MUST be completed in this task file before declaring done.
 
 ## 11) Work Summary (3–7 bullets)
 
-* Documented `logging.replay.directory` default as `./var/replays` in the v1 logging specification.
+* Documented `logging.replay.directory` default as `./log/replays` in the v1 logging specification.
 * Added a canonical replay filename format using `<matchId>-<yyyyMMddTHHmmssZ>-<seed>.replay.ndjson`.
 * Added normative operator guidance that replay storage remains configurable by environment.
 * Added guidance that replay logs should not target source/documentation trees (`packages/` and `docs/`).

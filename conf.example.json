@@ -3,7 +3,7 @@
   "logging": {
     "replay": {
       "enabled": true,
-      "directory": "./var/replays",
+      "directory": "./log/replays",
       "format": "ndjson",
       "includeStateHash": true,
       "flushEveryEvents": 1

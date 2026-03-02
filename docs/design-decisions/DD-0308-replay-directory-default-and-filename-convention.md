@@ -7,7 +7,7 @@ Accepted
 Task 0306 introduced a v1 logging config contract with a replay subtree. Follow-up housekeeping requires an explicit default replay directory, robust ignore patterns, and a canonical replay filename pattern that supports deterministic artifact routing in local and automated environments.
 
 ## Decision
-1. Keep `logging.replay.directory` defaulted to `./var/replays` in the v1 logging specification.
+1. Keep `logging.replay.directory` defaulted to `./log/replays` in the v1 logging specification.
 2. Standardize replay filenames as `<matchId>-<yyyyMMddTHHmmssZ>-<seed>.replay.ndjson`.
 3. Require that `logging.replay.directory` remains configurable per runtime environment (local, CI, server).
 4. Add operator guidance that replay outputs should not be written under `docs/` or `packages/`.

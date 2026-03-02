@@ -56,7 +56,7 @@ Die effektive Konfiguration wird strikt in folgender Reihenfolge gebildet:
 
 **Sicherheitsregeln für Logpfade (MVP):**
 
-- Replay-Verzeichnis muss auf schreibbaren Runtime-Speicher zeigen (Default `./var/replays`).
+- Replay-Verzeichnis muss auf schreibbaren Runtime-Speicher zeigen (Default `./log/replays`).
 - Unsichere Pfadangaben werden fail-fast abgewiesen (u. a. leere Werte, Null-Bytes, relative Path-Traversal-Segmente `..`).
 - Replay-Dateien sind Runtime-Artefakte und dürfen nicht in Source-/Dokumentationsbäume abgelegt werden.
 - Ablage und Dateinamenkonvention müssen stabil und betriebssicher bleiben (`*.replay.ndjson`, ignoriert in VCS).

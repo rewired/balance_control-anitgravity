@@ -49,7 +49,7 @@ The following namespaces are reserved in v1 and MUST NOT be treated as errors if
     "replay": {
       "enabled": true,
       "format": "ndjson",
-      "directory": "./var/replays",
+      "directory": "./log/replays",
       "flushEveryEvents": 1,
       "includeStateHash": true,
       "maxFileSizeMB": 64,
@@ -100,7 +100,7 @@ Replay payload schema contract (record types + deterministic serialization):
 
 Default for v1 baseline:
 
-- `logging.replay.directory` defaults to `./var/replays`.
+- `logging.replay.directory` defaults to `./log/replays`.
 
 Replay filename convention:
 
@@ -138,7 +138,7 @@ Dieser Abschnitt ist **normativ** und priorisiert für Implementierungen, die nu
 
 ### Defaults (v1)
 
-- `logging.replay.directory`: `./var/replays`
+- `logging.replay.directory`: `./log/replays`
 - `logging.replay.includeStateHash`: `true`
 - `logging.replay.flushEveryEvents`: `1`
 

@@ -35,13 +35,13 @@ Replay v1 format is fixed to `ndjson`.
 
 ### 3) Configurable replay directory + safety boundaries
 
-`logging.replay.directory` remains runtime-configurable with default `./var/replays`.
+`logging.replay.directory` remains runtime-configurable with default `./log/replays`.
 
 **Rationale:**
 
 - Different execution contexts (local dev, CI, containerized server) require writable paths that are deployment-specific.
 - A fixed hard-coded path is brittle across environments and increases startup failure risk.
-- Defaulting to `./var/replays` provides a predictable baseline while preserving operator control.
+- Defaulting to `./log/replays` provides a predictable baseline while preserving operator control.
 
 **Safety boundaries (v1 policy):**
 
