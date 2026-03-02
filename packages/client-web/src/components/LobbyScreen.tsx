@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { LobbyClient } from 'boardgame.io/client';
 import { GAME_NAME } from '../game';
 import { clearLastSession, readLastSession, type LastSession } from '../lobby/session';
+import { buildValidatedSetupData, type StartSeatMode } from '../config/matchConfig';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? 'http://localhost:8000';
 
@@ -71,6 +72,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
     const [playerName, setPlayerName] = useState('');
     const [numPlayers, setNumPlayers] = useState(2);
     const [expansions, setExpansions] = useState<ExpansionFlags>({ ex01: false, ex02: false, ex03: false });
+    const [seatMode, setSeatMode] = useState<StartSeatMode>('human-vs-human');
+    const [botModel, setBotModel] = useState('llama3.1:8b');
     const [isCreating, setIsCreating] = useState(false);
     const [joiningSeat, setJoiningSeat] = useState<{ matchID: string; playerID: string } | null>(null);
 
@@ -101,9 +104,10 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
         if (expansions.ex02) enabledPacks.push('exp02');
         if (expansions.ex03) enabledPacks.push('exp03');
         try {
+            const setupData = buildValidatedSetupData({ enabledPacks, seatMode, model: botModel });
             await lobbyClient.createMatch(GAME_NAME, {
                 numPlayers,
-                setupData: { packs: { enabledPacks } }
+                setupData
             });
             await loadMatches();
         } catch (err) {
@@ -297,10 +301,29 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
 
                         <div className="lobby-field">
                             <span className="lobby-label">Player type</span>
-                            <select className="lobby-input" disabled>
-                                <option>TODO (human/network/ai)</option>
+                            <select
+                                className="lobby-input"
+                                value={seatMode}
+                                onChange={(e) => setSeatMode(e.target.value as StartSeatMode)}
+                                data-testid="lobby-seat-mode"
+                            >
+                                <option value="human-vs-human">Mensch vs Mensch</option>
+                                <option value="human-vs-ai">Mensch vs KI</option>
+                                <option value="ai-vs-ai">KI vs KI</option>
                             </select>
                         </div>
+
+                        {seatMode !== 'human-vs-human' && (
+                            <label className="lobby-field">
+                                <span className="lobby-label">KI-Modell (Ollama)</span>
+                                <input
+                                    className="lobby-input"
+                                    value={botModel}
+                                    onChange={(e) => setBotModel(e.target.value)}
+                                    data-testid="lobby-bot-model"
+                                />
+                            </label>
+                        )}
 
                         <div className="lobby-field">
                             <span className="lobby-label">Rule variants</span>

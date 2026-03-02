@@ -22,7 +22,38 @@ export interface GameConfig {
     packs?: PackSelection;
     tileRecycling?: boolean;
     firstPlayerHandicap?: boolean;
+    seats?: SeatConfigMap;
 }
+
+export type SeatRole = 'human' | 'bot';
+
+export interface BotDecodingConfig {
+    temperature?: number;
+    topP?: number;
+    topK?: number;
+    maxTokens?: number;
+}
+
+export interface BotTimeoutConfig {
+    requestMs?: number;
+    turnMs?: number;
+}
+
+export interface SeatBotConfig {
+    role: 'bot';
+    provider: 'ollama';
+    model: string;
+    decoding?: BotDecodingConfig;
+    timeouts?: BotTimeoutConfig;
+}
+
+export interface SeatHumanConfig {
+    role: 'human';
+}
+
+export type SeatConfig = SeatHumanConfig | SeatBotConfig;
+
+export type SeatConfigMap = Record<string, SeatConfig>;
 
 export type PackManifestRecord = Readonly<{
     id: string;
