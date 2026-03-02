@@ -253,8 +253,8 @@ const App: React.FC = () => {
             <>
                 <HexSilhouette />
                 <StartScreen
-                    onSelectHotseat={({ seatMode, model }: { seatMode: StartSeatMode; model: string }) => {
-                        setHotseatSetupData(buildValidatedSetupData({ seatMode, model }));
+                    onSelectHotseat={({ seatMode, model, availableModels }: { seatMode: StartSeatMode; model: string; availableModels: string[] }) => {
+                        setHotseatSetupData(buildValidatedSetupData({ seatMode, model, availableModels }));
                         setMode('hotseat');
                     }}
                     onSelectOnlineLobby={() => setMode('onlineLobby')}
