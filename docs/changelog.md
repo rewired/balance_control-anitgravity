@@ -4,6 +4,7 @@
 
 ## Unreleased
 
+- 2026-03-02: task(0318) Bot/LLM: add `runTurnOrchestrator(...)` to execute full bot turn cycles via legal-intent enumeration + Ollama selection + callback-based intent dispatch; introduce host-agnostic integration hooks (`dispatchIntent`, `getLatestSnapshot`) and deterministic loop guards (`maxTurns`, `maxConsecutiveBotActions`) for bot-vs-bot safety (CORE-01-04-09, ARCH-04:INTERACTION_MODEL/RESTRICTIONS/DETERMINISM).
 - 2026-02-26: task(0316) Docs/ADR: **Replay Logging MVP** — ergänze DD-0316 als konsolidierte Begründung für den Namespace `logging.replay`, NDJSON als Replay-v1-Format sowie die kanonische Konfig-Priorität (`CLI > ENV > conf.json > Defaults`) inkl. Sicherheitsregeln für Replay-Logpfade.
 - 2026-02-26: task(0315) Game/Replay: ergänze einen fail-fast NDJSON-Replay-Verifier inkl. CLI (`pnpm replay:verify`), der Match-Setup aus `header` (Seed + Match-Config) übernimmt, `action`-Records strikt sequentiell ausführt, bei erster Abweichung mit `seq`+Diagnose abbricht und optional `checkpoint`-/`footer`-Hashes über Flags (`--verify-checkpoints`, `--verify-final-hash`) prüft; DD-0315 dokumentiert die ADR-Entscheidung.
 - 2026-02-26: task(0314) Server/Replay: verdrahte Replay-Datei-Logging im Server mit `ReplaySink`-Dateiausgabe, Default-Pfad `./log/replays` (ENV-override `BC_REPLAY_DIRECTORY`), Start-up-Verzeichniserzeugung, fail-fast Pfadvalidierung ohne relative Path-Traversal-Segmente (`..`) und Dateinamenkonvention `<matchId>-<seed>-<yyyyMMddTHHmmssZ>.replay.ndjson`; ergänze ADR DD-0314.
