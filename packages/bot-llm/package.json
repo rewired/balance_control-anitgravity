@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "pretest": "pnpm -C ../rules build && pnpm -C ../shared build && pnpm -C ../game build"
+    "pretest": "pnpm -C ../rules build && pnpm -C ../shared build && pnpm -C ../expansion-01 build && pnpm -C ../expansion-02 build && pnpm -C ../expansion-03 build && pnpm -C ../packs build && pnpm -C ../game build"
   },
   "dependencies": {
     "@balance-control/expansion-01": "workspace:*",

@@ -1,6 +1,7 @@
 import { enumerateLegalIntents, type LegalIntent } from '@balance-control/game';
 import type { GameState } from '@balance-control/rules';
 import { z } from 'zod';
+import { requestOllamaSelection, type OllamaRequestConfig } from './ollama-client';
 
 export const LLMSelectionSchema = z.object({
     selectedIndex: z.number().int().nonnegative()
@@ -17,7 +18,7 @@ export interface BotSelectionResult {
     selectedIntent: LegalIntent | null;
     selectedIndex: number;
     usedFallback: boolean;
-    reason: 'ok' | 'invalid-json' | 'schema-violation' | 'out-of-range' | 'stale-selection' | 'no-legal-moves';
+    reason: 'ok' | 'invalid-json' | 'schema-violation' | 'out-of-range' | 'stale-selection' | 'no-legal-moves' | 'transport-error';
 }
 
 /**
@@ -100,6 +101,45 @@ export function selectIntentFromLLMResponse(params: {
         usedFallback: false,
         reason: 'ok'
     };
+}
+
+/**
+ * Executes a deterministic LLM round-trip using the Ollama transport and validates response via parseLLMSelection/LLMSelectionSchema.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @sideEffects performs network I/O through injected transport client
+ */
+export async function selectIntentWithOllama(params: {
+    G: GameState;
+    ctx: unknown;
+    playerID: string;
+    config: OllamaRequestConfig;
+}): Promise<BotSelectionResult> {
+    const legalMoves = enumerateDeterministicLegalMoves(params.G, params.ctx, params.playerID);
+    if (legalMoves.length === 0) {
+        return {
+            selectedIntent: null,
+            selectedIndex: -1,
+            usedFallback: true,
+            reason: 'no-legal-moves'
+        };
+    }
+
+    try {
+        const rawResponse = await requestOllamaSelection({
+            config: params.config,
+            legalMoves
+        });
+        return selectIntentFromLLMResponse({
+            G: params.G,
+            ctx: params.ctx,
+            playerID: params.playerID,
+            rawResponse,
+            expectedLegalMoves: legalMoves
+        });
+    } catch {
+        return fallback(legalMoves, 'transport-error');
+    }
 }
 
 function fallback(

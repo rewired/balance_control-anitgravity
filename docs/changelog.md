@@ -1,3 +1,4 @@
+- 2026-03-02: task(0317) Bot/LLM: Add dedicated Ollama transport layer (`requestOllamaSelection`) with config-driven endpoint/model/timeout, keep selection validation via existing `parseLLMSelection`/`LLMSelectionSchema`, and enforce deterministic index-only fallback on invalid responses and transport errors (ARCH-04:INTERACTION_MODEL/RESTRICTIONS/DETERMINISM).
 - 2026-02-26: task(0305) Engine/Tests: enforce CORE-01 formalize timing gate (CORE-01-08-02/08-03) during legal-intent committee enumeration, split timing regression into explicit blocked/allowed boundary tests, and keep inherited `isStarting` prototype flags non-blocking via explicit-own-property gate checks.
 # Changelog — BALANCE // CONTROL
 

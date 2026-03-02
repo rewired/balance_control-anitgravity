@@ -4,7 +4,10 @@ export {
     enumerateDeterministicLegalMoves,
     parseLLMSelection,
     selectIntentFromLLMResponse,
+    selectIntentWithOllama,
     type BotSelectionResult,
     type LegalMoveOption,
     type LLMSelection
 } from './adapter';
+
+export { requestOllamaSelection, type OllamaRequestConfig } from './ollama-client';

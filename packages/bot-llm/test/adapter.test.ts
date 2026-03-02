@@ -1,6 +1,13 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type { LegalIntent } from '@balance-control/game';
-import { enumerateDeterministicLegalMoves, parseLLMSelection, selectIntentFromLLMResponse } from '../src/adapter';
+import {
+    enumerateDeterministicLegalMoves,
+    parseLLMSelection,
+    requestOllamaSelection,
+    selectIntentFromLLMResponse,
+    selectIntentWithOllama,
+    type OllamaRequestConfig
+} from '../src';
 
 let mockedIntents: LegalIntent[] = [];
 
@@ -14,6 +21,15 @@ vi.mock('@balance-control/game', async () => {
 
 function intent(moveType: string, payload: Record<string, unknown>): LegalIntent {
     return { moveType, payload };
+}
+
+function configWithHttpClient(httpClient: typeof fetch): OllamaRequestConfig {
+    return {
+        endpoint: 'http://localhost:11434/api/generate',
+        model: 'llama3.1:8b',
+        timeoutMs: 100,
+        httpClient
+    };
 }
 
 describe('bot adapter LLM contract', () => {
@@ -99,5 +115,115 @@ describe('bot adapter LLM contract', () => {
         });
 
         expect(repeatResult).toEqual(staleResult);
+    });
+
+    it('accepts a valid Ollama response string and resolves selected intent', async () => {
+        const httpClient = vi.fn<typeof fetch>().mockResolvedValue({
+            ok: true,
+            json: async () => ({ response: JSON.stringify({ selectedIndex: 1 }) })
+        } as Response);
+
+        const result = await selectIntentWithOllama({
+            G: {} as any,
+            ctx: {} as any,
+            playerID: '0',
+            config: configWithHttpClient(httpClient)
+        });
+
+        expect(result.usedFallback).toBe(false);
+        expect(result.reason).toBe('ok');
+        expect(result.selectedIndex).toBe(1);
+        expect(result.selectedIntent).toEqual(mockedIntents[1]);
+    });
+
+    it('uses deterministic fallback for transport invalid JSON', async () => {
+        const httpClient = vi.fn<typeof fetch>().mockResolvedValue({
+            ok: true,
+            json: async () => ({ response: '{invalid-json' })
+        } as Response);
+
+        const result = await selectIntentWithOllama({
+            G: {} as any,
+            ctx: {} as any,
+            playerID: '0',
+            config: configWithHttpClient(httpClient)
+        });
+
+        expect(result.usedFallback).toBe(true);
+        expect(result.reason).toBe('invalid-json');
+        expect(result.selectedIntent).toEqual(mockedIntents[0]);
+    });
+
+    it('uses deterministic fallback for transport schema violation', async () => {
+        const httpClient = vi.fn<typeof fetch>().mockResolvedValue({
+            ok: true,
+            json: async () => ({ response: JSON.stringify({ selectedIndex: '1' }) })
+        } as Response);
+
+        const result = await selectIntentWithOllama({
+            G: {} as any,
+            ctx: {} as any,
+            playerID: '0',
+            config: configWithHttpClient(httpClient)
+        });
+
+        expect(result.usedFallback).toBe(true);
+        expect(result.reason).toBe('schema-violation');
+        expect(result.selectedIntent).toEqual(mockedIntents[0]);
+    });
+
+    it('uses deterministic fallback for transport out-of-range index', async () => {
+        const httpClient = vi.fn<typeof fetch>().mockResolvedValue({
+            ok: true,
+            json: async () => ({ response: JSON.stringify({ selectedIndex: 99 }) })
+        } as Response);
+
+        const result = await selectIntentWithOllama({
+            G: {} as any,
+            ctx: {} as any,
+            playerID: '0',
+            config: configWithHttpClient(httpClient)
+        });
+
+        expect(result.usedFallback).toBe(true);
+        expect(result.reason).toBe('out-of-range');
+        expect(result.selectedIntent).toEqual(mockedIntents[0]);
+    });
+
+    it('uses deterministic fallback on timeout/network failure', async () => {
+        const httpClient = vi.fn<typeof fetch>().mockRejectedValue(new Error('network down'));
+
+        const result = await selectIntentWithOllama({
+            G: {} as any,
+            ctx: {} as any,
+            playerID: '0',
+            config: configWithHttpClient(httpClient)
+        });
+
+        expect(result.usedFallback).toBe(true);
+        expect(result.reason).toBe('transport-error');
+        expect(result.selectedIntent).toEqual(mockedIntents[0]);
+    });
+
+    it('requestOllamaSelection sends index-only prompt options', async () => {
+        const httpClient = vi.fn<typeof fetch>().mockResolvedValue({
+            ok: true,
+            json: async () => ({ response: JSON.stringify({ selectedIndex: 0 }) })
+        } as Response);
+
+        const legalMoves = enumerateDeterministicLegalMoves({} as any, {} as any, '0');
+        const raw = await requestOllamaSelection({
+            config: configWithHttpClient(httpClient),
+            legalMoves
+        });
+
+        expect(raw).toBe(JSON.stringify({ selectedIndex: 0 }));
+        const [requestUrl, init] = httpClient.mock.calls[0] ?? [];
+        expect(requestUrl).toBe('http://localhost:11434/api/generate');
+        expect((init as RequestInit).method).toBe('POST');
+        const body = JSON.parse((init as RequestInit).body as string) as { prompt: string };
+        expect(body.prompt).toContain('0:');
+        expect(body.prompt).toContain('1:');
+        expect(body.prompt).toContain('Return strict JSON only');
     });
 });
