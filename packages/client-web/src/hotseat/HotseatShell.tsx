@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Client } from 'boardgame.io/client';
 import { Local } from 'boardgame.io/multiplayer';
-import { BalanceControlGame } from '../game';
+import { createClientGameWithReplayHooks } from '../game';
 import { Board } from '../Board';
 import { computeUiStateKey } from '../ui/interaction/diagnostics';
 import type { DispatchTripwireInfo } from '../ui/interaction/types';
 import { dispatchIntentToMoves, runBotOrchestratorForSnapshot } from '../bot/orchestratorBridge';
+import { HotseatForwardingReplaySink } from '../replay/hotseat-forwarding-sink';
 
 type SeatID = '0' | '1';
 
@@ -78,7 +79,10 @@ export const HotseatShell: React.FC<{ setupData?: unknown }> = ({ setupData }) =
 
     const client = useMemo(() => {
         return Client({
-            game: BalanceControlGame,
+            game: createClientGameWithReplayHooks({
+                sink: new HotseatForwardingReplaySink(),
+                includeStateHash: true,
+            }),
             numPlayers: 2,
             matchID: MATCH_ID,
             playerID: '0',

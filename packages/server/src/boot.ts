@@ -1,4 +1,4 @@
-import { createBalanceControlGameWithHooks } from '@balance-control/game';
+import { createBalanceControlGameWithHooks, type ReplaySink } from '@balance-control/game';
 import { registerCanonicalPacks } from '@balance-control/packs';
 import { createReplaySink, readReplayDirectoryFromEnv } from './replay-logging';
 
@@ -6,10 +6,10 @@ export function registerServerPacks(): void {
     registerCanonicalPacks();
 }
 
-export function createServerGame() {
+export function createServerGame(providedReplaySink?: ReplaySink) {
     registerServerPacks();
 
-    const replaySink = createReplaySink({ replayDirectory: readReplayDirectoryFromEnv() });
+    const replaySink = providedReplaySink ?? createReplaySink({ replayDirectory: readReplayDirectoryFromEnv() });
     return createBalanceControlGameWithHooks({
         sink: replaySink,
         includeStateHash: true,

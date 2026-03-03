@@ -2,9 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { ReplayActionRecord, ReplaySink } from '@balance-control/game';
 
-const DEFAULT_REPLAY_DIRECTORY = './log/replays';
+const DEFAULT_REPLAY_DIRECTORY_SEGMENTS = ['log', 'replay'] as const;
 const FILE_EXTENSION = '.replay.ndjson';
 const SAFE_FILENAME_CHARS = /[^a-zA-Z0-9._-]/g;
+const WORKSPACE_ROOT_MARKER = 'pnpm-workspace.yaml';
 
 type ReplayLoggingConfig = Readonly<{
     replayDirectory?: string;
@@ -20,14 +21,37 @@ function formatUtcTimestamp(date: Date): string {
     return iso.replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 }
 
+function findWorkspaceRoot(startDirectory: string): string {
+    let current = path.resolve(startDirectory);
+
+    while (true) {
+        const markerPath = path.join(current, WORKSPACE_ROOT_MARKER);
+        if (fs.existsSync(markerPath)) {
+            return current;
+        }
+
+        const parent = path.dirname(current);
+        if (parent === current) {
+            return startDirectory;
+        }
+
+        current = parent;
+    }
+}
+
+function getDefaultReplayDirectory(currentWorkingDirectory: string): string {
+    const workspaceRoot = findWorkspaceRoot(currentWorkingDirectory);
+    return path.join(workspaceRoot, ...DEFAULT_REPLAY_DIRECTORY_SEGMENTS);
+}
+
 /**
  * Validates and resolves replay output directory.
  * Rejects relative path traversal and invalid empty paths.
  */
 export function resolveReplayDirectory(inputPath?: string, currentWorkingDirectory = process.cwd()): string {
-    const configured = inputPath?.trim() || DEFAULT_REPLAY_DIRECTORY;
+    const configured = inputPath?.trim();
     if (!configured) {
-        throw new Error('Invalid replay directory: empty path is not allowed.');
+        return path.normalize(getDefaultReplayDirectory(currentWorkingDirectory));
     }
 
     if (configured.includes('\u0000')) {
