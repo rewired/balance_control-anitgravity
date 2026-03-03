@@ -5,6 +5,7 @@
 
 ## Unreleased
 
+- 2026-03-03: task(0323) Bot/LLM tooling: fix `packages/bot-llm` pretest build order by building `@balance-control/game` before `@balance-control/packs`, resolving workspace TS2307 module-resolution failures for `@balance-control/game` during `pnpm -w test`; add DD-0323 and task documentation.
 - 2026-03-03: task(0322) Replay logging: ändere den Server-Defaultpfad auf den Workspace-Root `log/replay` (statt cwd-abhängig), verdrahte Hotseat-Replays aus dem Client per `/api/replay/hotseat` in denselben Server-`ReplaySink`, damit auch Local-Hotseat-Aktionen als NDJSON-Datei persistiert werden; ergänze Task- und ADR-Dokumentation.
 - 2026-03-02: task(0318) Bot/LLM: add `runTurnOrchestrator(...)` to execute full bot turn cycles via legal-intent enumeration + Ollama selection + callback-based intent dispatch; introduce host-agnostic integration hooks (`dispatchIntent`, `getLatestSnapshot`) and deterministic loop guards (`maxTurns`, `maxConsecutiveBotActions`) for bot-vs-bot safety (CORE-01-04-09, ARCH-04:INTERACTION_MODEL/RESTRICTIONS/DETERMINISM).
 - 2026-02-26: task(0316) Docs/ADR: **Replay Logging MVP** — ergänze DD-0316 als konsolidierte Begründung für den Namespace `logging.replay`, NDJSON als Replay-v1-Format sowie die kanonische Konfig-Priorität (`CLI > ENV > conf.json > Defaults`) inkl. Sicherheitsregeln für Replay-Logpfade.
