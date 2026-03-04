@@ -5,6 +5,7 @@
 
 ## Unreleased
 
+- 2026-03-04: task(0325) Client-web tests: fix pre-existing `board-viewport.test.tsx` failures by aligning `setTransform` mock/assertions with runtime 4-argument call shape (`x`, `y`, `scale`, `animationTime=200`); no production behavior change; add DD-0325 and task documentation.
 - 2026-03-03: task(0324) Client-web build: fix TypeScript compile break by including `packages/bot-llm/src` in `client-web` TS project scope (TS6307), narrowing bot seat config to `SeatBotConfig` before reading `model` (TS2339), and using a typed local `Client` options intersection to admit existing `setupData` runtime usage (TS2353); add DD-0324 and task documentation.
 - 2026-03-03: task(0323) Bot/LLM tooling: fix `packages/bot-llm` pretest build order by building `@balance-control/game` before `@balance-control/packs`, resolving workspace TS2307 module-resolution failures for `@balance-control/game` during `pnpm -w test`; add DD-0323 and task documentation.
 - 2026-03-03: task(0322) Replay logging: ändere den Server-Defaultpfad auf den Workspace-Root `log/replay` (statt cwd-abhängig), verdrahte Hotseat-Replays aus dem Client per `/api/replay/hotseat` in denselben Server-`ReplaySink`, damit auch Local-Hotseat-Aktionen als NDJSON-Datei persistiert werden; ergänze Task- und ADR-Dokumentation.
