@@ -5,7 +5,7 @@ import { BoardViewport } from '../src/components/BoardViewport';
 import { computeBoardLayout } from '../src/ui/hexLayout';
 import { computeFitTransform } from '../src/ui/fitToBounds';
 
-let mockSetTransform: ((x: number, y: number, scale: number) => void) | undefined;
+let mockSetTransform: ((x: number, y: number, scale: number, animationTime?: number) => void) | undefined;
 let lastOnTransformed: ((ref: unknown, state: { scale: number; positionX: number; positionY: number }) => void) | undefined;
 
 vi.mock('react-zoom-pan-pinch', () => ({
@@ -96,7 +96,7 @@ describe('BoardViewport', () => {
         expect(viewport.dataset.baselineScale).toBe(String(expected.scale));
         expect(viewport.dataset.baselineTx).toBe(String(expected.x));
         expect(viewport.dataset.baselineTy).toBe(String(expected.y));
-        expect(setTransformSpy).toHaveBeenCalledWith(expected.x, expected.y, expected.scale);
+        expect(setTransformSpy).toHaveBeenCalledWith(expected.x, expected.y, expected.scale, 200);
     });
 
     it('resetView ist ohne baseline ein no-op und nutzt mit baseline die gespeicherten Werte', () => {
@@ -118,7 +118,7 @@ describe('BoardViewport', () => {
 
         setTransformSpy.mockClear();
         fireEvent.click(screen.getByTestId('btn-reset-view'));
-        expect(setTransformSpy).toHaveBeenCalledWith(baselineTx, baselineTy, baselineScale);
+        expect(setTransformSpy).toHaveBeenCalledWith(baselineTx, baselineTy, baselineScale, 200);
     });
 
     it('onTransformed schreibt dataset.scale/tx/ty', () => {
