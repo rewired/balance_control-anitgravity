@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 2026-03-04: task(0329) Client-web replay forwarding: align `HotseatForwardingReplaySink` with `ReplaySink.writeRecord(record: ReplayRecord)` from `@balance-control/game` while preserving existing JSON forwarding transport (`sendBeacon`/`fetch` POST to `/api/replay/hotseat`); add DD-0329 and task documentation.
 - 2026-03-04: task(0327) Replay: ergänze optionales deterministisches `action.typedFields`-Metadatenfeld (u. a. für `convertResources` typed/untyped Varianten) via zentralem Mapper im Replay-Sink, validiere die Typspur im Replay-Verifier, und erweitere `engine.history` um minimale nachvollziehbare Typkontexte (`tileType`, `resourceType`); dokumentiert in DD-0327 + Replay-Format-v1.
 - 2026-03-04: task(0326) Replay: erweitere v1-Recordmodell um deterministischen `system.roundSettlement`-Record (regular/final inkl. `roundNumber`, `resortTileOrder`, optional `stateHash`), emittiere Records in beiden Settlement-Pfaden, akzeptiere/validiere den Typ im Verifier und aktualisiere Replay-Docs + DD-0326.
 - 2026-03-04: task(0325) Client-web tests: fix pre-existing `board-viewport.test.tsx` failures by aligning `setTransform` mock/assertions with runtime 4-argument call shape (`x`, `y`, `scale`, `animationTime=200`); no production behavior change; add DD-0325 and task documentation.
