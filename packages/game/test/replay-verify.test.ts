@@ -68,6 +68,41 @@ describe('Replay NDJSON verifier', () => {
         expect(() => verifyReplayRecords(records)).toThrow(/Replay divergence at seq 1: expected action seq 1, got 2/);
     });
 
+
+
+    it('accepts action typedFields metadata when values are known domain types', () => {
+        const records = baseRecords();
+        records[1] = {
+            recordType: 'action',
+            seq: 1,
+            player: '0',
+            moveType: 'placeTile',
+            args: [{ targetCoord: '1,0' }],
+            typedFields: {
+                '0.targetCoord': 'tileId'
+            }
+        };
+
+        const result = verifyReplayRecords(records);
+        expect(result.totalActions).toBe(1);
+    });
+
+    it('rejects unknown action typedFields domain type labels', () => {
+        const records = baseRecords();
+        records[1] = {
+            recordType: 'action',
+            seq: 1,
+            player: '0',
+            moveType: 'placeTile',
+            args: [{ targetCoord: '1,0' }],
+            typedFields: {
+                '0.targetCoord': 'ui-only'
+            }
+        };
+
+        expect(() => verifyReplayRecords(records)).toThrow(/invalid action.typedFields/);
+    });
+
     it('fails on invalid system.roundSettlement payload shape', () => {
         const records = baseRecords();
         records.splice(2, 0, {

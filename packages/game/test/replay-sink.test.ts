@@ -38,6 +38,7 @@ describe('withReplaySink', () => {
                 player: '0',
                 moveType: 'okMove',
                 args: [{ id: 'b' }],
+                typedFields: undefined,
                 turn: 1,
                 phase: 'politicalAction',
                 stateHash: undefined,
@@ -48,9 +49,57 @@ describe('withReplaySink', () => {
                 player: '0',
                 moveType: 'okMove',
                 args: [{ id: 'c' }],
+                typedFields: undefined,
                 turn: 1,
                 phase: 'politicalAction',
                 stateHash: undefined,
+            },
+        ]);
+    });
+
+
+    it('adds deterministic typedFields metadata for convertResources payload variants', () => {
+        const records: ReplayActionRecord[] = [];
+
+        const wrapped = withReplaySink(
+            {
+                convertResources: () => undefined,
+            },
+            {
+                sink: {
+                    writeRecord: (record) => {
+                        if (record.recordType === 'action') {
+                            records.push(record);
+                        }
+                    },
+                },
+            }
+        );
+
+        wrapped.convertResources(makeContext() as any, {
+            grassrootsTileId: 'tile-1',
+            outputResort: 'DOM',
+            inputResourceIds: ['resource-1', 'resource-2'],
+            extraResourceIds: ['resource-3'],
+        });
+
+        wrapped.convertResources(makeContext() as any, {
+            grassrootsTileId: 'tile-2',
+            outputResort: 'FOR',
+            inputCount: 3,
+        });
+
+        expect(records.map((record) => record.typedFields)).toEqual([
+            {
+                '0.extraResourceIds': 'resourceId[]',
+                '0.grassrootsTileId': 'tileId',
+                '0.inputResourceIds': 'resourceId[]',
+                '0.outputResort': 'resourceType',
+            },
+            {
+                '0.grassrootsTileId': 'tileId',
+                '0.inputCount': 'resourceCount',
+                '0.outputResort': 'resourceType',
             },
         ]);
     });
