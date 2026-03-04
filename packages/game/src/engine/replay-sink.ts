@@ -3,6 +3,7 @@ import { hashState } from '../hash-state';
 import type { MoveMap } from '../move-module-registry';
 
 export type ReplayActionRecord = Readonly<{
+    recordType: 'action';
     seq: number;
     player: string;
     moveType: string;
@@ -14,13 +15,25 @@ export type ReplayActionRecord = Readonly<{
     seed?: string;
 }>;
 
+export type ReplaySystemRoundSettlementRecord = Readonly<{
+    recordType: 'system.roundSettlement';
+    roundNumber: number;
+    settlementKind: 'regular' | 'final';
+    resortTileOrder: readonly string[];
+    stateHash?: string;
+    matchId?: string;
+    seed?: string;
+}>;
+
+export type ReplayRecord = ReplayActionRecord | ReplaySystemRoundSettlementRecord;
+
 export interface ReplaySink {
-    writeAction(record: ReplayActionRecord): void;
+    writeRecord(record: ReplayRecord): void;
 }
 
 export type ReplaySinkErrorRecord = Readonly<{
     error: unknown;
-    record: ReplayActionRecord;
+    record: ReplayRecord;
 }>;
 
 export type ReplaySinkErrorChannel = (event: ReplaySinkErrorRecord) => void;
@@ -29,6 +42,12 @@ export type ReplayHookOptions = Readonly<{
     sink?: ReplaySink;
     onError?: ReplaySinkErrorChannel;
     includeStateHash?: boolean;
+}>;
+
+export type ReplaySystemRoundSettlementPayload = Readonly<{
+    roundNumber: number;
+    settlementKind: 'regular' | 'final';
+    resortTileOrder: readonly string[];
 }>;
 
 
@@ -63,6 +82,7 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
             if (typeof playerId !== 'string') return result;
 
             const record: ReplayActionRecord = {
+                recordType: 'action',
                 seq,
                 player: playerId,
                 moveType,
@@ -77,7 +97,7 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
             seq += 1;
 
             try {
-                options.sink?.writeAction(record);
+                options.sink?.writeRecord(record);
             } catch (error) {
                 options.onError?.({ error, record });
             }
@@ -87,4 +107,34 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
     }
 
     return wrapped;
+}
+
+/**
+ * Emits deterministic replay system records for engine-driven transitions without direct player moves.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @sideEffects
+ */
+export function emitReplaySystemRecord(
+    options: ReplayHookOptions | undefined,
+    context: any,
+    payload: ReplaySystemRoundSettlementPayload
+): void {
+    if (!options?.sink) return;
+
+    const record: ReplaySystemRoundSettlementRecord = {
+        recordType: 'system.roundSettlement',
+        roundNumber: payload.roundNumber,
+        settlementKind: payload.settlementKind,
+        resortTileOrder: [...payload.resortTileOrder],
+        stateHash: options.includeStateHash ? hashState(context.G) : undefined,
+        matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
+        seed: resolveReplaySeed(context),
+    };
+
+    try {
+        options.sink.writeRecord(record);
+    } catch (error) {
+        options.onError?.({ error, record });
+    }
 }

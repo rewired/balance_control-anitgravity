@@ -17,9 +17,8 @@ Normative goals:
 - Exactly one record object per line.
 - Record ordering in file MUST be:
   1. `header` (exactly once, first line)
-  2. zero or more `action` records
-  3. zero or more `checkpoint` records (optional MVP)
-  4. `footer` (exactly once, last line)
+  2. zero or more body records (`action`, `system.roundSettlement`, `checkpoint`) in deterministic engine emission order
+  3. `footer` (exactly once, last line)
 
 ## 3. Record Types
 
@@ -27,6 +26,7 @@ Each line object MUST contain `recordType` with one of:
 
 - `header`
 - `action`
+- `system.roundSettlement`
 - `checkpoint`
 - `footer`
 
@@ -64,7 +64,27 @@ Rules:
 - `seq` is the canonical action index for deterministic replay iteration.
 - `args` MUST include only deterministic move inputs; no ephemeral UI-only fields.
 
-### 3.3 `checkpoint` (optional MVP)
+
+### 3.3 `system.roundSettlement`
+
+Required fields:
+
+- `recordType`: `"system.roundSettlement"`
+- `roundNumber`: integer (`>= 1`)
+- `settlementKind`: `"regular" | "final"`
+- `resortTileOrder`: string[]
+
+Optional field:
+
+- `stateHash`: string (only when replay sink runs with `includeStateHash`)
+
+Rules:
+
+- Emitted for engine-driven round settlement passes that are not direct player actions.
+- `resortTileOrder` MUST be the exact deterministic execution order used by the settlement resolver.
+- Record payload MUST NOT include timestamps or non-deterministic IDs.
+
+### 3.4 `checkpoint` (optional MVP)
 
 Required fields:
 
@@ -80,7 +100,7 @@ Rules:
 - `checkpoint` is optional in MVP and may be emitted at implementation-defined cadence.
 - If present, `stateHash` MUST be produced with the canonical deterministic hashing pipeline.
 
-### 3.4 `footer`
+### 3.5 `footer`
 
 Required fields:
 
@@ -115,6 +135,7 @@ A Replay v1 file is valid iff:
 - one `footer` exists and is last
 - every non-boundary line has `recordType` in the allowed set
 - `action.seq` is contiguous and strictly increasing
+- `system.roundSettlement` payload fields satisfy the deterministic schema
 - `footer.totalActions` equals action count
 
 ## 6. Minimal Example (NDJSON)
@@ -122,6 +143,7 @@ A Replay v1 file is valid iff:
 ```json
 {"recordType":"header","schemaVersion":"1","seed":"seed-123","matchConfig":{"players":2},"expansions":["exp01","exp03"]}
 {"recordType":"action","seq":1,"player":"0","moveType":"playCard","args":{"cardId":"C-001","tile":"A1"},"turn":0,"phase":"main"}
+{"recordType":"system.roundSettlement","roundNumber":1,"settlementKind":"regular","resortTileOrder":["tile-a","tile-b"]}
 {"recordType":"checkpoint","afterSeq":1,"stateHash":"sha256:abc..."}
 {"recordType":"footer","finalStateHash":"sha256:def...","totalActions":1}
 ```

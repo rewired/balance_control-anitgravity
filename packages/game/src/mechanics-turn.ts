@@ -110,15 +110,15 @@ export function drawMeasure(G: GameState, ctx: any) {
 }
 
 /**
- * Runs the final round settlement.
- * @rule CORE-01-09-01A
+ * Computes the deterministic Resort tile processing order for round settlement.
+ * @rule CORE-01-07-03D
  * @deterministic
- * @sideEffects
+ * @pure
  */
-export function runFinalRoundSettlement(G: GameState & { engine: any; grid?: Record<string, string> }, ctx: any): void {
+export function getRoundSettlementResortTileOrder(G: GameState & { grid?: Record<string, string> }): string[] {
     const boardZone = G.zones[CoreZoneName.Board];
     const grid = G.grid ?? {};
-    if (!boardZone) return;
+    if (!boardZone) return [];
 
     const resortTilesWithCoord: { tileId: string; posKey: string }[] = [];
     for (const tileId of boardZone.items) {
@@ -130,9 +130,23 @@ export function runFinalRoundSettlement(G: GameState & { engine: any; grid?: Rec
             posKey: coordStr ? positionKeyFromCoordString(coordStr) : tileId
         });
     }
+
     resortTilesWithCoord.sort((a, b) => a.posKey.localeCompare(b.posKey));
-    for (const { tileId } of resortTilesWithCoord) {
+    return resortTilesWithCoord.map(({ tileId }) => tileId);
+}
+
+/**
+ * Runs the final round settlement.
+ * @rule CORE-01-09-01A
+ * @rule CORE-01-07-03D
+ * @deterministic
+ * @sideEffects
+ */
+export function runFinalRoundSettlement(G: GameState & { engine: any; grid?: Record<string, string> }, ctx: any): string[] {
+    const resortTileOrder = getRoundSettlementResortTileOrder(G);
+    for (const tileId of resortTileOrder) {
         G.engine.effectQueue.push({ kind: 'production.resolve', tileId });
     }
     EffectResolver.resolve(G, ctx);
+    return resortTileOrder;
 }

@@ -21,6 +21,14 @@ type ReplayActionRecord = Readonly<{
     args?: unknown;
 }>;
 
+type ReplaySystemRoundSettlementRecord = Readonly<{
+    recordType: 'system.roundSettlement';
+    roundNumber: number;
+    settlementKind: 'regular' | 'final';
+    resortTileOrder: readonly string[];
+    stateHash?: string;
+}>;
+
 type ReplayCheckpointRecord = Readonly<{
     recordType: 'checkpoint';
     afterSeq?: number;
@@ -33,7 +41,7 @@ type ReplayFooterRecord = Readonly<{
     totalActions?: number;
 }>;
 
-export type ReplayNdjsonRecord = ReplayHeaderRecord | ReplayActionRecord | ReplayCheckpointRecord | ReplayFooterRecord;
+export type ReplayNdjsonRecord = ReplayHeaderRecord | ReplayActionRecord | ReplaySystemRoundSettlementRecord | ReplayCheckpointRecord | ReplayFooterRecord;
 
 export type ReplayVerifyOptions = Readonly<{
     verifyCheckpoints?: boolean;
@@ -44,7 +52,6 @@ function toArgs(args: unknown): unknown[] {
     if (args === undefined) return [];
     return Array.isArray(args) ? args : [args];
 }
-
 
 function resolveMoveArgs(G: any, move: string, args: unknown[]): unknown[] {
     if (!args || args.length === 0) return args;
@@ -93,11 +100,25 @@ function fail(seq: number, message: string): never {
     throw new Error(`Replay divergence at seq ${seq}: ${message}`);
 }
 
-
 function ensureCorePackForReplayVerifier(): void {
     const corePack = EnginePackRegistry.getRegisteredPacks().find((pack) => pack.id === 'core');
     if (corePack && Object.keys(corePack.moves ?? {}).length > 0) return;
     EnginePackRegistry.registerPack({ ...CorePack, moves: CoreMoves });
+}
+
+function validateRoundSettlementRecord(record: ReplaySystemRoundSettlementRecord, seq: number): void {
+    if (!Number.isInteger(record.roundNumber) || record.roundNumber < 1) {
+        fail(seq, `invalid system.roundSettlement.roundNumber ${record.roundNumber}.`);
+    }
+    if (record.settlementKind !== 'regular' && record.settlementKind !== 'final') {
+        fail(seq, `invalid system.roundSettlement.settlementKind "${record.settlementKind}".`);
+    }
+    if (!Array.isArray(record.resortTileOrder) || record.resortTileOrder.some((tileId) => typeof tileId !== 'string')) {
+        fail(seq, 'invalid system.roundSettlement.resortTileOrder (expected string[]).');
+    }
+    if (record.stateHash !== undefined && typeof record.stateHash !== 'string') {
+        fail(seq, 'invalid system.roundSettlement.stateHash (expected string when present).');
+    }
 }
 
 /**
@@ -166,6 +187,21 @@ export function verifyReplayRecords(records: readonly ReplayNdjsonRecord[], opti
 
             expectedSeq += 1;
             actionCount += 1;
+            continue;
+        }
+
+        if (record.recordType === 'system.roundSettlement') {
+            validateRoundSettlementRecord(record, expectedSeq - 1);
+            if (options.verifyCheckpoints && typeof record.stateHash === 'string') {
+                const state = client.getState();
+                if (!state) {
+                    fail(expectedSeq - 1, 'engine produced no state for system.roundSettlement hash verification.');
+                }
+                const actualHash = hashState(state.G as any);
+                if (actualHash !== record.stateHash) {
+                    fail(expectedSeq - 1, `system.roundSettlement hash mismatch (expected ${record.stateHash}, got ${actualHash}).`);
+                }
+            }
             continue;
         }
 

@@ -1,5 +1,5 @@
 import { Server, Origins } from 'boardgame.io/server';
-import type { ReplayActionRecord } from '@balance-control/game';
+import type { ReplayRecord } from '@balance-control/game';
 import { createServerGame } from './boot';
 import { createReplaySink, readReplayDirectoryFromEnv } from './replay-logging';
 
@@ -28,8 +28,8 @@ if (serverApp?.use) {
             ctx.req.on('error', reject);
         });
 
-        const parsed = JSON.parse(body) as ReplayActionRecord;
-        replaySink.writeAction(parsed);
+        const parsed = JSON.parse(body) as ReplayRecord;
+        replaySink.writeRecord(parsed);
         ctx.status = 204;
     }
     catch (error) {
