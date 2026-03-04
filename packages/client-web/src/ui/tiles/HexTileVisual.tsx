@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { BadgeSlots } from "./BadgeSlots";
 import { HexTileFrame } from "./HexTileFrame";
 import { InfluenceCorners } from "./InfluenceCorners";
+import { MetaMarkerOverlay, type MetaMarkerEntry } from "./MetaMarkerOverlay";
 import { CENTER_ABS } from "./tileGeometry";
 import type { SeatId, TileBadge } from "./types";
 
@@ -14,7 +15,7 @@ export type HexTileVisualProps = {
   isSelected: boolean;
 
   influenceBySeat: Partial<Record<SeatId, number>>;
-  metaIconsBySeat: Partial<Record<SeatId, ReactNode[]>>;
+  metaMarkers: MetaMarkerEntry[];
 
   badges: TileBadge[];
 
@@ -41,7 +42,7 @@ export function HexTileVisual({
   isHovered,
   isSelected,
   influenceBySeat,
-  metaIconsBySeat,
+  metaMarkers,
   badges,
   resortIcon,
   typeIcon,
@@ -92,7 +93,7 @@ export function HexTileVisual({
             {valueW}
           </text>
         ) : hasTag ? (
-           <text
+          <text
             x={cx}
             y={cy + secondaryOffset}
             textAnchor="middle"
@@ -124,9 +125,9 @@ export function HexTileVisual({
         isHovered={isHovered}
         isSelected={isSelected}
         influenceBySeat={influenceBySeat}
-        metaIconsBySeat={metaIconsBySeat}
         seatColor={seatColor}
       />
+      <MetaMarkerOverlay markers={metaMarkers} />
       <BadgeSlots badges={badges} />
     </HexTileFrame>
   );

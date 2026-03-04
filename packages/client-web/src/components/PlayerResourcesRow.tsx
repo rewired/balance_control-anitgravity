@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import type { GameState } from '@balance-control/rules';
 import { CoreZoneName } from '@balance-control/rules';
 import { ResortIcon } from '../ui/tiles/ResortIcon';
+import { LobbyistIcon } from '../ui/tiles/LobbyistIcon';
 import { useT } from '../ui/i18n';
 
 interface PlayerResourcesRowProps {
@@ -16,10 +17,11 @@ export const PlayerResourcesRow: React.FC<PlayerResourcesRowProps> = ({ playerId
 
     const counts = useMemo(() => {
         const zone = G.zones[supplyZoneId];
-        if (!zone) return { influence: 0, resources: {} as Record<string, number> };
+        if (!zone) return { influence: 0, resources: {} as Record<string, number>, metaMarker: null };
 
         let influence = 0;
         const resources: Record<string, number> = {};
+        let metaMarker: any = null;
 
         for (const itemId of zone.items) {
             const obj = G.objects[itemId];
@@ -30,9 +32,11 @@ export const PlayerResourcesRow: React.FC<PlayerResourcesRowProps> = ({ playerId
             } else if (obj.type === 'Resource' && obj.resort) {
                 const type = obj.resort;
                 resources[type] = (resources[type] || 0) + 1;
+            } else if (obj.type === 'MetaMarker') {
+                metaMarker = obj;
             }
         }
-        return { influence, resources };
+        return { influence, resources, metaMarker };
     }, [G, supplyZoneId]);
 
     // Sort resources for stable order
@@ -57,15 +61,6 @@ export const PlayerResourcesRow: React.FC<PlayerResourcesRowProps> = ({ playerId
                     }}
                 />
                 <span className="player-label">P{playerId}</span>
-
-                {metaMarker && (
-                    <div
-                        className={`meta-marker-tag ${metaMarker.location.toLowerCase()}`}
-                        title={`Meta-Marker: ${metaMarker.location}${metaMarker.mode ? ` (${metaMarker.mode})` : ''}`}
-                    >
-                        M
-                    </div>
-                )}
             </div>
 
             <div className="resources-list">
@@ -106,6 +101,18 @@ export const PlayerResourcesRow: React.FC<PlayerResourcesRowProps> = ({ playerId
                     </div>
                     <span className="resource-count highlighted">{boardInfluence}</span>
                 </div>
+
+                {/* Meta-Marker Supply */}
+                {counts.metaMarker && (
+                    <div className="resource-item" title="Meta-Marker (Ready)">
+                        <div className="resource-icon meta-marker-icon" aria-label="Meta-Marker Supply">
+                            <svg width="20" height="20" viewBox="0 0 24 24" style={{ color: `var(${seatColorVar})` }}>
+                                <LobbyistIcon mode={counts.metaMarker.mode} />
+                            </svg>
+                        </div>
+                        <span className="resource-count">1</span>
+                    </div>
+                )}
 
                 {/* Resources */}
                 {sortedResources.map(([resort, count]) => (

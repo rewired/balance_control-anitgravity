@@ -11,8 +11,8 @@ import { validateSurfaceHash } from './surface';
 import { withReplaySink, type ReplayHookOptions } from './engine/replay-sink';
 
 const ROOT_SYSTEM_MOVE_IDS = ['resolveChoice'] as const;
-const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources'] as const;
-const DRAW_AND_PLACE_MOVE_IDS = ['placeTile'] as const;
+const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources', 'resolveChoice'] as const;
+const DRAW_AND_PLACE_MOVE_IDS = ['placeTile', 'resolveChoice'] as const;
 
 function selectMoves(mergedMoves: MoveMap, moveIds: readonly string[], stageName: string): MoveMap {
     const out: MoveMap = {};
@@ -215,6 +215,7 @@ export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions
             },
             activePlayers: {
                 currentPlayer: 'drawAndPlace',
+                others: 'choice',
             },
             stages: {
                 drawAndPlace: {
@@ -223,6 +224,9 @@ export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions
                 },
                 politicalAction: {
                     moves: politicalActionMoves,
+                },
+                choice: {
+                    moves: rootSystemMoves,
                 },
             },
             onBegin: ({ G, ctx, events }: any) => {

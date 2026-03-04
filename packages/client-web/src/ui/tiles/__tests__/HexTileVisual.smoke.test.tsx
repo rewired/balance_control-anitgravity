@@ -6,9 +6,6 @@ import { HexTileVisual } from "../HexTileVisual";
 import { ResortIcon } from "../ResortIcon";
 import {
   CENTER_ABS,
-  INFLUENCE_CAPSULE_LABEL_GAP,
-  INFLUENCE_META_ICON_GAP,
-  INFLUENCE_META_ICON_SIZE,
   MARKER_RADIUS,
   OVERLAY_RENDER_RECT,
 } from "../tileGeometry";
@@ -27,7 +24,7 @@ function renderHexTileVisual(overrides: Partial<React.ComponentProps<typeof HexT
       isHovered={false}
       isSelected={false}
       influenceBySeat={{}}
-      metaIconsBySeat={{}}
+      metaMarkers={[]}
       badges={[]}
       {...overrides}
     />
@@ -77,22 +74,27 @@ describe("HexTileVisual smoke", () => {
     expect(screen.getByText("3")).not.toBeNull();
   });
 
-  it("renders a capsule (rect) when metaIcons exist and expands width deterministically", () => {
+  it("renders MetaMarkerOverlay chip when metaMarkers contains an entry", () => {
     const { container } = renderHexTileVisual({
-      isHovered: true,
-      influenceBySeat: { 1: 1 },
-      metaIconsBySeat: {
-        1: [<circle key="meta" cx="12" cy="12" r="10" />],
-      },
+      metaMarkers: [
+        { seat: 1 as SeatId, color: "#123456", mode: "ReturnPenalty" },
+      ],
     });
 
-    const capsule = container.querySelector("rect");
-    expect(capsule).not.toBeNull();
+    // The chip circle should be present (filled with owner color)
+    const circles = container.querySelectorAll("circle");
+    const chip = Array.from(circles).find(
+      (c) => c.getAttribute("fill") === "#123456"
+    );
+    expect(chip).not.toBeNull();
+  });
 
-    const capsuleWidth = Number(capsule?.getAttribute("width"));
-    const expectedWidth =
-      2 * MARKER_RADIUS + INFLUENCE_CAPSULE_LABEL_GAP + 1 * (INFLUENCE_META_ICON_SIZE + INFLUENCE_META_ICON_GAP);
-    expect(capsuleWidth).toBeCloseTo(expectedWidth, 4);
+  it("renders nothing in MetaMarkerOverlay when metaMarkers is empty", () => {
+    const { container } = renderHexTileVisual({
+      metaMarkers: [],
+    });
+
+    expect(screen.queryByText("M")).toBeNull();
   });
 
   it("switches badge layout mode (compact vs belt) based on badge count", () => {

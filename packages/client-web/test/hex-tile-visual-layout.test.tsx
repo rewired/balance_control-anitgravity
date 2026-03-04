@@ -12,7 +12,7 @@ describe('HexTileVisual Layout', () => {
                 isHovered={false}
                 isSelected={false}
                 influenceBySeat={{}}
-                metaIconsBySeat={{}}
+                metaMarkers={[]}
                 badges={[]}
                 resortIcon={<rect data-testid="test-icon" width="24" height="24" />}
                 valueW={5}
@@ -49,7 +49,7 @@ describe('HexTileVisual Layout', () => {
                 isHovered={false}
                 isSelected={false}
                 influenceBySeat={{}}
-                metaIconsBySeat={{}}
+                metaMarkers={[]}
                 badges={[]}
                 resortIcon={<rect data-testid="test-icon" width="24" height="24" />}
             />
@@ -77,7 +77,7 @@ describe('HexTileVisual Layout', () => {
                 isHovered={false}
                 isSelected={false}
                 influenceBySeat={{}}
-                metaIconsBySeat={{}}
+                metaMarkers={[]}
                 badges={[]}
                 valueW={5}
             />
@@ -103,7 +103,7 @@ describe('HexTileVisual Layout', () => {
                 isHovered={false}
                 isSelected={false}
                 influenceBySeat={{}}
-                metaIconsBySeat={{}}
+                metaMarkers={[]}
                 badges={[]}
                 typeIcon={<rect data-testid="type-icon" width="24" height="24" />}
                 typeTag="DOM"

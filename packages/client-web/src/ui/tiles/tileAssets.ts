@@ -16,6 +16,14 @@ import hotspotIconUrl from "../../assets/tile-icons/hotspot.svg";
 import lobbyistIconUrl from "../../assets/tile-icons/lobbyist.svg";
 import startCommitteeIconUrl from "../../assets/tile-icons/start-committee.svg";
 
+import conversionPenaltyIconUrl from "../../assets/marker-icons/conversion-penalty.svg";
+import returnPenaltyIconUrl from "../../assets/marker-icons/return-penalty.svg";
+
+export const markerIconUrls = {
+  ConversionPenalty: conversionPenaltyIconUrl,
+  ReturnPenalty: returnPenaltyIconUrl,
+} as const;
+
 export const tileOverlayUrl = overlayUrl;
 export const baseTileSvgUrl = baseTileUrl;
 

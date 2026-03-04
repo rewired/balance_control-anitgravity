@@ -7,7 +7,7 @@ import { HexTileVisual } from '../ui/tiles/HexTileVisual';
 import { ResortIcon, isResortKey } from '../ui/tiles/ResortIcon';
 import { TileTypeIcon, isTileTypeKey } from '../ui/tiles/TileTypeIcon';
 import { seatColor } from '../ui/tiles/seatColor';
-import { LobbyistIcon } from '../ui/tiles/LobbyistIcon';
+import type { MetaMarkerEntry } from '../ui/tiles/MetaMarkerOverlay';
 import type { SeatId } from '../ui/tiles/types';
 import { HexSilhouette, HexOutline } from './HexSilhouette';
 import { BoardHoverCard } from './BoardHoverCard';
@@ -202,7 +202,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
 
                     const zone = G.zones[tileId];
                     const influenceBySeat: Partial<Record<SeatId, number>> = {};
-                    const metaIconsBySeat: Partial<Record<SeatId, React.ReactNode[]>> = {};
+                    const metaMarkers: MetaMarkerEntry[] = [];
 
                     if (zone) {
                         for (const itemId of zone.items) {
@@ -214,8 +214,17 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                             if (obj.type === 'Influence') {
                                 influenceBySeat[seat] = (influenceBySeat[seat] ?? 0) + 1;
                             } else if (obj.type === 'MetaMarker') {
-                                if (!metaIconsBySeat[seat]) metaIconsBySeat[seat] = [];
-                                metaIconsBySeat[seat].push(<LobbyistIcon key={itemId} />);
+                                // CORE-01-02-17D: Meta-Marker must not be on Start Committee.
+                                if (tile.type === 'StartCommittee') {
+                                    console.warn(`[ENGINE BUG] MetaMarker ${itemId} found on Start Committee!`);
+                                    // Do not render on Start Committee
+                                } else {
+                                    metaMarkers.push({
+                                        seat,
+                                        color: seatColor(seat),
+                                        mode: obj.mode,
+                                    });
+                                }
                             }
                         }
                     }
@@ -266,7 +275,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 isHovered={hoveredTileId === tileId}
                                 isSelected={isSelected}
                                 influenceBySeat={influenceBySeat}
-                                metaIconsBySeat={metaIconsBySeat}
+                                metaMarkers={metaMarkers}
                                 badges={[]}
                                 resortIcon={tile.type !== 'Grassroots' && tile.resort && isResortKey(tile.resort) ? <ResortIcon resort={tile.resort} /> : undefined}
                                 typeIcon={(tile.type === 'Grassroots' || (!tile.resort && isTileTypeKey(tile.type))) ? <TileTypeIcon type={tile.type} /> : undefined}
@@ -347,7 +356,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                         isHovered={false}
                                         isSelected={false}
                                         influenceBySeat={{}}
-                                        metaIconsBySeat={{}}
+                                        metaMarkers={[]}
                                         badges={[]}
                                         resortIcon={pendingTile!.type !== 'Grassroots' && pendingTile!.resort ? <ResortIcon resort={pendingTile!.resort} /> : undefined}
                                         typeIcon={(pendingTile!.type === 'Grassroots' || !pendingTile!.resort) ? <TileTypeIcon type={pendingTile!.type} /> : undefined}
