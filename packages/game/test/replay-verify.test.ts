@@ -40,11 +40,10 @@ describe('Replay NDJSON verifier', () => {
         return verifyReplayRecords(baseRecords()).finalStateHash;
     }
 
-    function hashAtReplayStart(): string {
-        const records = baseRecords();
-        records.splice(1, 1);
-        records[records.length - 1] = { recordType: 'footer', totalActions: 0 };
-        return verifyReplayRecords(records).finalStateHash;
+    function createMismatchingHash(): string {
+        // Create a fake hash that is guaranteed to mismatch the real one
+        // by returning a known 64-char hex string that won't naturally occur
+        return '0'.repeat(64);
     }
 
     it('replays strict action sequence and returns deterministic final hash', () => {
@@ -66,9 +65,11 @@ describe('Replay NDJSON verifier', () => {
         expect(result.totalActions).toBe(1);
     });
 
+    /** @rule CORE-01-07-03 */
     it('verifies regular settlement stateHash checkpoints when includeStateHash is present', () => {
         const records = baseRecords();
-        records.splice(2, 0, {
+        const footerIdx = records.findIndex(r => r.recordType === 'footer');
+        records.splice(footerIdx, 0, {
             recordType: 'system.roundSettlement',
             roundNumber: 1,
             settlementKind: 'regular',
@@ -80,22 +81,26 @@ describe('Replay NDJSON verifier', () => {
         expect(result.totalActions).toBe(1);
     });
 
+    /** @rule CORE-01-07-03 */
     it('rejects settlement checkpoint hashes when they do not match current verifier state', () => {
         const records = baseRecords();
-        records.splice(2, 0, {
+        const footerIdx = records.findIndex(r => r.recordType === 'footer');
+        records.splice(footerIdx, 0, {
             recordType: 'system.roundSettlement',
             roundNumber: 1,
             settlementKind: 'regular',
             resortTileOrder: ['tile-1'],
-            stateHash: hashAtReplayStart(),
+            stateHash: createMismatchingHash(),
         });
 
         expect(() => verifyReplayRecords(records, { verifyCheckpoints: true })).toThrow(/system\.roundSettlement hash mismatch/);
     });
 
+    /** @rule CORE-01-09-01A */
     it('verifies settlement checkpoint hashing for settlementKind="final" records', () => {
         const records = baseRecords();
-        records.splice(2, 0, {
+        const footerIdx = records.findIndex(r => r.recordType === 'footer');
+        records.splice(footerIdx, 0, {
             recordType: 'system.roundSettlement',
             roundNumber: 1,
             settlementKind: 'final',
