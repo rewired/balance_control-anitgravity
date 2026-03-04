@@ -19,6 +19,7 @@ type ReplayActionRecord = Readonly<{
     player: string;
     moveType: string;
     args?: unknown;
+    typedFields?: Record<string, unknown>;
 }>;
 
 type ReplaySystemRoundSettlementRecord = Readonly<{
@@ -121,6 +122,23 @@ function validateRoundSettlementRecord(record: ReplaySystemRoundSettlementRecord
     }
 }
 
+function validateActionTypedFields(record: ReplayActionRecord): void {
+    if (record.typedFields === undefined) return;
+    if (!record.typedFields || typeof record.typedFields !== 'object' || Array.isArray(record.typedFields)) {
+        fail(record.seq, 'invalid action.typedFields (expected object when present).');
+    }
+
+    const allowedTypes = new Set(['tileId', 'resourceType', 'resourceCount', 'resourceId[]']);
+    for (const [fieldPath, fieldType] of Object.entries(record.typedFields)) {
+        if (typeof fieldPath !== 'string' || fieldPath.length === 0) {
+            fail(record.seq, 'invalid action.typedFields key (expected non-empty string path).');
+        }
+        if (typeof fieldType !== 'string' || !allowedTypes.has(fieldType)) {
+            fail(record.seq, `invalid action.typedFields["${fieldPath}"] type "${String(fieldType)}".`);
+        }
+    }
+}
+
 /**
  * Verifies Replay Format v1 NDJSON records against deterministic engine execution.
  * @remarks infrastructure; no direct SPEC binding
@@ -165,6 +183,7 @@ export function verifyReplayRecords(records: readonly ReplayNdjsonRecord[], opti
         const record = records[i];
 
         if (record.recordType === 'action') {
+            validateActionTypedFields(record);
             if (record.seq !== expectedSeq) {
                 fail(expectedSeq, `expected action seq ${expectedSeq}, got ${record.seq}.`);
             }

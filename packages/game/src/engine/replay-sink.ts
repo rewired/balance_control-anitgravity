@@ -1,6 +1,7 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { hashState } from '../hash-state';
 import type { MoveMap } from '../move-module-registry';
+import { deriveReplayTypedFields, type ReplayTypedFields } from './replay-typed-fields';
 
 export type ReplayActionRecord = Readonly<{
     recordType: 'action';
@@ -8,6 +9,7 @@ export type ReplayActionRecord = Readonly<{
     player: string;
     moveType: string;
     args: unknown[];
+    typedFields?: ReplayTypedFields;
     turn?: number;
     phase?: string;
     stateHash?: string;
@@ -87,6 +89,7 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                 player: playerId,
                 moveType,
                 args,
+                typedFields: deriveReplayTypedFields(moveType, args),
                 turn: context?.ctx?.turn,
                 phase: context?.ctx?.phase,
                 stateHash: options.includeStateHash ? hashState(context.G) : undefined,

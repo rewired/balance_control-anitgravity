@@ -328,4 +328,11 @@ export { lookupMeasureDeckForObjectId } from './engine/measure-deck-provider';
 export { exp02RegulationAtoms } from './engine/atoms/regulation';
 export { exp03CountdownAtoms } from './engine/atoms/countdown';
 
-export type { ReplayActionRecord, ReplayRecord, ReplaySink, ReplayHookOptions, ReplaySystemRoundSettlementRecord } from './engine/replay-sink';
+export type {
+    ReplayActionRecord,
+    ReplayRecord,
+    ReplaySink,
+    ReplayHookOptions,
+    ReplaySystemRoundSettlementRecord,
+} from './engine/replay-sink';
+export type { ReplayDomainFieldType, ReplayTypedFields } from './engine/replay-typed-fields';

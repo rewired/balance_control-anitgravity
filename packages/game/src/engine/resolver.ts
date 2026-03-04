@@ -276,6 +276,21 @@ export class EffectResolver {
         if (atomAny.tileId) historyEntry.tileId = atomAny.tileId;
         if (atomAny.context?.tileId) historyEntry.tileId = atomAny.context.tileId;
 
+        if (typeof historyEntry.tileId === 'string') {
+            const tile = G.tiles[historyEntry.tileId];
+            if (tile?.type) {
+                historyEntry.tileType = tile.type;
+            }
+        }
+
+        if (atom.kind === 'resource.grant') {
+            historyEntry.resourceType = atom.resort;
+        }
+
+        if (atom.kind === 'resource.pay' && Array.isArray(atom.resorts) && atom.resorts.length > 0) {
+            historyEntry.resourceType = atom.resorts.length === 1 ? atom.resorts[0] : [...atom.resorts];
+        }
+
         G.engine.history.push(historyEntry);
 
         return true;

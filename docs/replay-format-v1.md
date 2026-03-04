@@ -59,10 +59,16 @@ Required fields:
 - `turn`: integer (`>= 0`)
 - `phase`: string
 
+Optional fields:
+
+- `typedFields`: object mapping deterministic argument paths to domain type labels
+
 Rules:
 
 - `seq` is the canonical action index for deterministic replay iteration.
 - `args` MUST include only deterministic move inputs; no ephemeral UI-only fields.
+- If present, `typedFields` MUST contain only deterministic, engine-derivable metadata (for example `tileId`, `resourceType`, `resourceCount`, `resourceId[]`) and MUST NOT contain UI-only or runtime-timestamp fields.
+- `typedFields` keys MUST reference argument-local JSON paths using `<argIndex>.<field>` notation (for example `0.grassrootsTileId`).
 
 
 ### 3.3 `system.roundSettlement`
@@ -142,7 +148,7 @@ A Replay v1 file is valid iff:
 
 ```json
 {"recordType":"header","schemaVersion":"1","seed":"seed-123","matchConfig":{"players":2},"expansions":["exp01","exp03"]}
-{"recordType":"action","seq":1,"player":"0","moveType":"playCard","args":{"cardId":"C-001","tile":"A1"},"turn":0,"phase":"main"}
+{"recordType":"action","seq":1,"player":"0","moveType":"convertResources","args":[{"grassrootsTileId":"tile-1","inputCount":2,"outputResort":"DOM"}],"typedFields":{"0.grassrootsTileId":"tileId","0.inputCount":"resourceCount","0.outputResort":"resourceType"},"turn":0,"phase":"main"}
 {"recordType":"system.roundSettlement","roundNumber":1,"settlementKind":"regular","resortTileOrder":["tile-a","tile-b"]}
 {"recordType":"checkpoint","afterSeq":1,"stateHash":"sha256:abc..."}
 {"recordType":"footer","finalStateHash":"sha256:def...","totalActions":1}

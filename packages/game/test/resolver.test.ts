@@ -44,6 +44,52 @@ describe('EffectResolver cost and production behavior', () => {
         expect(G.engine.idSeq).toBe(0);
     });
 
+
+    it('adds minimal deterministic type trace metadata into engine history entries', () => {
+        const G: any = {
+            zones: {
+                Bank: { id: 'Bank', name: 'Bank', items: ['res_dom_1'] },
+                'PersonalSupply:p1': { id: 'PersonalSupply:p1', name: 'PS', items: [] },
+                tile_resort: { id: 'tile_resort', name: 'Tile', items: [] }
+            },
+            tiles: {
+                tile_resort: { id: 'tile_resort', type: TileType.Resort, weight: 1, resort: 'DOM' }
+            },
+            objects: {
+                res_dom_1: { id: 'res_dom_1', type: 'Resource', resort: 'DOM' }
+            },
+            adjacency: {},
+            grid: {},
+            engine: {
+                idSeq: 0,
+                effectQueue: [
+                    {
+                        kind: 'resource.grant',
+                        playerId: 'p1',
+                        amount: 1,
+                        resort: 'DOM',
+                        context: { tileId: 'tile_resort' }
+                    }
+                ],
+                activeModifiers: [],
+                history: [],
+                attributes: {}
+            }
+        };
+
+        const ok = EffectResolver.resolve(G, {});
+
+        expect(ok).toBe(true);
+        expect(G.engine.history).toContainEqual(
+            expect.objectContaining({
+                atom: 'resource.grant',
+                tileId: 'tile_resort',
+                tileType: TileType.Resort,
+                resourceType: 'DOM'
+            })
+        );
+    });
+
     it('should split tied production evenly and send remainder to Noise', () => {
         const bankIds = ['res_dom_1', 'res_dom_2', 'res_dom_3', 'res_dom_4', 'res_dom_5', 'res_dom_6'];
         const G: any = {
