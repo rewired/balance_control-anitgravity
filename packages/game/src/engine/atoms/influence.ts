@@ -1,3 +1,4 @@
+import { CoreZoneName } from '@balance-control/rules';
 import type { GameState } from '@balance-control/rules';
 import type { AtomRegistration } from '../engine-module-registry';
 import type { EngineState } from '../types';
@@ -8,7 +9,7 @@ import { applyModifiers } from '../resolver/modifiers';
 function handleInfluencePlace(G: GameState & { engine: EngineState }, atom: any): void {
     applyModifiers(G, null, 'beforeAction', atom);
     const { playerId, targetTileId } = atom;
-    const supplyId = `PersonalSupply:${playerId}`;
+    const supplyId = `${CoreZoneName.PersonalSupply}:${playerId}`;
     const supply = G.zones[supplyId];
     const targetZone = G.zones[targetTileId];
 

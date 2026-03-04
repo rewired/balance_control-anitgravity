@@ -100,6 +100,7 @@ export const convertResources = ({ G, ctx, events }: any, payload: unknown) => {
     if (!baseCostValidation.ok) return INVALID_MOVE;
 
     // Decoupled Extra Costs
+    // CORE-01-04-22: Always place meta-marker on conversion, even if no extra costs
     if (!EffectResolver.checkAndPayCosts(G, pid, 'convertResources', grassrootsTileId, resolvedExtraResourceIds)) return INVALID_MOVE;
 
     // Emit conversion atoms

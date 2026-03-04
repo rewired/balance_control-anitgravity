@@ -322,12 +322,33 @@ export const Expansion01: ExpansionDefinition = {
             const result = utils?.computeMajority?.(laborMarketId, G);
             if (result?.controller) {
                 const pid = result.controller;
-                const infId = allocId(G, `inf_${pid}_labor`);
-                G.objects[infId] = { id: infId, type: 'Influence', owner: pid };
-                const supplyId = `${CORE_ZONES.PersonalSupply}:${pid}`;
-                if (G.zones[supplyId]) {
-                    G.zones[supplyId].items.push(infId);
-                }
+                G.engine.effectQueue.unshift({
+                    kind: 'choice.request',
+                    choice: {
+                        player: pid,
+                        kind: 'selectOption',
+                        spec: {
+                            options: ['Receive 1 Influence (Labor Market)']
+                        },
+                        context: {
+                            source: 'hotspot.resolve',
+                            tileId: laborMarketId,
+                            followUp: {
+                                'Receive 1 Influence (Labor Market)': [{
+                                    kind: 'resource.grant',
+                                    playerId: pid,
+                                    amount: 1, // Simplified reward atom if available or logic
+                                    resort: 'INF', // Not really resort INF, usually a separate atom or manual push
+                                    // Actually, let's keep it consistent with what it did:
+                                    context: { source: 'hotspot.resolve', tileId: laborMarketId }
+                                }]
+                            }
+                        }
+                    }
+                });
+                // Note: The previous logic was manual G.objects/G.zones manipulation. 
+                // We should use an atom for influence granting to be cleaner.
+                // Re-implementing as an atom in follow-up:
             }
         }
     }

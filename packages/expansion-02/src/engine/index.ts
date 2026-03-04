@@ -275,24 +275,31 @@ export const Expansion02: ExpansionDefinition = {
                 const result = utils?.computeMajority?.(effect.payload.tileId, G);
                 if (result?.controller) {
                     const pid = result.controller;
-                    if (effect.payload.action === 'place') {
-                        let cost = 2;
-                        if (G.engine.attributes.regDiscount?.[pid]) {
-                            cost = Math.max(1, cost - G.engine.attributes.regDiscount[pid]);
-                            // We don't decrement here, we let the pay atom or a separate attribute atom handle it?
-                            // Actually, regDiscount is usually per-action.
+                    const action = effect.payload.action;
+                    const label = action === 'place' ? `Place ${effect.payload.regType} Regulation` : `Move Regulation`;
+
+                    G.engine.effectQueue.unshift({
+                        kind: 'choice.request',
+                        choice: {
+                            player: pid,
+                            kind: 'selectOption',
+                            spec: {
+                                options: [label]
+                            },
+                            context: {
+                                source: 'hotspot.resolve',
+                                tileId: EXP02_TILE_INNER_ORDER_ID,
+                                followUp: {
+                                    [label]: action === 'place' ? [
+                                        { kind: 'resource.pay', playerId: pid, amount: G.engine.attributes.regDiscount?.[pid] ? Math.max(1, 2 - G.engine.attributes.regDiscount[pid]) : 2, resorts: ['SEC'] },
+                                        { kind: 'regulation.place', regType: effect.payload.regType, targetTileId: effect.payload.targetTileId }
+                                    ] : [
+                                        { kind: 'regulation.move', regulationId: effect.payload.regulationId, targetTileId: effect.payload.targetTileId }
+                                    ]
+                                }
+                            }
                         }
-                        G.engine.effectQueue.push(
-                            { kind: 'resource.pay', playerId: pid, amount: cost, resorts: ['SEC'] },
-                            { kind: 'regulation.place', regType: effect.payload.regType, targetTileId: effect.payload.targetTileId }
-                        );
-                    } else if (effect.payload.action === 'move') {
-                        G.engine.effectQueue.push({
-                            kind: 'regulation.move',
-                            regulationId: effect.payload.regulationId,
-                            targetTileId: effect.payload.targetTileId
-                        });
-                    }
+                    });
                 }
             }
         },
@@ -300,13 +307,13 @@ export const Expansion02: ExpansionDefinition = {
             if (effect.payload.tileId === 'tile_authority_apparatus') {
                 const pid = effect.payload.playerId;
                 if (effect.payload.action === 'move') {
-                    G.engine.effectQueue.push({
+                    G.engine.effectQueue.unshift({
                         kind: 'regulation.move',
                         regulationId: effect.payload.regulationId,
                         targetTileId: effect.payload.targetTileId
                     });
                 } else if (effect.payload.action === 'remove') {
-                    G.engine.effectQueue.push({
+                    G.engine.effectQueue.unshift({
                         kind: 'regulation.remove',
                         regulationId: effect.payload.regulationId
                     });

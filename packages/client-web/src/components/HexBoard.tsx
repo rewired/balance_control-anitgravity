@@ -7,6 +7,7 @@ import { HexTileVisual } from '../ui/tiles/HexTileVisual';
 import { ResortIcon, isResortKey } from '../ui/tiles/ResortIcon';
 import { TileTypeIcon, isTileTypeKey } from '../ui/tiles/TileTypeIcon';
 import { seatColor } from '../ui/tiles/seatColor';
+import { LobbyistIcon } from '../ui/tiles/LobbyistIcon';
 import type { SeatId } from '../ui/tiles/types';
 import { HexSilhouette, HexOutline } from './HexSilhouette';
 import { BoardHoverCard } from './BoardHoverCard';
@@ -201,13 +202,21 @@ export const HexBoard: React.FC<HexBoardProps> = ({
 
                     const zone = G.zones[tileId];
                     const influenceBySeat: Partial<Record<SeatId, number>> = {};
+                    const metaIconsBySeat: Partial<Record<SeatId, React.ReactNode[]>> = {};
+
                     if (zone) {
                         for (const itemId of zone.items) {
                             const obj = G.objects[itemId];
-                            if (obj?.type !== 'Influence' || !obj.owner) continue;
+                            if (!obj || !obj.owner) continue;
                             const seat = playerIdToSeatId(obj.owner);
                             if (!seat) continue;
-                            influenceBySeat[seat] = (influenceBySeat[seat] ?? 0) + 1;
+
+                            if (obj.type === 'Influence') {
+                                influenceBySeat[seat] = (influenceBySeat[seat] ?? 0) + 1;
+                            } else if (obj.type === 'MetaMarker') {
+                                if (!metaIconsBySeat[seat]) metaIconsBySeat[seat] = [];
+                                metaIconsBySeat[seat].push(<LobbyistIcon key={itemId} />);
+                            }
                         }
                     }
 
@@ -257,7 +266,7 @@ export const HexBoard: React.FC<HexBoardProps> = ({
                                 isHovered={hoveredTileId === tileId}
                                 isSelected={isSelected}
                                 influenceBySeat={influenceBySeat}
-                                metaIconsBySeat={{}}
+                                metaIconsBySeat={metaIconsBySeat}
                                 badges={[]}
                                 resortIcon={tile.type !== 'Grassroots' && tile.resort && isResortKey(tile.resort) ? <ResortIcon resort={tile.resort} /> : undefined}
                                 typeIcon={(tile.type === 'Grassroots' || (!tile.resort && isTileTypeKey(tile.type))) ? <TileTypeIcon type={tile.type} /> : undefined}

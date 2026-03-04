@@ -33,12 +33,28 @@ function handleHotspotResolve(G: GameState & { engine: EngineState }, ctx: any, 
         // 2. Determine Majority
         const { controller } = computeMajority(tileId, G);
         if (controller) {
-            // Emit influence placement
+            // CORE-01-06-03C: Inform controller about reward via choice dialog
             G.engine.effectQueue.unshift({
-                kind: 'influence.place',
-                playerId: controller,
-                targetTileId: tileId,
-                context: { source: 'hotspot.resolve', tileId }
+                kind: 'choice.request',
+                choice: {
+                    player: controller,
+                    kind: 'selectOption',
+                    spec: {
+                        options: ['Receive 1 Influence']
+                    },
+                    context: {
+                        source: 'hotspot.resolve',
+                        tileId,
+                        followUp: {
+                            'Receive 1 Influence': [{
+                                kind: 'influence.place',
+                                playerId: controller,
+                                targetTileId: tileId,
+                                context: { source: 'hotspot.resolve', tileId }
+                            }]
+                        }
+                    }
+                }
             });
         }
     }
