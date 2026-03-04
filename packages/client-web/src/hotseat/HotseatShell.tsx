@@ -89,7 +89,7 @@ export const HotseatShell: React.FC<{ setupData?: unknown }> = ({ setupData }) =
             setupData,
             multiplayer: localMultiplayer,
             debug: false,
-        });
+        } as any);
     }, [localMultiplayer, setupData]);
 
     const [clientState, setClientState] = useState<any>(null);
