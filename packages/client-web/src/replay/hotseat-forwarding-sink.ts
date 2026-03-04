@@ -1,9 +1,9 @@
-import type { ReplayActionRecord, ReplaySink } from '@balance-control/game';
+import type { ReplayRecord, ReplaySink } from '@balance-control/game';
 
 const HOTSEAT_REPLAY_ENDPOINT = '/api/replay/hotseat';
 
 export class HotseatForwardingReplaySink implements ReplaySink {
-    public writeAction(record: ReplayActionRecord): void {
+    public writeRecord(record: ReplayRecord): void {
         const payload = JSON.stringify(record);
 
         if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
