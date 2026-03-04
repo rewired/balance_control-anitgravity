@@ -18,12 +18,17 @@
     /* Emerald */
     --accent-inf: #8b5cf6;
     /* Violet */
-    --accent-sec: #ef4444;
-    /* Red */
     --accent-clm: #38bdf8;
     /* Sky */
 
-    /* Borders */
+    /* Glass Effect */
+    --bg-glass: rgba(15, 23, 42, 0.75);
+    --bg-glass-heavy: rgba(10, 15, 30, 0.9);
+    --glass-blur: blur(12px);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+    /* Spacing */
     --border-glass: 1px solid rgba(255, 255, 255, 0.1);
     --border-active: 1px solid rgba(255, 255, 255, 0.3);
 
@@ -67,10 +72,12 @@ body {
 
 /* Utilities */
 .glass-panel {
-    background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    border: var(--border-glass);
+    background: var(--bg-glass);
+    backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
     border-radius: var(--radius-lg);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s ease;
 }
 
 .flex-center {
@@ -285,9 +292,11 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
-    padding: var(--space-md);
+    padding: var(--space-lg);
     overflow-y: auto;
     min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
 .left-panel {
@@ -1246,4 +1255,94 @@ button.btn-primary:hover {
 /* Hide zone title for cleaner look if needed */
 .zone-title-hidden {
     display: none;
+}
+
+/* Player Resources Row Improvements */
+.player-resources-row {
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    transition: all 0.2s ease;
+}
+
+.player-resources-row.active {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.player-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.status-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.player-label {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+.meta-marker-tag {
+    font-size: 9px;
+    font-weight: 900;
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: #f472b6;
+    color: white;
+    margin-left: auto;
+    text-transform: uppercase;
+}
+
+.meta-marker-tag.supply {
+    opacity: 0.6;
+}
+
+.meta-marker-tag.board {
+    box-shadow: 0 0 8px #f472b6;
+}
+
+.resources-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.resource-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.resource-count.highlighted {
+    color: var(--text-primary);
+    font-size: 15px;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.player-resources-row {
+    animation: fadeIn 0.4s ease forwards;
 }

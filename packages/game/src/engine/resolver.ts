@@ -13,6 +13,8 @@ import {
     type CostSpec,
     type CostValidationResult
 } from './resolver/costs';
+import { getPublicSurface } from '../surface';
+import { updateGlobalStats } from '../state-lookup';
 import { assemblePacks } from '../move-assembly';
 
 /**
@@ -230,6 +232,9 @@ export class EffectResolver {
             }
         }
 
+        // Task: Server-authoritative influence/meta-marker stats
+        updateGlobalStats(G, ctx);
+
         return ok;
     }
 
@@ -276,8 +281,8 @@ export class EffectResolver {
         return true;
     }
 
-    private static buildAtomDispatch(G: GameState & { engine: EngineState }): ReadonlyMap<string, AtomHandler> {
+    private static buildAtomDispatch(G: GameState & { engine: EngineState }): ReadonlyMap<string, any> {
         const assembly = assemblePacks({ config: G.meta?.cfg as any, mode: 'enabled' });
-        return assembly.buildAtomDispatch(G, (G2, ctx2, hook, payload) => this.triggerHook(G2 as any, ctx2, hook, payload));
+        return assembly.buildAtomDispatch(G, (G2: any, ctx2: any, hook: string, payload: any) => this.triggerHook(G2, ctx2, hook as any, payload));
     }
 }

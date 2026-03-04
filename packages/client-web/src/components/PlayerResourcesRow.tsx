@@ -43,6 +43,10 @@ export const PlayerResourcesRow: React.FC<PlayerResourcesRowProps> = ({ playerId
     // Seat colors mapping
     const seatColorVar = `--seat-${parseInt(playerId) + 1}`;
 
+    const stats = (G.meta as any)?.stats?.[playerId];
+    const boardInfluence = stats?.boardInfluence ?? 0;
+    const metaMarker = stats?.metaMarker;
+
     return (
         <div className={`player-resources-row ${active ? 'active' : ''}`} data-testid={`player-resources-${playerId}`}>
             <div className="player-indicator">
@@ -53,22 +57,54 @@ export const PlayerResourcesRow: React.FC<PlayerResourcesRowProps> = ({ playerId
                     }}
                 />
                 <span className="player-label">P{playerId}</span>
+
+                {metaMarker && (
+                    <div
+                        className={`meta-marker-tag ${metaMarker.location.toLowerCase()}`}
+                        title={`Meta-Marker: ${metaMarker.location}${metaMarker.mode ? ` (${metaMarker.mode})` : ''}`}
+                    >
+                        M
+                    </div>
+                )}
             </div>
 
             <div className="resources-list">
                 {/* Influence Supply */}
-                <div className="resource-item" title={t('core:inspector.influence') || 'Influence'}>
-                    <div className="resource-icon influence-icon" aria-label="Influence">
+                <div className="resource-item" title={t('core:inspector.influence') + ' (Supply)'}>
+                    <div className="resource-icon influence-icon" aria-label="Influence Supply">
                         <div style={{
                             width: '14px',
                             height: '14px',
                             borderRadius: '50%',
                             background: `var(${seatColorVar})`,
-                            border: '1px solid rgba(255,255,255,0.5)',
-                            boxShadow: '0 0 4px rgba(0,0,0,0.5)'
-                        }} />
+                            border: '1px solid rgba(255,255,255,0.3)',
+                            boxShadow: '0 0 4px rgba(0,0,0,0.5)',
+                            position: 'relative'
+                        }}>
+                            <div style={{
+                                position: 'absolute',
+                                inset: '-2px',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                borderRadius: '50%'
+                            }} />
+                        </div>
                     </div>
                     <span className="resource-count">{counts.influence}</span>
+                </div>
+
+                {/* Board Influence */}
+                <div className="resource-item" title="Influence on Board">
+                    <div className="resource-icon influence-board-icon" aria-label="Board Influence">
+                        <div style={{
+                            width: '14px',
+                            height: '14px',
+                            borderRadius: '50%',
+                            background: 'transparent',
+                            border: `2px solid var(${seatColorVar})`,
+                            boxShadow: `0 0 6px var(${seatColorVar})`,
+                        }} />
+                    </div>
+                    <span className="resource-count highlighted">{boardInfluence}</span>
                 </div>
 
                 {/* Resources */}

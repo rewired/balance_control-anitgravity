@@ -1,7 +1,7 @@
 import { GameState, CoreZoneName, TileType } from '@balance-control/rules';
 import { positionKeyFromCoordString } from './topology';
 import { EffectResolver } from './engine/resolver';
-import { findObjectZoneId } from './state-lookup';
+import { findObjectZoneId, getPlayerMetaMarker } from './state-lookup';
 
 /**
  * Returns the maximum influence cap based on player count.
@@ -14,12 +14,6 @@ export function getInfluenceCap(ctx: any): number {
     return ctx.numPlayers >= 5 ? 8 : 7;
 }
 
-/**
- * Counts the total Influence objects owned by a player.
- * @rule CORE-01-08-01
- * @deterministic
- * @pure
- */
 export function countPlayerInfluence(G: any, pid: string): number {
     let count = 0;
     for (const obj of Object.values(G.objects) as any[]) {
@@ -27,6 +21,7 @@ export function countPlayerInfluence(G: any, pid: string): number {
     }
     return count;
 }
+
 
 /**
  * Checks if the player has at least one Influence in their PersonalSupply.
