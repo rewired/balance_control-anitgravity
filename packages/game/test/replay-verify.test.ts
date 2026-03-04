@@ -40,6 +40,13 @@ describe('Replay NDJSON verifier', () => {
         return verifyReplayRecords(baseRecords()).finalStateHash;
     }
 
+    function hashAtReplayStart(): string {
+        const records = baseRecords();
+        records.splice(1, 1);
+        records[records.length - 1] = { recordType: 'footer', totalActions: 0 };
+        return verifyReplayRecords(records).finalStateHash;
+    }
+
     it('replays strict action sequence and returns deterministic final hash', () => {
         const result = verifyReplayRecords(baseRecords());
         expect(result.totalActions).toBe(1);
@@ -73,7 +80,20 @@ describe('Replay NDJSON verifier', () => {
         expect(result.totalActions).toBe(1);
     });
 
-    it('verifies final settlement stateHash checkpoints when includeStateHash is present', () => {
+    it('rejects settlement checkpoint hashes when they do not match current verifier state', () => {
+        const records = baseRecords();
+        records.splice(2, 0, {
+            recordType: 'system.roundSettlement',
+            roundNumber: 1,
+            settlementKind: 'regular',
+            resortTileOrder: ['tile-1'],
+            stateHash: hashAtReplayStart(),
+        });
+
+        expect(() => verifyReplayRecords(records, { verifyCheckpoints: true })).toThrow(/system\.roundSettlement hash mismatch/);
+    });
+
+    it('verifies settlement checkpoint hashing for settlementKind="final" records', () => {
         const records = baseRecords();
         records.splice(2, 0, {
             recordType: 'system.roundSettlement',
