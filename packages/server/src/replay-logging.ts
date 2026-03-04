@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { ReplayActionRecord, ReplayRecord, ReplaySink } from '@balance-control/game';
+import type { ReplayRecord, ReplaySink } from '@balance-control/game';
 
 const DEFAULT_REPLAY_DIRECTORY_SEGMENTS = ['log', 'replay'] as const;
 const FILE_EXTENSION = '.replay.ndjson';
@@ -71,7 +71,7 @@ export function resolveReplayDirectory(inputPath?: string, currentWorkingDirecto
     return path.normalize(resolved);
 }
 
-export function createReplayFilename(record: ReplayActionRecord, timestamp: Date = new Date()): string {
+export function createReplayFilename(record: ReplayRecord, timestamp: Date = new Date()): string {
     const matchIdPart = sanitizeFilenamePart(record.matchId ?? 'unknown-match', 'unknown-match');
     const seedPart = sanitizeFilenamePart(record.seed ?? 'unknown-seed', 'unknown-seed');
     const timestampPart = formatUtcTimestamp(timestamp);
