@@ -3,6 +3,7 @@ import { CoreZoneName, TileType } from '@balance-control/rules';
 import { EffectResolver } from '../../../engine/resolver';
 import { formalizeInfluencePayloadSchema, validateMovePayload } from '../../../move-contracts';
 import { CostSlot, hasDuplicateIds, hasOverlap, isBoardTile } from '../../shared';
+import { selectDeterministicCostResourceIds } from '../../../engine/deterministic-cost';
 import { allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap, returnMetaMarkerToSupply } from '../../../mechanics-turn';
 import { beginPoliticalActionMove, finalizePoliticalActionMove } from './shared';
 
@@ -39,10 +40,19 @@ import { beginPoliticalActionMove, finalizePoliticalActionMove } from './shared'
 export const formalizeInfluence = ({ G, ctx, events }: any, payload: unknown) => {
     const validated = validateMovePayload('formalizeInfluence', formalizeInfluencePayloadSchema, payload);
     if (!validated.ok) return INVALID_MOVE;
-    const { committeeTileId, paymentResourceIds, extraResourceIds } = validated.value;
-
+    const { committeeTileId, paymentResourceIds: explicitResourceIds, paymentResorts, extraResourceIds } = validated.value;
     const pid = beginPoliticalActionMove({ G, ctx }, 'formalizeInfluence');
     if (pid === INVALID_MOVE) return INVALID_MOVE;
+
+    let paymentResourceIds = explicitResourceIds;
+    if (!paymentResourceIds && paymentResorts) {
+        // Resolve paymentResorts to deterministic resource IDs
+        const slots = paymentResorts.map(resort => (resort === 'ANY' ? 'ANY' : [resort]));
+        paymentResourceIds = selectDeterministicCostResourceIds(G, pid, slots) ?? undefined;
+    }
+
+    if (!paymentResourceIds) return INVALID_MOVE;
+
     const tile = G.tiles[committeeTileId];
     const isStartCommittee = tile?.type === TileType.StartCommittee;
 

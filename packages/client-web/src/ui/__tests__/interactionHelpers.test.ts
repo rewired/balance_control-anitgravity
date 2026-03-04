@@ -13,30 +13,29 @@ describe('interaction helpers', () => {
         it('groups and sorts formalize intents deterministically', () => {
             const intents: LegalIntent[] = [
                 // Committee C1
-                // Payment P1 (A, B)
-                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['B', 'A'], extraResourceIds: ['X'] }), // Variant 1
-                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['A', 'B'], extraResourceIds: ['Y'] }), // Variant 2
-                // Payment P2 (C)
-                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['C'] }),
+                // Payment P1 (DOM, FOR)
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResorts: ['FOR', 'DOM'], extraResourceIds: ['X'] }), // Variant 1
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResorts: ['DOM', 'FOR'], extraResourceIds: ['Y'] }), // Variant 2
+                // Payment P2 (ECO)
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResorts: ['ECO'] }),
 
                 // Committee C2
-                intent('formalizeInfluence', { committeeTileId: 'C2', paymentResourceIds: [] }),
+                intent('formalizeInfluence', { committeeTileId: 'C2', paymentResorts: [] }),
             ];
 
             const groupsMap = groupFormalizeIntents(intents);
 
             expect(groupsMap.size).toBe(2);
-            expect(Array.from(groupsMap.keys())).toEqual(['C1', 'C2']); // Map iteration order is insertion order, but logic doesn't guarantee key sort.
-            // However, the groups within each committee are sorted.
+            expect(Array.from(groupsMap.keys())).toEqual(['C1', 'C2']);
 
             const c1Groups = groupsMap.get('C1')!;
             expect(c1Groups).toHaveLength(2);
 
             // Expected order:
-            // 1. Payment "A|B" (sorted paymentResourceIds)
-            // 2. Payment "C"
-            expect(c1Groups[0].paymentKey).toBe('A|B');
-            expect(c1Groups[1].paymentKey).toBe('C');
+            // 1. Payment "DOM|FOR" (sorted paymentResorts)
+            // 2. Payment "ECO"
+            expect(c1Groups[0].paymentKey).toBe('DOM|FOR');
+            expect(c1Groups[1].paymentKey).toBe('ECO');
 
             // Check variants sorting in first group
             // Expected order: extraResourceIds "X" then "Y"
@@ -86,7 +85,7 @@ describe('interaction helpers', () => {
                 intent('convertResources', { grassrootsTileId: 'T1', inputCount: 2 }), // missing outputResort
                 intent('convertResources', { outputResort: 'O2', inputCount: 1 }), // missing grassrootsTileId
                 intent('convertResources', { grassrootsTileId: 'T2', outputResort: 'O2', inputCount: 1 }),
-                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['A'] }),
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResorts: ['A'] }),
             ];
 
             const groupsMap = groupConvertIntents(intents);
@@ -136,7 +135,7 @@ describe('interaction helpers', () => {
                 intent('exp02.takeMeasure', {}),
                 intent('exp02.takeMeasure', null),
                 intent('exp03.takeMeasure.extra', 'not-a-match'),
-                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['A'] }),
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResorts: ['A'] }),
             ];
 
             const groups = groupMeasureIntents(intents);
@@ -150,11 +149,11 @@ describe('interaction helpers', () => {
     describe('groupFormalizeIntents', () => {
         it('ignores invalid formalize intents and keeps deterministic payment grouping', () => {
             const intents: LegalIntent[] = [
-                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['B', 'A'], extraResourceIds: ['Z'] }),
-                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['A', 'B'], extraResourceIds: ['Y'] }),
-                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResourceIds: ['C'] }),
-                intent('formalizeInfluence', { committeeTileId: 'C1' }), // missing paymentResourceIds
-                intent('formalizeInfluence', { paymentResourceIds: ['D'] }), // missing committeeTileId
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResorts: ['B', 'A'], extraResourceIds: ['Z'] }),
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResorts: ['A', 'B'], extraResourceIds: ['Y'] }),
+                intent('formalizeInfluence', { committeeTileId: 'C1', paymentResorts: ['C'] }),
+                intent('formalizeInfluence', { committeeTileId: 'C1' }), // missing paymentResorts
+                intent('formalizeInfluence', { paymentResorts: ['D'] }), // missing committeeTileId
                 intent('convertResources', { grassrootsTileId: 'T1', outputResort: 'O1', inputCount: 1 }),
             ];
 
@@ -165,8 +164,8 @@ describe('interaction helpers', () => {
             expect(c1Groups.map((group) => group.paymentKey)).toEqual(['', 'A|B', 'C']);
             expect(c1Groups[0]?.variants.map((variant) => variant.payload)).toEqual([{ committeeTileId: 'C1' }]);
             expect(c1Groups[1]?.variants.map((variant) => variant.payload)).toEqual([
-                { committeeTileId: 'C1', paymentResourceIds: ['A', 'B'], extraResourceIds: ['Y'] },
-                { committeeTileId: 'C1', paymentResourceIds: ['B', 'A'], extraResourceIds: ['Z'] },
+                { committeeTileId: 'C1', paymentResorts: ['A', 'B'], extraResourceIds: ['Y'] },
+                { committeeTileId: 'C1', paymentResorts: ['B', 'A'], extraResourceIds: ['Z'] },
             ]);
         });
     });

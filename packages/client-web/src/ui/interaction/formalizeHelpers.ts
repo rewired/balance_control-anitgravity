@@ -3,7 +3,7 @@ import type { LegalIntent } from '@balance-control/game';
 
 export interface FormalizeGroup {
     paymentKey: string;
-    paymentResourceIds: string[];
+    paymentResorts: string[];
     variants: LegalIntent[];
 }
 
@@ -22,10 +22,9 @@ export function groupFormalizeIntents(intents: LegalIntent[]): Map<string, Forma
         const committeeTileId = intent.payload?.committeeTileId;
         if (typeof committeeTileId !== 'string') continue;
 
-        // Payment key is derived from the paymentResourceIds.
-        // We sort them for the key to ensure stability.
-        const paymentResourceIds: string[] = intent.payload?.paymentResourceIds ?? [];
-        const paymentKey = [...paymentResourceIds].sort().join('|');
+        // Payment key is derived from the paymentResorts.
+        const paymentResorts: string[] = intent.payload?.paymentResorts ?? [];
+        const paymentKey = [...paymentResorts].sort().join('|');
 
         if (!byCommittee.has(committeeTileId)) {
             byCommittee.set(committeeTileId, new Map());
@@ -50,7 +49,7 @@ export function groupFormalizeIntents(intents: LegalIntent[]): Map<string, Forma
 
             groups.push({
                 paymentKey,
-                paymentResourceIds: variants[0].payload?.paymentResourceIds ?? [],
+                paymentResorts: variants[0].payload?.paymentResorts ?? [],
                 variants: sortedVariants
             });
         }

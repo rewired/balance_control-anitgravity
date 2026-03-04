@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -19,12 +20,20 @@ export default defineConfig({
             '@balance-control/packs': path.resolve(__dirname, '../packs/src/index.ts'),
         }
     },
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost:8000',
+                changeOrigin: true,
+            },
+        },
+    },
     test: {
         environment: 'jsdom',
         coverage: {
             provider: 'v8',
             reporter: ['text', 'lcov'],
-            thresholds: {
+            threshold: {
                 branches: 75,
                 functions: 80,
                 lines: 90,

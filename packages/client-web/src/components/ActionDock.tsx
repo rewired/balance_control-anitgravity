@@ -122,23 +122,28 @@ const VariantSelectionPanel: React.FC<{ controller: InteractionController }> = (
                 {groups.map(group => (
                     <div key={group.paymentKey} style={{ marginBottom: '8px' }}>
                         <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                            {group.paymentResourceIds.length > 0
-                                ? t('core:ui.pay', { pay: group.paymentResourceIds.join(', ') })
+                            {group.paymentResorts.length > 0
+                                ? t('core:ui.pay', { pay: group.paymentResorts.join(', ') })
                                 : t('core:ui.free')}
                         </div>
-                        {group.variants.map(variant => (
-                            <button
-                                key={intentSortKey(variant)}
-                                className="btn-secondary btn-small"
-                                onClick={() => proposeIntent(variant)}
-                                style={{ width: '100%', textAlign: 'left', marginBottom: '4px' }}
-                                data-testid={`btn-variant-${variant.payload?.extraResourceIds?.join('-') || 'base'}`}
-                            >
-                                {variant.payload?.extraResourceIds && variant.payload.extraResourceIds.length > 0
-                                    ? t('core:ui.extra', { extra: variant.payload.extraResourceIds.join(', ') })
-                                    : t('core:ui.standard')}
-                            </button>
-                        ))}
+                        {group.variants.map(variant => {
+                            const extraIds = (variant.payload?.extraResourceIds as string[]) ?? [];
+                            const extraCount = extraIds.length;
+
+                            return (
+                                <button
+                                    key={intentSortKey(variant)}
+                                    className="btn-secondary btn-small"
+                                    onClick={() => proposeIntent(variant)}
+                                    style={{ width: '100%', textAlign: 'left', marginBottom: '4px' }}
+                                    data-testid={`btn-variant-${extraIds.join('-') || 'base'}`}
+                                >
+                                    {extraCount > 0
+                                        ? t('core:ui.extra', { extra: extraIds.join(', ') })
+                                        : t('core:ui.standard')}
+                                </button>
+                            );
+                        })}
                     </div>
                 ))}
             </div>
@@ -397,7 +402,7 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
     // Helper to add to More
     const addToMore = (key: string, label: string, onClick: () => void, testId: string, count?: number) => {
         moreItems.push(
-             <button
+            <button
                 key={key}
                 className="btn-secondary"
                 onClick={onClick}
@@ -405,7 +410,7 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
                 data-testid={testId}
             >
                 <span>{label}</span>
-                {count !== undefined && <span style={{opacity: 0.7, fontSize: '0.9em'}}>({count})</span>}
+                {count !== undefined && <span style={{ opacity: 0.7, fontSize: '0.9em' }}>({count})</span>}
             </button>
         );
     };
@@ -419,21 +424,21 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
 
     // If Convert is NOT primary but has intents
     if (thirdActionType !== 'convert' && convertIntents.length > 0) {
-         addToMore('convert', t('core:action.convert'),
+        addToMore('convert', t('core:action.convert'),
             () => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources'),
             'btn-more-convert', convertIntents.length);
     }
 
     // If Measure is NOT primary but has intents
     if (thirdActionType !== 'takeMeasure' && measureIntents.length > 0) {
-         addToMore('takeMeasure', t('core:action.takeMeasure'),
+        addToMore('takeMeasure', t('core:action.takeMeasure'),
             () => setActionMode(actionMode === 'takeMeasure' ? 'none' : 'takeMeasure'),
             'btn-more-takeMeasure', measureIntents.length);
     }
 
     // Others (Expansions)
     vm.political.others.forEach(intent => {
-         moreItems.push(
+        moreItems.push(
             <button
                 key={intentSortKey(intent)}
                 className="btn-secondary"
@@ -443,7 +448,7 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
             >
                 {formatIntentLabel(intent, t, G)}
             </button>
-         );
+        );
     });
 
     return (
@@ -457,7 +462,7 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
                     style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
                 >
                     <span>{t('core:action.placeInfluence')}</span>
-                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({placeIntents.length})</span>
+                    <span style={{ opacity: 0.8, fontSize: '0.9em' }}>({placeIntents.length})</span>
                 </button>
             )}
 
@@ -467,10 +472,10 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
                     className={actionMode === 'moveInfluence' ? 'btn-primary' : 'btn-secondary'}
                     onClick={() => setActionMode(actionMode === 'moveInfluence' ? 'none' : 'moveInfluence')}
                     data-testid="btn-mode-move-influence"
-                     style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
+                    style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
                 >
                     <span>{t('core:action.moveInfluence')}</span>
-                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({moveIntents.length})</span>
+                    <span style={{ opacity: 0.8, fontSize: '0.9em' }}>({moveIntents.length})</span>
                 </button>
             )}
 
@@ -482,26 +487,26 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
                     data-testid="btn-mode-formalize-influence"
                     style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}
                 >
-                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <img src={tileIconUrlByType.Committee} style={{ width: 16, height: 16 }} alt="" />
                         {t('core:action.formalize')}
                     </div>
-                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({formalizeIntents.length})</span>
+                    <span style={{ opacity: 0.8, fontSize: '0.9em' }}>({formalizeIntents.length})</span>
                 </button>
             )}
 
             {thirdActionType === 'convert' && (
-                 <button
+                <button
                     className={actionMode === 'convertResources' ? 'btn-primary' : 'btn-secondary'}
                     onClick={() => setActionMode(actionMode === 'convertResources' ? 'none' : 'convertResources')}
                     data-testid="btn-mode-convert-resources"
                     style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}
                 >
-                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <img src={tileIconUrlByType.Grassroots} style={{ width: 16, height: 16 }} alt="" />
                         {t('core:action.convert')}
                     </div>
-                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({convertIntents.length})</span>
+                    <span style={{ opacity: 0.8, fontSize: '0.9em' }}>({convertIntents.length})</span>
                 </button>
             )}
 
@@ -510,10 +515,10 @@ const PoliticalActionList: React.FC<{ G: GameState; controller: InteractionContr
                     className={actionMode === 'takeMeasure' ? 'btn-primary' : 'btn-secondary'}
                     onClick={() => setActionMode(actionMode === 'takeMeasure' ? 'none' : 'takeMeasure')}
                     data-testid="btn-mode-take-measure"
-                     style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
+                    style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
                 >
                     <span>{t('core:action.takeMeasure')}</span>
-                    <span style={{opacity: 0.8, fontSize: '0.9em'}}>({measureIntents.length})</span>
+                    <span style={{ opacity: 0.8, fontSize: '0.9em' }}>({measureIntents.length})</span>
                 </button>
             )}
 

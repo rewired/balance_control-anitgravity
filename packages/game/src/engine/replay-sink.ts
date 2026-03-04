@@ -51,8 +51,13 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
 
     for (const [moveType, moveFn] of Object.entries(moves)) {
         wrapped[moveType] = ((context: any, ...args: unknown[]) => {
+            const isClientOptimistic = Boolean((context?.G as any)?._isPlayerView);
             const result = moveFn(context, ...args);
             if (result === INVALID_MOVE) return result;
+
+            if (isClientOptimistic) {
+                return result;
+            }
 
             const playerId = context?.ctx?.currentPlayer;
             if (typeof playerId !== 'string') return result;

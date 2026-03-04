@@ -62,7 +62,7 @@ export const FormalizeWizardModal: React.FC<FormalizeWizardModalProps> = ({
 
                     <div className="payment-options" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {groups.map((group) => {
-                            const paymentLabels = group.paymentResourceIds.map((id) => getObjectLabel(G, id).toUpperCase());
+                            const paymentLabels = group.paymentResorts.map((resort) => resort.toUpperCase());
 
                             return (
                                 <div key={group.paymentKey} className="payment-group" style={{ border: 'var(--border-glass)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
@@ -71,10 +71,9 @@ export const FormalizeWizardModal: React.FC<FormalizeWizardModalProps> = ({
                                     </div>
                                     <div className="variants" style={{ display: 'flex', flexDirection: 'column' }}>
                                         {group.variants.map((intent, idx) => {
-                                            const extra = (intent.payload?.extraResourceIds as string[]) ?? [];
-                                            const extraLabels = extra.map((id) => getObjectLabel(G, id).toUpperCase());
-                                            const label = extra.length > 0
-                                                ? `Include extra: ${extraLabels.join(', ')}`
+                                            const extraCount = ((intent.payload?.extraResourceIds as string[]) ?? []).length;
+                                            const label = extraCount > 0
+                                                ? `Include extra costs (${extraCount} resources)`
                                                 : 'Standard payment (no extras)';
 
                                             return (

@@ -108,6 +108,8 @@ describe('enumerateLegalIntents', () => {
         const intents = enumerateLegalIntents(G as any, ctx, '0');
         const formalize = intents.find(intent => intent.moveType === 'formalizeInfluence');
         expect(formalize).toBeTruthy();
+        expect(formalize?.payload.paymentResorts).toEqual(['DOM', 'FOR'].sort());
+        expect(formalize?.payload.paymentResourceIds).toBeUndefined();
 
         const events = { endTurn: () => { }, endStage: () => { }, setStage: () => { } };
         const cloned = cloneGameState(G);

@@ -18,9 +18,18 @@ export const moveInfluencePayloadSchema = z.object({
 
 export const formalizeInfluencePayloadSchema = z.object({
     committeeTileId: z.string(),
-    paymentResourceIds: z.array(z.string()),
+    paymentResourceIds: z.array(z.string()).optional(),
+    paymentResorts: z.array(z.string()).optional(),
     extraResourceIds: z.array(z.string()).optional(),
-}).strict();
+}).strict().superRefine((value, ctx) => {
+    if (!value.paymentResourceIds && !value.paymentResorts) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['paymentResourceIds'],
+            message: 'either paymentResourceIds or paymentResorts is required'
+        });
+    }
+});
 
 const convertResourcesInputCountSchema = z.number().int().refine((count) => count === 2 || count === 3, {
     message: 'inputCount must be 2 or 3'

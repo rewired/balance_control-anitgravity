@@ -310,25 +310,32 @@ function enumerateFormalize(G: GameState, ctx: any, playerID: string): LegalInte
         }
 
         const requiredCount = isStartCommittee ? 4 : 2;
-        const paymentCandidates = enumerateResourceCombos(G, supplyResources, requiredCount)
-            .filter(combo => hasUniqueResorts(G, combo, isStartCommittee ? 3 : 2));
+        const supplyResorts = supplyResources.map(rid => (G.objects[rid] as any).resort).sort();
+        const resortCombos = enumerateResortCombos(supplyResorts, requiredCount);
 
-        for (const paymentResourceIds of paymentCandidates) {
+        for (const paymentResorts of resortCombos) {
+            if (!hasUniqueResortsCount(paymentResorts, isStartCommittee ? 3 : 2)) continue;
+
+            const paymentSlots = paymentResorts.map(r => [r]);
+            const paymentResourceIds = selectDeterministicCostResourceIds(G, playerID, paymentSlots);
+            if (!paymentResourceIds) continue;
+
             const extraCostSlots = isStartCommittee ? [] : EffectResolver.getExtraCostSlots(G as any, playerID, 'influence.formalize', tileId);
-            const extraResourceCombos = extraCostSlots.length === 0
-                ? [[]]
-                : enumerateCostResourceIds(G, playerID, extraCostSlots, new Set(paymentResourceIds));
-            for (const extraResourceIds of extraResourceCombos) {
-                intents.push({
-                    moveType: 'formalizeInfluence',
-                    payload: {
-                        committeeTileId: tileId,
-                        paymentResourceIds,
-                        extraResourceIds: extraResourceIds.length > 0 ? extraResourceIds : undefined
-                    },
-                    contextTileId: tileId
-                });
-            }
+            const extraResourceIds = extraCostSlots.length === 0
+                ? []
+                : selectDeterministicCostResourceIds(G, playerID, extraCostSlots, new Set(paymentResourceIds));
+
+            if (extraCostSlots.length > 0 && !extraResourceIds) continue;
+
+            intents.push({
+                moveType: 'formalizeInfluence',
+                payload: {
+                    committeeTileId: tileId,
+                    paymentResorts,
+                    extraResourceIds: extraResourceIds && extraResourceIds.length > 0 ? extraResourceIds : undefined
+                },
+                contextTileId: tileId
+            });
         }
     }
 
@@ -447,20 +454,17 @@ function hasPlayerInfluenceOnTile(G: GameState, tileId: string, playerID: string
     });
 }
 
-function enumerateResourceCombos(G: GameState, resourceIds: string[], count: number): string[][] {
+function enumerateResortCombos(resorts: string[], count: number): string[][] {
     const results: string[][] = [];
     if (count <= 0) return results;
-    const sorted = [...resourceIds].sort((a, b) => a.localeCompare(b));
 
     const recurse = (startIndex: number, acc: string[]) => {
         if (acc.length === count) {
             results.push([...acc]);
             return;
         }
-        for (let i = startIndex; i <= sorted.length - (count - acc.length); i++) {
-            const rid = sorted[i];
-            if (!isResourceId(G, rid)) continue;
-            acc.push(rid);
+        for (let i = startIndex; i <= resorts.length - (count - acc.length); i++) {
+            acc.push(resorts[i]);
             recurse(i + 1, acc);
             acc.pop();
         }
@@ -470,13 +474,9 @@ function enumerateResourceCombos(G: GameState, resourceIds: string[], count: num
     return results;
 }
 
-function hasUniqueResorts(G: GameState, resourceIds: string[], requiredUnique: number): boolean {
-    const resorts = new Set<string>();
-    for (const rid of resourceIds) {
-        const res: any = G.objects[rid];
-        if (res && res.resort) resorts.add(res.resort);
-    }
-    return resorts.size >= requiredUnique;
+function hasUniqueResortsCount(resorts: string[], requiredUnique: number): boolean {
+    const unique = new Set(resorts);
+    return unique.size >= requiredUnique;
 }
 
 function enumerateCostResourceIds(G: GameState, playerID: string, slots: CostSlot[], excluded: Set<string>): string[][] {

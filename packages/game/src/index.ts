@@ -96,7 +96,7 @@ function buildPlayerView(G: GameState, playerID?: string | null): GameState {
         engine.pendingChoice = undefined;
     }
 
-    return { ...G, zones, objects, tiles, engine };
+    return { ...G, _isPlayerView: true, zones, objects, tiles, engine } as any;
 }
 
 function computeCoreGameover(G: GameState): { winner: string } | { draw: true } {
