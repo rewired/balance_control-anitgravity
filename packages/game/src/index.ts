@@ -248,16 +248,19 @@ export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions
                     if (!G.roundNumber) G.roundNumber = 0;
                     G.roundNumber++;
                     const resortTileOrder = runFinalRoundSettlement(G as any, ctx);
-                    emitReplaySystemRecord(replayHook, { G, ctx }, {
-                        roundNumber: G.roundNumber,
-                        settlementKind: 'final',
-                        resortTileOrder,
-                    });
                     G.roundSettlementDone = true;
 
                     const drawPile = G.zones[CoreZoneName.DrawPile];
                     const shouldEndForDrawPile = Boolean(drawPile && drawPile.items.length === 0);
                     const shouldEnd = shouldEndForDrawPile || endedByNoLegalPlacements;
+
+                    // Emit after deterministic settlement mutations to keep system record hashes verifier-aligned.
+                    emitReplaySystemRecord(replayHook, { G, ctx }, {
+                        roundNumber: G.roundNumber,
+                        settlementKind: 'final',
+                        resortTileOrder,
+                    });
+
                     if (shouldEnd && typeof events?.endGame === 'function') {
                         events.endGame(computeCoreGameover(G));
                     }
@@ -288,11 +291,6 @@ export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions
                         (G as any).engine.effectQueue.push({ kind: 'production.resolve', tileId });
                     }
                     EffectResolver.resolve(G as any, ctx);
-                    emitReplaySystemRecord(replayHook, { G, ctx }, {
-                        roundNumber: G.roundNumber,
-                        settlementKind: 'regular',
-                        resortTileOrder,
-                    });
 
                     EffectResolver.triggerHook(G as any, ctx, 'onRoundEnd');
                     EffectResolver.resetRoundScopedUsage(G as any);
@@ -302,6 +300,13 @@ export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions
                     if (drawPile && drawPile.items.length === 0) {
                         G.roundSettlementDone = true;
                     }
+
+                    // Emit after all deterministic round-settlement mutations to keep hashes post-settlement.
+                    emitReplaySystemRecord(replayHook, { G, ctx }, {
+                        roundNumber: G.roundNumber,
+                        settlementKind: 'regular',
+                        resortTileOrder,
+                    });
                 }
             },
         },

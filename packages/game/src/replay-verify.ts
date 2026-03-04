@@ -218,7 +218,7 @@ export function verifyReplayRecords(records: readonly ReplayNdjsonRecord[], opti
                 }
                 const actualHash = hashState(state.G as any);
                 if (actualHash !== record.stateHash) {
-                    fail(expectedSeq - 1, `system.roundSettlement hash mismatch (expected ${record.stateHash}, got ${actualHash}).`);
+                    fail(expectedSeq - 1, `system.roundSettlement hash mismatch (expected post-settlement ${record.stateHash}, got ${actualHash}).`);
                 }
             }
             continue;

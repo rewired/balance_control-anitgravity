@@ -36,6 +36,10 @@ describe('Replay NDJSON verifier', () => {
         ];
     }
 
+    function hashAfterBaseAction(): string {
+        return verifyReplayRecords(baseRecords()).finalStateHash;
+    }
+
     it('replays strict action sequence and returns deterministic final hash', () => {
         const result = verifyReplayRecords(baseRecords());
         expect(result.totalActions).toBe(1);
@@ -55,6 +59,34 @@ describe('Replay NDJSON verifier', () => {
         expect(result.totalActions).toBe(1);
     });
 
+    it('verifies regular settlement stateHash checkpoints when includeStateHash is present', () => {
+        const records = baseRecords();
+        records.splice(2, 0, {
+            recordType: 'system.roundSettlement',
+            roundNumber: 1,
+            settlementKind: 'regular',
+            resortTileOrder: ['tile-1'],
+            stateHash: hashAfterBaseAction(),
+        });
+
+        const result = verifyReplayRecords(records, { verifyCheckpoints: true });
+        expect(result.totalActions).toBe(1);
+    });
+
+    it('verifies final settlement stateHash checkpoints when includeStateHash is present', () => {
+        const records = baseRecords();
+        records.splice(2, 0, {
+            recordType: 'system.roundSettlement',
+            roundNumber: 1,
+            settlementKind: 'final',
+            resortTileOrder: ['tile-1'],
+            stateHash: hashAfterBaseAction(),
+        });
+
+        const result = verifyReplayRecords(records, { verifyCheckpoints: true });
+        expect(result.totalActions).toBe(1);
+    });
+
     it('fails fast on first action-seq divergence with diagnostic', () => {
         const records = baseRecords();
         records[1] = {
@@ -67,8 +99,6 @@ describe('Replay NDJSON verifier', () => {
 
         expect(() => verifyReplayRecords(records)).toThrow(/Replay divergence at seq 1: expected action seq 1, got 2/);
     });
-
-
 
     it('accepts action typedFields metadata when values are known domain types', () => {
         const records = baseRecords();
