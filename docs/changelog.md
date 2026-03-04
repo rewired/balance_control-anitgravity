@@ -5,6 +5,7 @@
 
 ## Unreleased
 
+- 2026-03-03: task(0324) Client-web build: fix TypeScript compile break by including `packages/bot-llm/src` in `client-web` TS project scope (TS6307), narrowing bot seat config to `SeatBotConfig` before reading `model` (TS2339), and using a typed local `Client` options intersection to admit existing `setupData` runtime usage (TS2353); add DD-0324 and task documentation.
 - 2026-03-03: task(0323) Bot/LLM tooling: fix `packages/bot-llm` pretest build order by building `@balance-control/game` before `@balance-control/packs`, resolving workspace TS2307 module-resolution failures for `@balance-control/game` during `pnpm -w test`; add DD-0323 and task documentation.
 - 2026-03-03: task(0322) Replay logging: ändere den Server-Defaultpfad auf den Workspace-Root `log/replay` (statt cwd-abhängig), verdrahte Hotseat-Replays aus dem Client per `/api/replay/hotseat` in denselben Server-`ReplaySink`, damit auch Local-Hotseat-Aktionen als NDJSON-Datei persistiert werden; ergänze Task- und ADR-Dokumentation.
 - 2026-03-02: task(0318) Bot/LLM: add `runTurnOrchestrator(...)` to execute full bot turn cycles via legal-intent enumeration + Ollama selection + callback-based intent dispatch; introduce host-agnostic integration hooks (`dispatchIntent`, `getLatestSnapshot`) and deterministic loop guards (`maxTurns`, `maxConsecutiveBotActions`) for bot-vs-bot safety (CORE-01-04-09, ARCH-04:INTERACTION_MODEL/RESTRICTIONS/DETERMINISM).

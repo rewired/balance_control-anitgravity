@@ -1,7 +1,7 @@
 import { runTurnOrchestrator, type TurnOrchestratorConfig, type TurnOrchestratorSnapshot } from '../../../bot-llm/src/turn-orchestrator';
 import type { LegalIntent } from '@balance-control/game';
 import { INVALID_MOVE } from 'boardgame.io/core';
-import type { GameConfig, SeatConfig } from '@balance-control/rules';
+import type { GameConfig, SeatBotConfig, SeatConfig } from '@balance-control/rules';
 
 const DEFAULT_OLLAMA_ENDPOINT = import.meta.env.VITE_OLLAMA_ENDPOINT ?? 'http://127.0.0.1:11434/api/generate';
 const DEFAULT_OLLAMA_TIMEOUT_MS = Number(import.meta.env.VITE_OLLAMA_TIMEOUT_MS ?? 10_000);
@@ -12,7 +12,7 @@ export function getSeatsFromSnapshot(snapshot: TurnOrchestratorSnapshot): NonNul
     return seats && typeof seats === 'object' ? seats : {};
 }
 
-export function isBotSeat(seat: SeatConfig | undefined): boolean {
+export function isBotSeat(seat: SeatConfig | undefined): seat is SeatBotConfig {
     return seat?.role === 'bot' && seat.provider === 'ollama' && typeof seat.model === 'string' && seat.model.length > 0;
 }
 

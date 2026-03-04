@@ -25,11 +25,13 @@
             "@balance-control/expansion-03": ["../expansion-03/src"],
             "@balance-control/expansion-01/engine": ["../expansion-01/src/engine"],
             "@balance-control/expansion-02/engine": ["../expansion-02/src/engine"],
-            "@balance-control/expansion-03/engine": ["../expansion-03/src/engine"]
+            "@balance-control/expansion-03/engine": ["../expansion-03/src/engine"],
+            "@balance-control/bot-llm": ["../bot-llm/src"]
         }
     },
     "include": [
         "src",
+        "../bot-llm/src",
         "../game/src",
         "../rules/src",
         "../shared/src",
