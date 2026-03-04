@@ -13,6 +13,7 @@ import { isProhibited } from '../resolver/prohibitions';
  * @rule CORE-01-06-07
  * @rule CORE-01-06-08
  * @rule CORE-01-06-03A
+ * @rule CORE-01-06-03B
  * @deterministic
  * @sideEffects
  */
@@ -33,7 +34,7 @@ function handleHotspotResolve(G: GameState & { engine: EngineState }, ctx: any, 
         // 2. Determine Majority
         const { controller } = computeMajority(tileId, G);
         if (controller) {
-            // CORE-01-06-03C: Inform controller about reward via choice dialog
+            // CORE-01-06-05: Majority controller receives the hotspot Influence placement reward
             G.engine.effectQueue.unshift({
                 kind: 'choice.request',
                 choice: {
