@@ -42,6 +42,19 @@ describe('Replay NDJSON verifier', () => {
         expect(result.finalStateHash).toMatch(/^[a-f0-9]{64}$/);
     });
 
+    it('accepts deterministic system.roundSettlement records in replay body', () => {
+        const records = baseRecords();
+        records.splice(2, 0, {
+            recordType: 'system.roundSettlement',
+            roundNumber: 1,
+            settlementKind: 'regular',
+            resortTileOrder: ['tile-1', 'tile-2']
+        });
+
+        const result = verifyReplayRecords(records);
+        expect(result.totalActions).toBe(1);
+    });
+
     it('fails fast on first action-seq divergence with diagnostic', () => {
         const records = baseRecords();
         records[1] = {
@@ -53,5 +66,17 @@ describe('Replay NDJSON verifier', () => {
         };
 
         expect(() => verifyReplayRecords(records)).toThrow(/Replay divergence at seq 1: expected action seq 1, got 2/);
+    });
+
+    it('fails on invalid system.roundSettlement payload shape', () => {
+        const records = baseRecords();
+        records.splice(2, 0, {
+            recordType: 'system.roundSettlement',
+            roundNumber: 0,
+            settlementKind: 'regular',
+            resortTileOrder: []
+        });
+
+        expect(() => verifyReplayRecords(records)).toThrow(/invalid system.roundSettlement.roundNumber/);
     });
 });

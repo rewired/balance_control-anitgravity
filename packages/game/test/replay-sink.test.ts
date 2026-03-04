@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { withReplaySink, type ReplayActionRecord } from '../src/engine/replay-sink';
+import { emitReplaySystemRecord, withReplaySink, type ReplayActionRecord, type ReplayRecord } from '../src/engine/replay-sink';
 
 describe('withReplaySink', () => {
     const makeContext = () => ({
@@ -18,8 +18,10 @@ describe('withReplaySink', () => {
             },
             {
                 sink: {
-                    writeAction: (record) => {
-                        records.push(record);
+                    writeRecord: (record) => {
+                        if (record.recordType === 'action') {
+                            records.push(record);
+                        }
                     },
                 },
             }
@@ -31,6 +33,7 @@ describe('withReplaySink', () => {
 
         expect(records).toEqual([
             {
+                recordType: 'action',
                 seq: 0,
                 player: '0',
                 moveType: 'okMove',
@@ -40,6 +43,7 @@ describe('withReplaySink', () => {
                 stateHash: undefined,
             },
             {
+                recordType: 'action',
                 seq: 1,
                 player: '0',
                 moveType: 'okMove',
@@ -60,7 +64,7 @@ describe('withReplaySink', () => {
             },
             {
                 sink: {
-                    writeAction: () => {
+                    writeRecord: () => {
                         throw new Error('sink failure');
                     },
                 },
@@ -73,5 +77,40 @@ describe('withReplaySink', () => {
         const event = onError.mock.calls[0][0];
         expect(event.record.seq).toBe(0);
         expect(event.record.moveType).toBe('okMove');
+    });
+});
+
+describe('emitReplaySystemRecord', () => {
+    it('emits deterministic system.roundSettlement records', () => {
+        const records: ReplayRecord[] = [];
+
+        emitReplaySystemRecord(
+            {
+                sink: {
+                    writeRecord: (record) => records.push(record),
+                },
+            },
+            {
+                G: { engine: { seed: 'seed-1' } },
+                ctx: { matchID: 'match-1' }
+            },
+            {
+                roundNumber: 2,
+                settlementKind: 'regular',
+                resortTileOrder: ['tile-a', 'tile-b'],
+            }
+        );
+
+        expect(records).toEqual([
+            {
+                recordType: 'system.roundSettlement',
+                roundNumber: 2,
+                settlementKind: 'regular',
+                resortTileOrder: ['tile-a', 'tile-b'],
+                stateHash: undefined,
+                matchId: 'match-1',
+                seed: 'seed-1',
+            },
+        ]);
     });
 });

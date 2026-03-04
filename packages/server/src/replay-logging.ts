@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { ReplayActionRecord, ReplaySink } from '@balance-control/game';
+import type { ReplayActionRecord, ReplayRecord, ReplaySink } from '@balance-control/game';
 
 const DEFAULT_REPLAY_DIRECTORY_SEGMENTS = ['log', 'replay'] as const;
 const FILE_EXTENSION = '.replay.ndjson';
@@ -83,7 +83,7 @@ class NdjsonReplaySink implements ReplaySink {
 
     public constructor(private readonly replayDirectory: string) { }
 
-    public writeAction(record: ReplayActionRecord): void {
+    public writeRecord(record: ReplayRecord): void {
         const streamKey = record.matchId ?? '__unknown_match__';
         const stream = this.ensureStream(streamKey, record);
         stream.write(`${JSON.stringify(record)}\n`);
@@ -96,7 +96,7 @@ class NdjsonReplaySink implements ReplaySink {
         this.streams.clear();
     }
 
-    private ensureStream(streamKey: string, record: ReplayActionRecord): fs.WriteStream {
+    private ensureStream(streamKey: string, record: ReplayRecord): fs.WriteStream {
         const existing = this.streams.get(streamKey);
         if (existing) {
             return existing;

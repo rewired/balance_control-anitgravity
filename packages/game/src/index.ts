@@ -1,14 +1,13 @@
 import { Game } from 'boardgame.io';
 import { GameState, CoreZoneName, TileType } from '@balance-control/rules';
 import { SetupGame } from './setup';
-import { positionKeyFromCoordString } from './topology';
 import { drawTileToStaging } from './mechanics-draw';
-import { runFinalRoundSettlement } from './mechanics-turn';
+import { getRoundSettlementResortTileOrder, runFinalRoundSettlement } from './mechanics-turn';
 import { EffectResolver } from './engine/resolver';
 import { assemblePacks, buildStageMoveMap, type MoveMap } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
 import { validateSurfaceHash } from './surface';
-import { withReplaySink, type ReplayHookOptions } from './engine/replay-sink';
+import { emitReplaySystemRecord, withReplaySink, type ReplayHookOptions } from './engine/replay-sink';
 
 const ROOT_SYSTEM_MOVE_IDS = ['resolveChoice'] as const;
 const CORE_POLITICAL_MOVE_IDS = ['placeInfluence', 'moveInfluence', 'formalizeInfluence', 'convertResources', 'resolveChoice'] as const;
@@ -248,7 +247,12 @@ export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions
 
                     if (!G.roundNumber) G.roundNumber = 0;
                     G.roundNumber++;
-                    runFinalRoundSettlement(G as any, ctx);
+                    const resortTileOrder = runFinalRoundSettlement(G as any, ctx);
+                    emitReplaySystemRecord(replayHook, { G, ctx }, {
+                        roundNumber: G.roundNumber,
+                        settlementKind: 'final',
+                        resortTileOrder,
+                    });
                     G.roundSettlementDone = true;
 
                     const drawPile = G.zones[CoreZoneName.DrawPile];
@@ -279,26 +283,16 @@ export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions
                     G.roundNumber++;
 
                     // CORE-01-07-03D: Round Settlement — resolve production in ascending PositionKey order
-                    const boardZone = G.zones[CoreZoneName.Board];
-                    const grid = G.grid ?? {};
-                    if (boardZone) {
-                        const resortTilesWithCoord: { tileId: string; posKey: string }[] = [];
-                        for (const tileId of boardZone.items) {
-                            const tile = G.tiles[tileId];
-                            if (tile?.type !== TileType.Resort) continue;
-                            const coordStr = Object.entries(grid).find(([, id]) => id === tileId)?.[0];
-                            if (coordStr) {
-                                resortTilesWithCoord.push({ tileId, posKey: positionKeyFromCoordString(coordStr) });
-                            } else {
-                                resortTilesWithCoord.push({ tileId, posKey: tileId });
-                            }
-                        }
-                        resortTilesWithCoord.sort((a, b) => a.posKey.localeCompare(b.posKey));
-                        for (const { tileId } of resortTilesWithCoord) {
-                            (G as any).engine.effectQueue.push({ kind: 'production.resolve', tileId });
-                        }
-                        EffectResolver.resolve(G as any, ctx);
+                    const resortTileOrder = getRoundSettlementResortTileOrder(G as any);
+                    for (const tileId of resortTileOrder) {
+                        (G as any).engine.effectQueue.push({ kind: 'production.resolve', tileId });
                     }
+                    EffectResolver.resolve(G as any, ctx);
+                    emitReplaySystemRecord(replayHook, { G, ctx }, {
+                        roundNumber: G.roundNumber,
+                        settlementKind: 'regular',
+                        resortTileOrder,
+                    });
 
                     EffectResolver.triggerHook(G as any, ctx, 'onRoundEnd');
                     EffectResolver.resetRoundScopedUsage(G as any);
@@ -334,4 +328,4 @@ export { lookupMeasureDeckForObjectId } from './engine/measure-deck-provider';
 export { exp02RegulationAtoms } from './engine/atoms/regulation';
 export { exp03CountdownAtoms } from './engine/atoms/countdown';
 
-export type { ReplayActionRecord, ReplaySink, ReplayHookOptions } from './engine/replay-sink';
+export type { ReplayActionRecord, ReplayRecord, ReplaySink, ReplayHookOptions, ReplaySystemRoundSettlementRecord } from './engine/replay-sink';
