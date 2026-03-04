@@ -45,11 +45,11 @@ describe('computeMajority', () => {
         expect(result.winners).toContain('p2');
     });
 
-    it('should handle Lobbyist influence', () => {
+    it('should handle Lobbyist influence only when physical influence is present', () => {
         const G = stubG();
         // Tile 1 has P1
         G.objects['inf_p1'] = { id: 'inf_p1', type: 'Influence', owner: 'p1' };
-        G.zones['tile_1'].items.push('inf_p1'); // P1 = 1
+        G.zones['tile_1'].items.push('inf_p1'); // P1 = 1 (raw)
 
         // Lobbyist (Tile 2) adjacent to Tile 1
         G.adjacency['tile_1'] = ['tile_2'];
@@ -61,18 +61,19 @@ describe('computeMajority', () => {
         // Calculate Majority on T1
         // P1 has 1 (raw)
         // P2 controls Lobbyist -> +1 (virtual)
-        // Total: P1=1, P2=1 -> Tie.
+        // BUT P2 has 0 (raw) on T1.
+        // Result: P1=1, P2=0 eligible. P1 controls.
 
         let result = computeMajority('tile_1', G);
-        expect(result.controller).toBeNull();
-        expect(result.winners).toContain('p1');
-        expect(result.winners).toContain('p2');
+        expect(result.controller).toBe('p1');
+        expect(result.winners).toEqual(['p1']);
 
-        // Add another influence for P2 on T1
+        // Add physical influence for P2 on T1
         G.objects['inf_p2_t1'] = { id: 'inf_p2_t1', type: 'Influence', owner: 'p2' };
         G.zones['tile_1'].items.push('inf_p2_t1');
 
         // Total: P1=1, P2=2 (1 raw + 1 virtual)
+        // Both have physical presence.
         result = computeMajority('tile_1', G);
         expect(result.controller).toBe('p2');
     });

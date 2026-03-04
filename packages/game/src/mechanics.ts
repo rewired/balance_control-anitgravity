@@ -64,6 +64,7 @@ export function computeMajority(tileId: string, G: GameState, visited: Set<strin
         }
     }
 
+    // CORE-01-05-03A: Determine majority winners
     let max = 0;
     let winners: string[] = [];
 
@@ -76,9 +77,21 @@ export function computeMajority(tileId: string, G: GameState, visited: Set<strin
         }
     }
 
-    if (winners.length === 1) {
-        return { controller: winners[0], winners };
+    // Determine controller from winners, requiring physical presence
+    // According to reported bug: Grassroots-Tile must not be colored for P0 if P0 has 0 influence.
+    // This implies that virtual influence alone (from Lobbyists) is insufficient for control.
+    const physicalPlayers = new Set(
+        tileZone.items
+            .map(itemId => G.objects[itemId])
+            .filter(obj => obj && obj.type === 'Influence' && obj.owner)
+            .map(obj => obj!.owner!)
+    );
+
+    const eligibleWinners = winners.filter(w => physicalPlayers.has(w));
+
+    if (eligibleWinners.length === 1) {
+        return { controller: eligibleWinners[0], winners: eligibleWinners };
     }
 
-    return { controller: null, winners: winners };
+    return { controller: null, winners: eligibleWinners };
 }
