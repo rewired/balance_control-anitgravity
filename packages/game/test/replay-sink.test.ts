@@ -42,6 +42,8 @@ describe('withReplaySink', () => {
                 turn: 1,
                 phase: 'politicalAction',
                 stateHash: undefined,
+                stateDelta: undefined,
+                stateSnapshot: undefined,
                 seed: 'seed-from-attributes',
             },
             {
@@ -54,9 +56,55 @@ describe('withReplaySink', () => {
                 turn: 1,
                 phase: 'politicalAction',
                 stateHash: undefined,
+                stateDelta: undefined,
+                stateSnapshot: undefined,
                 seed: 'seed-from-attributes',
             },
         ]);
+    });
+
+    it('emits deterministic stateDelta and periodic stateSnapshot checkpoint records', () => {
+        const records: ReplayRecord[] = [];
+
+        const wrapped = withReplaySink(
+            {
+                addResource: (context: any, id: string) => {
+                    context.G.objects[id] = { id, type: 'Resource', owner: '0', resort: 'DOM' };
+                    context.G.zones.stockpile.items.push(id);
+                    return undefined;
+                },
+            },
+            {
+                includeStateDelta: true,
+                snapshotEveryActions: 2,
+                sink: { writeRecord: (record) => records.push(record) },
+            }
+        );
+
+        const context = {
+            G: {
+                engine: { attributes: { seed: 'seed-from-attributes' } },
+                zones: { stockpile: { items: [] } },
+                objects: {},
+            },
+            ctx: { currentPlayer: '0', turn: 1, phase: 'politicalAction', matchID: 'm-1', numPlayers: 2 },
+        };
+
+        wrapped.addResource(context as any, 'res-1');
+        wrapped.addResource(context as any, 'res-2');
+
+        const actionRecords = records.filter((record): record is ReplayActionRecord => record.recordType === 'action');
+        expect(actionRecords).toHaveLength(2);
+        expect(actionRecords[0].stateDelta?.changedResources).toMatchObject({
+            'res-1': { owner: '0', resort: 'DOM', zone: 'stockpile' },
+        });
+        expect(actionRecords[1].stateDelta?.changedResources).toMatchObject({
+            'res-2': { owner: '0', resort: 'DOM', zone: 'stockpile' },
+        });
+
+        const checkpoints = records.filter((record) => record.recordType === 'checkpoint');
+        expect(checkpoints).toHaveLength(1);
+        expect(checkpoints[0]).toMatchObject({ recordType: 'checkpoint', afterSeq: 2, matchId: 'm-1' });
     });
 
 

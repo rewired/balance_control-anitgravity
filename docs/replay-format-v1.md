@@ -62,6 +62,8 @@ Required fields:
 Optional fields:
 
 - `typedFields`: object mapping deterministic argument paths to domain type labels
+- `stateDelta`: object carrying minimal changed/removed state slices
+- `stateSnapshot`: object carrying periodic full snapshot slices
 
 Rules:
 
@@ -69,6 +71,8 @@ Rules:
 - `args` MUST include only deterministic move inputs; no ephemeral UI-only fields.
 - If present, `typedFields` MUST contain only deterministic, engine-derivable metadata (for example `tileId`, `resourceType`, `resourceCount`, `resourceId[]`) and MUST NOT contain UI-only or runtime-timestamp fields.
 - `typedFields` keys MUST reference argument-local JSON paths using `<argIndex>.<field>` notation (for example `0.grassrootsTileId`).
+- If present, `stateDelta` MUST contain only deterministic engine state slices and MUST NOT contain UI-only fields. MVP delta scope is limited to changed/removed `zones`, `resources`, and `metaMarkers`.
+- If present, `stateSnapshot` MUST contain only deterministic engine state slices and MUST NOT contain UI-only fields. MVP snapshot scope is limited to `zones`, `resources`, and `metaMarkers`.
 
 
 ### 3.3 `system.roundSettlement`
@@ -100,11 +104,13 @@ Required fields:
 Optional recommended field:
 
 - `afterSeq`: integer (`>= 0`), linking the checkpoint to the last applied action sequence.
+- `stateSnapshot`: object, deterministic snapshot payload at checkpoint boundary.
 
 Rules:
 
 - `checkpoint` is optional in MVP and may be emitted at implementation-defined cadence.
 - If present, `stateHash` MUST be produced with the canonical deterministic hashing pipeline.
+- If present, `stateSnapshot` MUST be deterministic and engine-authoritative; verifier implementations MAY validate it against replayed state.
 
 ### 3.5 `footer`
 
