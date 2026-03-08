@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- 2026-03-08: task(0341) Replay API docs hardening: add TSDoc contract blocks for exported replay boundary types (`ReplayActionRecord`, `ReplaySystemRoundSettlementRecord`, `ReplayCheckpointRecord`, `ReplaySink`), clarify optional `matchConfig`/`expansions` semantics as header-consistent metadata echoes, and add determinism/remarks side-effect tags for engine/server contract clarity.
 - 2026-03-08: task(0340) Replay delta/snapshot determinism: add minimal engine-authoritative `stateDelta` (`zones`, `resources`, `metaMarkers`) and periodic `stateSnapshot`/`checkpoint` emission in replay hook, and extend replay verifier to validate snapshot payload shape plus snapshot-vs-replayed-state consistency when checkpoint verification is enabled.
 - 2026-03-08: task(0339) Replay logging/verifier alignment: emit v1 NDJSON boundary records (`header` first, `footer` last), add optional action-cadence `checkpoint` emission in server sink, align replay action sequencing to start at 1 for verifier compatibility, and add server integration tests that replay generated files through `verifyReplayRecords` with checkpoint/final-hash validation.
 - 2026-03-08: task(0335) Game setup seed resolution: prioritize boardgame.io seed candidates in order (`ctx.randomSeed`, `ctx._randomSeed`, nested `ctx.ctx` variants) before RNG internals, coerce numeric/string seeds via `String(...)`, and resolve from normalized setup context to keep `G.engine.attributes.seed` consistently populated.
