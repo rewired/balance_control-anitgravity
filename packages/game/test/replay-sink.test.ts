@@ -34,7 +34,7 @@ describe('withReplaySink', () => {
         expect(records).toEqual([
             {
                 recordType: 'action',
-                seq: 0,
+                seq: 1,
                 player: '0',
                 moveType: 'okMove',
                 args: [{ id: 'b' }],
@@ -46,7 +46,7 @@ describe('withReplaySink', () => {
             },
             {
                 recordType: 'action',
-                seq: 1,
+                seq: 2,
                 player: '0',
                 moveType: 'okMove',
                 args: [{ id: 'c' }],
@@ -126,7 +126,7 @@ describe('withReplaySink', () => {
         expect(() => wrapped.okMove(makeContext() as any, { id: 'x' })).not.toThrow();
         expect(onError).toHaveBeenCalledTimes(1);
         const event = onError.mock.calls[0][0];
-        expect(event.record.seq).toBe(0);
+        expect(event.record.seq).toBe(1);
         expect(event.record.moveType).toBe('okMove');
     });
 });

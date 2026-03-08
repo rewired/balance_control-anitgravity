@@ -15,6 +15,8 @@ export type ReplayActionRecord = Readonly<{
     stateHash?: string;
     matchId?: string;
     seed?: string;
+    matchConfig?: Record<string, unknown>;
+    expansions?: readonly string[];
 }>;
 
 export type ReplaySystemRoundSettlementRecord = Readonly<{
@@ -25,6 +27,8 @@ export type ReplaySystemRoundSettlementRecord = Readonly<{
     stateHash?: string;
     matchId?: string;
     seed?: string;
+    matchConfig?: Record<string, unknown>;
+    expansions?: readonly string[];
 }>;
 
 export type ReplayRecord = ReplayActionRecord | ReplaySystemRoundSettlementRecord;
@@ -58,6 +62,33 @@ function resolveReplaySeed(context: any): string | undefined {
     return typeof seedCandidate === 'string' ? seedCandidate : undefined;
 }
 
+function resolveReplayMatchConfig(context: any): Record<string, unknown> | undefined {
+    const players = context?.ctx?.numPlayers;
+    if (typeof players !== 'number' || !Number.isInteger(players) || players < 2) {
+        return undefined;
+    }
+
+    const expansionFlags = (context?.G?.meta?.cfg?.expansions ?? {}) as Record<string, unknown>;
+    return {
+        players,
+        expansions: {
+            ex01: expansionFlags.ex01 === true,
+            ex02: expansionFlags.ex02 === true,
+            ex03: expansionFlags.ex03 === true,
+        },
+    };
+}
+
+function resolveReplayExpansions(matchConfig: Record<string, unknown> | undefined): readonly string[] | undefined {
+    if (!matchConfig) return undefined;
+    const expansionFlags = (matchConfig.expansions ?? {}) as Record<string, unknown>;
+    const enabled: string[] = [];
+    if (expansionFlags.ex01 === true) enabled.push('exp01');
+    if (expansionFlags.ex02 === true) enabled.push('exp02');
+    if (expansionFlags.ex03 === true) enabled.push('exp03');
+    return enabled;
+}
+
 /**
  * Wraps move handlers with a best-effort post-success replay hook.
  * @remarks infrastructure; no direct SPEC binding
@@ -67,7 +98,7 @@ function resolveReplaySeed(context: any): string | undefined {
 export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): MoveMap {
     if (!options?.sink) return moves;
 
-    let seq = 0;
+    let seq = 1;
     const wrapped: MoveMap = {};
 
     for (const [moveType, moveFn] of Object.entries(moves)) {
@@ -83,6 +114,7 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
             const playerId = context?.ctx?.currentPlayer;
             if (typeof playerId !== 'string') return result;
 
+            const matchConfig = resolveReplayMatchConfig(context);
             const record: ReplayActionRecord = {
                 recordType: 'action',
                 seq,
@@ -95,6 +127,8 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                 stateHash: options.includeStateHash ? hashState(context.G) : undefined,
                 matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
                 seed: resolveReplaySeed(context),
+                matchConfig,
+                expansions: resolveReplayExpansions(matchConfig),
             };
 
             seq += 1;
@@ -125,6 +159,8 @@ export function emitReplaySystemRecord(
 ): void {
     if (!options?.sink) return;
 
+    const matchConfig = resolveReplayMatchConfig(context);
+
     const record: ReplaySystemRoundSettlementRecord = {
         recordType: 'system.roundSettlement',
         roundNumber: payload.roundNumber,
@@ -133,6 +169,8 @@ export function emitReplaySystemRecord(
         stateHash: options.includeStateHash ? hashState(context.G) : undefined,
         matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
         seed: resolveReplaySeed(context),
+        matchConfig,
+        expansions: resolveReplayExpansions(matchConfig),
     };
 
     try {
