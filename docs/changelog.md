@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- 2026-03-08: task(0335) Game setup seed resolution: prioritize boardgame.io seed candidates in order (`ctx.randomSeed`, `ctx._randomSeed`, nested `ctx.ctx` variants) before RNG internals, coerce numeric/string seeds via `String(...)`, and resolve from normalized setup context to keep `G.engine.attributes.seed` consistently populated.
 - 2026-03-08: task(0336) Game tests: harden `RULESET_MANIFEST` override safety by moving manifest writes into a helper-scoped `try/finally` restore path in `setup.test.ts`, and enable Vitest file isolation for `@balance-control/game` (`--no-threads --isolate true`) to reduce cross-file shared-module leakage risk in single-process runs; add DD-0336 and task documentation.
 - 2026-03-08: task(0334) Game setup: remove local ruleset manifest fallback literals in `SetupGame`, source metadata directly from `@balance-control/rules` `RULESET_MANIFEST`, retain enabled-expansion-only projection in `meta.ruleset.expansions`, and add setup regression coverage proving central-manifest coupling; add DD-0334 and task documentation.
 - 2026-03-04: task(0332) Replay verifier tests: add explicit negative control for `system.roundSettlement.stateHash` mismatch (non-matching replay-start hash), and rename the `settlementKind: final` checkpoint test to clarify enum-payload hashing scope; no engine runtime behavior changes; add DD-0332 and task documentation.

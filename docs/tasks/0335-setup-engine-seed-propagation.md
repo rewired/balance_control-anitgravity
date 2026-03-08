@@ -253,4 +253,4 @@ Recorded in final commit message (Postflight: block).
 
 ## 15) Amendments (append-only)
 
-* N/A
+* 2026-03-08 (amendment): Refined `resolveEngineSeed` precedence to prefer direct boardgame.io seed candidates (`randomSeed`, `_randomSeed`, nested `ctx` variants) before RNG internals, switched `SetupGame` to call `resolveEngineSeed(normalizedCtx)`, and added setup tests covering precedence and numeric seed coercion.
