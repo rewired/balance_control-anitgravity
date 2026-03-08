@@ -65,7 +65,7 @@ function resolveEngineSeed(ctx: any): string | undefined {
  */
 export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown }): GameState => {
     const normalizedCtx = normalizeBoardgameCtx(ctx);
-    const effectiveSeed = resolveEngineSeed(normalizedCtx);
+    const effectiveSeed = resolveEngineSeed(ctx);
 
     const gameConfig = normalizeGameConfig(setupData);
     const rulesetBase: RulesetManifest = RULESET_MANIFEST;

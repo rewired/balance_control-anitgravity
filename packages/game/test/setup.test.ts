@@ -174,6 +174,26 @@ describe('SetupGame', () => {
         expect(G.engine.attributes.seed).toBe('seed-from-randomSeed');
     });
 
+
+    it('should preserve outer wrapped randomSeed when resolving setup engine seed', () => {
+        const outerCtx: any = {
+            randomSeed: 'outer-seed',
+            random: {
+                _private: { state: { seed: 'internal' } },
+            },
+            ctx: {
+                numPlayers: 2,
+                random: {
+                    Shuffle: (arr: any[]) => arr,
+                    Die: () => 1,
+                },
+            },
+        };
+
+        const G = SetupGame({ ctx: outerCtx as any });
+        expect(G.engine.attributes.seed).toBe('outer-seed');
+    });
+
     it('should read nested ctx._randomSeed and coerce numeric seeds to strings', () => {
         const outerCtx: any = {
             random: {
