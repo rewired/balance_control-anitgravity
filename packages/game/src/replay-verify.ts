@@ -1,10 +1,11 @@
 import { Client } from 'boardgame.io/client';
 import { createBalanceControlGame } from './index';
 import { SetupGame } from './setup';
-import { hashState } from './hash-state';
+import { canonicalJsonStringify, hashState } from './hash-state';
 import { EnginePackRegistry } from './expansion-registry';
 import { CorePack } from './packs/core';
 import { CoreMoves } from './moves';
+import { projectReplayStateSnapshot } from './engine/replay-sink';
 
 type ReplayHeaderRecord = Readonly<{
     recordType: 'header';
@@ -20,6 +21,8 @@ type ReplayActionRecord = Readonly<{
     moveType: string;
     args?: unknown;
     typedFields?: Record<string, unknown>;
+    stateDelta?: Record<string, unknown>;
+    stateSnapshot?: Record<string, unknown>;
 }>;
 
 type ReplaySystemRoundSettlementRecord = Readonly<{
@@ -34,6 +37,7 @@ type ReplayCheckpointRecord = Readonly<{
     recordType: 'checkpoint';
     afterSeq?: number;
     stateHash: string;
+    stateSnapshot?: Record<string, unknown>;
 }>;
 
 type ReplayFooterRecord = Readonly<{
@@ -139,6 +143,23 @@ function validateActionTypedFields(record: ReplayActionRecord): void {
     }
 }
 
+function validateStatePayloadShape(seq: number, field: 'stateDelta' | 'stateSnapshot', value: unknown): void {
+    if (value === undefined) return;
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        fail(seq, `invalid action.${field} (expected object when present).`);
+    }
+}
+
+function verifySnapshotPayload(seq: number, expected: Record<string, unknown> | undefined, G: any): void {
+    if (!expected) return;
+    const projected = projectReplayStateSnapshot(G) as unknown as Record<string, unknown>;
+    const expectedCanonical = canonicalJsonStringify(expected as any);
+    const actualCanonical = canonicalJsonStringify(projected as any);
+    if (expectedCanonical !== actualCanonical) {
+        fail(seq, 'stateSnapshot mismatch against replayed state.');
+    }
+}
+
 /**
  * Verifies Replay Format v1 NDJSON records against deterministic engine execution.
  * @remarks infrastructure; no direct SPEC binding
@@ -184,6 +205,8 @@ export function verifyReplayRecords(records: readonly ReplayNdjsonRecord[], opti
 
         if (record.recordType === 'action') {
             validateActionTypedFields(record);
+            validateStatePayloadShape(record.seq, 'stateDelta', record.stateDelta);
+            validateStatePayloadShape(record.seq, 'stateSnapshot', record.stateSnapshot);
             if (record.seq !== expectedSeq) {
                 fail(expectedSeq, `expected action seq ${expectedSeq}, got ${record.seq}.`);
             }
@@ -202,6 +225,10 @@ export function verifyReplayRecords(records: readonly ReplayNdjsonRecord[], opti
 
             if (!after || after._stateID === beforeStateId) {
                 fail(record.seq, `move "${record.moveType}" by player ${record.player} was rejected or produced no state transition.`);
+            }
+
+            if (options.verifyCheckpoints) {
+                verifySnapshotPayload(record.seq, record.stateSnapshot, after.G as any);
             }
 
             expectedSeq += 1;
@@ -227,6 +254,8 @@ export function verifyReplayRecords(records: readonly ReplayNdjsonRecord[], opti
         if (record.recordType === 'checkpoint') {
             if (!options.verifyCheckpoints) continue;
 
+            validateStatePayloadShape(record.afterSeq ?? expectedSeq - 1, 'stateSnapshot', record.stateSnapshot);
+
             const state = client.getState();
             if (!state) {
                 fail(record.afterSeq ?? expectedSeq - 1, 'engine produced no state for checkpoint verification.');
@@ -235,6 +264,8 @@ export function verifyReplayRecords(records: readonly ReplayNdjsonRecord[], opti
             if (actualHash !== record.stateHash) {
                 fail(record.afterSeq ?? expectedSeq - 1, `checkpoint hash mismatch (expected ${record.stateHash}, got ${actualHash}).`);
             }
+
+            verifySnapshotPayload(record.afterSeq ?? expectedSeq - 1, record.stateSnapshot, state.G as any);
             continue;
         }
 

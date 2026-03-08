@@ -142,6 +142,30 @@ describe('Replay NDJSON verifier', () => {
         expect(result.totalActions).toBe(1);
     });
 
+    it('accepts deterministic action stateDelta/stateSnapshot payload objects', () => {
+        const records = baseRecords();
+        records[1] = {
+            recordType: 'action',
+            seq: 1,
+            player: '0',
+            moveType: 'placeTile',
+            args: [{ targetCoord: '1,0' }],
+            stateDelta: {
+                changedZones: {
+                    board: ['tile-1'],
+                },
+            },
+            stateSnapshot: {
+                zones: {},
+                resources: {},
+                metaMarkers: {},
+            },
+        };
+
+        const result = verifyReplayRecords(records);
+        expect(result.totalActions).toBe(1);
+    });
+
     it('rejects unknown action typedFields domain type labels', () => {
         const records = baseRecords();
         records[1] = {
@@ -156,6 +180,42 @@ describe('Replay NDJSON verifier', () => {
         };
 
         expect(() => verifyReplayRecords(records)).toThrow(/invalid action.typedFields/);
+    });
+
+    it('rejects non-object action stateDelta payload', () => {
+        const records = baseRecords();
+        records[1] = {
+            recordType: 'action',
+            seq: 1,
+            player: '0',
+            moveType: 'placeTile',
+            args: [{ targetCoord: '1,0' }],
+            stateDelta: [] as any,
+        };
+
+        expect(() => verifyReplayRecords(records)).toThrow(/invalid action.stateDelta/);
+    });
+
+    it('verifies checkpoint stateSnapshot payload against replayed state when enabled', () => {
+        const expected = verifyReplayRecords(baseRecords());
+        const records = baseRecords();
+        records.splice(2, 0, {
+            recordType: 'checkpoint',
+            afterSeq: 1,
+            stateHash: expected.finalStateHash,
+            stateSnapshot: {
+                zones: {
+                    board: ['tile-bureaucracy'],
+                    drawPile: [
+                        '__drawpile_marker__',
+                    ],
+                },
+                resources: {},
+                metaMarkers: {},
+            },
+        });
+
+        expect(() => verifyReplayRecords(records, { verifyCheckpoints: true })).toThrow(/stateSnapshot mismatch/);
     });
 
     it('fails on invalid system.roundSettlement payload shape', () => {
