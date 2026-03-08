@@ -25,6 +25,20 @@ function normalizeBoardgameCtx(ctx: any): Ctx {
 }
 
 /**
+ * Resolves the effective boardgame.io match seed from setup context.
+ * @remarks infrastructure; no direct SPEC binding
+ * @usesRNG
+ * @rule CORE-01-03-02A
+ * @deterministic
+ * @pure
+ */
+function resolveEngineSeed(ctx: any): string | undefined {
+    const randomSource = ctx?.random ?? ctx?.ctx?.random;
+    const seedCandidate = randomSource?._private?.state?.seed;
+    return typeof seedCandidate === 'string' ? seedCandidate : undefined;
+}
+
+/**
  * Main entry point for initializing the Balance Control game state.
  * @rule CORE-01-03-01
  * @rule CORE-01-00-09
@@ -35,6 +49,7 @@ function normalizeBoardgameCtx(ctx: any): Ctx {
  */
 export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown }): GameState => {
     const normalizedCtx = normalizeBoardgameCtx(ctx);
+    const effectiveSeed = resolveEngineSeed(ctx);
 
     const gameConfig = normalizeGameConfig(setupData);
     const rulesetBase: RulesetManifest = RULESET_MANIFEST;
@@ -83,6 +98,7 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
                 tileExtraCosts: {},
                 playerExtraCosts: {},
                 climateCostRules: [],
+                seed: effectiveSeed,
                 enabledExpansions: {
                     ex01: enabledPacks.includes('exp01'),
                     ex02: enabledPacks.includes('exp02'),

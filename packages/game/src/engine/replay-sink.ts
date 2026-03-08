@@ -54,7 +54,7 @@ export type ReplaySystemRoundSettlementPayload = Readonly<{
 
 
 function resolveReplaySeed(context: any): string | undefined {
-    const seedCandidate = context?.G?.engine?.seed ?? context?.G?.engine?.attributes?.seed;
+    const seedCandidate = context?.G?.engine?.attributes?.seed;
     return typeof seedCandidate === 'string' ? seedCandidate : undefined;
 }
 

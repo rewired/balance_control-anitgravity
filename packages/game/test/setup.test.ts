@@ -121,6 +121,21 @@ describe('SetupGame', () => {
         });
     });
 
+
+    it('should persist effective boardgame.io match seed into engine attributes', () => {
+        const ctx: any = {
+            numPlayers: 2,
+            random: {
+                _private: { state: { seed: 'setup-seed-123' } },
+                Shuffle: (arr: any[]) => arr,
+                Die: () => 1,
+            },
+        };
+
+        const G = SetupGame({ ctx });
+        expect(G.engine.attributes.seed).toBe('setup-seed-123');
+    });
+
     it('should keep ruleset manifest stable for identical setup data', () => {
         const ctxA: any = { numPlayers: 2, random: createSeededRandom(42) };
         const ctxB: any = { numPlayers: 2, random: createSeededRandom(42) };
