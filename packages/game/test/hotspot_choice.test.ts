@@ -75,7 +75,7 @@ function makeHotspotChoiceTestGame(): Game {
         turn: {
             activePlayers: { currentPlayer: 'drawAndPlace' },
             stages: {
-                drawAndPlace: { moves: { placeTile: CoreMoves.placeTile }, next: 'politicalAction' },
+                drawAndPlace: { moves: { placeTile: CoreMoves.placeTile, resolveChoice: CoreMoves.resolveChoice }, next: 'politicalAction' },
                 politicalAction: { moves: CoreMoves },
             },
         },

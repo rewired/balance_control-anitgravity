@@ -73,7 +73,7 @@ describe('Expansion System', () => {
 
         // Resolve
         G.engine.effectQueue.push({ kind: 'production.resolve', tileId: 'r1' });
-        EffectResolver.resolve(G, null);
+        EffectResolver.resolve(G, { numPlayers: 2 } as any);
 
         // Check result
         // Should produce 1 + 10 = 11 resources

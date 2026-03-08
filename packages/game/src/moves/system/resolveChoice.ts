@@ -29,7 +29,7 @@ export const SystemMoves = {
             kind: 'choice.apply',
             choiceId,
             selection,
-            context: choice.spec // Spec might contain the branching data
+            context: (choice as any).context || choice.spec // Spec might still contain branching data
         } as any);
 
         EffectResolver.resolve(G, ctx);

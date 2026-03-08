@@ -4,6 +4,7 @@ import { SetupGame } from '../src/setup';
 import { CoreMoves } from '../src/moves';
 import { registerTestPacks } from './_helpers/registerPacks';
 import { INVALID_MOVE } from 'boardgame.io/core';
+import { enumerateLegalIntents } from '../src/engine/legal-intents';
 
 describe('Grassroots Repro', () => {
     beforeEach(() => {
@@ -37,8 +38,7 @@ describe('Grassroots Repro', () => {
         G.objects['r2'] = { id: 'r2', type: 'Resource', owner: '0', resort: 'DOM' } as any;
         G.objects['r3'] = { id: 'r3', type: 'Resource', owner: '0', resort: 'DOM' } as any;
 
-        const { enumerateLegalIntents } = require('../src/engine/legal-intents');
-        const intents = enumerateLegalIntents(G, ctx, '0');
+        const intents = enumerateLegalIntents(G, ctx as any, '0');
         const convertIntents = intents.filter(i => i.moveType === 'convertResources' && i.payload.grassrootsTileId === tileId);
 
         console.log('Intents for Grassroots DOM:', convertIntents.map(i => `${i.payload.inputCount} -> ${i.payload.outputResort}`));

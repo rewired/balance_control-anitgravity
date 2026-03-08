@@ -126,21 +126,23 @@ describe('Hotspot Mechanics', () => {
         // Center should now be fully surrounded (all 6 neighbors occupied)
         expect(Object.keys(state1.G.grid).length).toBe(7); // center + 6
 
-        // Hotspot resolution should have fired:
         // - computeMajority(tile_center): Player 0 has 1 influence → controller = '0'
-        // - 1 Influence moved from PersonalSupply:0 to tile_center zone
+        // - Choice request pushed to effect queue
+        expect(state1.G.engine.pendingChoice).toBeDefined();
+        expect(state1.G.engine.pendingChoice?.kind).toBe('selectOption');
+
         const centerZone = state1.G.zones['tile_center'];
         const infCount = centerZone.items.filter(
             (id: string) => state1.G.objects[id]?.type === 'Influence'
         ).length;
-        expect(infCount).toBe(2); // original 1 + hotspot reward 1
+        expect(infCount).toBe(1); // STILL 1 because it's pending choice
 
-        // Supply should be empty now
+        // Supply should still have 1
         const supply = state1.G.zones[`${CoreZoneName.PersonalSupply}:0`];
         const supplyInf = supply.items.filter(
             (id: string) => state1.G.objects[id]?.type === 'Influence'
         ).length;
-        expect(supplyInf).toBe(0);
+        expect(supplyInf).toBe(1);
     });
 
     it('should NOT trigger hotspot if center is not fully surrounded', () => {
