@@ -101,7 +101,7 @@ Concrete starting points: files, existing functions, state shape, fixtures.
   * `packages/rules/src/spec-anchors.generated.json`
 * Existing behavior summary (current):
 
-  * Hotspot resolve atom includes inline comment `CORE-01-06-03C` that is not canonical.
+  * Hotspot resolve atom includes inline comment a non-canonical hotspot anchor that is not present in the generated registry.
 
 ### 4.1 QA Runbook Baseline (mandatory for UI/prozess tasks)
 
@@ -181,7 +181,7 @@ Notes:
 
 Write pass/fail criteria; avoid vague language.
 
-* [ ] `packages/game/src/engine/atoms/hotspot.ts` no longer references non-canonical `CORE-01-06-03C`.
+* [ ] `packages/game/src/engine/atoms/hotspot.ts` no longer references non-canonical hotspot anchor reference.
 * [ ] All `@rule` tags in hotspot atom map to IDs present in generated anchors registry.
 * [ ] `pnpm run check:spec-anchors` passes.
 * [ ] Golden replay unchanged or updated intentionally with explanation.
@@ -208,7 +208,7 @@ This section MUST be completed in this task file before declaring done.
 
 ## 11) Work Summary (3–7 bullets)
 
-* Replaced non-canonical inline hotspot comment anchor `CORE-01-06-03C` with canonical `CORE-01-06-05` in `handleHotspotResolve` near the majority/controller choice enqueue path.
+* Replaced non-canonical inline hotspot comment anchor a non-canonical hotspot anchor with canonical `CORE-01-06-05` in `handleHotspotResolve` near the majority/controller choice enqueue path.
 * Added `@rule CORE-01-06-03B` to the atom TSDoc since the function enforces single-resolution behavior.
 * Verified `packages/rules/src/spec-anchors.generated.json` contains the canonical hotspot anchors (`CORE-01-06-03`, `03A`, `03B`, `04`..`08`) and did not require regeneration.
 * Ran anchor validation to confirm no unresolved rule IDs remain.

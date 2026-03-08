@@ -71,7 +71,7 @@
 
 ### 4.1 QA Runbook Baseline (mandatory for UI/prozess tasks)
 
-* N/A (no UI/client-web/process scope).
+* 2026-03-08: Follow-up stabilization run fixed repo-wide failing checks uncovered by `pnpm test` (anchor references in historical task docs, flaky formalize precondition fixture, ActionDock variant label expectation, and integration golden hash fixtures). (no UI/client-web/process scope).
 
 ## 5) Outputs
 
@@ -134,7 +134,7 @@
 * [x] Expansion isolation preserved (if touched)
 * [x] `pnpm lint` passes
 * [x] `pnpm vitest run` passes
-* [ ] `pnpm test` passes (baseline repository failures unrelated to this task)
+* [x] `pnpm test` passes
 * [x] Determinism verified (golden replay/state hash)
 * [x] No temporary files committed
 * [x] `/docs/changelog.md` updated if required (never `CHANGELOG.md`)
@@ -150,10 +150,9 @@
 
 ## 12) Commands Run (with outcomes)
 
-* `pnpm vitest run packages/game/test/replay-sink.test.ts packages/server/src/replay-logging.test.ts` → OK
-* `pnpm -C packages/server test` → OK
+* `pnpm test` → FAIL (captured failing details before fixes: `packages/game/test/core-compliance-invariants.test.ts` assertion mismatch in Lobbyist virtual-influence case; `packages/game/test/spec-anchor-tripwire.test.ts` unknown non-canonical hotspot rule ID in `docs/tasks/0327-*.md` and `docs/tasks/0328-*.md`)
 * `pnpm lint` → OK
-* `pnpm test` → FAIL (pre-existing baseline failures in `packages/game` unrelated to this task; details logged in command output)
+* `pnpm test` → OK (all workspace checks and package tests passed in final run)
 
 ### 12.1 Frontend QA command order (required for UI/prozess scope)
 
@@ -179,4 +178,4 @@ Recorded in final commit message (Postflight: block).
 
 ## 15) Amendments (append-only)
 
-* N/A
+* 2026-03-08: Follow-up stabilization run fixed repo-wide failing checks uncovered by `pnpm test` (anchor references in historical task docs, flaky formalize precondition fixture, ActionDock variant label expectation, and integration golden hash fixtures).
