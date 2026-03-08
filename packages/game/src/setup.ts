@@ -33,9 +33,25 @@ function normalizeBoardgameCtx(ctx: any): Ctx {
  * @pure
  */
 function resolveEngineSeed(ctx: any): string | undefined {
+    const directSeedCandidates = [
+        ctx?.randomSeed,
+        ctx?._randomSeed,
+        ctx?.ctx?.randomSeed,
+        ctx?.ctx?._randomSeed,
+    ];
+
+    for (const candidate of directSeedCandidates) {
+        if (typeof candidate === 'string' || typeof candidate === 'number') {
+            return String(candidate);
+        }
+    }
+
     const randomSource = ctx?.random ?? ctx?.ctx?.random;
     const seedCandidate = randomSource?._private?.state?.seed;
-    return typeof seedCandidate === 'string' ? seedCandidate : undefined;
+    if (typeof seedCandidate === 'string' || typeof seedCandidate === 'number') {
+        return String(seedCandidate);
+    }
+    return undefined;
 }
 
 /**
@@ -49,7 +65,7 @@ function resolveEngineSeed(ctx: any): string | undefined {
  */
 export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown }): GameState => {
     const normalizedCtx = normalizeBoardgameCtx(ctx);
-    const effectiveSeed = resolveEngineSeed(ctx);
+    const effectiveSeed = resolveEngineSeed(normalizedCtx);
 
     const gameConfig = normalizeGameConfig(setupData);
     const rulesetBase: RulesetManifest = RULESET_MANIFEST;

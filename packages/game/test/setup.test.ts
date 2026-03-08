@@ -157,6 +157,41 @@ describe('SetupGame', () => {
         expect(G.engine.attributes.seed).toBe('setup-seed-123');
     });
 
+    it('should prioritize direct ctx randomSeed over random internals', () => {
+        const ctx: any = {
+            numPlayers: 2,
+            randomSeed: 'seed-from-randomSeed',
+            _randomSeed: 'seed-from-_randomSeed',
+            random: {
+                _private: { state: { seed: 'seed-from-random-internals' } },
+                Shuffle: (arr: any[]) => arr,
+                Die: () => 1,
+            },
+        };
+
+        const G = SetupGame({ ctx });
+        expect(G.engine.attributes.seed).toBe('seed-from-randomSeed');
+    });
+
+    it('should read nested ctx._randomSeed and coerce numeric seeds to strings', () => {
+        const outerCtx: any = {
+            random: {
+                _private: { state: { seed: 'fallback-random-internals-seed' } },
+            },
+            ctx: {
+                numPlayers: 2,
+                _randomSeed: 987654,
+                random: {
+                    Shuffle: (arr: any[]) => arr,
+                    Die: () => 1,
+                },
+            },
+        };
+
+        const G = SetupGame({ ctx: outerCtx as any });
+        expect(G.engine.attributes.seed).toBe('987654');
+    });
+
     it('should keep ruleset manifest stable for identical setup data', () => {
         const ctxA: any = { numPlayers: 2, random: createSeededRandom(42) };
         const ctxB: any = { numPlayers: 2, random: createSeededRandom(42) };
