@@ -341,3 +341,5 @@ export type {
     ReplaySystemRoundSettlementRecord,
 } from './engine/replay-sink';
 export type { ReplayDomainFieldType, ReplayTypedFields } from './engine/replay-typed-fields';
+
+export { verifyReplayRecords, type ReplayNdjsonRecord, type ReplayVerifyOptions } from './replay-verify';

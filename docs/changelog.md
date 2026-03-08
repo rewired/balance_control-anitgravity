@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- 2026-03-08: task(0339) Replay logging/verifier alignment: emit v1 NDJSON boundary records (`header` first, `footer` last), add optional action-cadence `checkpoint` emission in server sink, align replay action sequencing to start at 1 for verifier compatibility, and add server integration tests that replay generated files through `verifyReplayRecords` with checkpoint/final-hash validation.
 - 2026-03-08: task(0335) Game setup seed resolution: prioritize boardgame.io seed candidates in order (`ctx.randomSeed`, `ctx._randomSeed`, nested `ctx.ctx` variants) before RNG internals, coerce numeric/string seeds via `String(...)`, and resolve from normalized setup context to keep `G.engine.attributes.seed` consistently populated.
 - 2026-03-08: task(0336) Game tests: harden `RULESET_MANIFEST` override safety by moving manifest writes into a helper-scoped `try/finally` restore path in `setup.test.ts`, and enable Vitest file isolation for `@balance-control/game` (`--no-threads --isolate true`) to reduce cross-file shared-module leakage risk in single-process runs; add DD-0336 and task documentation.
 - 2026-03-08: task(0334) Game setup: remove local ruleset manifest fallback literals in `SetupGame`, source metadata directly from `@balance-control/rules` `RULESET_MANIFEST`, retain enabled-expansion-only projection in `meta.ruleset.expansions`, and add setup regression coverage proving central-manifest coupling; add DD-0334 and task documentation.
