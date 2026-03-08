@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { SetupGame } from '../src/setup';
 import { EnginePackRegistry } from '../src/expansion-registry';
 import { registerTestPacks } from './_helpers/registerPacks';
-import { CoreZoneName, TileType } from '@balance-control/rules';
+import { CoreZoneName, RULESET_MANIFEST, TileType } from '@balance-control/rules';
 import { makeTestPack } from './_helpers/makeTestPack';
 
 function createSeededRandom(seed: number) {
@@ -28,8 +28,6 @@ function createSeededRandom(seed: number) {
     };
 }
 
-const EXPECTED_CORE_VERSION = 'v1.1.0';
-const EXPECTED_SPEC_ANCHOR_HASH = '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3';
 
 describe('SetupGame', () => {
     const resetRegistry = () => {
@@ -117,9 +115,9 @@ describe('SetupGame', () => {
         const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
         const G = SetupGame({ ctx });
         expect(G.meta?.ruleset).toEqual({
-            coreVersion: EXPECTED_CORE_VERSION,
+            coreVersion: RULESET_MANIFEST.coreVersion,
             expansions: {},
-            specAnchorHash: EXPECTED_SPEC_ANCHOR_HASH,
+            specAnchorHash: RULESET_MANIFEST.specAnchorHash,
         });
     });
 

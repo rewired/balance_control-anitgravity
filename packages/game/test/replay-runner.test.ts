@@ -1,9 +1,8 @@
 import { beforeEach, describe, it, expect } from 'vitest';
+import { RULESET_MANIFEST } from '@balance-control/rules';
 import { runReplay, type ReplaySpec } from '../src/replay';
 import { registerTestPacks } from './_helpers/registerPacks';
 
-const EXPECTED_CORE_VERSION = 'v1.1.0';
-const EXPECTED_SPEC_ANCHOR_HASH = '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3';
 
 describe('Replay runner', () => {
     beforeEach(() => {
@@ -48,9 +47,9 @@ describe('Replay runner', () => {
                 }
             },
             rulesetManifest: {
-                coreVersion: EXPECTED_CORE_VERSION,
+                coreVersion: RULESET_MANIFEST.coreVersion,
                 expansions: {},
-                specAnchorHash: EXPECTED_SPEC_ANCHOR_HASH
+                specAnchorHash: RULESET_MANIFEST.specAnchorHash
             },
             moves: [
                 { move: 'placeTile', payload: { targetCoord: '1,0' } },
@@ -59,7 +58,7 @@ describe('Replay runner', () => {
         };
 
         const result = runReplay(replay);
-        expect(result.state.G.meta?.ruleset?.coreVersion).toBe(EXPECTED_CORE_VERSION);
+        expect(result.state.G.meta?.ruleset?.coreVersion).toBe(RULESET_MANIFEST.coreVersion);
     });
 
     it('includes ruleset manifest in exported replay payload', () => {
