@@ -33,6 +33,8 @@ type ReplayFooterRecord = Readonly<{
 }>;
 
 type StreamState = {
+    streamKey: string;
+    matchId?: string;
     stream: fs.WriteStream;
     actionCount: number;
     lastStateHash?: string;
@@ -128,7 +130,13 @@ class NdjsonReplaySink implements ReplaySink {
         const streamKey = record.matchId ?? '__unknown_match__';
         const streamState = this.ensureStream(streamKey, record);
         this.captureHeaderMetadata(streamState, record);
-        this.ensureHeader(streamState);
+        try {
+            this.ensureHeader(streamState);
+        } catch (error) {
+            streamState.stream.destroy();
+            this.streams.delete(streamKey);
+            throw error;
+        }
 
         writeNdjsonLine(streamState.stream, record);
 
@@ -170,10 +178,15 @@ class NdjsonReplaySink implements ReplaySink {
     }
 
     private captureHeaderMetadata(streamState: StreamState, record: ReplayRecord): void {
-        if (!streamState.seed && typeof record.seed === 'string') {
+        if (typeof streamState.seed === 'undefined' && typeof record.seed === 'string' && record.seed.length > 0) {
             streamState.seed = record.seed;
         }
-        if (!streamState.matchConfig && record.matchConfig && typeof record.matchConfig === 'object') {
+        if (
+            typeof streamState.matchConfig === 'undefined'
+            && record.matchConfig
+            && typeof record.matchConfig === 'object'
+            && !Array.isArray(record.matchConfig)
+        ) {
             streamState.matchConfig = record.matchConfig;
         }
         if (typeof streamState.expansions === 'undefined' && Array.isArray(record.expansions)) {
@@ -184,11 +197,26 @@ class NdjsonReplaySink implements ReplaySink {
     private ensureHeader(streamState: StreamState): void {
         if (streamState.headerWritten) return;
 
+        const missingFields: string[] = [];
+        if (typeof streamState.seed === 'undefined') {
+            missingFields.push('seed');
+        }
+        if (typeof streamState.matchConfig === 'undefined') {
+            missingFields.push('matchConfig');
+        }
+
+        if (missingFields.length > 0) {
+            const matchIdentifier = streamState.matchId ?? 'unknown-match';
+            throw new Error(
+                `Cannot write replay header for stream "${streamState.streamKey}" (matchId="${matchIdentifier}"): missing required metadata ${missingFields.join(', ')}.`
+            );
+        }
+
         const header: ReplayHeaderRecord = {
             recordType: 'header',
             schemaVersion: '1',
-            seed: streamState.seed ?? 'unknown-seed',
-            matchConfig: streamState.matchConfig ?? { players: 2 },
+            seed: streamState.seed,
+            matchConfig: streamState.matchConfig,
             expansions: normalizeExpansions(streamState.expansions),
         };
         writeNdjsonLine(streamState.stream, header);
@@ -204,11 +232,15 @@ class NdjsonReplaySink implements ReplaySink {
         const fileName = createReplayFilename(record);
         const stream = fs.createWriteStream(path.join(this.replayDirectory, fileName), { flags: 'a', encoding: 'utf8' });
         const streamState: StreamState = {
+            streamKey,
+            matchId: record.matchId,
             stream,
             actionCount: 0,
             headerWritten: false,
-            seed: typeof record.seed === 'string' ? record.seed : undefined,
-            matchConfig: record.matchConfig,
+            seed: typeof record.seed === 'string' && record.seed.length > 0 ? record.seed : undefined,
+            matchConfig: record.matchConfig && typeof record.matchConfig === 'object' && !Array.isArray(record.matchConfig)
+                ? record.matchConfig
+                : undefined,
             expansions: Array.isArray(record.expansions) ? normalizeExpansions(record.expansions) : undefined,
         };
 

@@ -195,4 +195,56 @@ describe('NdjsonReplaySink v1 boundaries', () => {
         const header = records[0];
         expect(header).toMatchObject({ recordType: 'header', expansions: ['exp01', 'exp03'] });
     });
+
+    it('writes header with required seed and matchConfig metadata when captured before emission', async () => {
+        const directory = makeTempDir();
+        const sink = createReplaySink({ replayDirectory: directory }) as ReplaySinkLike;
+
+        sink.writeRecord({
+            recordType: 'action',
+            seq: 1,
+            player: '0',
+            moveType: 'placeTile',
+            args: [{ targetCoord: '1,0' }],
+            turn: 0,
+            phase: 'drawAndPlace',
+            matchId: 'header-required-metadata',
+            seed: 'header-required-seed',
+            matchConfig: { players: 2, mode: 'hotseat' },
+            stateHash: 'd'.repeat(64),
+        });
+
+        sink.close();
+
+        const records = await readSingleReplayFile(directory);
+        expect(records[0]).toMatchObject({
+            recordType: 'header',
+            schemaVersion: '1',
+            seed: 'header-required-seed',
+            matchConfig: { players: 2, mode: 'hotseat' },
+        });
+    });
+
+    it('throws descriptive error when required header metadata is missing', async () => {
+        const directory = makeTempDir();
+        const sink = createReplaySink({ replayDirectory: directory }) as ReplaySinkLike;
+
+        expect(() => {
+            sink.writeRecord({
+                recordType: 'action',
+                seq: 1,
+                player: '0',
+                moveType: 'placeTile',
+                args: [{ targetCoord: '1,0' }],
+                turn: 0,
+                phase: 'drawAndPlace',
+                matchId: 'missing-metadata-match',
+                stateHash: 'e'.repeat(64),
+            });
+        }).toThrowError(
+            'Cannot write replay header for stream "missing-metadata-match" (matchId="missing-metadata-match"): missing required metadata seed, matchConfig.'
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, 25));
+    });
 });
