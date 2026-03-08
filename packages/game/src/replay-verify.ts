@@ -282,7 +282,10 @@ export function verifyReplayRecords(records: readonly ReplayNdjsonRecord[], opti
     }
     const finalStateHash = hashState(finalState.G as any);
 
-    if (options.verifyFinalHash && typeof footer.finalStateHash === 'string' && footer.finalStateHash.length > 0) {
+    if (options.verifyFinalHash) {
+        if (typeof footer.finalStateHash !== 'string' || footer.finalStateHash.length === 0) {
+            fail(actionCount, 'final hash missing or empty while verifyFinalHash is enabled.');
+        }
         if (footer.finalStateHash !== finalStateHash) {
             fail(actionCount, `final hash mismatch (expected ${footer.finalStateHash}, got ${finalStateHash}).`);
         }

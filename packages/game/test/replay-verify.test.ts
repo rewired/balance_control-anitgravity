@@ -229,4 +229,30 @@ describe('Replay NDJSON verifier', () => {
 
         expect(() => verifyReplayRecords(records)).toThrow(/invalid system.roundSettlement.roundNumber/);
     });
+    it('rejects empty footer finalStateHash when verifyFinalHash is enabled', () => {
+        const records = baseRecords();
+        const footerIndex = records.findIndex((record) => record.recordType === 'footer');
+        records[footerIndex] = {
+            recordType: 'footer',
+            totalActions: 1,
+            finalStateHash: '',
+        };
+
+        expect(() => verifyReplayRecords(records, { verifyFinalHash: true })).toThrow(/final hash missing or empty/);
+    });
+
+    it('accepts matching footer finalStateHash when verifyFinalHash is enabled', () => {
+        const records = baseRecords();
+        const expectedFinalHash = verifyReplayRecords(records).finalStateHash;
+        const footerIndex = records.findIndex((record) => record.recordType === 'footer');
+        records[footerIndex] = {
+            recordType: 'footer',
+            totalActions: 1,
+            finalStateHash: expectedFinalHash,
+        };
+
+        const result = verifyReplayRecords(records, { verifyFinalHash: true });
+        expect(result.finalStateHash).toBe(expectedFinalHash);
+    });
+
 });

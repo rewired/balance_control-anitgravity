@@ -117,13 +117,13 @@ Rules:
 Required fields:
 
 - `recordType`: `"footer"`
-- `finalStateHash`: string
+- `finalStateHash`: non-empty string
 - `totalActions`: integer (`>= 0`)
 
 Rules:
 
 - `totalActions` MUST equal the number of emitted `action` records.
-- `finalStateHash` MUST match the terminal deterministic state hash after all actions are applied.
+- `finalStateHash` MUST be non-empty and MUST match the terminal deterministic state hash after all actions are applied.
 
 ## 4. Deterministic Serialization Rules
 
@@ -172,5 +172,5 @@ Behavior:
 
 1. read `header` and initialize the match with identical seed/config
 2. execute `action` records in strict sequence
-3. optionally verify checkpoint/footer hashes
+3. optionally verify checkpoint/footer hashes (strict final-hash mode rejects empty footer hashes)
 4. abort at first divergence with sequence number and diagnosis

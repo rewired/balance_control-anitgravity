@@ -1,3 +1,4 @@
+- 2026-03-08: task(0344) Replay/footer strict final hash contract: server sink now refuses footer emission when no non-empty terminal `stateHash` was observed (no `finalStateHash: ""` output), replay verifier now rejects empty/missing `footer.finalStateHash` when `verifyFinalHash` is enabled, tests cover rejection/acceptance paths, and DD-0344 documents the decision.
 - 2026-03-08: task(0335) Engine/Replay: persist effective boardgame.io match seed in `SetupGame` (`G.engine.attributes.seed`), make replay sink seed resolution read-only from engine attributes (remove legacy `G.engine.seed` fallback), and add tests for replay record seed propagation plus server replay filename seed embedding (ARCH-01:DETERMINISM, ARCH-02:SERIALIZATION, CORE-01-03-02A).
 # Changelog — BALANCE // CONTROL
 

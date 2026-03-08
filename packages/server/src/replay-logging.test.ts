@@ -126,6 +126,27 @@ describe('NdjsonReplaySink v1 boundaries', () => {
     });
 
 
+    it('throws on close when no non-empty stateHash was observed for footer emission', () => {
+        const directory = makeTempDir();
+        const sink = createReplaySink({ replayDirectory: directory }) as ReplaySinkLike;
+
+        sink.writeRecord({
+            recordType: 'action',
+            seq: 1,
+            player: '0',
+            moveType: 'placeTile',
+            args: [{ targetCoord: '1,0' }],
+            turn: 0,
+            phase: 'drawAndPlace',
+            matchId: 'missing-footer-hash-match',
+            seed: 'missing-footer-hash-seed',
+            matchConfig: { players: 2 },
+        });
+
+        expect(() => sink.close()).toThrowError(/missing required finalStateHash/);
+    });
+
+
     it('captures expansions once from the first valid metadata record before header emission', async () => {
         const directory = makeTempDir();
         const sink = createReplaySink({ replayDirectory: directory }) as ReplaySinkLike & {
