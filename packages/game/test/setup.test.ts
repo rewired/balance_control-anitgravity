@@ -142,19 +142,20 @@ describe('SetupGame', () => {
         });
     });
 
-
+    /** @rule CORE-01-03-02A */
     it('should persist effective boardgame.io match seed into engine attributes', () => {
         const ctx: any = {
             numPlayers: 2,
+            randomSeed: 'seed-x',
             random: {
-                _private: { state: { seed: 'setup-seed-123' } },
                 Shuffle: (arr: any[]) => arr,
                 Die: () => 1,
             },
         };
 
         const G = SetupGame({ ctx });
-        expect(G.engine.attributes.seed).toBe('setup-seed-123');
+        expect(ctx.random?._private?.state?.seed).toBeUndefined();
+        expect(G.engine.attributes.seed).toBe('seed-x');
     });
 
     it('should prioritize direct ctx randomSeed over random internals', () => {
