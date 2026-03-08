@@ -176,7 +176,7 @@ class NdjsonReplaySink implements ReplaySink {
         if (!streamState.matchConfig && record.matchConfig && typeof record.matchConfig === 'object') {
             streamState.matchConfig = record.matchConfig;
         }
-        if (!streamState.expansions && Array.isArray(record.expansions)) {
+        if (typeof streamState.expansions === 'undefined' && Array.isArray(record.expansions)) {
             streamState.expansions = normalizeExpansions(record.expansions);
         }
     }
@@ -209,7 +209,7 @@ class NdjsonReplaySink implements ReplaySink {
             headerWritten: false,
             seed: typeof record.seed === 'string' ? record.seed : undefined,
             matchConfig: record.matchConfig,
-            expansions: normalizeExpansions(record.expansions),
+            expansions: Array.isArray(record.expansions) ? normalizeExpansions(record.expansions) : undefined,
         };
 
         this.streams.set(streamKey, streamState);

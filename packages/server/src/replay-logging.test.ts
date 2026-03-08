@@ -124,4 +124,75 @@ describe('NdjsonReplaySink v1 boundaries', () => {
         expect(result.totalActions).toBe(1);
         expect(result.finalStateHash).toMatch(/^[a-f0-9]{64}$/);
     });
+
+
+    it('captures expansions once from the first valid metadata record before header emission', async () => {
+        const directory = makeTempDir();
+        const sink = createReplaySink({ replayDirectory: directory }) as ReplaySinkLike & {
+            ensureStream(streamKey: string, record: ReplayRecord): {
+                stream: fs.WriteStream;
+                actionCount: number;
+                headerWritten: boolean;
+                expansions?: string[];
+            };
+            captureHeaderMetadata(
+                streamState: {
+                    stream: fs.WriteStream;
+                    actionCount: number;
+                    headerWritten: boolean;
+                    expansions?: string[];
+                },
+                record: ReplayRecord
+            ): void;
+            ensureHeader(streamState: {
+                stream: fs.WriteStream;
+                actionCount: number;
+                headerWritten: boolean;
+                expansions?: string[];
+            }): void;
+        };
+
+        const firstRecordWithoutExpansions: ReplayRecord = {
+            recordType: 'action',
+            seq: 1,
+            player: '0',
+            moveType: 'placeTile',
+            args: [{ targetCoord: '1,0' }],
+            turn: 0,
+            phase: 'drawAndPlace',
+            matchId: 'late-expansion-match',
+            seed: 'late-expansion-seed',
+            matchConfig: { players: 2 },
+            stateHash: 'b'.repeat(64),
+        };
+
+        const laterRecordWithExpansions: ReplayRecord = {
+            recordType: 'action',
+            seq: 2,
+            player: '1',
+            moveType: 'placeInfluence',
+            args: [{ targetCoord: '2,0' }],
+            turn: 0,
+            phase: 'drawAndPlace',
+            matchId: 'late-expansion-match',
+            expansions: ['exp03', 'exp01', 'exp03'],
+            stateHash: 'c'.repeat(64),
+        };
+
+        const streamState = sink.ensureStream('late-expansion-match', firstRecordWithoutExpansions);
+        expect(streamState.expansions).toBeUndefined();
+
+        sink.captureHeaderMetadata(streamState, firstRecordWithoutExpansions);
+        expect(streamState.expansions).toBeUndefined();
+
+        sink.captureHeaderMetadata(streamState, laterRecordWithExpansions);
+        expect(streamState.expansions).toEqual(['exp01', 'exp03']);
+
+        sink.ensureHeader(streamState);
+        sink.close();
+
+        const records = await readSingleReplayFile(directory);
+        const header = records[0];
+        expect(header).toMatchObject({ recordType: 'header', expansions: ['exp01', 'exp03'] });
+    });
 });
