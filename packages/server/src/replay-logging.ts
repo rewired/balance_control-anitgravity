@@ -153,14 +153,31 @@ class NdjsonReplaySink implements CloseableReplaySink {
     }
 
     public close(): void {
+        let closeValidationError: Error | undefined;
+
         for (const streamState of this.streams.values()) {
-            this.ensureHeader(streamState);
+            try {
+                this.ensureHeader(streamState);
+            } catch (error) {
+                closeValidationError = error instanceof Error ? error : new Error(String(error));
+                break;
+            }
+
             if (typeof streamState.lastStateHash !== 'string' || streamState.lastStateHash.length === 0) {
                 const matchIdentifier = streamState.matchId ?? 'unknown-match';
-                throw new Error(
+                closeValidationError = new Error(
                     `Cannot write replay footer for stream "${streamState.streamKey}" (matchId="${matchIdentifier}"): missing required finalStateHash (no non-empty stateHash observed).`
                 );
+                break;
             }
+        }
+
+        if (closeValidationError) {
+            for (const streamState of this.streams.values()) {
+                streamState.stream.destroy();
+            }
+            this.streams.clear();
+            throw closeValidationError;
         }
 
         for (const streamState of this.streams.values()) {

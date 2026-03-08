@@ -5,6 +5,7 @@
 
 ## Unreleased
 
+- 2026-03-08: task(0346) Server replay logging/tests: align replay boundary tests with strict footer hash requirement by always providing `stateHash` in successful close paths, harden close-time cleanup by destroying open streams before throwing on validation failures, and stabilize negative close test teardown to avoid async `ENOENT` noise; add DD-0346 and task documentation.
 - 2026-03-08: task(0342) Server replay logging: keep stream `expansions` metadata unset until a real expansions array is observed, gate `ensureStream` assignment on `Array.isArray(record.expansions)`, tighten first-capture guard in `captureHeaderMetadata`, and add replay logging regression coverage for missing-first/later-present expansions metadata before header emission.
 - 2026-03-08: task(0341) Replay API docs hardening: add TSDoc contract blocks for exported replay boundary types (`ReplayActionRecord`, `ReplaySystemRoundSettlementRecord`, `ReplayCheckpointRecord`, `ReplaySink`), clarify optional `matchConfig`/`expansions` semantics as header-consistent metadata echoes, and add determinism/remarks side-effect tags for engine/server contract clarity.
 - 2026-03-08: task(0340) Replay delta/snapshot determinism: add minimal engine-authoritative `stateDelta` (`zones`, `resources`, `metaMarkers`) and periodic `stateSnapshot`/`checkpoint` emission in replay hook, and extend replay verifier to validate snapshot payload shape plus snapshot-vs-replayed-state consistency when checkpoint verification is enabled.

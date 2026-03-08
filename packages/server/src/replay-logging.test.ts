@@ -53,7 +53,7 @@ async function runOneActionReplay(directory: string, checkpointEveryActions?: nu
             },
         },
         expansions: [],
-        stateHash: checkpointEveryActions ? 'a'.repeat(64) : undefined,
+        stateHash: 'a'.repeat(64),
     };
 
     sink.writeRecord(actionRecord);
@@ -126,7 +126,7 @@ describe('NdjsonReplaySink v1 boundaries', () => {
     });
 
 
-    it('throws on close when no non-empty stateHash was observed for footer emission', () => {
+    it('throws on close when no non-empty stateHash was observed for footer emission', async () => {
         const directory = makeTempDir();
         const sink = createReplaySink({ replayDirectory: directory }) as ReplaySinkLike;
 
@@ -144,6 +144,8 @@ describe('NdjsonReplaySink v1 boundaries', () => {
         });
 
         expect(() => sink.close()).toThrowError(/missing required finalStateHash/);
+
+        await new Promise((resolve) => setTimeout(resolve, 25));
     });
 
 
@@ -210,6 +212,7 @@ describe('NdjsonReplaySink v1 boundaries', () => {
         expect(streamState.expansions).toEqual(['exp01', 'exp03']);
 
         sink.ensureHeader(streamState);
+        streamState.lastStateHash = 'c'.repeat(64);
         sink.close();
 
         const records = await readSingleReplayFile(directory);
