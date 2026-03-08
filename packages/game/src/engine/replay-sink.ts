@@ -33,6 +33,25 @@ export type ReplayStateDelta = Readonly<{
     removedMetaMarkers?: readonly string[];
 }>;
 
+/**
+ * Canonical replay payload for a player-driven action record.
+ *
+ * @remarks
+ * Infrastructure contract for Replay Format v1 `action` lines. `matchConfig` and
+ * `expansions` are optional on body records because they are canonically defined
+ * by the replay `header`; when present on an action record they MUST mirror the
+ * same deterministic semantics as header metadata (same effective setup config,
+ * same canonical expansion list).
+ *
+ * `matchConfig` carries replay-relevant deterministic setup parameters only.
+ * `expansions` carries the canonical enabled expansion IDs in stable order with
+ * no duplicates.
+ *
+ * @deterministic
+ * @pure
+ * @see docs/replay-format-v1.md#31-header
+ * @see docs/replay-format-v1.md#32-action
+ */
 export type ReplayActionRecord = Readonly<{
     recordType: 'action';
     seq: number;
@@ -51,6 +70,20 @@ export type ReplayActionRecord = Readonly<{
     expansions?: readonly string[];
 }>;
 
+/**
+ * Canonical replay payload for a non-player round-settlement system record.
+ *
+ * @remarks
+ * Infrastructure contract for Replay Format v1 `system.roundSettlement` lines.
+ * `matchConfig` and `expansions` are optional replay-context echoes; if present,
+ * they MUST be semantically identical to header metadata for the same replay
+ * stream (deterministic setup config + canonical expansion set).
+ *
+ * @deterministic
+ * @pure
+ * @see docs/replay-format-v1.md#31-header
+ * @see docs/replay-format-v1.md#33-systemroundsettlement
+ */
 export type ReplaySystemRoundSettlementRecord = Readonly<{
     recordType: 'system.roundSettlement';
     roundNumber: number;
@@ -63,6 +96,20 @@ export type ReplaySystemRoundSettlementRecord = Readonly<{
     expansions?: readonly string[];
 }>;
 
+/**
+ * Canonical replay payload for a deterministic checkpoint boundary.
+ *
+ * @remarks
+ * Infrastructure contract for Replay Format v1 `checkpoint` lines. Checkpoints
+ * may repeat replay header metadata for convenience; when `matchConfig` and/or
+ * `expansions` are present, consumers MUST treat them as header-equivalent
+ * metadata and reject semantic mismatch.
+ *
+ * @deterministic
+ * @pure
+ * @see docs/replay-format-v1.md#31-header
+ * @see docs/replay-format-v1.md#34-checkpoint-optional-mvp
+ */
 export type ReplayCheckpointRecord = Readonly<{
     recordType: 'checkpoint';
     afterSeq: number;
@@ -76,6 +123,20 @@ export type ReplayCheckpointRecord = Readonly<{
 
 export type ReplayRecord = ReplayActionRecord | ReplaySystemRoundSettlementRecord | ReplayCheckpointRecord;
 
+/**
+ * Sink contract used by game/server replay writers.
+ *
+ * @remarks
+ * Boundary interface between `packages/game` emission and downstream sinks
+ * (e.g., server NDJSON persistence). Implementations MUST preserve record
+ * ordering and payload values exactly as emitted to maintain replay
+ * determinism and header/body metadata consistency.
+ *
+ * @deterministic
+ * @sideEffects Receives emitted replay records and forwards them to an external sink implementation.
+ * @see docs/architecture/ARCH-01-ENGINE-CONTRACT.md
+ * @see docs/replay-format-v1.md
+ */
 export interface ReplaySink {
     writeRecord(record: ReplayRecord): void;
 }
