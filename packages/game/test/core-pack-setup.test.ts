@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CoreZoneName, TileType, type GameConfig, type GameState } from '@balance-control/rules';
+import { CoreZoneName, RULESET_MANIFEST, TileType, type GameConfig, type GameState } from '@balance-control/rules';
 import { CorePack } from '../src/packs/core';
 
 function makeBaseState(cfg: GameConfig): GameState {
@@ -11,9 +11,9 @@ function makeBaseState(cfg: GameConfig): GameState {
         grid: {},
         meta: {
             ruleset: {
-                coreVersion: 'v1.1.0',
+                coreVersion: RULESET_MANIFEST.coreVersion,
                 expansions: {},
-                specAnchorHash: '5F563AFF09ADCAF45B62E5CBBB97C5DC5D722EE2B56E3AB67B7B71BEA2F9FEF3',
+                specAnchorHash: RULESET_MANIFEST.specAnchorHash,
             },
             cfg,
         },
