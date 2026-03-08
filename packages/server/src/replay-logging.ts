@@ -153,9 +153,18 @@ class NdjsonReplaySink implements ReplaySink {
     public close(): void {
         for (const streamState of this.streams.values()) {
             this.ensureHeader(streamState);
+            if (typeof streamState.lastStateHash !== 'string' || streamState.lastStateHash.length === 0) {
+                const matchIdentifier = streamState.matchId ?? 'unknown-match';
+                throw new Error(
+                    `Cannot write replay footer for stream "${streamState.streamKey}" (matchId="${matchIdentifier}"): missing required finalStateHash (no non-empty stateHash observed).`
+                );
+            }
+        }
+
+        for (const streamState of this.streams.values()) {
             const footer: ReplayFooterRecord = {
                 recordType: 'footer',
-                finalStateHash: streamState.lastStateHash ?? '',
+                finalStateHash: streamState.lastStateHash,
                 totalActions: streamState.actionCount,
             };
             writeNdjsonLine(streamState.stream, footer);
