@@ -129,6 +129,27 @@ describe('SetupGame', () => {
         expect(G1.meta?.ruleset).toEqual(G2.meta?.ruleset);
     });
 
+    it('should source ruleset metadata from central manifest export (no local literals)', () => {
+        const previousCoreVersion = RULESET_MANIFEST.coreVersion;
+        const previousSpecAnchorHash = RULESET_MANIFEST.specAnchorHash;
+        const overriddenCoreVersion = 'v-test-core-version';
+        const overriddenSpecAnchorHash = 'v-test-spec-anchor-hash';
+
+        RULESET_MANIFEST.coreVersion = overriddenCoreVersion;
+        RULESET_MANIFEST.specAnchorHash = overriddenSpecAnchorHash;
+
+        try {
+            const ctx: any = { numPlayers: 2, random: { Shuffle: (arr: any[]) => arr } };
+            const G = SetupGame({ ctx });
+
+            expect(G.meta.ruleset.coreVersion).toBe(overriddenCoreVersion);
+            expect(G.meta.ruleset.specAnchorHash).toBe(overriddenSpecAnchorHash);
+        } finally {
+            RULESET_MANIFEST.coreVersion = previousCoreVersion;
+            RULESET_MANIFEST.specAnchorHash = previousSpecAnchorHash;
+        }
+    });
+
     it('should not apply ex01 setup when ex01 flag is disabled', () => {
         resetRegistry();
         const mockPack = makeTestPack({
