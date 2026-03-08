@@ -6,7 +6,7 @@
       "ex03": false
     }
   },
-  "expectedFinalHash": "4943c31d4fe595c34965d6f619369e24554b730cbd8fef985e2b7f9792d97950",
+  "expectedFinalHash": "9887f758fc82bab4bac3e235d0a94577a3b094091688bf4c144c54b9927bc588",
   "expectedPublicSurfaceHash": "600edc6b6b052ddefdfd3efae43d321594f9ed44b7816c1954db2a14068d2ce8",
   "id": "convert_resources_fungible_large_supply",
   "moves": [

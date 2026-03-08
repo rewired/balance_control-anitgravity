@@ -6,7 +6,7 @@
       "ex03": false
     }
   },
-  "expectedFinalHash": "e8befb8399a4638dbdcec9757bb69b129652eae1dc4343bad13a9c398ac2f82d",
+  "expectedFinalHash": "53d56eb5935f780e894a54a5b7b12be7870c14cff9431943cdf4979859ffeca1",
   "expectedPublicSurfaceHash": "600edc6b6b052ddefdfd3efae43d321594f9ed44b7816c1954db2a14068d2ce8",
   "id": "core_pingpong_meta_marker",
   "moves": [

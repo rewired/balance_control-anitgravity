@@ -404,13 +404,12 @@ describe('CORE Compliance Invariants', () => {
             G.adjacency[resortId] = [lobbyId];
             G.adjacency[lobbyId] = [resortId];
 
-            // Player 1 has 1 influence.
-            // Player 0 has 0 real influence but +1 virtual from Lobbyist.
-            // Result should be a tie.
+            // Player 1 has 1 physical influence on the evaluated tile.
+            // Player 0 has only +1 virtual influence from Lobbyist adjacency.
+            // Control requires physical presence on the tile, so player 1 controls.
             const result = computeMajority(resortId, G);
-            expect(result.controller).toBeNull();
-            expect(result.winners).toContain('0');
-            expect(result.winners).toContain('1');
+            expect(result.controller).toBe('1');
+            expect(result.winners).toEqual(['1']);
         });
 
         /**

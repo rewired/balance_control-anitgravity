@@ -160,7 +160,7 @@
 
 * `pnpm --dir packages/game exec vitest run test/replay-sink.test.ts test/replay-verify.test.ts test/resolver.test.ts` → ok (3 files, 17 tests passed)
 * `pnpm lint` → ok
-* `pnpm test` → fail (pre-existing `check:spec-anchors` violation in `packages/game/src/engine/atoms/hotspot.ts` for invalid anchor `CORE-01-06-03C`)
+* `pnpm test` → fail (pre-existing `check:spec-anchors` violation in `packages/game/src/engine/atoms/hotspot.ts` for a non-canonical hotspot anchor reference)
 
 ### 12.1 Frontend QA command order (required for UI/prozess scope)
 

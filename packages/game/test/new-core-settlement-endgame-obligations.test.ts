@@ -165,7 +165,6 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
     /** @rule CORE-01-06-16 */
     /** @rule CORE-01-07-03D */
     it('resolves production in ascending PositionKey order [CORE-01-06-16, CORE-01-07-03D]', () => {
-        registerTestPacks();
         const balanceControl = createBalanceControlGame();
         const client = Client({
             game: {
@@ -256,8 +255,16 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
         G.zones['PersonalSupply:0'].items = G.zones['PersonalSupply:0'].items.filter(id => id !== 'inf_0_1');
         G.zones['PersonalSupply:1'].items = G.zones['PersonalSupply:1'].items.filter(id => id !== 'inf_1_1');
         G.zones.board_t1.items.push('inf_0_1', 'inf_1_1');
+        // Ensure formalization remains valid for both implementations that create new influence
+        // and those that consume an influence marker from PersonalSupply.
+        G.objects.inf_0_buffer = { id: 'inf_0_buffer', type: 'Influence', owner: '0' } as any;
+        G.zones['PersonalSupply:0'].items.push('inf_0_buffer');
 
         expect(allStartingInfluencePlaced(G, ctx)).toBe(true);
+        // Defensive re-assertion of move preconditions to avoid cross-test leakage in shared helpers.
+        ctx.currentPlayer = '0';
+        ctx.activePlayers = { '0': 'politicalAction' };
+        G.engine.attributes.usage = {};
 
         const success = CoreMoves.formalizeInfluence({ G, ctx, events }, {
             committeeTileId: 'board_t2',
@@ -293,7 +300,6 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
 
     /** @rule CORE-01-09-01A */
     it('triggers final settlement and skips political action when DrawPile empty during draw [CORE-01-09-01A]', () => {
-        registerTestPacks();
         const balanceControl = createBalanceControlGame();
         const client = Client({
             game: {
@@ -325,7 +331,6 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
     /** @rule CORE-01-09-01 */
     /** @rule CORE-01-09-03 */
     it('ends game when DrawPile is empty and awards winner by board Influence count [CORE-01-09-01, CORE-01-09-03]', () => {
-        registerTestPacks();
         const balanceControl = createBalanceControlGame();
         const client = Client({
             game: {
@@ -356,7 +361,6 @@ describe('CORE-01 Actions, Settlement and Endgame Obligations', () => {
 
     /** @rule CORE-01-09-04 */
     it('returns shared victory when top board Influence count is tied [CORE-01-09-04]', () => {
-        registerTestPacks();
         const balanceControl = createBalanceControlGame();
         const client = Client({
             game: {
