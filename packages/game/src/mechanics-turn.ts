@@ -14,6 +14,12 @@ export function getInfluenceCap(ctx: any): number {
     return ctx.numPlayers >= 5 ? 8 : 7;
 }
 
+/**
+ * Counts all Influence objects owned by a player across zones.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
 export function countPlayerInfluence(G: any, pid: string): number {
     let count = 0;
     for (const obj of Object.values(G.objects) as any[]) {

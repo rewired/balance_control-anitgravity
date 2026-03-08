@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "concurrently \"tsc -w\" \"node --watch dist/index.js\""
+    "dev": "concurrently \"tsc -w\" \"node --watch dist/index.js\"",
+    "test": "vitest run"
   },
   "dependencies": {
     "boardgame.io": "^0.50.0",
@@ -16,7 +17,8 @@
     "@balance-control/expansion-03": "workspace:*"
   },
   "devDependencies": {
-     "typescript": "^5.0.0",
-     "@types/node": "^20.0.0"
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "vitest": "^0.34.6"
   }
 }

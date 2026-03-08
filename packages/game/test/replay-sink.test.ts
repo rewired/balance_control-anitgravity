@@ -4,7 +4,7 @@ import { emitReplaySystemRecord, withReplaySink, type ReplayActionRecord, type R
 
 describe('withReplaySink', () => {
     const makeContext = () => ({
-        G: { engine: { attributes: {} } },
+        G: { engine: { attributes: { seed: 'seed-from-attributes' } } },
         ctx: { currentPlayer: '0', turn: 1, phase: 'politicalAction' },
     });
 
@@ -42,6 +42,7 @@ describe('withReplaySink', () => {
                 turn: 1,
                 phase: 'politicalAction',
                 stateHash: undefined,
+                seed: 'seed-from-attributes',
             },
             {
                 recordType: 'action',
@@ -53,6 +54,7 @@ describe('withReplaySink', () => {
                 turn: 1,
                 phase: 'politicalAction',
                 stateHash: undefined,
+                seed: 'seed-from-attributes',
             },
         ]);
     });
@@ -140,7 +142,7 @@ describe('emitReplaySystemRecord', () => {
                 },
             },
             {
-                G: { engine: { seed: 'seed-1' } },
+                G: { engine: { attributes: { seed: 'seed-1' } } },
                 ctx: { matchID: 'match-1' }
             },
             {
@@ -162,4 +164,28 @@ describe('emitReplaySystemRecord', () => {
             },
         ]);
     });
+
+    it('reads seed only from engine.attributes.seed', () => {
+        const records: ReplayRecord[] = [];
+
+        emitReplaySystemRecord(
+            {
+                sink: {
+                    writeRecord: (record) => records.push(record),
+                },
+            },
+            {
+                G: { engine: { seed: 'legacy-seed', attributes: {} } },
+                ctx: { matchID: 'match-1' }
+            },
+            {
+                roundNumber: 3,
+                settlementKind: 'regular',
+                resortTileOrder: ['tile-c'],
+            }
+        );
+
+        expect(records[0]).toMatchObject({ seed: undefined });
+    });
+
 });

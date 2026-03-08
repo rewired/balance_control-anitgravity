@@ -60,7 +60,7 @@ export function countBoardInfluence(G: any, pid: string): number {
 
 /**
  * Updates global statistics in G.meta.stats for all players.
- * @remarks server-authoritative stats for UI presentation.
+ * @remarks infrastructure; no direct SPEC binding
  * @deterministic
  * @sideEffects
  */
