@@ -185,7 +185,8 @@ Changelog path policy (hard):
 * [x] No phantom moves introduced
 * [x] Expansion isolation preserved (if touched)
 * [x] `pnpm lint` passes
-* [x] `pnpm test` (or `pnpm vitest run`) passes (targeted vitest suite used; full `pnpm test` currently red due unrelated pre-existing failures)
+* [ ] `pnpm test` passes
+* [x] Scoped verification run passes: `pnpm vitest run packages/game/test/setup.test.ts packages/game/test/replay-sink.test.ts packages/game/test/replay-runner.test.ts packages/server/src/replay-logging.test.ts`
 * [x] Determinism verified (golden replay/state hash)
 * [x] No temporary files committed
 * [x] `/docs/changelog.md` updated if required (never `CHANGELOG.md`)
@@ -209,11 +210,9 @@ Changelog path policy (hard):
 
 * `pnpm install` → OK
 * `pnpm lint` → OK
-* `pnpm vitest run packages/game/test/setup.test.ts packages/game/test/replay-sink.test.ts packages/server/src/replay-logging.test.ts` → FAIL (`@balance-control/rules` entry unresolved before build)
-* `pnpm --filter @balance-control/rules build` → OK
 * `pnpm vitest run packages/game/test/setup.test.ts packages/game/test/replay-sink.test.ts packages/game/test/replay-runner.test.ts packages/server/src/replay-logging.test.ts` → OK
 * `pnpm -C packages/server test` → OK
-* `pnpm test` → FAIL (pre-existing unrelated red tests in `core-compliance-invariants.test.ts`, `new-core-settlement-endgame-obligations.test.ts`, `spec-anchor-tripwire.test.ts`)
+* `pnpm test` → FAIL (pre-existing unrelated red tests in `core-compliance-invariants.test.ts` and `spec-anchor-tripwire.test.ts`)
 
 ### 12.1 Frontend QA command order (required for UI/prozess scope)
 
