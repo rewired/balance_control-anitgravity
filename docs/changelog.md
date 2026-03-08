@@ -3,6 +3,7 @@
 
 ## Unreleased
 
+- 2026-03-08: task(0336) Game tests: harden `RULESET_MANIFEST` override safety by moving manifest writes into a helper-scoped `try/finally` restore path in `setup.test.ts`, and enable Vitest file isolation for `@balance-control/game` (`--no-threads --isolate true`) to reduce cross-file shared-module leakage risk in single-process runs; add DD-0336 and task documentation.
 - 2026-03-08: task(0334) Game setup: remove local ruleset manifest fallback literals in `SetupGame`, source metadata directly from `@balance-control/rules` `RULESET_MANIFEST`, retain enabled-expansion-only projection in `meta.ruleset.expansions`, and add setup regression coverage proving central-manifest coupling; add DD-0334 and task documentation.
 - 2026-03-04: task(0332) Replay verifier tests: add explicit negative control for `system.roundSettlement.stateHash` mismatch (non-matching replay-start hash), and rename the `settlementKind: final` checkpoint test to clarify enum-payload hashing scope; no engine runtime behavior changes; add DD-0332 and task documentation.
 - 2026-03-04: task(0331) Replay settlement ordering: emit `system.roundSettlement` records only after each settlement path has completed deterministic `G` mutations (regular + final), keep `stateHash` semantics tied to post-settlement `G`, clarify verifier mismatch diagnostics, and add checkpoint-verification tests that capture both settlement kinds with `includeStateHash: true`; add DD-0331 and task documentation.
