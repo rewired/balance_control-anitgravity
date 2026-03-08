@@ -7,7 +7,7 @@ const FILE_EXTENSION = '.replay.ndjson';
 const SAFE_FILENAME_CHARS = /[^a-zA-Z0-9._-]/g;
 const WORKSPACE_ROOT_MARKER = 'pnpm-workspace.yaml';
 
-type ReplayLoggingConfig = Readonly<{
+export type ReplayLoggingConfig = Readonly<{
     replayDirectory?: string;
     checkpointEveryActions?: number;
 }>;
@@ -31,6 +31,8 @@ type ReplayFooterRecord = Readonly<{
     finalStateHash: string;
     totalActions: number;
 }>;
+
+export type CloseableReplaySink = ReplaySink & Required<Pick<ReplaySink, 'close'>>;
 
 type StreamState = {
     streamKey: string;
@@ -121,7 +123,7 @@ export function createReplayFilename(record: ReplayRecord, timestamp: Date = new
     return `${matchIdPart}-${seedPart}-${timestampPart}${FILE_EXTENSION}`;
 }
 
-class NdjsonReplaySink implements ReplaySink {
+class NdjsonReplaySink implements CloseableReplaySink {
     private readonly streams = new Map<string, StreamState>();
 
     public constructor(private readonly replayDirectory: string, private readonly checkpointEveryActions?: number) { }
@@ -162,9 +164,10 @@ class NdjsonReplaySink implements ReplaySink {
         }
 
         for (const streamState of this.streams.values()) {
+            const finalStateHash = streamState.lastStateHash as string;
             const footer: ReplayFooterRecord = {
                 recordType: 'footer',
-                finalStateHash: streamState.lastStateHash,
+                finalStateHash,
                 totalActions: streamState.actionCount,
             };
             writeNdjsonLine(streamState.stream, footer);
@@ -221,11 +224,13 @@ class NdjsonReplaySink implements ReplaySink {
             );
         }
 
+        const seed = streamState.seed as string;
+        const matchConfig = streamState.matchConfig as Record<string, unknown>;
         const header: ReplayHeaderRecord = {
             recordType: 'header',
             schemaVersion: '1',
-            seed: streamState.seed,
-            matchConfig: streamState.matchConfig,
+            seed,
+            matchConfig,
             expansions: normalizeExpansions(streamState.expansions),
         };
         writeNdjsonLine(streamState.stream, header);
@@ -258,7 +263,7 @@ class NdjsonReplaySink implements ReplaySink {
     }
 }
 
-export function createReplaySink(config: ReplayLoggingConfig): ReplaySink {
+export function createReplaySink(config: ReplayLoggingConfig): CloseableReplaySink {
     const replayDirectory = resolveReplayDirectory(config.replayDirectory);
     fs.mkdirSync(replayDirectory, { recursive: true });
     return new NdjsonReplaySink(replayDirectory, config.checkpointEveryActions);

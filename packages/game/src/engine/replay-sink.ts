@@ -139,6 +139,18 @@ export type ReplayRecord = ReplayActionRecord | ReplaySystemRoundSettlementRecor
  */
 export interface ReplaySink {
     writeRecord(record: ReplayRecord): void;
+
+    /**
+     * Finalizes replay sink lifecycle.
+     *
+     * @remarks
+     * Sinks that emit replay boundary records (e.g. `footer`) MUST flush those
+     * terminal records during `close()` before process shutdown. Callers SHOULD
+     * invoke this hook exactly once when the owning process is terminating.
+     *
+     * @deterministic
+     */
+    close?(): void | Promise<void>;
 }
 
 export type ReplaySinkErrorRecord = Readonly<{
