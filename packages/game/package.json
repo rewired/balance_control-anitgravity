@@ -7,7 +7,7 @@
     "build": "tsc",
     "dev": "tsc -w",
     "pretest": "pnpm -C ../rules build && pnpm -C ../shared build",
-    "test": "vitest run --no-threads --sequence.concurrent false"
+    "test": "vitest run --no-threads --isolate true --sequence.concurrent false"
   },
   "dependencies": {
     "@balance-control/rules": "workspace:*",
