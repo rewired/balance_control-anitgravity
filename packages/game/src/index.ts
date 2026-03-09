@@ -335,10 +335,14 @@ export { exp03CountdownAtoms } from './engine/atoms/countdown';
 
 export type {
     ReplayActionRecord,
+    ReplayCheckpointRoundEndRecord,
+    ReplayCheckpointTurnEndRecord,
     ReplayManifestRecord,
     ReplayRecord,
     ReplaySink,
     ReplayHookOptions,
+    ReplaySystemChoiceOpenedRecord,
+    ReplaySystemHotspotResolvedRecord,
     ReplaySystemRoundSettlementRecord,
 } from './engine/replay-sink';
 export type { ReplayDomainFieldType, ReplayTypedFields } from './engine/replay-typed-fields';
