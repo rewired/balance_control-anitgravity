@@ -96,6 +96,10 @@ export type ReplayHookOptions = Readonly<{ sink?: ReplaySink; onError?: ReplaySi
 export type ReplaySystemRoundSettlementPayload = Readonly<{ roundNumber: number; settlementKind: 'regular' | 'final'; resortTileOrder: readonly string[] }>;
 
 type ReplayInfluenceProjection = Readonly<{ personalSupply: number; board: number }>;
+type ReplayCheckpointSummary = Readonly<{
+    perPlayer: Record<string, Record<string, unknown>>;
+    global: Record<string, unknown>;
+}>;
 
 function projectPlayerInfluence(G: any, playerId: string): ReplayInfluenceProjection {
     const influenceBoard = Object.values(G?.objects ?? {}).filter((o: any) => o?.type === 'Influence' && o.owner === playerId && typeof o.tileId === 'string').length;
@@ -135,7 +139,13 @@ function buildManifest(context: any): ReplayManifestRecord {
     };
 }
 
-function summarizeTurnEnd(G: any, ctx: any) {
+/**
+ * Projects deterministic checkpoint summary fields from a single authoritative snapshot.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
+export function projectReplayCheckpointSummary(G: any, ctx: any): ReplayCheckpointSummary {
     const perPlayer: Record<string, Record<string, unknown>> = {};
     const players = Number(ctx?.numPlayers ?? 0);
     for (let i = 0; i < players; i += 1) {
@@ -152,6 +162,11 @@ function summarizeTurnEnd(G: any, ctx: any) {
     const discardFaceUpCount = G?.zones?.[CoreZoneName.DiscardFaceUp]?.items?.length ?? 0;
     const boardTileCount = G?.zones?.[CoreZoneName.Board]?.items?.length ?? 0;
     return { perPlayer, global: { drawPileCount, discardFaceUpCount, boardTileCount } };
+}
+
+function shouldLogReplayDebug(): boolean {
+    const deterministicDevMode = process.env.BC_DETERMINISTIC_DEV_MODE === '1';
+    return process.env.NODE_ENV !== 'production' || deterministicDevMode;
 }
 
 /**
@@ -174,6 +189,8 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
             const placeInfluencePre = moveType === 'placeInfluence' && typeof currentPlayer === 'string'
                 ? projectPlayerInfluence(context?.G, currentPlayer)
                 : undefined;
+            const preMoveStateRef = context?.G;
+            const preMoveStateVersion = Number(context?.ctx?._stateID ?? -1);
             const result = moveFn(context, ...args);
             if (result === INVALID_MOVE || isClientOptimistic) return result;
             const playerId = currentPlayer;
@@ -185,9 +202,23 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                     manifestWritten = true;
                 }
 
-                const drawnTileId = context?.G?.zones?.[`staging_${playerId}`]?.items?.[0];
-                const drawnTile = drawnTileId ? context?.G?.tiles?.[drawnTileId] : undefined;
-                const placeInfluencePost = moveType === 'placeInfluence' ? projectPlayerInfluence(context?.G, playerId) : undefined;
+                const authoritativeG = context?.G;
+                const authoritativeCtx = context?.ctx;
+                const postMoveStateVersion = Number(authoritativeCtx?._stateID ?? preMoveStateVersion);
+                if (shouldLogReplayDebug()) {
+                    console.debug('[ReplayDebug] withReplaySink.moveStateSnapshot', {
+                        moveType,
+                        playerId,
+                        preStateVersion: preMoveStateVersion,
+                        postStateVersion: postMoveStateVersion,
+                        sameObjectIdentity: preMoveStateRef === authoritativeG,
+                    });
+                }
+                const drawnTileId = authoritativeG?.zones?.[`staging_${playerId}`]?.items?.[0];
+                const drawnTile = drawnTileId ? authoritativeG?.tiles?.[drawnTileId] : undefined;
+                const placeInfluencePost = moveType === 'placeInfluence' ? projectPlayerInfluence(authoritativeG, playerId) : undefined;
+                const postCommitStateHash = options.includeStateHash ? hashState(authoritativeG) : undefined;
+                const checkpointSummary = projectReplayCheckpointSummary(authoritativeG, authoritativeCtx);
                 if (moveType === 'placeInfluence' && placeInfluencePre && placeInfluencePost) {
                     const expectedPersonalSupply = placeInfluencePre.personalSupply - 1;
                     const expectedBoard = placeInfluencePre.board + 1;
@@ -214,7 +245,7 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                                     },
                                 },
                             },
-                            postActionStateHash: options.includeStateHash ? hashState(context.G) : undefined,
+                            postActionStateHash: postCommitStateHash,
                             matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
                         };
                         options.sink?.writeRecord(invariantRecord);
@@ -249,7 +280,7 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                             placementOutcome: drawnTileId ? 'placed' : 'discarded_unplaceable',
                         } : {}),
                     },
-                    postActionStateHash: options.includeStateHash ? hashState(context.G) : undefined,
+                    postActionStateHash: postCommitStateHash,
                     matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
                 };
                 options.sink?.writeRecord(record);
@@ -269,8 +300,14 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                 }
                 previousPendingChoiceId = pendingChoiceId;
 
-                const { perPlayer, global } = summarizeTurnEnd(context?.G, context?.ctx);
-                options.sink?.writeRecord({ recordType: 'checkpoint.turnEnd', turn: Number(context?.ctx?.turn ?? 0), perPlayer, global, stateHash: hashState(context.G), matchId: record.matchId });
+                options.sink?.writeRecord({
+                    recordType: 'checkpoint.turnEnd',
+                    turn: Number(authoritativeCtx?.turn ?? 0),
+                    perPlayer: checkpointSummary.perPlayer,
+                    global: checkpointSummary.global,
+                    stateHash: hashState(authoritativeG),
+                    matchId: record.matchId,
+                });
             } catch (error) {
                 options.onError?.({ error, record: { recordType: 'action', seq, round: 0, turn: 0, stage: 'unknown', player: playerId, moveType, intent: args, resolved: {} } });
             }
@@ -317,11 +354,11 @@ export function emitReplaySystemRecord(options: ReplayHookOptions | undefined, c
         postSettlementStateHash: options.includeStateHash ? hashState(context.G) : undefined,
         matchId,
     });
-    const { perPlayer, global } = summarizeTurnEnd(context?.G, context?.ctx);
-    if (perTile.length > 0 && Number(global.boardTileCount ?? 0) <= 0) {
+    const checkpointSummary = projectReplayCheckpointSummary(context?.G, context?.ctx);
+    if (perTile.length > 0 && Number(checkpointSummary.global.boardTileCount ?? 0) <= 0) {
         throw new Error('Replay invariant failed: settlement perTile is non-empty while boardTileCount is 0.');
     }
-    options.sink.writeRecord({ recordType: 'checkpoint.roundEnd', round: payload.roundNumber, perPlayer, global, stateHash: hashState(context.G), matchId });
+    options.sink.writeRecord({ recordType: 'checkpoint.roundEnd', round: payload.roundNumber, perPlayer: checkpointSummary.perPlayer, global: checkpointSummary.global, stateHash: hashState(context.G), matchId });
 }
 
 /**

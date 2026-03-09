@@ -5,13 +5,15 @@ import { hashState } from './hash-state';
 import { EnginePackRegistry } from './expansion-registry';
 import { CorePack } from './packs/core';
 import { CoreMoves } from './moves';
+import { canonicalJsonStringify } from './hash-state';
+import { projectReplayCheckpointSummary } from './engine/replay-sink';
 
 type ReplayHeaderRecord = Readonly<{ recordType: 'header'; schemaVersion: '2' | string; seed: string; matchConfig: Record<string, unknown>; }>;
 type ReplayManifestRecord = Readonly<{ recordType: 'manifest' }>;
 type ReplayActionRecord = Readonly<{ recordType: 'action'; seq: number; player: string; moveType: string; intent?: unknown; }>;
 type ReplayChoiceOpenedRecord = Readonly<{ recordType: 'system.choiceOpened'; choiceId: string }>;
 type ReplayRoundSettlementRecord = Readonly<{ recordType: 'system.roundSettlement'; postSettlementStateHash?: string }>;
-type ReplayCheckpointRecord = Readonly<{ recordType: 'checkpoint.turnEnd' | 'checkpoint.roundEnd'; stateHash: string }>;
+type ReplayCheckpointRecord = Readonly<{ recordType: 'checkpoint.turnEnd' | 'checkpoint.roundEnd'; perPlayer: Record<string, Record<string, unknown>>; global: Record<string, unknown>; stateHash: string }>;
 type ReplayFooterRecord = Readonly<{ recordType: 'footer'; finalStateHash?: string; totalActions?: number }>;
 export type ReplayNdjsonRecord = ReplayHeaderRecord | ReplayManifestRecord | ReplayActionRecord | ReplayChoiceOpenedRecord | ReplayRoundSettlementRecord | ReplayCheckpointRecord | ReplayFooterRecord;
 export type ReplayVerifyOptions = Readonly<{ verifyCheckpoints?: boolean; verifyFinalHash?: boolean }>;
@@ -54,8 +56,16 @@ export function verifyReplayRecords(records: readonly ReplayNdjsonRecord[], opti
         }
         if (record.recordType === 'checkpoint.turnEnd' || record.recordType === 'checkpoint.roundEnd') {
             if (options.verifyCheckpoints) {
+                const currentState = client.getState();
                 const currentHash = hashState(client.getState()?.G as any);
                 if (currentHash !== record.stateHash) fail(expectedSeq - 1, `checkpoint hash mismatch (expected ${record.stateHash}, got ${currentHash}).`);
+                const projected = projectReplayCheckpointSummary(currentState?.G, currentState?.ctx);
+                if (canonicalJsonStringify(projected.perPlayer as any) !== canonicalJsonStringify(record.perPlayer as any)) {
+                    fail(expectedSeq - 1, `checkpoint perPlayer projection mismatch for ${record.recordType}.`);
+                }
+                if (canonicalJsonStringify(projected.global as any) !== canonicalJsonStringify(record.global as any)) {
+                    fail(expectedSeq - 1, `checkpoint global projection mismatch for ${record.recordType}.`);
+                }
             }
             continue;
         }
