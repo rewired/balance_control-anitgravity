@@ -156,6 +156,7 @@ describe('NdjsonReplaySink v1 boundaries', () => {
                 stream: fs.WriteStream;
                 actionCount: number;
                 headerWritten: boolean;
+                lastStateHash?: string;
                 expansions?: string[];
             };
             captureHeaderMetadata(
@@ -163,6 +164,7 @@ describe('NdjsonReplaySink v1 boundaries', () => {
                     stream: fs.WriteStream;
                     actionCount: number;
                     headerWritten: boolean;
+                    lastStateHash?: string;
                     expansions?: string[];
                 },
                 record: ReplayRecord
@@ -171,6 +173,7 @@ describe('NdjsonReplaySink v1 boundaries', () => {
                 stream: fs.WriteStream;
                 actionCount: number;
                 headerWritten: boolean;
+                lastStateHash?: string;
                 expansions?: string[];
             }): void;
         };
