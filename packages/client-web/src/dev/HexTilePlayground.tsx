@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 
 import HexTilePackedSimulator from "./HexTilePackedSimulator";
 import { HexTileVisual } from "../ui/tiles/HexTileVisual";
+import type { MetaMarkerEntry } from "../ui/tiles/MetaMarkerOverlay";
 import { seatColor } from "../ui/tiles/seatColor";
 import type { SeatId, TileBadge } from "../ui/tiles/types";
 
@@ -61,7 +62,7 @@ type TileCase = {
   majoritySeat: SeatId;
   valueW?: number;
   influenceBySeat: Partial<Record<SeatId, number>>;
-  metaIconsBySeat: Partial<Record<SeatId, React.ReactNode[]>>;
+  metaMarkers: MetaMarkerEntry[];
   badges: TileBadge[];
 };
 
@@ -82,7 +83,10 @@ export default function HexTilePlayground() {
         majoritySeat: 1,
         valueW: 1,
         influenceBySeat: { 1: 2, 3: 1 },
-        metaIconsBySeat: { 1: [<IconStar key="a" />], 3: [<IconFlag key="b" />] },
+        metaMarkers: [
+          { seat: 1, color: seatColor(1), mode: "ReturnPenalty" },
+          { seat: 3, color: seatColor(3), mode: "Convert" },
+        ],
         badges: makeBadges(["A", "B"], "neutral"),
       },
       {
@@ -91,7 +95,7 @@ export default function HexTilePlayground() {
         majoritySeat: 2,
         valueW: 2,
         influenceBySeat: { 2: 4, 5: 1 },
-        metaIconsBySeat: { 2: [<IconBolt key="a" />, <IconStar key="b" />] },
+        metaMarkers: [{ seat: 2, color: seatColor(2), mode: "Convert" }],
         badges: [
           ...makeBadges(["C"], "warn"),
           ...makeBadges(["D"], "neutral"),
@@ -105,7 +109,7 @@ export default function HexTilePlayground() {
         majoritySeat: 3,
         valueW: 3,
         influenceBySeat: { 3: 3 },
-        metaIconsBySeat: { 3: [<IconFlag key="a" />, <IconFlag key="b" />, <IconStar key="c" />] },
+        metaMarkers: [{ seat: 3, color: seatColor(3), mode: "ReturnPenalty" }],
         badges: makeBadges(["G"], "warn"),
       },
       {
@@ -114,7 +118,7 @@ export default function HexTilePlayground() {
         majoritySeat: 4,
         valueW: 4,
         influenceBySeat: { 1: 1, 2: 2, 4: 1, 6: 3 },
-        metaIconsBySeat: { 6: [<IconBolt key="a" />] },
+        metaMarkers: [{ seat: 6, color: seatColor(6), mode: "Convert" }],
         badges: [],
       },
       {
@@ -123,7 +127,7 @@ export default function HexTilePlayground() {
         majoritySeat: 5,
         valueW: 5,
         influenceBySeat: { 5: 5 },
-        metaIconsBySeat: {},
+        metaMarkers: [],
         badges: [...makeBadges(["H"], "neutral"), ...makeBadges(["I"], "warn"), ...makeBadges(["J"], "danger")],
       },
       {
@@ -132,7 +136,7 @@ export default function HexTilePlayground() {
         majoritySeat: 6,
         valueW: 6,
         influenceBySeat: { 6: 1 },
-        metaIconsBySeat: {},
+        metaMarkers: [],
         badges: [],
       },
     ],
@@ -267,7 +271,7 @@ export default function HexTilePlayground() {
                   isHovered={isHovered}
                   isSelected={isSelected}
                   influenceBySeat={t.influenceBySeat}
-                  metaIconsBySeat={t.metaIconsBySeat}
+                  metaMarkers={t.metaMarkers}
                   badges={t.badges}
                   valueW={t.valueW}
                   className="hex-tile-visual"

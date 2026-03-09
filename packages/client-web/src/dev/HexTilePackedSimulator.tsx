@@ -4,6 +4,7 @@ import { BoardViewport } from "../components/BoardViewport";
 import { HEX_SIZE } from "../components/HexBoard";
 import { axialToPixel, parseCoordString, stableSortCoords } from "../ui/hexLayout";
 import { HexTileVisual } from "../ui/tiles/HexTileVisual";
+import type { MetaMarkerEntry } from "../ui/tiles/MetaMarkerOverlay";
 import { ResortIcon } from "../ui/tiles/ResortIcon";
 import { seatColor } from "../ui/tiles/seatColor";
 import type { SeatId, TileBadge } from "../ui/tiles/types";
@@ -89,7 +90,7 @@ type PackedTileCase = {
   resort?: string;
   valueW?: number;
   influenceBySeat: Partial<Record<SeatId, number>>;
-  metaIconsBySeat: Partial<Record<SeatId, React.ReactNode[]>>;
+  metaMarkers: MetaMarkerEntry[];
   badges: TileBadge[];
 };
 
@@ -117,13 +118,11 @@ export default function HexTilePackedSimulator() {
         influenceBySeat[seat] = (influenceBySeat[seat] ?? 0) + randInt(rand, 1, 4);
       }
 
-      const metaIconsBySeat: Partial<Record<SeatId, React.ReactNode[]>> = {};
+      const metaMarkers: MetaMarkerEntry[] = [];
       if (idx % 2 === 0) {
         const seat = (((idx % 6) + 1) as SeatId);
-        const n = randInt(rand, 1, 3);
-        metaIconsBySeat[seat] = Array.from({ length: n }, (_v, j) =>
-          j % 2 === 0 ? <IconStar key={`${coordStr}-m${j}`} /> : <IconBolt key={`${coordStr}-m${j}`} />
-        );
+        const mode = idx % 4 === 0 ? "ReturnPenalty" : "Convert";
+        metaMarkers.push({ seat, color: seatColor(seat), mode });
       }
 
       const badges: TileBadge[] = [];
@@ -138,7 +137,7 @@ export default function HexTilePackedSimulator() {
         resort,
         valueW,
         influenceBySeat,
-        metaIconsBySeat,
+        metaMarkers,
         badges
       };
     });
@@ -218,7 +217,7 @@ export default function HexTilePackedSimulator() {
                       isHovered={isHovered}
                       isSelected={isSelected}
                       influenceBySeat={t.influenceBySeat}
-                      metaIconsBySeat={t.metaIconsBySeat}
+                      metaMarkers={t.metaMarkers}
                       badges={t.badges}
                       resortIcon={<ResortIcon resort={t.resort} />}
                       valueW={t.valueW}
