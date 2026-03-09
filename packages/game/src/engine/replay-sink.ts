@@ -93,6 +93,14 @@ export type ReplaySinkErrorChannel = (event: ReplaySinkErrorRecord) => void;
 export type ReplayHookOptions = Readonly<{ sink?: ReplaySink; onError?: ReplaySinkErrorChannel; includeStateHash?: boolean }>;
 export type ReplaySystemRoundSettlementPayload = Readonly<{ roundNumber: number; settlementKind: 'regular' | 'final'; resortTileOrder: readonly string[] }>;
 
+type ReplayInfluenceProjection = Readonly<{ personalSupply: number; board: number }>;
+
+function projectPlayerInfluence(G: any, playerId: string): ReplayInfluenceProjection {
+    const influenceBoard = Object.values(G?.objects ?? {}).filter((o: any) => o?.type === 'Influence' && o.owner === playerId && typeof o.tileId === 'string').length;
+    const influenceSupply = Object.values(G?.objects ?? {}).filter((o: any) => o?.type === 'Influence' && o.owner === playerId && !o.tileId).length;
+    return { personalSupply: influenceSupply, board: influenceBoard };
+}
+
 function buildManifest(context: any): ReplayManifestRecord {
     const G = context?.G ?? {};
     const tiles: Record<string, ReplayTileRef> = {};
@@ -160,9 +168,13 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
     for (const [moveType, moveFn] of Object.entries(moves)) {
         wrapped[moveType] = ((context: any, ...args: unknown[]) => {
             const isClientOptimistic = Boolean((context?.G as any)?._isPlayerView);
+            const currentPlayer = context?.ctx?.currentPlayer;
+            const placeInfluencePre = moveType === 'placeInfluence' && typeof currentPlayer === 'string'
+                ? projectPlayerInfluence(context?.G, currentPlayer)
+                : undefined;
             const result = moveFn(context, ...args);
             if (result === INVALID_MOVE || isClientOptimistic) return result;
-            const playerId = context?.ctx?.currentPlayer;
+            const playerId = currentPlayer;
             if (typeof playerId !== 'string') return result;
 
             try {
@@ -173,6 +185,40 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
 
                 const drawnTileId = context?.G?.zones?.[`staging_${playerId}`]?.items?.[0];
                 const drawnTile = drawnTileId ? context?.G?.tiles?.[drawnTileId] : undefined;
+                const placeInfluencePost = moveType === 'placeInfluence' ? projectPlayerInfluence(context?.G, playerId) : undefined;
+                if (moveType === 'placeInfluence' && placeInfluencePre && placeInfluencePost) {
+                    const expectedPersonalSupply = placeInfluencePre.personalSupply - 1;
+                    const expectedBoard = placeInfluencePre.board + 1;
+                    if (placeInfluencePost.personalSupply !== expectedPersonalSupply || placeInfluencePost.board !== expectedBoard) {
+                        const invariantRecord: ReplayActionRecord = {
+                            recordType: 'action',
+                            seq,
+                            round: Number(context?.G?.roundNumber ?? 0),
+                            turn: Number(context?.ctx?.turn ?? 0),
+                            stage: String(context?.ctx?.activePlayers?.[playerId] ?? context?.ctx?.phase ?? 'unknown'),
+                            player: playerId,
+                            moveType,
+                            intent: args.length === 1 ? args[0] : args,
+                            resolved: {
+                                outcome: 'error',
+                                errorCode: 'PLACE_INFLUENCE_INVARIANT_FAILED',
+                                influence: {
+                                    pre: placeInfluencePre,
+                                    post: placeInfluencePost,
+                                    expectedDelta: { personalSupply: -1, board: 1 },
+                                    observedDelta: {
+                                        personalSupply: placeInfluencePost.personalSupply - placeInfluencePre.personalSupply,
+                                        board: placeInfluencePost.board - placeInfluencePre.board,
+                                    },
+                                },
+                            },
+                            postActionStateHash: options.includeStateHash ? hashState(context.G) : undefined,
+                            matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
+                        };
+                        options.sink?.writeRecord(invariantRecord);
+                        throw new Error('Deterministic replay invariant failed for placeInfluence.');
+                    }
+                }
                 const record: ReplayActionRecord = {
                     recordType: 'action',
                     seq,
@@ -184,6 +230,17 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                     intent: args.length === 1 ? args[0] : args,
                     resolved: {
                         outcome: 'applied',
+                        ...(moveType === 'placeInfluence' && placeInfluencePre && placeInfluencePost ? {
+                            influence: {
+                                pre: placeInfluencePre,
+                                post: placeInfluencePost,
+                                expectedDelta: { personalSupply: -1, board: 1 },
+                                observedDelta: {
+                                    personalSupply: placeInfluencePost.personalSupply - placeInfluencePre.personalSupply,
+                                    board: placeInfluencePost.board - placeInfluencePre.board,
+                                },
+                            },
+                        } : {}),
                         ...(moveType === 'placeTile' ? {
                             drawnTileId,
                             drawnTileRef: drawnTile ? { label: drawnTile.name ?? drawnTileId, kind: drawnTile.type } : undefined,
