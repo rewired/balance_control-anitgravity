@@ -132,3 +132,6 @@ Will include `git show -1 --stat` output in same `Postflight:` block.
 ## 15) Amendments (append-only)
 
 * Initial draft.
+
+* Follow-up: switched nested watcher shell from `bash -lc` to `bash -c` so pnpm-injected Node PATH is preserved and `node --watch` resolves in dev subprocesses.
+* Validation follow-up: `pnpm lint` passed; `pnpm -C packages/server build` fails in clean state until workspace deps are built; `pnpm -r build` then passed (including server), and `pnpm test` passed workspace-wide.
