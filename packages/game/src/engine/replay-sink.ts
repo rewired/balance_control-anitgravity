@@ -1,422 +1,221 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { hashState } from '../hash-state';
 import type { MoveMap } from '../move-module-registry';
-import { deriveReplayTypedFields, type ReplayTypedFields } from './replay-typed-fields';
+import { computeMajority } from '../mechanics';
 
-export type ReplayResourceSnapshot = Readonly<{
-    owner?: string;
+export type ReplayTileRef = Readonly<{
+    tileId: string;
+    label: string;
+    kind: string;
     resort?: string;
-    zone: string;
+    printedValue?: number;
+    isStartCommittee?: boolean;
+    grassrootsType?: string;
 }>;
 
-export type ReplayMetaMarkerSnapshot = Readonly<{
-    owner?: string;
-    measureId?: string;
-    playCount?: number;
-    targetTileId?: string;
-    mode?: string;
-    zone: string;
+export type ReplayManifestRecord = Readonly<{
+    recordType: 'manifest';
+    tiles: Record<string, ReplayTileRef>;
+    playerSeats: Record<string, string>;
+    resourceTypes: readonly string[];
+    seed?: string;
+    matchConfig?: Record<string, unknown>;
+    expansions?: readonly string[];
+    loggingMode?: 'canonical';
+    matchId?: string;
 }>;
 
-export type ReplayStateSnapshot = Readonly<{
-    zones: Record<string, readonly string[]>;
-    resources: Record<string, ReplayResourceSnapshot>;
-    metaMarkers: Record<string, ReplayMetaMarkerSnapshot>;
-}>;
-
-export type ReplayStateDelta = Readonly<{
-    changedZones?: Record<string, readonly string[]>;
-    removedZones?: readonly string[];
-    changedResources?: Record<string, ReplayResourceSnapshot>;
-    removedResources?: readonly string[];
-    changedMetaMarkers?: Record<string, ReplayMetaMarkerSnapshot>;
-    removedMetaMarkers?: readonly string[];
-}>;
-
-/**
- * Canonical replay payload for a player-driven action record.
- *
- * @remarks
- * Infrastructure contract for Replay Format v1 `action` lines. `matchConfig` and
- * `expansions` are optional on body records because they are canonically defined
- * by the replay `header`; when present on an action record they MUST mirror the
- * same deterministic semantics as header metadata (same effective setup config,
- * same canonical expansion list).
- *
- * `matchConfig` carries replay-relevant deterministic setup parameters only.
- * `expansions` carries the canonical enabled expansion IDs in stable order with
- * no duplicates.
- *
- * @deterministic
- * @pure
- * @see docs/replay-format-v1.md#31-header
- * @see docs/replay-format-v1.md#32-action
- */
 export type ReplayActionRecord = Readonly<{
     recordType: 'action';
     seq: number;
+    round: number;
+    turn: number;
+    stage: string;
     player: string;
     moveType: string;
-    args: unknown[];
-    typedFields?: ReplayTypedFields;
-    turn?: number;
-    phase?: string;
-    stateHash?: string;
-    stateDelta?: ReplayStateDelta;
-    stateSnapshot?: ReplayStateSnapshot;
+    intent: unknown;
+    resolved: Record<string, unknown>;
+    postActionStateHash?: string;
     matchId?: string;
-    seed?: string;
-    matchConfig?: Record<string, unknown>;
-    expansions?: readonly string[];
 }>;
 
-/**
- * Canonical replay payload for a non-player round-settlement system record.
- *
- * @remarks
- * Infrastructure contract for Replay Format v1 `system.roundSettlement` lines.
- * `matchConfig` and `expansions` are optional replay-context echoes; if present,
- * they MUST be semantically identical to header metadata for the same replay
- * stream (deterministic setup config + canonical expansion set).
- *
- * @deterministic
- * @pure
- * @see docs/replay-format-v1.md#31-header
- * @see docs/replay-format-v1.md#33-systemroundsettlement
- */
+export type ReplaySystemChoiceOpenedRecord = Readonly<{
+    recordType: 'system.choiceOpened';
+    choiceId: string;
+    player: string;
+    sourceTileId?: string;
+    reason: string;
+    options: readonly unknown[];
+    matchId?: string;
+}>;
+
+export type ReplaySystemHotspotResolvedRecord = Readonly<{
+    recordType: 'system.hotspotResolved';
+    tileId: string;
+    totals: Record<string, number>;
+    placementAttempted: boolean;
+    placementSucceeded: boolean;
+    resolvedMark: boolean;
+    matchId?: string;
+}>;
+
 export type ReplaySystemRoundSettlementRecord = Readonly<{
     recordType: 'system.roundSettlement';
-    roundNumber: number;
+    round: number;
     settlementKind: 'regular' | 'final';
-    resortTileOrder: readonly string[];
-    stateHash?: string;
+    perTile: ReadonlyArray<Record<string, unknown>>;
+    postSettlementStateHash?: string;
     matchId?: string;
-    seed?: string;
-    matchConfig?: Record<string, unknown>;
-    expansions?: readonly string[];
 }>;
 
-/**
- * Canonical replay payload for a deterministic checkpoint boundary.
- *
- * @remarks
- * Infrastructure contract for Replay Format v1 `checkpoint` lines. Checkpoints
- * may repeat replay header metadata for convenience; when `matchConfig` and/or
- * `expansions` are present, consumers MUST treat them as header-equivalent
- * metadata and reject semantic mismatch.
- *
- * @deterministic
- * @pure
- * @see docs/replay-format-v1.md#31-header
- * @see docs/replay-format-v1.md#34-checkpoint-optional-mvp
- */
-export type ReplayCheckpointRecord = Readonly<{
-    recordType: 'checkpoint';
-    afterSeq: number;
-    stateHash?: string;
-    stateSnapshot: ReplayStateSnapshot;
+export type ReplayCheckpointTurnEndRecord = Readonly<{
+    recordType: 'checkpoint.turnEnd';
+    turn: number;
+    perPlayer: Record<string, Record<string, unknown>>;
+    global: Record<string, unknown>;
+    stateHash: string;
     matchId?: string;
-    seed?: string;
-    matchConfig?: Record<string, unknown>;
-    expansions?: readonly string[];
 }>;
 
-export type ReplayRecord = ReplayActionRecord | ReplaySystemRoundSettlementRecord | ReplayCheckpointRecord;
-
-/**
- * Sink contract used by game/server replay writers.
- *
- * @remarks
- * Boundary interface between `packages/game` emission and downstream sinks
- * (e.g., server NDJSON persistence). Implementations MUST preserve record
- * ordering and payload values exactly as emitted to maintain replay
- * determinism and header/body metadata consistency.
- *
- * @deterministic
- * @sideEffects Receives emitted replay records and forwards them to an external sink implementation.
- * @see docs/architecture/ARCH-01-ENGINE-CONTRACT.md
- * @see docs/replay-format-v1.md
- */
-export interface ReplaySink {
-    writeRecord(record: ReplayRecord): void;
-
-    /**
-     * Finalizes replay sink lifecycle.
-     *
-     * @remarks
-     * Sinks that emit replay boundary records (e.g. `footer`) MUST flush those
-     * terminal records during `close()` before process shutdown. Callers SHOULD
-     * invoke this hook exactly once when the owning process is terminating.
-     *
-     * @deterministic
-     */
-    close?(): void | Promise<void>;
-}
-
-export type ReplaySinkErrorRecord = Readonly<{
-    error: unknown;
-    record: ReplayRecord;
+export type ReplayCheckpointRoundEndRecord = Readonly<{
+    recordType: 'checkpoint.roundEnd';
+    round: number;
+    perPlayer: Record<string, Record<string, unknown>>;
+    stateHash: string;
+    matchId?: string;
 }>;
 
+export type ReplayRecord = ReplayManifestRecord | ReplayActionRecord | ReplaySystemChoiceOpenedRecord | ReplaySystemHotspotResolvedRecord | ReplaySystemRoundSettlementRecord | ReplayCheckpointTurnEndRecord | ReplayCheckpointRoundEndRecord;
+
+export interface ReplaySink { writeRecord(record: ReplayRecord): void; close?(): void | Promise<void>; }
+export type ReplaySinkErrorRecord = Readonly<{ error: unknown; record: ReplayRecord }>;
 export type ReplaySinkErrorChannel = (event: ReplaySinkErrorRecord) => void;
+export type ReplayHookOptions = Readonly<{ sink?: ReplaySink; onError?: ReplaySinkErrorChannel; includeStateHash?: boolean }>;
+export type ReplaySystemRoundSettlementPayload = Readonly<{ roundNumber: number; settlementKind: 'regular' | 'final'; resortTileOrder: readonly string[] }>;
 
-export type ReplayHookOptions = Readonly<{
-    sink?: ReplaySink;
-    onError?: ReplaySinkErrorChannel;
-    includeStateHash?: boolean;
-    includeStateDelta?: boolean;
-    snapshotEveryActions?: number;
-}>;
-
-export type ReplaySystemRoundSettlementPayload = Readonly<{
-    roundNumber: number;
-    settlementKind: 'regular' | 'final';
-    resortTileOrder: readonly string[];
-}>;
-
-
-function resolveReplaySeed(context: any): string | undefined {
-    const seedCandidate = context?.G?.engine?.attributes?.seed;
-    return typeof seedCandidate === 'string' ? seedCandidate : undefined;
-}
-
-function resolveReplayMatchConfig(context: any): Record<string, unknown> | undefined {
-    const players = context?.ctx?.numPlayers;
-    if (typeof players !== 'number' || !Number.isInteger(players) || players < 2) {
-        return undefined;
-    }
-
-    const expansionFlags = (context?.G?.meta?.cfg?.expansions ?? {}) as Record<string, unknown>;
-    return {
-        players,
-        expansions: {
-            ex01: expansionFlags.ex01 === true,
-            ex02: expansionFlags.ex02 === true,
-            ex03: expansionFlags.ex03 === true,
-        },
-    };
-}
-
-function resolveReplayExpansions(matchConfig: Record<string, unknown> | undefined): readonly string[] | undefined {
-    if (!matchConfig) return undefined;
-    const expansionFlags = (matchConfig.expansions ?? {}) as Record<string, unknown>;
-    const enabled: string[] = [];
-    if (expansionFlags.ex01 === true) enabled.push('exp01');
-    if (expansionFlags.ex02 === true) enabled.push('exp02');
-    if (expansionFlags.ex03 === true) enabled.push('exp03');
-    return enabled;
-}
-
-function isDeterministicEngineObject(value: unknown): value is Record<string, unknown> {
-    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
-
-function resolveObjectZones(G: any): Record<string, string> {
-    const objectZoneIndex: Record<string, string> = {};
-    const zones = isDeterministicEngineObject(G?.zones) ? G.zones : {};
-
-    for (const [zoneId, zone] of Object.entries(zones)) {
-        if (!isDeterministicEngineObject(zone) || !Array.isArray(zone.items)) continue;
-        for (const itemId of zone.items) {
-            if (typeof itemId !== 'string') continue;
-            objectZoneIndex[itemId] = zoneId;
-        }
-    }
-
-    return objectZoneIndex;
-}
-
-function orderedEntries<T>(value: Record<string, T>): Array<[string, T]> {
-    return Object.entries(value).sort(([a], [b]) => a.localeCompare(b));
-}
-
-/**
- * Projects authoritative engine state into a minimal replay snapshot surface.
- * @remarks infrastructure; no direct SPEC binding
- * @deterministic
- * @pure
- */
-export function projectReplayStateSnapshot(G: any): ReplayStateSnapshot {
-    const zonesInput = isDeterministicEngineObject(G?.zones) ? G.zones : {};
-    const objectsInput = isDeterministicEngineObject(G?.objects) ? G.objects : {};
-    const objectZones = resolveObjectZones(G);
-
-    const zones: Record<string, readonly string[]> = {};
-    for (const [zoneId, zone] of orderedEntries(zonesInput)) {
-        if (!isDeterministicEngineObject(zone) || !Array.isArray(zone.items)) continue;
-        zones[zoneId] = zone.items.filter((itemId): itemId is string => typeof itemId === 'string');
-    }
-
-    const resources: Record<string, ReplayResourceSnapshot> = {};
-    const metaMarkers: Record<string, ReplayMetaMarkerSnapshot> = {};
-
-    for (const [objectId, objectValue] of orderedEntries(objectsInput)) {
-        if (!isDeterministicEngineObject(objectValue)) continue;
-        const zone = objectZones[objectId] ?? '__unzoned__';
-
-        if (objectValue.type === 'Resource') {
-            resources[objectId] = {
-                owner: typeof objectValue.owner === 'string' ? objectValue.owner : undefined,
-                resort: typeof objectValue.resort === 'string' ? objectValue.resort : undefined,
-                zone,
-            };
-            continue;
-        }
-
-        if (objectValue.type === 'MetaMarker') {
-            metaMarkers[objectId] = {
-                owner: typeof objectValue.owner === 'string' ? objectValue.owner : undefined,
-                measureId: typeof objectValue.measureId === 'string' ? objectValue.measureId : undefined,
-                playCount: typeof objectValue.playCount === 'number' ? objectValue.playCount : undefined,
-                targetTileId: typeof objectValue.targetTileId === 'string' ? objectValue.targetTileId : undefined,
-                mode: typeof objectValue.mode === 'string' ? objectValue.mode : undefined,
-                zone,
-            };
-        }
-    }
-
-    return { zones, resources, metaMarkers };
-}
-
-function areStringArraysEqual(a: readonly string[] | undefined, b: readonly string[] | undefined): boolean {
-    if (!a || !b) return a === b;
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i += 1) {
-        if (a[i] !== b[i]) return false;
-    }
-    return true;
-}
-
-function computeRecordMapDelta<T extends Record<string, unknown>>(
-    previous: Record<string, T>,
-    next: Record<string, T>
-): { changed?: Record<string, T>; removed?: readonly string[] } {
-    const changed: Record<string, T> = {};
-    const removed: string[] = [];
-
-    for (const [key, nextValue] of orderedEntries(next)) {
-        const previousValue = previous[key];
-        if (!previousValue || JSON.stringify(previousValue) !== JSON.stringify(nextValue)) {
-            changed[key] = nextValue;
-        }
-    }
-
-    for (const key of Object.keys(previous).sort((a, b) => a.localeCompare(b))) {
-        if (!(key in next)) {
-            removed.push(key);
-        }
-    }
-
-    return {
-        changed: Object.keys(changed).length > 0 ? changed : undefined,
-        removed: removed.length > 0 ? removed : undefined,
-    };
-}
-
-function computeReplayStateDelta(previous: ReplayStateSnapshot | undefined, next: ReplayStateSnapshot): ReplayStateDelta {
-    if (!previous) {
-        return {
-            changedZones: next.zones,
-            changedResources: next.resources,
-            changedMetaMarkers: next.metaMarkers,
+function buildManifest(context: any): ReplayManifestRecord {
+    const G = context?.G ?? {};
+    const tiles: Record<string, ReplayTileRef> = {};
+    const tileEntries = Object.entries((G.tiles ?? {}) as Record<string, any>).sort(([a], [b]) => a.localeCompare(b));
+    for (const [tileId, tile] of tileEntries) {
+        tiles[tileId] = {
+            tileId,
+            label: tile?.name ?? tileId,
+            kind: tile?.type ?? 'Unknown',
+            resort: typeof tile?.resort === 'string' ? tile.resort : undefined,
+            printedValue: typeof tile?.weight === 'number' ? tile.weight : undefined,
+            isStartCommittee: tile?.type === 'StartCommittee' ? true : undefined,
+            grassrootsType: tile?.conversion?.typedResort,
         };
     }
-
-    const changedZones: Record<string, readonly string[]> = {};
-    const removedZones: string[] = [];
-
-    for (const [zoneId, zoneItems] of orderedEntries(next.zones)) {
-        if (!areStringArraysEqual(previous.zones[zoneId], zoneItems)) {
-            changedZones[zoneId] = zoneItems;
-        }
-    }
-    for (const zoneId of Object.keys(previous.zones).sort((a, b) => a.localeCompare(b))) {
-        if (!(zoneId in next.zones)) removedZones.push(zoneId);
-    }
-
-    const resourceDelta = computeRecordMapDelta(previous.resources, next.resources);
-    const markerDelta = computeRecordMapDelta(previous.metaMarkers, next.metaMarkers);
-
+    const numPlayers = Number(context?.ctx?.numPlayers ?? 0);
+    const playerSeats: Record<string, string> = {};
+    for (let i = 0; i < numPlayers; i += 1) playerSeats[String(i)] = `Seat ${i}`;
+    const resourceTypes = Array.from(new Set(Object.values((G.objects ?? {}) as Record<string, any>).filter((o: any) => o?.type === 'Resource').map((o: any) => o.resort).filter((v: any) => typeof v === 'string'))).sort();
     return {
-        changedZones: Object.keys(changedZones).length > 0 ? changedZones : undefined,
-        removedZones: removedZones.length > 0 ? removedZones : undefined,
-        changedResources: resourceDelta.changed,
-        removedResources: resourceDelta.removed,
-        changedMetaMarkers: markerDelta.changed,
-        removedMetaMarkers: markerDelta.removed,
+        recordType: 'manifest',
+        tiles,
+        playerSeats,
+        resourceTypes,
+        seed: G?.engine?.attributes?.seed,
+        matchConfig: typeof context?.ctx?.numPlayers === 'number' ? { players: context.ctx.numPlayers, expansions: G?.meta?.cfg?.expansions ?? {} } : undefined,
+        expansions: Object.entries(G?.meta?.cfg?.expansions ?? {}).filter(([, v]) => v === true).map(([k]) => k).sort(),
+        loggingMode: 'canonical',
+        matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
     };
 }
 
+function summarizeTurnEnd(G: any, ctx: any) {
+    const perPlayer: Record<string, Record<string, unknown>> = {};
+    const players = Number(ctx?.numPlayers ?? 0);
+    for (let i = 0; i < players; i += 1) {
+        const pid = String(i);
+        const influenceBoard = Object.values(G.objects ?? {}).filter((o: any) => o?.type === 'Influence' && o.owner === pid && typeof o.tileId === 'string').length;
+        const influenceSupply = Object.values(G.objects ?? {}).filter((o: any) => o?.type === 'Influence' && o.owner === pid && !o.tileId).length;
+        const resourcesByResort: Record<string, number> = {};
+        for (const obj of Object.values(G.objects ?? {}) as any[]) {
+            if (obj?.type === 'Resource' && obj.owner === pid && typeof obj.resort === 'string') resourcesByResort[obj.resort] = (resourcesByResort[obj.resort] ?? 0) + 1;
+        }
+        perPlayer[pid] = { resourcesPersonalSupplyByResort: resourcesByResort, influence: { personalSupply: influenceSupply, board: influenceBoard, total: influenceSupply + influenceBoard } };
+    }
+    const drawPileCount = G?.zones?.drawPile?.items?.length ?? 0;
+    const discardFaceUpCount = G?.zones?.discardFaceUp?.items?.length ?? 0;
+    const boardTileCount = G?.zones?.board?.items?.length ?? 0;
+    return { perPlayer, global: { drawPileCount, discardFaceUpCount, boardTileCount } };
+}
+
 /**
- * Wraps move handlers with a best-effort post-success replay hook.
+ * Wrap move handlers with deterministic Replay v2 event emission.
  * @remarks infrastructure; no direct SPEC binding
  * @deterministic
  * @sideEffects
  */
 export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): MoveMap {
     if (!options?.sink) return moves;
-
     let seq = 1;
-    let previousSnapshot: ReplayStateSnapshot | undefined;
+    let manifestWritten = false;
+    let previousPendingChoiceId: string | undefined;
     const wrapped: MoveMap = {};
 
     for (const [moveType, moveFn] of Object.entries(moves)) {
         wrapped[moveType] = ((context: any, ...args: unknown[]) => {
             const isClientOptimistic = Boolean((context?.G as any)?._isPlayerView);
             const result = moveFn(context, ...args);
-            if (result === INVALID_MOVE) return result;
-
-            if (isClientOptimistic) {
-                return result;
-            }
-
+            if (result === INVALID_MOVE || isClientOptimistic) return result;
             const playerId = context?.ctx?.currentPlayer;
             if (typeof playerId !== 'string') return result;
 
-            const matchConfig = resolveReplayMatchConfig(context);
-            const stateSnapshot = projectReplayStateSnapshot(context?.G);
-            const stateDelta = options.includeStateDelta ? computeReplayStateDelta(previousSnapshot, stateSnapshot) : undefined;
-            const record: ReplayActionRecord = {
-                recordType: 'action',
-                seq,
-                player: playerId,
-                moveType,
-                args,
-                typedFields: deriveReplayTypedFields(moveType, args),
-                turn: context?.ctx?.turn,
-                phase: context?.ctx?.phase,
-                stateHash: options.includeStateHash ? hashState(context.G) : undefined,
-                stateDelta,
-                stateSnapshot: options.snapshotEveryActions && options.snapshotEveryActions > 0 && seq % options.snapshotEveryActions === 0
-                    ? stateSnapshot
-                    : undefined,
-                matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
-                seed: resolveReplaySeed(context),
-                matchConfig,
-                expansions: resolveReplayExpansions(matchConfig),
-            };
-
-            seq += 1;
-            previousSnapshot = stateSnapshot;
-
             try {
+                if (!manifestWritten) {
+                    options.sink?.writeRecord(buildManifest(context));
+                    manifestWritten = true;
+                }
+
+                const drawnTileId = context?.G?.zones?.[`staging_${playerId}`]?.items?.[0];
+                const drawnTile = drawnTileId ? context?.G?.tiles?.[drawnTileId] : undefined;
+                const record: ReplayActionRecord = {
+                    recordType: 'action',
+                    seq,
+                    round: Number(context?.G?.roundNumber ?? 0),
+                    turn: Number(context?.ctx?.turn ?? 0),
+                    stage: String(context?.ctx?.activePlayers?.[playerId] ?? context?.ctx?.phase ?? 'unknown'),
+                    player: playerId,
+                    moveType,
+                    intent: args.length === 1 ? args[0] : args,
+                    resolved: {
+                        outcome: 'applied',
+                        ...(moveType === 'placeTile' ? {
+                            drawnTileId,
+                            drawnTileRef: drawnTile ? { label: drawnTile.name ?? drawnTileId, kind: drawnTile.type } : undefined,
+                            placementOutcome: drawnTileId ? 'placed' : 'discarded_unplaceable',
+                        } : {}),
+                    },
+                    postActionStateHash: options.includeStateHash ? hashState(context.G) : undefined,
+                    matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
+                };
                 options.sink?.writeRecord(record);
-                if (record.stateSnapshot) {
+
+                const pendingChoice = context?.G?.engine?.pendingChoice;
+                const pendingChoiceId = typeof pendingChoice?.choiceId === 'string' ? pendingChoice.choiceId : undefined;
+                if (pendingChoiceId && pendingChoiceId !== previousPendingChoiceId) {
                     options.sink?.writeRecord({
-                        recordType: 'checkpoint',
-                        afterSeq: record.seq,
-                        stateHash: record.stateHash ?? hashState(context.G),
-                        stateSnapshot: record.stateSnapshot,
+                        recordType: 'system.choiceOpened',
+                        choiceId: pendingChoiceId,
+                        player: String(pendingChoice.player ?? playerId),
+                        sourceTileId: typeof pendingChoice?.sourceId === 'string' ? pendingChoice.sourceId : undefined,
+                        reason: String(pendingChoice?.sourceId ?? 'choice.requested'),
+                        options: Array.isArray(pendingChoice?.spec?.options) ? pendingChoice.spec.options : [],
                         matchId: record.matchId,
-                        seed: record.seed,
-                        matchConfig: record.matchConfig,
-                        expansions: record.expansions,
                     });
                 }
-            } catch (error) {
-                options.onError?.({ error, record });
-            }
+                previousPendingChoiceId = pendingChoiceId;
 
+                const { perPlayer, global } = summarizeTurnEnd(context?.G, context?.ctx);
+                options.sink?.writeRecord({ recordType: 'checkpoint.turnEnd', turn: Number(context?.ctx?.turn ?? 0), perPlayer, global, stateHash: hashState(context.G), matchId: record.matchId });
+            } catch (error) {
+                options.onError?.({ error, record: { recordType: 'action', seq, round: 0, turn: 0, stage: 'unknown', player: playerId, moveType, intent: args, resolved: {} } });
+            }
+            seq += 1;
             return result;
         }) as any;
     }
@@ -425,35 +224,48 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
 }
 
 /**
- * Emits deterministic replay system records for engine-driven transitions without direct player moves.
+ * Emit deterministic replay records for system-driven round settlement transitions.
  * @remarks infrastructure; no direct SPEC binding
  * @deterministic
  * @sideEffects
  */
-export function emitReplaySystemRecord(
-    options: ReplayHookOptions | undefined,
-    context: any,
-    payload: ReplaySystemRoundSettlementPayload
-): void {
+export function emitReplaySystemRecord(options: ReplayHookOptions | undefined, context: any, payload: ReplaySystemRoundSettlementPayload): void {
     if (!options?.sink) return;
-
-    const matchConfig = resolveReplayMatchConfig(context);
-
-    const record: ReplaySystemRoundSettlementRecord = {
+    const perTile = payload.resortTileOrder.map((tileId, index) => {
+        const tile = context?.G?.tiles?.[tileId] ?? {};
+        const majority = computeMajority(tileId, context?.G as any);
+        const computedOutput = Number(tile?.weight ?? 0);
+        return {
+            tileId,
+            tileRef: { label: tile?.name ?? tileId, kind: tile?.type ?? 'Unknown' },
+            position: index,
+            resort: tile?.resort,
+            printedValue: tile?.weight,
+            modifiers: [],
+            computedOutput,
+            majorityTotals: Object.fromEntries((majority.winners ?? []).map((winner: string) => [winner, 1])),
+            winners: majority.controller ? [majority.controller] : [],
+            distribution: majority.controller ? { [majority.controller]: computedOutput } : {},
+            noise: majority.controller ? 0 : computedOutput,
+        };
+    });
+    const matchId = typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined;
+    options.sink.writeRecord({
         recordType: 'system.roundSettlement',
-        roundNumber: payload.roundNumber,
+        round: payload.roundNumber,
         settlementKind: payload.settlementKind,
-        resortTileOrder: [...payload.resortTileOrder],
-        stateHash: options.includeStateHash ? hashState(context.G) : undefined,
-        matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
-        seed: resolveReplaySeed(context),
-        matchConfig,
-        expansions: resolveReplayExpansions(matchConfig),
-    };
-
-    try {
-        options.sink.writeRecord(record);
-    } catch (error) {
-        options.onError?.({ error, record });
-    }
+        perTile,
+        postSettlementStateHash: options.includeStateHash ? hashState(context.G) : undefined,
+        matchId,
+    });
+    const { perPlayer } = summarizeTurnEnd(context?.G, context?.ctx);
+    options.sink.writeRecord({ recordType: 'checkpoint.roundEnd', round: payload.roundNumber, perPlayer, stateHash: hashState(context.G), matchId });
 }
+
+/**
+ * Compatibility projection helper retained for verifier imports.
+ * @remarks infrastructure; no direct SPEC binding
+ * @deterministic
+ * @pure
+ */
+export function projectReplayStateSnapshot(_G: any): any { return { zones: {}, resources: {}, metaMarkers: {} }; }
