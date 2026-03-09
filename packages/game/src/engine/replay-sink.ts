@@ -1,4 +1,5 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
+import { CoreZoneName } from '@balance-control/rules';
 import { hashState } from '../hash-state';
 import type { MoveMap } from '../move-module-registry';
 import { computeMajority } from '../mechanics';
@@ -81,6 +82,7 @@ export type ReplayCheckpointRoundEndRecord = Readonly<{
     recordType: 'checkpoint.roundEnd';
     round: number;
     perPlayer: Record<string, Record<string, unknown>>;
+    global: Record<string, unknown>;
     stateHash: string;
     matchId?: string;
 }>;
@@ -146,9 +148,9 @@ function summarizeTurnEnd(G: any, ctx: any) {
         }
         perPlayer[pid] = { resourcesPersonalSupplyByResort: resourcesByResort, influence: { personalSupply: influenceSupply, board: influenceBoard, total: influenceSupply + influenceBoard } };
     }
-    const drawPileCount = G?.zones?.drawPile?.items?.length ?? 0;
-    const discardFaceUpCount = G?.zones?.discardFaceUp?.items?.length ?? 0;
-    const boardTileCount = G?.zones?.board?.items?.length ?? 0;
+    const drawPileCount = G?.zones?.[CoreZoneName.DrawPile]?.items?.length ?? 0;
+    const discardFaceUpCount = G?.zones?.[CoreZoneName.DiscardFaceUp]?.items?.length ?? 0;
+    const boardTileCount = G?.zones?.[CoreZoneName.Board]?.items?.length ?? 0;
     return { perPlayer, global: { drawPileCount, discardFaceUpCount, boardTileCount } };
 }
 
@@ -315,8 +317,11 @@ export function emitReplaySystemRecord(options: ReplayHookOptions | undefined, c
         postSettlementStateHash: options.includeStateHash ? hashState(context.G) : undefined,
         matchId,
     });
-    const { perPlayer } = summarizeTurnEnd(context?.G, context?.ctx);
-    options.sink.writeRecord({ recordType: 'checkpoint.roundEnd', round: payload.roundNumber, perPlayer, stateHash: hashState(context.G), matchId });
+    const { perPlayer, global } = summarizeTurnEnd(context?.G, context?.ctx);
+    if (perTile.length > 0 && Number(global.boardTileCount ?? 0) <= 0) {
+        throw new Error('Replay invariant failed: settlement perTile is non-empty while boardTileCount is 0.');
+    }
+    options.sink.writeRecord({ recordType: 'checkpoint.roundEnd', round: payload.roundNumber, perPlayer, global, stateHash: hashState(context.G), matchId });
 }
 
 /**

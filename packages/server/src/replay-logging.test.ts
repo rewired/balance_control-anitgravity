@@ -95,6 +95,7 @@ describe('NdjsonReplaySink v2 boundaries', () => {
             recordType: 'checkpoint.roundEnd',
             round: 1,
             perPlayer: {},
+            global: {},
             stateHash: 'd'.repeat(64),
             matchId: 'm1',
         } satisfies ReplayCheckpointRoundEndRecord,
