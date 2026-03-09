@@ -5,6 +5,7 @@
 
 ## Unreleased
 
+- 2026-03-09: task(0350) Client-web viewport interaction deflake: harden BoardViewport fit/reset with clamp-aligned no-op transform guards, add non-passive gesture default prevention on viewport root, and stabilize board-viewport E2E zoom assertions with explicit scale-delta waits plus non-clamped zoom-out baselining; add DD-0350.
 - 2026-03-09: task(0349) Client-web hotseat seat-switch draft revalidation: keep mounted draft across active-seat changes, recompute `draft.isLegalNow` against new-seat legal intents, hard-gate `confirmDraft` when draft is illegal, and harden ARCH-06 e2e with explicit Given/When/Then + stable waits for disabled confirm and unchanged state id; add DD-0349.
 - 2026-03-09: task(0348) Client-web dev build fix: align HexTileVisual dev playground/simulator fixtures with the current `metaMarkers` API (replace deprecated `metaIconsBySeat` usage), preserving presentation-only behavior while restoring `pnpm -w build` success.
 - 2026-03-08: task(0346) Server replay logging/tests: align replay boundary tests with strict footer hash requirement by always providing `stateHash` in successful close paths, harden close-time cleanup by destroying open streams before throwing on validation failures, and stabilize negative close test teardown to avoid async `ENOENT` noise; add DD-0346 and task documentation.
