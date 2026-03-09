@@ -463,39 +463,43 @@ describe('useGameInteractionController State Machine', () => {
             expect(result.current.selectedConvertFamily).toBeNull();
         });
 
-        it('resets transient UI state when myPid changes', () => {
+        it('keeps draft mounted but marks it illegal when seat switch changes legal intents', () => {
+            const legalIntentForP0 = { moveType: 'placeInfluence', payload: { tileId: 'tile1' } } as any;
+            const legalIntentForP1 = { moveType: 'placeInfluence', payload: { tileId: 'tile2' } } as any;
+
+            vi.mocked(useIntentViewModel)
+                .mockReturnValueOnce({ ...mockDefaultVM, intents: [legalIntentForP0] })
+                .mockReturnValueOnce({ ...mockDefaultVM, intents: [legalIntentForP0] })
+                .mockReturnValueOnce({ ...mockDefaultVM, intents: [legalIntentForP1] });
+
             const { result, rerender } = renderHook((props: { playerID: string; currentPlayer: string }) => useGameInteractionController({
-                G: { zones: {}, grid: { '0,0': 'tile1' }, tiles: { tile1: { id: 'tile1' } }, objects: {} } as any,
+                G: {
+                    zones: {},
+                    grid: { '0,0': 'tile1', '0,1': 'tile2' },
+                    tiles: { tile1: { id: 'tile1' }, tile2: { id: 'tile2' } },
+                    objects: {}
+                } as any,
                 ctx: { currentPlayer: props.currentPlayer },
                 playerID: props.playerID,
-                moves: {}
+                moves: { placeInfluence: vi.fn() }
             }), {
                 initialProps: { playerID: '0', currentPlayer: '0' }
             });
 
             act(() => {
-                result.current.setActionMode('placeInfluence');
-            });
-            act(() => {
-                result.current.selectTile('tile1', '0,0');
-            });
-            act(() => {
-                result.current.proposeIntent({ moveType: 'placeInfluence', payload: { tileId: 'tile1' } } as any);
+                result.current.proposeIntent(legalIntentForP0);
             });
 
             expect(result.current.interactionState).toBe('draftReady');
+            expect(result.current.proposedIntent).toEqual(legalIntentForP0);
+            expect(result.current.draft.isLegalNow).toBe(true);
 
             rerender({ playerID: '1', currentPlayer: '1' });
 
-            expect(result.current.interactionState).toBe('selectingAction');
+            expect(result.current.interactionState).toBe('draftReady');
+            expect(result.current.proposedIntent).toEqual(legalIntentForP0);
+            expect(result.current.draft.isLegalNow).toBe(false);
             expect(result.current.actionMode).toBe('none');
-            expect(result.current.proposedIntent).toBeNull();
-            expect(result.current.selectedTileId).toBeNull();
-            expect(result.current.selectedCoord).toBeNull();
-            expect(result.current.moveInfluenceSourceId).toBeNull();
-            expect(result.current.pinnedCommitteeTileId).toBeNull();
-            expect(result.current.pinnedGrassrootsTileId).toBeNull();
-            expect(result.current.selectedConvertFamily).toBeNull();
         });
 
         it('Escape key clears selection, proposal, and mode state', () => {
@@ -629,6 +633,11 @@ describe('useGameInteractionController State Machine', () => {
         });
 
         it('removes notices after timeout', () => {
+            vi.mocked(useIntentViewModel).mockReturnValue({
+                ...mockDefaultVM,
+                intents: [{ moveType: 'placeInfluence', payload: { tileId: 'tile1' } } as any]
+            });
+
             const { result } = renderHook(() => useGameInteractionController({
                 G: { zones: {}, grid: {}, tiles: {}, objects: {} } as any,
                 ctx: { currentPlayer: '0' },
@@ -655,6 +664,11 @@ describe('useGameInteractionController State Machine', () => {
         it('cleans timers on unmount and avoids post-unmount updates', () => {
             const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
             const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            vi.mocked(useIntentViewModel).mockReturnValue({
+                ...mockDefaultVM,
+                intents: [{ moveType: 'placeInfluence', payload: { tileId: 'tile1' } } as any]
+            });
 
             const { result, unmount } = renderHook(() => useGameInteractionController({
                 G: { zones: {}, grid: {}, tiles: {}, objects: {} } as any,

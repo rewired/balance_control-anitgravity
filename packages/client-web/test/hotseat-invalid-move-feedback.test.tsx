@@ -57,7 +57,10 @@ const Harness: React.FC<{ moves: any }> = ({ moves }) => {
 
 describe('Hotseat diagnostics: invalid move feedback', () => {
     it('shows a toast when dispatch is rejected (INVALID_MOVE)', async () => {
-        mockEnumerateLegalIntents.mockReturnValue([]);
+        mockEnumerateLegalIntents.mockReturnValue([
+            { moveType: 'badMove', payload: { x: 1 } }
+        ]);
+
 
         const moves = {
             badMove: vi.fn(() => INVALID_MOVE)

@@ -19,6 +19,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('draft becomes illegal after seat switch and disables Confirm without auto-commit', async ({ page }) => {
+    // Given: active seat P0 has a legal draft and Confirm is enabled.
     const firstGhost = page.locator('[data-testid^="hex-ghost-"]:not([disabled])').first();
     await expect(firstGhost).toBeVisible({ timeout: 15_000 });
     await firstGhost.click();
@@ -36,12 +37,14 @@ test('draft becomes illegal after seat switch and disables Confirm without auto-
         return (window as any).__BC_HOTSEAT_E2E__?.getStateID?.() ?? null;
     });
 
+    // When: we switch hotseat control to P1 while keeping the existing draft mounted.
     await page.getByTestId('hotseat-switch-1').click();
     await expect(page.getByTestId('hotseat-status')).toContainText('Active seat P1');
 
+    // Then: draft is revalidated against P1 legal intents, Confirm becomes disabled, and no state commit occurs.
     const confirmCountAfterSwitch = await confirmButton.count();
     if (confirmCountAfterSwitch > 0) {
-        await expect(confirmButton).toBeDisabled();
+        await expect(confirmButton).toBeDisabled({ timeout: 10_000 });
     }
 
     const draftKeyCountAfterSwitch = await draftKeyLocator.count();
@@ -49,6 +52,10 @@ test('draft becomes illegal after seat switch and disables Confirm without auto-
         const draftKeyAfter = (await draftKeyLocator.textContent())?.trim();
         expect(draftKeyAfter).toBe(draftKeyBefore);
     }
+
+    await expect.poll(async () => page.evaluate(() => {
+        return (window as any).__BC_HOTSEAT_E2E__?.getStateID?.() ?? null;
+    })).toBe(stateIdBeforeSwitch);
 
     const stateIdAfterSwitch = await page.evaluate(() => {
         return (window as any).__BC_HOTSEAT_E2E__?.getStateID?.() ?? null;

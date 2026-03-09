@@ -21,7 +21,7 @@ describe('useGameInteractionController Hotseat Switching', () => {
         vi.mocked(useIntentViewModel).mockReturnValue(mockDefaultVM);
     });
 
-    it('resets state when playerID changes', () => {
+    it('does not force-reset transient selection state when playerID changes', () => {
         const { result, rerender } = renderHook(
             (props) => useGameInteractionController(props),
             {
@@ -51,9 +51,9 @@ describe('useGameInteractionController Hotseat Switching', () => {
             moves: {}
         });
 
-        // 3. Assert state is reset
-        expect(result.current.actionMode).toBe('none');
-        expect(result.current.moveInfluenceSourceId).toBe(null);
+        // 3. Assert state is preserved; draft legality is revalidated separately.
+        expect(result.current.actionMode).toBe('placeInfluence');
+        expect(result.current.moveInfluenceSourceId).toBe('tile_123');
     });
 
     it('updates stale closures when isHardGate changes across seats', () => {
