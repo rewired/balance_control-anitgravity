@@ -22,6 +22,54 @@ async function getHotseatApi(page: any): Promise<HotseatE2EApi> {
     return hotseatApi;
 }
 
+async function waitForBoardReady(page: any): Promise<void> {
+    const hotseatStatus = page.getByTestId('hotseat-status');
+    await expect(hotseatStatus).toBeVisible();
+
+    let currentSeat: '0' | '1' | null = null;
+    await expect
+        .poll(async () => {
+            const text = (await hotseatStatus.textContent()) ?? '';
+            const match = text.match(/currentPlayer P([01])/);
+            currentSeat = (match?.[1] as '0' | '1' | undefined) ?? null;
+            return currentSeat;
+        }, { timeout: 10_000, message: 'Waiting for a deterministic currentPlayer in hotseat status.' })
+        .not.toBeNull();
+
+    const targetSeatButton = page.getByTestId(`hotseat-switch-${currentSeat!}`);
+    if (await targetSeatButton.isEnabled()) {
+        await targetSeatButton.click();
+    }
+    await expect(hotseatStatus).toContainText(`Active seat P${currentSeat!}`);
+    await expect(hotseatStatus).toContainText(`currentPlayer P${currentSeat!}`);
+    await expect(page.getByTestId('btn-confirm-draft')).toHaveCount(0);
+}
+
+async function clickStableLegalGhostTarget(page: any): Promise<void> {
+    const board = page.getByTestId('hex-board');
+    const legalGhostTargets = board.locator('[data-testid^="hex-ghost-"]:not([disabled])');
+
+    await expect
+        .poll(async () => legalGhostTargets.count(), {
+            timeout: 15_000,
+            message: 'Waiting for legal ghost targets to be rendered and enabled.',
+        })
+        .toBeGreaterThan(0);
+
+    const targetIds = await legalGhostTargets.evaluateAll((elements) =>
+        elements
+            .map((element) => element.getAttribute('data-testid'))
+            .filter((id): id is string => typeof id === 'string' && id.length > 0),
+    );
+    const stableTargetId = targetIds.sort()[0];
+
+    expect(stableTargetId).toBeTruthy();
+
+    const stableTarget = board.getByTestId(stableTargetId!);
+    await expect(stableTarget).toBeVisible();
+    await stableTarget.click();
+}
+
 test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
         (window as any).__BC_ENABLE_E2E_HOOKS__ = true;
@@ -34,13 +82,12 @@ test.beforeEach(async ({ page }) => {
 
 test('normal board action is draft-only (no auto-commit) and commits only after Confirm', async ({ page }) => {
     const api = await getHotseatApi(page);
+    await waitForBoardReady(page);
 
     const initialStateID = await api.evaluate((h: HotseatE2EApi) => h.getStateID());
     expect(initialStateID).not.toBeNull();
 
-    const firstGhost = page.locator('[data-testid^="hex-ghost-"]:not([disabled])').first();
-    await expect(firstGhost).toBeVisible({ timeout: 15_000 });
-    await firstGhost.click();
+    await clickStableLegalGhostTarget(page);
 
     const confirmButton = page.getByTestId('btn-confirm-draft');
     await expect(confirmButton).toBeVisible();

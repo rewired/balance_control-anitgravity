@@ -5,6 +5,7 @@
 
 ## Unreleased
 
+- 2026-03-09: task(0351) Client-web ARCH-06 e2e deflake: harden `arch06-no-autocommit-confirm` by waiting for hotseat board readiness before ghost interaction, polling legal `hex-ghost-*` targets until count > 0, and selecting a deterministic target test-id from the board-scoped set instead of fragile global `.first()` matching.
 - 2026-03-09: task(0350) Client-web viewport interaction deflake: harden BoardViewport fit/reset with clamp-aligned no-op transform guards, add non-passive gesture default prevention on viewport root, and stabilize board-viewport E2E zoom assertions with explicit scale-delta waits plus non-clamped zoom-out baselining; add DD-0350.
 - 2026-03-09: task(0349) Client-web hotseat seat-switch draft revalidation: keep mounted draft across active-seat changes, recompute `draft.isLegalNow` against new-seat legal intents, hard-gate `confirmDraft` when draft is illegal, and harden ARCH-06 e2e with explicit Given/When/Then + stable waits for disabled confirm and unchanged state id; add DD-0349.
 - 2026-03-09: task(0348) Client-web dev build fix: align HexTileVisual dev playground/simulator fixtures with the current `metaMarkers` API (replace deprecated `metaIconsBySeat` usage), preserving presentation-only behavior while restoring `pnpm -w build` success.
