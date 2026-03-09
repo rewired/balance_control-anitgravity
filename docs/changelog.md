@@ -6,6 +6,7 @@
 
 ## Unreleased
 
+- 2026-03-09: task(0356) Server replay tests: remove `as any` fixture casts for manifest/action records in `replay-logging.test.ts`, add compile-time `satisfies` coverage for all replay record variants, and add negative boundary coverage proving header metadata is sourced from `recordType: "manifest"` only.
 - 2026-03-09: task(0352) Client-web ARCH-06 pendingChoice hardgate stabilization: align selectTile E2E with state-ack ordering (wait for `stateID` increment before asserting clear), couple injected hotseat pendingChoice cleanup to successful resolve payload validation (matching `choiceId` + `selection` present), and add HotseatShell lifecycle unit coverage for `set -> resolve -> clear` including deterministic stateID bump behavior.
 - 2026-03-09: task(0351) Client-web ARCH-06 e2e deflake: harden `arch06-no-autocommit-confirm` by waiting for hotseat board readiness before ghost interaction, polling legal `hex-ghost-*` targets until count > 0, and selecting a deterministic target test-id from the board-scoped set instead of fragile global `.first()` matching.
 - 2026-03-09: task(0350) Client-web viewport interaction deflake: harden BoardViewport fit/reset with clamp-aligned no-op transform guards, add non-passive gesture default prevention on viewport root, and stabilize board-viewport E2E zoom assertions with explicit scale-delta waits plus non-clamped zoom-out baselining; add DD-0350.
