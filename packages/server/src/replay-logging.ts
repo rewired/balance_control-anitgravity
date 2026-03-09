@@ -7,285 +7,87 @@ const FILE_EXTENSION = '.replay.ndjson';
 const SAFE_FILENAME_CHARS = /[^a-zA-Z0-9._-]/g;
 const WORKSPACE_ROOT_MARKER = 'pnpm-workspace.yaml';
 
-export type ReplayLoggingConfig = Readonly<{
-    replayDirectory?: string;
-    checkpointEveryActions?: number;
-}>;
+export type ReplayLoggingConfig = Readonly<{ replayDirectory?: string; checkpointEveryActions?: number }>;
 
-type ReplayHeaderRecord = Readonly<{
-    recordType: 'header';
-    schemaVersion: '1';
-    seed: string;
-    matchConfig: Record<string, unknown>;
-    expansions: string[];
-}>;
-
-type ReplayCheckpointRecord = Readonly<{
-    recordType: 'checkpoint';
-    stateHash: string;
-    afterSeq: number;
-}>;
-
-type ReplayFooterRecord = Readonly<{
-    recordType: 'footer';
-    finalStateHash: string;
-    totalActions: number;
-}>;
-
+type ReplayHeaderRecord = Readonly<{ recordType: 'header'; schemaVersion: '2'; format: 'balance-control.replay.jsonl'; seed: string; matchConfig: Record<string, unknown>; expansions: string[]; loggingMode: string }>;
+type ReplayFooterRecord = Readonly<{ recordType: 'footer'; finalStateHash: string; totalActions: number; totalRecords: number }>;
 export type CloseableReplaySink = ReplaySink & Required<Pick<ReplaySink, 'close'>>;
 
-type StreamState = {
-    streamKey: string;
-    matchId?: string;
-    stream: fs.WriteStream;
-    actionCount: number;
-    lastStateHash?: string;
-    headerWritten: boolean;
-    seed?: string;
-    matchConfig?: Record<string, unknown>;
-    expansions?: string[];
-};
+type StreamState = { streamKey: string; matchId?: string; stream: fs.WriteStream; actionCount: number; totalRecords: number; lastStateHash?: string; headerWritten: boolean; manifestWritten: boolean; seed?: string; matchConfig?: Record<string, unknown>; expansions?: string[]; loggingMode?: string };
 
-function sanitizeFilenamePart(value: string, fallback: string): string {
-    const sanitized = value.trim().replace(SAFE_FILENAME_CHARS, '_');
-    return sanitized.length > 0 ? sanitized : fallback;
-}
+const sanitizeFilenamePart = (value: string, fallback: string) => (value.trim().replace(SAFE_FILENAME_CHARS, '_') || fallback);
+const formatUtcTimestamp = (date: Date) => date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+function findWorkspaceRoot(startDirectory: string): string { let current = path.resolve(startDirectory); while (true) { if (fs.existsSync(path.join(current, WORKSPACE_ROOT_MARKER))) return current; const parent = path.dirname(current); if (parent === current) return startDirectory; current = parent; } }
+const getDefaultReplayDirectory = (cwd: string) => path.join(findWorkspaceRoot(cwd), ...DEFAULT_REPLAY_DIRECTORY_SEGMENTS);
+const normalizeExpansions = (value: readonly string[] | undefined): string[] => !value ? [] : [...new Set(value)].sort((a, b) => a.localeCompare(b));
+const writeNdjsonLine = (stream: fs.WriteStream, record: unknown): void => { stream.write(`${JSON.stringify(record)}\n`); };
 
-function formatUtcTimestamp(date: Date): string {
-    const iso = date.toISOString();
-    return iso.replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
-}
-
-function findWorkspaceRoot(startDirectory: string): string {
-    let current = path.resolve(startDirectory);
-
-    while (true) {
-        const markerPath = path.join(current, WORKSPACE_ROOT_MARKER);
-        if (fs.existsSync(markerPath)) {
-            return current;
-        }
-
-        const parent = path.dirname(current);
-        if (parent === current) {
-            return startDirectory;
-        }
-
-        current = parent;
-    }
-}
-
-function getDefaultReplayDirectory(currentWorkingDirectory: string): string {
-    const workspaceRoot = findWorkspaceRoot(currentWorkingDirectory);
-    return path.join(workspaceRoot, ...DEFAULT_REPLAY_DIRECTORY_SEGMENTS);
-}
-
-function normalizeExpansions(value: readonly string[] | undefined): string[] {
-    if (!value) return [];
-    const sorted = [...new Set(value)].sort((a, b) => a.localeCompare(b));
-    return sorted;
-}
-
-function writeNdjsonLine(stream: fs.WriteStream, record: ReplayRecord | ReplayHeaderRecord | ReplayCheckpointRecord | ReplayFooterRecord): void {
-    stream.write(`${JSON.stringify(record)}\n`);
-}
-
-/**
- * Validates and resolves replay output directory.
- * Rejects relative path traversal and invalid empty paths.
- */
 export function resolveReplayDirectory(inputPath?: string, currentWorkingDirectory = process.cwd()): string {
-    const configured = inputPath?.trim();
-    if (!configured) {
-        return path.normalize(getDefaultReplayDirectory(currentWorkingDirectory));
-    }
-
-    if (configured.includes('\u0000')) {
-        throw new Error('Invalid replay directory: path must not contain null bytes.');
-    }
-
+    const configured = inputPath?.trim(); if (!configured) return path.normalize(getDefaultReplayDirectory(currentWorkingDirectory));
+    if (configured.includes('\u0000')) throw new Error('Invalid replay directory: path must not contain null bytes.');
     const normalizedInput = path.posix.normalize(configured.replace(/\\/g, '/'));
-    if (!path.isAbsolute(configured)) {
-        if (normalizedInput === '..' || normalizedInput.startsWith('../') || normalizedInput.includes('/../')) {
-            throw new Error(
-                `Invalid replay directory "${configured}": path traversal ("..") is not allowed for relative replay paths.`
-            );
-        }
-    }
-
-    const resolved = path.resolve(currentWorkingDirectory, configured);
-    return path.normalize(resolved);
+    if (!path.isAbsolute(configured) && (normalizedInput === '..' || normalizedInput.startsWith('../') || normalizedInput.includes('/../'))) throw new Error(`Invalid replay directory "${configured}": path traversal ("..") is not allowed for relative replay paths.`);
+    return path.normalize(path.resolve(currentWorkingDirectory, configured));
 }
 
 export function createReplayFilename(record: ReplayRecord, timestamp: Date = new Date()): string {
-    const matchIdPart = sanitizeFilenamePart(record.matchId ?? 'unknown-match', 'unknown-match');
-    const seedPart = sanitizeFilenamePart(record.seed ?? 'unknown-seed', 'unknown-seed');
-    const timestampPart = formatUtcTimestamp(timestamp);
-    return `${matchIdPart}-${seedPart}-${timestampPart}${FILE_EXTENSION}`;
+    const matchIdPart = sanitizeFilenamePart((record as any).matchId ?? 'unknown-match', 'unknown-match');
+    const seedPart = sanitizeFilenamePart((record as any).seed ?? 'unknown-seed', 'unknown-seed');
+    return `${matchIdPart}-${seedPart}-${formatUtcTimestamp(timestamp)}${FILE_EXTENSION}`;
 }
 
 class NdjsonReplaySink implements CloseableReplaySink {
     private readonly streams = new Map<string, StreamState>();
-
-    public constructor(private readonly replayDirectory: string, private readonly checkpointEveryActions?: number) { }
-
+    public constructor(private readonly replayDirectory: string) { }
     public writeRecord(record: ReplayRecord): void {
-        const streamKey = record.matchId ?? '__unknown_match__';
-        const streamState = this.ensureStream(streamKey, record);
-        this.captureHeaderMetadata(streamState, record);
-        try {
-            this.ensureHeader(streamState);
-        } catch (error) {
-            streamState.stream.destroy();
-            this.streams.delete(streamKey);
-            throw error;
+        const streamKey = (record as any).matchId ?? '__unknown_match__';
+        const state = this.ensureStream(streamKey, record);
+        this.captureMetadata(state, record);
+        this.ensureHeader(state);
+        if (record.recordType === 'manifest' && !state.manifestWritten) {
+            const { seed: _seed, matchConfig: _cfg, expansions: _exp, loggingMode: _mode, ...manifestRecord } = record as any;
+            writeNdjsonLine(state.stream, manifestRecord);
+            state.totalRecords += 1;
+            state.manifestWritten = true;
+            return;
         }
-
-        writeNdjsonLine(streamState.stream, record);
-
-        if (record.recordType === 'action') {
-            streamState.actionCount += 1;
-            this.maybeWriteCheckpoint(streamState, record.seq, record.stateHash);
-        }
-
-        if (typeof record.stateHash === 'string') {
-            streamState.lastStateHash = record.stateHash;
-        }
+        writeNdjsonLine(state.stream, record);
+        state.totalRecords += 1;
+        if (record.recordType === 'action') state.actionCount += 1;
+        const hash = (record as any).postActionStateHash ?? (record as any).postSettlementStateHash ?? (record as any).stateHash;
+        if (typeof hash === 'string' && hash.length > 0) state.lastStateHash = hash;
     }
-
     public close(): void {
-        let closeValidationError: Error | undefined;
-
-        for (const streamState of this.streams.values()) {
-            try {
-                this.ensureHeader(streamState);
-            } catch (error) {
-                closeValidationError = error instanceof Error ? error : new Error(String(error));
-                break;
-            }
-
-            if (typeof streamState.lastStateHash !== 'string' || streamState.lastStateHash.length === 0) {
-                const matchIdentifier = streamState.matchId ?? 'unknown-match';
-                closeValidationError = new Error(
-                    `Cannot write replay footer for stream "${streamState.streamKey}" (matchId="${matchIdentifier}"): missing required finalStateHash (no non-empty stateHash observed).`
-                );
-                break;
-            }
-        }
-
-        if (closeValidationError) {
-            for (const streamState of this.streams.values()) {
-                streamState.stream.destroy();
-            }
-            this.streams.clear();
-            throw closeValidationError;
-        }
-
-        for (const streamState of this.streams.values()) {
-            const finalStateHash = streamState.lastStateHash as string;
-            const footer: ReplayFooterRecord = {
-                recordType: 'footer',
-                finalStateHash,
-                totalActions: streamState.actionCount,
-            };
-            writeNdjsonLine(streamState.stream, footer);
-            streamState.stream.end();
+        for (const state of this.streams.values()) {
+            this.ensureHeader(state);
+            if (!state.manifestWritten) throw new Error(`Cannot close replay stream "${state.streamKey}": manifest record was not written.`);
+            if (!state.lastStateHash) throw new Error(`Cannot write replay footer for stream "${state.streamKey}": missing required finalStateHash.`);
+            const footer: ReplayFooterRecord = { recordType: 'footer', finalStateHash: state.lastStateHash, totalActions: state.actionCount, totalRecords: state.totalRecords + 2 };
+            writeNdjsonLine(state.stream, footer);
+            state.stream.end();
         }
         this.streams.clear();
     }
-
-    private maybeWriteCheckpoint(streamState: StreamState, afterSeq: number, stateHash?: string): void {
-        if (!this.checkpointEveryActions || this.checkpointEveryActions <= 0) return;
-        if (streamState.actionCount % this.checkpointEveryActions !== 0) return;
-        if (typeof stateHash !== 'string' || stateHash.length === 0) return;
-
-        const checkpoint: ReplayCheckpointRecord = {
-            recordType: 'checkpoint',
-            afterSeq,
-            stateHash,
-        };
-        writeNdjsonLine(streamState.stream, checkpoint);
+    private captureMetadata(state: StreamState, record: ReplayRecord): void {
+        if (record.recordType !== 'manifest') return;
+        if (typeof (record as any).seed === 'string') state.seed = (record as any).seed;
+        if ((record as any).matchConfig && typeof (record as any).matchConfig === 'object') state.matchConfig = (record as any).matchConfig;
+        if (Array.isArray((record as any).expansions)) state.expansions = normalizeExpansions((record as any).expansions);
+        if (typeof (record as any).loggingMode === 'string') state.loggingMode = (record as any).loggingMode;
     }
-
-    private captureHeaderMetadata(streamState: StreamState, record: ReplayRecord): void {
-        if (typeof streamState.seed === 'undefined' && typeof record.seed === 'string' && record.seed.length > 0) {
-            streamState.seed = record.seed;
-        }
-        if (
-            typeof streamState.matchConfig === 'undefined'
-            && record.matchConfig
-            && typeof record.matchConfig === 'object'
-            && !Array.isArray(record.matchConfig)
-        ) {
-            streamState.matchConfig = record.matchConfig;
-        }
-        if (typeof streamState.expansions === 'undefined' && Array.isArray(record.expansions)) {
-            streamState.expansions = normalizeExpansions(record.expansions);
-        }
+    private ensureHeader(state: StreamState): void {
+        if (state.headerWritten) return;
+        if (!state.seed || !state.matchConfig) throw new Error(`Cannot write replay header for stream "${state.streamKey}" (matchId="${state.matchId ?? 'unknown-match'}"): missing required metadata seed, matchConfig.`);
+        const header: ReplayHeaderRecord = { recordType: 'header', schemaVersion: '2', format: 'balance-control.replay.jsonl', seed: state.seed, matchConfig: state.matchConfig, expansions: normalizeExpansions(state.expansions), loggingMode: state.loggingMode ?? 'canonical' };
+        writeNdjsonLine(state.stream, header); state.totalRecords += 1; state.headerWritten = true;
     }
-
-    private ensureHeader(streamState: StreamState): void {
-        if (streamState.headerWritten) return;
-
-        const missingFields: string[] = [];
-        if (typeof streamState.seed === 'undefined') {
-            missingFields.push('seed');
-        }
-        if (typeof streamState.matchConfig === 'undefined') {
-            missingFields.push('matchConfig');
-        }
-
-        if (missingFields.length > 0) {
-            const matchIdentifier = streamState.matchId ?? 'unknown-match';
-            throw new Error(
-                `Cannot write replay header for stream "${streamState.streamKey}" (matchId="${matchIdentifier}"): missing required metadata ${missingFields.join(', ')}.`
-            );
-        }
-
-        const seed = streamState.seed as string;
-        const matchConfig = streamState.matchConfig as Record<string, unknown>;
-        const header: ReplayHeaderRecord = {
-            recordType: 'header',
-            schemaVersion: '1',
-            seed,
-            matchConfig,
-            expansions: normalizeExpansions(streamState.expansions),
-        };
-        writeNdjsonLine(streamState.stream, header);
-        streamState.headerWritten = true;
-    }
-
     private ensureStream(streamKey: string, record: ReplayRecord): StreamState {
-        const existing = this.streams.get(streamKey);
-        if (existing) {
-            return existing;
-        }
-
-        const fileName = createReplayFilename(record);
-        const stream = fs.createWriteStream(path.join(this.replayDirectory, fileName), { flags: 'a', encoding: 'utf8' });
-        const streamState: StreamState = {
-            streamKey,
-            matchId: record.matchId,
-            stream,
-            actionCount: 0,
-            headerWritten: false,
-            seed: typeof record.seed === 'string' && record.seed.length > 0 ? record.seed : undefined,
-            matchConfig: record.matchConfig && typeof record.matchConfig === 'object' && !Array.isArray(record.matchConfig)
-                ? record.matchConfig
-                : undefined,
-            expansions: Array.isArray(record.expansions) ? normalizeExpansions(record.expansions) : undefined,
-        };
-
-        this.streams.set(streamKey, streamState);
-        return streamState;
+        const existing = this.streams.get(streamKey); if (existing) return existing;
+        const stream = fs.createWriteStream(path.join(this.replayDirectory, createReplayFilename(record)), { flags: 'a', encoding: 'utf8' });
+        const state: StreamState = { streamKey, matchId: (record as any).matchId, stream, actionCount: 0, totalRecords: 0, headerWritten: false, manifestWritten: false };
+        this.streams.set(streamKey, state); return state;
     }
 }
 
-export function createReplaySink(config: ReplayLoggingConfig): CloseableReplaySink {
-    const replayDirectory = resolveReplayDirectory(config.replayDirectory);
-    fs.mkdirSync(replayDirectory, { recursive: true });
-    return new NdjsonReplaySink(replayDirectory, config.checkpointEveryActions);
-}
-
-export function readReplayDirectoryFromEnv(env = process.env): string | undefined {
-    return env.BC_REPLAY_DIRECTORY;
-}
+export function createReplaySink(config: ReplayLoggingConfig): CloseableReplaySink { const replayDirectory = resolveReplayDirectory(config.replayDirectory); fs.mkdirSync(replayDirectory, { recursive: true }); return new NdjsonReplaySink(replayDirectory); }
+export function readReplayDirectoryFromEnv(env = process.env): string | undefined { return env.BC_REPLAY_DIRECTORY; }

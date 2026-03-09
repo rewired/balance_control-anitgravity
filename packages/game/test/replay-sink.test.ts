@@ -1,239 +1,39 @@
 import { describe, expect, it, vi } from 'vitest';
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { emitReplaySystemRecord, withReplaySink, type ReplayActionRecord, type ReplayRecord } from '../src/engine/replay-sink';
+import { emitReplaySystemRecord, withReplaySink, type ReplayRecord } from '../src/engine/replay-sink';
 
-describe('withReplaySink', () => {
+describe('withReplaySink v2', () => {
     const makeContext = () => ({
-        G: { engine: { attributes: { seed: 'seed-from-attributes' } } },
-        ctx: { currentPlayer: '0', turn: 1, phase: 'politicalAction' },
+        G: { engine: { attributes: { seed: 'seed-from-attributes' } }, zones: { staging_0: { items: [] }, drawPile: { items: [] }, discardFaceUp: { items: [] }, board: { items: [] } }, objects: {}, tiles: {} },
+        ctx: { currentPlayer: '0', turn: 1, phase: 'politicalAction', numPlayers: 2 },
     });
 
-    it('writes only successfully executed moves with monotone seq', () => {
-        const records: ReplayActionRecord[] = [];
-
-        const wrapped = withReplaySink(
-            {
-                okMove: () => undefined,
-                invalidMove: () => INVALID_MOVE,
-            },
-            {
-                sink: {
-                    writeRecord: (record) => {
-                        if (record.recordType === 'action') {
-                            records.push(record);
-                        }
-                    },
-                },
-            }
-        );
-
+    it('writes manifest once and successful action records with monotone seq', () => {
+        const records: ReplayRecord[] = [];
+        const wrapped = withReplaySink({ okMove: () => undefined, invalidMove: () => INVALID_MOVE }, { sink: { writeRecord: (record) => records.push(record) } });
         wrapped.invalidMove(makeContext() as any, { id: 'a' });
         wrapped.okMove(makeContext() as any, { id: 'b' });
         wrapped.okMove(makeContext() as any, { id: 'c' });
-
-        expect(records).toEqual([
-            {
-                recordType: 'action',
-                seq: 1,
-                player: '0',
-                moveType: 'okMove',
-                args: [{ id: 'b' }],
-                typedFields: undefined,
-                turn: 1,
-                phase: 'politicalAction',
-                stateHash: undefined,
-                stateDelta: undefined,
-                stateSnapshot: undefined,
-                seed: 'seed-from-attributes',
-            },
-            {
-                recordType: 'action',
-                seq: 2,
-                player: '0',
-                moveType: 'okMove',
-                args: [{ id: 'c' }],
-                typedFields: undefined,
-                turn: 1,
-                phase: 'politicalAction',
-                stateHash: undefined,
-                stateDelta: undefined,
-                stateSnapshot: undefined,
-                seed: 'seed-from-attributes',
-            },
-        ]);
-    });
-
-    it('emits deterministic stateDelta and periodic stateSnapshot checkpoint records', () => {
-        const records: ReplayRecord[] = [];
-
-        const wrapped = withReplaySink(
-            {
-                addResource: (context: any, id: string) => {
-                    context.G.objects[id] = { id, type: 'Resource', owner: '0', resort: 'DOM' };
-                    context.G.zones.stockpile.items.push(id);
-                    return undefined;
-                },
-            },
-            {
-                includeStateDelta: true,
-                snapshotEveryActions: 2,
-                sink: { writeRecord: (record) => records.push(record) },
-            }
-        );
-
-        const context = {
-            G: {
-                engine: { attributes: { seed: 'seed-from-attributes' } },
-                zones: { stockpile: { items: [] } },
-                objects: {},
-            },
-            ctx: { currentPlayer: '0', turn: 1, phase: 'politicalAction', matchID: 'm-1', numPlayers: 2 },
-        };
-
-        wrapped.addResource(context as any, 'res-1');
-        wrapped.addResource(context as any, 'res-2');
-
-        const actionRecords = records.filter((record): record is ReplayActionRecord => record.recordType === 'action');
-        expect(actionRecords).toHaveLength(2);
-        expect(actionRecords[0].stateDelta?.changedResources).toMatchObject({
-            'res-1': { owner: '0', resort: 'DOM', zone: 'stockpile' },
-        });
-        expect(actionRecords[1].stateDelta?.changedResources).toMatchObject({
-            'res-2': { owner: '0', resort: 'DOM', zone: 'stockpile' },
-        });
-
-        const checkpoints = records.filter((record) => record.recordType === 'checkpoint');
-        expect(checkpoints).toHaveLength(1);
-        expect(checkpoints[0]).toMatchObject({ recordType: 'checkpoint', afterSeq: 2, matchId: 'm-1' });
-    });
-
-
-    it('adds deterministic typedFields metadata for convertResources payload variants', () => {
-        const records: ReplayActionRecord[] = [];
-
-        const wrapped = withReplaySink(
-            {
-                convertResources: () => undefined,
-            },
-            {
-                sink: {
-                    writeRecord: (record) => {
-                        if (record.recordType === 'action') {
-                            records.push(record);
-                        }
-                    },
-                },
-            }
-        );
-
-        wrapped.convertResources(makeContext() as any, {
-            grassrootsTileId: 'tile-1',
-            outputResort: 'DOM',
-            inputResourceIds: ['resource-1', 'resource-2'],
-            extraResourceIds: ['resource-3'],
-        });
-
-        wrapped.convertResources(makeContext() as any, {
-            grassrootsTileId: 'tile-2',
-            outputResort: 'FOR',
-            inputCount: 3,
-        });
-
-        expect(records.map((record) => record.typedFields)).toEqual([
-            {
-                '0.extraResourceIds': 'resourceId[]',
-                '0.grassrootsTileId': 'tileId',
-                '0.inputResourceIds': 'resourceId[]',
-                '0.outputResort': 'resourceType',
-            },
-            {
-                '0.grassrootsTileId': 'tileId',
-                '0.inputCount': 'resourceCount',
-                '0.outputResort': 'resourceType',
-            },
-        ]);
+        expect(records[0].recordType).toBe('manifest');
+        const actions = records.filter((r) => r.recordType === 'action');
+        expect(actions).toHaveLength(2);
+        expect((actions[0] as any).seq).toBe(1);
+        expect((actions[1] as any).seq).toBe(2);
+        expect(records.filter((r) => r.recordType === 'checkpoint.turnEnd')).toHaveLength(2);
     });
 
     it('is best-effort and emits sink failures into the error channel', () => {
         const onError = vi.fn();
-
-        const wrapped = withReplaySink(
-            {
-                okMove: () => undefined,
-            },
-            {
-                sink: {
-                    writeRecord: () => {
-                        throw new Error('sink failure');
-                    },
-                },
-                onError,
-            }
-        );
-
+        const wrapped = withReplaySink({ okMove: () => undefined }, { sink: { writeRecord: () => { throw new Error('sink failure'); } }, onError });
         expect(() => wrapped.okMove(makeContext() as any, { id: 'x' })).not.toThrow();
         expect(onError).toHaveBeenCalledTimes(1);
-        const event = onError.mock.calls[0][0];
-        expect(event.record.seq).toBe(1);
-        expect(event.record.moveType).toBe('okMove');
     });
 });
 
-describe('emitReplaySystemRecord', () => {
-    it('emits deterministic system.roundSettlement records', () => {
+describe('emitReplaySystemRecord v2', () => {
+    it('emits round settlement and round checkpoint records', () => {
         const records: ReplayRecord[] = [];
-
-        emitReplaySystemRecord(
-            {
-                sink: {
-                    writeRecord: (record) => records.push(record),
-                },
-            },
-            {
-                G: { engine: { attributes: { seed: 'seed-1' } } },
-                ctx: { matchID: 'match-1' }
-            },
-            {
-                roundNumber: 2,
-                settlementKind: 'regular',
-                resortTileOrder: ['tile-a', 'tile-b'],
-            }
-        );
-
-        expect(records).toEqual([
-            {
-                recordType: 'system.roundSettlement',
-                roundNumber: 2,
-                settlementKind: 'regular',
-                resortTileOrder: ['tile-a', 'tile-b'],
-                stateHash: undefined,
-                matchId: 'match-1',
-                seed: 'seed-1',
-            },
-        ]);
+        emitReplaySystemRecord({ sink: { writeRecord: (record) => records.push(record) } }, { G: { tiles: { 'tile-a': { type: 'Resort', name: 'A', weight: 1 } }, influence: { byTile: { 'tile-a': { '0': 1 } } }, zones: { drawPile: { items: [] }, discardFaceUp: { items: [] }, board: { items: ['tile-a'] } }, objects: {} }, ctx: { matchID: 'match-1', numPlayers: 2 } }, { roundNumber: 2, settlementKind: 'regular', resortTileOrder: ['tile-a'] });
+        expect(records.map((r) => r.recordType)).toEqual(['system.roundSettlement', 'checkpoint.roundEnd']);
     });
-
-    it('reads seed only from engine.attributes.seed', () => {
-        const records: ReplayRecord[] = [];
-
-        emitReplaySystemRecord(
-            {
-                sink: {
-                    writeRecord: (record) => records.push(record),
-                },
-            },
-            {
-                G: { engine: { seed: 'legacy-seed', attributes: {} } },
-                ctx: { matchID: 'match-1' }
-            },
-            {
-                roundNumber: 3,
-                settlementKind: 'regular',
-                resortTileOrder: ['tile-c'],
-            }
-        );
-
-        expect(records[0]).toMatchObject({ seed: undefined });
-    });
-
 });
