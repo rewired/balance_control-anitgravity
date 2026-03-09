@@ -4,7 +4,7 @@ import { emitReplaySystemRecord, withReplaySink, type ReplayRecord } from '../sr
 
 describe('withReplaySink v2', () => {
     const makeContext = () => ({
-        G: { engine: { attributes: { seed: 'seed-from-attributes' } }, zones: { staging_0: { items: [] }, drawPile: { items: [] }, discardFaceUp: { items: [] }, board: { items: [] } }, objects: {}, tiles: {} },
+        G: { engine: { attributes: { seed: 'seed-from-attributes' } }, zones: { staging_0: { items: [] }, DrawPile: { items: [] }, DiscardFaceUp: { items: [] }, Board: { items: [] } }, objects: {}, tiles: {} },
         ctx: { currentPlayer: '0', turn: 1, phase: 'politicalAction', numPlayers: 2 },
     });
 
@@ -90,7 +90,65 @@ describe('withReplaySink v2', () => {
 describe('emitReplaySystemRecord v2', () => {
     it('emits round settlement and round checkpoint records', () => {
         const records: ReplayRecord[] = [];
-        emitReplaySystemRecord({ sink: { writeRecord: (record) => records.push(record) } }, { G: { tiles: { 'tile-a': { type: 'Resort', name: 'A', weight: 1 } }, influence: { byTile: { 'tile-a': { '0': 1 } } }, zones: { drawPile: { items: [] }, discardFaceUp: { items: [] }, board: { items: ['tile-a'] } }, objects: {} }, ctx: { matchID: 'match-1', numPlayers: 2 } }, { roundNumber: 2, settlementKind: 'regular', resortTileOrder: ['tile-a'] });
+        emitReplaySystemRecord({ sink: { writeRecord: (record) => records.push(record) } }, { G: { tiles: { 'tile-a': { type: 'Resort', name: 'A', weight: 1 } }, influence: { byTile: { 'tile-a': { '0': 1 } } }, zones: { DrawPile: { items: [] }, DiscardFaceUp: { items: [] }, Board: { items: ['tile-a'] } }, objects: {} }, ctx: { matchID: 'match-1', numPlayers: 2 } }, { roundNumber: 2, settlementKind: 'regular', resortTileOrder: ['tile-a'] });
         expect(records.map((r) => r.recordType)).toEqual(['system.roundSettlement', 'checkpoint.roundEnd']);
+        expect((records[1] as any).global.boardTileCount).toBe(1);
+    });
+
+    it('enforces settlement/board invariant and referential consistency with checkpoint metrics', () => {
+        const records: ReplayRecord[] = [];
+        const sink = { writeRecord: (record: ReplayRecord) => records.push(record) };
+        const context: any = {
+            G: {
+                engine: { attributes: { seed: 'seed' } },
+                roundNumber: 2,
+                zones: {
+                    staging_0: { items: [] },
+                    DrawPile: { items: [] },
+                    DiscardFaceUp: { items: [] },
+                    Board: { items: ['tile-a'] },
+                },
+                objects: {
+                    i_supply: { id: 'i_supply', type: 'Influence', owner: '0' },
+                },
+                tiles: {
+                    'tile-a': { id: 'tile-a', type: 'Resort', name: 'A', weight: 1 },
+                },
+            },
+            ctx: { currentPlayer: '0', turn: 1, phase: 'politicalAction', numPlayers: 2, matchID: 'match-1' },
+        };
+
+        const wrapped = withReplaySink({
+            placeInfluence: ({ G }: any, intent: any) => {
+                G.objects.i_supply.tileId = intent.targetTileId;
+            },
+        }, { sink });
+
+        wrapped.placeInfluence(context, { targetTileId: 'tile-a' });
+        emitReplaySystemRecord({ sink }, context, { roundNumber: 2, settlementKind: 'regular', resortTileOrder: ['tile-a'] });
+
+        const action = records.find((r) => r.recordType === 'action') as any;
+        const settlement = records.find((r) => r.recordType === 'system.roundSettlement') as any;
+        const checkpoint = records.find((r) => r.recordType === 'checkpoint.roundEnd') as any;
+
+        const settlementTileSet = new Set(settlement.perTile.map((entry: any) => entry.tileId));
+        expect(settlementTileSet.has(action.intent.targetTileId)).toBe(true);
+        expect(checkpoint.global.boardTileCount).toBe(context.G.zones.Board.items.length);
+    });
+
+    it('throws when settlement has perTile entries but authoritative boardTileCount is zero', () => {
+        const records: ReplayRecord[] = [];
+        const context: any = {
+            G: {
+                tiles: { 'tile-a': { id: 'tile-a', type: 'Resort', name: 'A', weight: 1 } },
+                influence: { byTile: { 'tile-a': { '0': 1 } } },
+                zones: { DrawPile: { items: [] }, DiscardFaceUp: { items: [] }, Board: { items: [] } },
+                objects: {},
+            },
+            ctx: { matchID: 'match-1', numPlayers: 2 },
+        };
+
+        expect(() => emitReplaySystemRecord({ sink: { writeRecord: (record) => records.push(record) } }, context, { roundNumber: 2, settlementKind: 'regular', resortTileOrder: ['tile-a'] })).toThrow(/boardTileCount is 0/);
+        expect(records.map((r) => r.recordType)).toEqual(['system.roundSettlement']);
     });
 });

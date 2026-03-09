@@ -30,3 +30,14 @@ Validation rules:
   - `resolved.influence` containing `pre`, `post`, `expectedDelta`, and `observedDelta`
 
 This invariant lets replay/tooling reject inconsistent checkpoints deterministically instead of silently accepting drift.
+
+## Settlement/checkpoint consistency invariants
+
+Checkpoint global metrics are always derived from authoritative engine zones at emission time:
+
+- `global.boardTileCount` is computed from the canonical board zone (`G.zones.Board.items` / `CoreZoneName.Board`), not from cached counters.
+
+Validation rules:
+
+- If `system.roundSettlement.perTile.length > 0`, then `checkpoint.roundEnd.global.boardTileCount > 0` MUST hold.
+- Replay records should preserve referential consistency between action targets and settlement projection data; e.g., `action.intent.targetTileId` used for board placement must reference a valid tile in the settled board tile set when evaluating round settlement snapshots.
