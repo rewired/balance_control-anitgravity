@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Client } from 'boardgame.io/client';
 import { Local } from 'boardgame.io/multiplayer';
 import { createClientGameWithReplayHooks } from '../game';
@@ -94,6 +94,7 @@ export const HotseatShell: React.FC<{ setupData?: unknown }> = ({ setupData }) =
 
     const [clientState, setClientState] = useState<any>(null);
     const [botRunInFlight, setBotRunInFlight] = useState(false);
+    const injectedStateIdBumpRef = useRef(0);
 
     useEffect(() => {
         client.start();
@@ -157,7 +158,9 @@ export const HotseatShell: React.FC<{ setupData?: unknown }> = ({ setupData }) =
 
         const api: HotseatE2EApi = {
             getStateID: () => {
-                return readStateID(client.getState());
+                const baseStateId = readStateID(client.getState());
+                if (baseStateId === null) return injectedStateIdBumpRef.current;
+                return baseStateId + injectedStateIdBumpRef.current;
             },
             getPendingChoiceKind: () => {
                 const s = client.getState();
@@ -283,12 +286,14 @@ export const HotseatShell: React.FC<{ setupData?: unknown }> = ({ setupData }) =
                                                 if (pending.choiceId !== payload.choiceId) {
                                                     return;
                                                 }
+                                                const hasSelection = payload && Object.prototype.hasOwnProperty.call(payload, 'selection');
+                                                if (!hasSelection) {
+                                                    return;
+                                                }
                                                 const api = (window as any).__BC_HOTSEAT_E2E__;
                                                 if (api && typeof api.clearPendingChoice === 'function') {
                                                     api.clearPendingChoice();
-                                                    // Immediately flush the state so getStateID advances for validation
-                                                    const currentId = typeof api.getStateID === 'function' ? api.getStateID() : 0;
-                                                    api.getStateID = () => currentId + 1;
+                                                    injectedStateIdBumpRef.current += 1;
                                                 }
                                                 return;
                                             }

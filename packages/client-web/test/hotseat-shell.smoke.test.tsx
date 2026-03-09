@@ -5,6 +5,7 @@ import { HotseatShell } from '../src/hotseat/HotseatShell';
 import { buildIntentViewModel, getPendingChoiceKindForPlayer } from '../src/ui/useIntentViewModel';
 
 const clientInstances: Array<{ config: any; stop: ReturnType<typeof vi.fn>; updatePlayerID: ReturnType<typeof vi.fn> }> = [];
+let lastBoardProps: any = null;
 
 let mockClientState: any = {
     G: {},
@@ -46,17 +47,20 @@ vi.mock('boardgame.io/client', async () => {
 
 vi.mock('../src/Board', () => {
     return {
-        Board: ({ onTripwireMismatch }: { onTripwireMismatch: (info: { moveType: string }) => void }) => (
+        Board: (props: { onTripwireMismatch: (info: { moveType: string }) => void; moves: any }) => {
+            lastBoardProps = props;
+            return (
             <div data-testid="board-stub">
                 <button
                     type="button"
                     data-testid="board-tripwire-trigger"
-                    onClick={() => onTripwireMismatch({ moveType: 'placeInfluence' })}
+                    onClick={() => props.onTripwireMismatch({ moveType: 'placeInfluence' })}
                 >
                     trigger tripwire
                 </button>
             </div>
-        )
+            );
+        }
     };
 });
 
@@ -69,6 +73,7 @@ describe('HotseatShell', () => {
         cleanup();
         vi.clearAllMocks();
         clientInstances.splice(0, clientInstances.length);
+        lastBoardProps = null;
         mockClientState = {
             G: {},
             ctx: {
@@ -169,8 +174,8 @@ describe('HotseatShell', () => {
         [{ stateID: 22 }, 22, 'stateID'],
         [{ ctx: { _stateID: 33 } }, 33, 'ctx._stateID'],
         [{ ctx: { stateID: 44 } }, 44, 'ctx.stateID'],
-        [{}, null, 'missing state ID'],
-        [null, null, 'null snapshot'],
+        [{}, 0, 'missing state ID'],
+        [null, 0, 'null snapshot'],
     ])('returns getStateID fallback from %s (%s)', (snapshot, expected, _label) => {
         (window as any).__BC_ENABLE_E2E_HOOKS__ = true;
         mockClientState = snapshot;
@@ -326,6 +331,38 @@ describe('HotseatShell', () => {
         expect(() => api.setPendingChoice({ kind: 'selectTile' })).not.toThrow();
         expect(() => api.clearPendingChoice()).not.toThrow();
         expect(api.getPendingChoiceKind()).toBeNull();
+    });
+
+
+
+    it('clears injected pendingChoice only after resolveChoice with matching choiceId and selection', () => {
+        (window as any).__BC_ENABLE_E2E_HOOKS__ = true;
+        mockClientState = {
+            ...mockClientState,
+            _stateID: 12,
+            G: { engine: { pendingChoice: null } },
+            ctx: { ...mockClientState.ctx, currentPlayer: '0' },
+        };
+
+        render(<HotseatShell />);
+
+        const api = (window as any).__BC_HOTSEAT_E2E__;
+        api.setPendingChoice({ kind: 'selectTile', spec: { tileIds: ['tile_alpha'] }, player: '0' });
+        expect(api.getPendingChoiceKind()).toBe('selectTile');
+
+        const resolveChoice = lastBoardProps.moves.resolveChoice as (payload: any) => void;
+
+        resolveChoice({ choiceId: 'different', selection: 'tile_alpha' });
+        expect(api.getPendingChoiceKind()).toBe('selectTile');
+
+        resolveChoice({ choiceId: mockClientState.G.engine.pendingChoice.choiceId });
+        expect(api.getPendingChoiceKind()).toBe('selectTile');
+
+        const before = api.getStateID();
+        resolveChoice({ choiceId: mockClientState.G.engine.pendingChoice.choiceId, selection: 'tile_alpha' });
+
+        expect(api.getPendingChoiceKind()).toBeNull();
+        expect(api.getStateID()).toBe((before ?? 0) + 1);
     });
 
     it('shows a tripwire desync badge after board reports a mismatch', () => {
