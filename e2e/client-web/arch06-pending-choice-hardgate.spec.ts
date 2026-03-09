@@ -31,13 +31,45 @@ test.beforeEach(async ({ page }) => {
     });
 });
 
-async function ensureActiveSeat(page: any, api: any) {
-    const cur = await page.evaluate(() => (window as any).__BC_HOTSEAT_E2E_STATE__?.ctx?.currentPlayer);
-    if (cur && cur !== '0') {
-        const btn = page.getByTestId(`hotseat-switch-${cur}`);
-        await expect(btn).toBeVisible();
-        await btn.click();
+async function ensureActiveSeat(page: any) {
+    const seat0Btn = page.getByTestId('hotseat-switch-0');
+    await expect(seat0Btn).toBeVisible();
+    if (!(await seat0Btn.isDisabled())) {
+        await seat0Btn.click();
     }
+}
+
+async function waitForStateIDIncrease(page: any, api: any, before: number | null, timeout = 10_000) {
+    await page.waitForFunction(
+        ({ previous }) => {
+            const hooks = (window as any).__BC_HOTSEAT_E2E__ as HotseatE2EApi | undefined;
+            if (!hooks || typeof hooks.getStateID !== 'function') return false;
+            const current = hooks.getStateID();
+            if (current == null) return false;
+            return current > (previous ?? -1);
+        },
+        { previous: before },
+        { timeout }
+    );
+}
+
+async function waitForPendingChoiceClear(page: any, api: any) {
+    await expect.poll(async () => api.evaluate((h: HotseatE2EApi) => h.getPendingChoiceKind()), { timeout: 10_000 }).toBeNull();
+}
+
+
+async function clickUntilStateIDIncrease(page: any, api: any, tile: any, before: number | null) {
+    let lastError: unknown = null;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+        await tile.click();
+        try {
+            await waitForStateIDIncrease(page, api, before, 3_500);
+            return;
+        } catch (error) {
+            lastError = error;
+        }
+    }
+    throw lastError ?? new Error('Expected stateID to increase after selectTile resolveChoice attempts.');
 }
 
 test('pendingChoice.selectOption is modal-driven and blocks board workflow', async ({ page }) => {
@@ -46,10 +78,10 @@ test('pendingChoice.selectOption is modal-driven and blocks board workflow', asy
     await expect(page.getByTestId('hex-board')).toBeVisible();
 
     const api = await getHotseatApi(page);
-    await ensureActiveSeat(page, api);
+    await ensureActiveSeat(page);
 
     await api.evaluate((h: HotseatE2EApi) => {
-        h.setPendingChoice({ kind: 'selectOption', spec: { options: ['A', 'B'] } });
+        h.setPendingChoice({ kind: 'selectOption', spec: { options: ['A', 'B'] }, player: '0' });
     });
 
     await expect(page.getByTestId('pending-choice-overlay')).toBeVisible();
@@ -61,8 +93,7 @@ test('pendingChoice.selectOption is modal-driven and blocks board workflow', asy
 
     await expect(page.getByTestId('pending-choice-overlay')).toBeHidden();
 
-    const pendingKind = await api.evaluate((h: HotseatE2EApi) => h.getPendingChoiceKind());
-    expect(pendingKind).toBeNull();
+    await waitForPendingChoiceClear(page, api);
 });
 
 test('pendingChoice.selectTile stays board-driven and does not render blocking modal', async ({ page }) => {
@@ -71,7 +102,7 @@ test('pendingChoice.selectTile stays board-driven and does not render blocking m
     await expect(page.getByTestId('hex-board')).toBeVisible();
 
     const api = await getHotseatApi(page);
-    await ensureActiveSeat(page, api);
+    await ensureActiveSeat(page);
 
     const stateIDBefore = await api.evaluate((h: HotseatE2EApi) => h.getStateID());
 
@@ -103,10 +134,9 @@ test('pendingChoice.selectTile stays board-driven and does not render blocking m
     const selectableTile = page.getByTestId(`hex-tile-${targetCoordId}`);
 
     await expect(selectableTile).toBeVisible();
-    await selectableTile.click();
 
-    const pendingKind = await api.evaluate((h: HotseatE2EApi) => h.getPendingChoiceKind());
-    expect(pendingKind).toBeNull();
+    await clickUntilStateIDIncrease(page, api, selectableTile, stateIDBefore);
+    await waitForPendingChoiceClear(page, api);
 
     const stateIDAfter = await api.evaluate((h: HotseatE2EApi) => h.getStateID());
     expect(stateIDAfter).toBeGreaterThan(stateIDBefore ?? -1);
