@@ -45,6 +45,17 @@ export function useGameInteractionController({
 
     const vm = useIntentViewModel({ G, ctx, playerID: myPid, selectedTileId, stagedTileId });
 
+    const isProposedIntentLegalNow = useMemo(() => {
+        if (!proposedIntent) {
+            return false;
+        }
+
+        return vm.intents.some((intent) =>
+            intent.moveType === proposedIntent.moveType
+            && canonicalJsonStringify(intent.payload ?? {}) === canonicalJsonStringify(proposedIntent.payload ?? {})
+        );
+    }, [proposedIntent, vm.intents]);
+
     const renderStateKey = useMemo(() => computeUiStateKey(G, ctx), [G, ctx]);
 
     const [uiNotices, setUiNotices] = useState<UiNotice[]>([]);
@@ -191,7 +202,7 @@ export function useGameInteractionController({
             return;
         }
 
-        if (proposedIntent) {
+        if (proposedIntent && isProposedIntentLegalNow) {
             const result = dispatchIntent(moves, proposedIntent, {
                 renderStateKey,
                 getDispatchStateKey,
@@ -217,7 +228,7 @@ export function useGameInteractionController({
                 });
             }
         }
-    }, [isHardGate, proposedIntent, moves, renderStateKey, getDispatchStateKey, onTripwireMismatch, pushNotice, myPid, ctx?.currentPlayer]);
+    }, [isHardGate, proposedIntent, isProposedIntentLegalNow, moves, renderStateKey, getDispatchStateKey, onTripwireMismatch, pushNotice, myPid, ctx?.currentPlayer]);
 
     const cancelDraft = useCallback(() => {
         setProposedIntent(null);
@@ -285,18 +296,6 @@ export function useGameInteractionController({
 
         setProposedIntent(outputGroup.variants[0]);
     }, [isHardGate, proposedIntent, actionMode, pinnedGrassrootsTileId, selectedConvertFamily, vm.intents]);
-
-    // Reset interaction state when active player seat changes (Hotseat)
-    useEffect(() => {
-        setProposedIntent(null);
-        setActionMode('none');
-        setMoveInfluenceSourceId(null);
-        setPinnedCommitteeTileId(null);
-        setPinnedGrassrootsTileId(null);
-        setSelectedConvertFamily(null);
-        setSelectedTileId(null);
-        setSelectedCoord(null);
-    }, [myPid]);
 
     // Handle Escape key to clear selection/proposal
     useEffect(() => {
@@ -378,10 +377,7 @@ export function useGameInteractionController({
     const draft: DraftIntentState = {
         intent: proposedIntent,
         key: proposedIntent ? canonicalJsonStringify(proposedIntent) : null,
-        isLegalNow: proposedIntent ? vm.intents.some(i =>
-            i.moveType === proposedIntent.moveType &&
-            canonicalJsonStringify(i.payload ?? {}) === canonicalJsonStringify(proposedIntent.payload ?? {})
-        ) : false
+        isLegalNow: isProposedIntentLegalNow
     };
 
     return {
