@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { ReplayRecord, ReplaySink } from '@balance-control/game';
+import type { ReplayManifestRecord, ReplayRecord, ReplaySink } from '@balance-control/game';
 
 const DEFAULT_REPLAY_DIRECTORY_SEGMENTS = ['log', 'replay'] as const;
 const FILE_EXTENSION = '.replay.ndjson';
@@ -21,6 +21,15 @@ function findWorkspaceRoot(startDirectory: string): string { let current = path.
 const getDefaultReplayDirectory = (cwd: string) => path.join(findWorkspaceRoot(cwd), ...DEFAULT_REPLAY_DIRECTORY_SEGMENTS);
 const normalizeExpansions = (value: readonly string[] | undefined): string[] => !value ? [] : [...new Set(value)].sort((a, b) => a.localeCompare(b));
 const writeNdjsonLine = (stream: fs.WriteStream, record: unknown): void => { stream.write(`${JSON.stringify(record)}\n`); };
+const isReplayManifestRecord = (record: ReplayRecord): record is ReplayManifestRecord => record.recordType === 'manifest';
+const getRecordMatchId = (record: ReplayRecord): string | undefined => typeof record.matchId === 'string' && record.matchId.length > 0 ? record.matchId : undefined;
+const getRecordSeed = (record: ReplayRecord): string | undefined => isReplayManifestRecord(record) && typeof record.seed === 'string' && record.seed.length > 0 ? record.seed : undefined;
+const getRecordStateHash = (record: ReplayRecord): string | undefined => {
+    if (record.recordType === 'action') return record.postActionStateHash;
+    if (record.recordType === 'system.roundSettlement') return record.postSettlementStateHash;
+    if (record.recordType === 'checkpoint.turnEnd' || record.recordType === 'checkpoint.roundEnd') return record.stateHash;
+    return undefined;
+};
 
 export function resolveReplayDirectory(inputPath?: string, currentWorkingDirectory = process.cwd()): string {
     const configured = inputPath?.trim(); if (!configured) return path.normalize(getDefaultReplayDirectory(currentWorkingDirectory));
@@ -31,8 +40,8 @@ export function resolveReplayDirectory(inputPath?: string, currentWorkingDirecto
 }
 
 export function createReplayFilename(record: ReplayRecord, timestamp: Date = new Date()): string {
-    const matchIdPart = sanitizeFilenamePart((record as any).matchId ?? 'unknown-match', 'unknown-match');
-    const seedPart = sanitizeFilenamePart((record as any).seed ?? 'unknown-seed', 'unknown-seed');
+    const matchIdPart = sanitizeFilenamePart(getRecordMatchId(record) ?? 'unknown-match', 'unknown-match');
+    const seedPart = sanitizeFilenamePart(getRecordSeed(record) ?? 'unknown-seed', 'unknown-seed');
     return `${matchIdPart}-${seedPart}-${formatUtcTimestamp(timestamp)}${FILE_EXTENSION}`;
 }
 
@@ -40,12 +49,12 @@ class NdjsonReplaySink implements CloseableReplaySink {
     private readonly streams = new Map<string, StreamState>();
     public constructor(private readonly replayDirectory: string) { }
     public writeRecord(record: ReplayRecord): void {
-        const streamKey = (record as any).matchId ?? '__unknown_match__';
+        const streamKey = getRecordMatchId(record) ?? '__unknown_match__';
         const state = this.ensureStream(streamKey, record);
         this.captureMetadata(state, record);
         this.ensureHeader(state);
         if (record.recordType === 'manifest' && !state.manifestWritten) {
-            const { seed: _seed, matchConfig: _cfg, expansions: _exp, loggingMode: _mode, ...manifestRecord } = record as any;
+            const { seed: _seed, matchConfig: _cfg, expansions: _exp, loggingMode: _mode, ...manifestRecord } = record;
             writeNdjsonLine(state.stream, manifestRecord);
             state.totalRecords += 1;
             state.manifestWritten = true;
@@ -54,7 +63,7 @@ class NdjsonReplaySink implements CloseableReplaySink {
         writeNdjsonLine(state.stream, record);
         state.totalRecords += 1;
         if (record.recordType === 'action') state.actionCount += 1;
-        const hash = (record as any).postActionStateHash ?? (record as any).postSettlementStateHash ?? (record as any).stateHash;
+        const hash = getRecordStateHash(record);
         if (typeof hash === 'string' && hash.length > 0) state.lastStateHash = hash;
     }
     public close(): void {
@@ -69,11 +78,11 @@ class NdjsonReplaySink implements CloseableReplaySink {
         this.streams.clear();
     }
     private captureMetadata(state: StreamState, record: ReplayRecord): void {
-        if (record.recordType !== 'manifest') return;
-        if (typeof (record as any).seed === 'string') state.seed = (record as any).seed;
-        if ((record as any).matchConfig && typeof (record as any).matchConfig === 'object') state.matchConfig = (record as any).matchConfig;
-        if (Array.isArray((record as any).expansions)) state.expansions = normalizeExpansions((record as any).expansions);
-        if (typeof (record as any).loggingMode === 'string') state.loggingMode = (record as any).loggingMode;
+        if (!isReplayManifestRecord(record)) return;
+        if (typeof record.seed === 'string') state.seed = record.seed;
+        if (record.matchConfig && typeof record.matchConfig === 'object') state.matchConfig = record.matchConfig;
+        if (Array.isArray(record.expansions)) state.expansions = normalizeExpansions(record.expansions);
+        if (typeof record.loggingMode === 'string') state.loggingMode = record.loggingMode;
     }
     private ensureHeader(state: StreamState): void {
         if (state.headerWritten) return;
@@ -84,7 +93,7 @@ class NdjsonReplaySink implements CloseableReplaySink {
     private ensureStream(streamKey: string, record: ReplayRecord): StreamState {
         const existing = this.streams.get(streamKey); if (existing) return existing;
         const stream = fs.createWriteStream(path.join(this.replayDirectory, createReplayFilename(record)), { flags: 'a', encoding: 'utf8' });
-        const state: StreamState = { streamKey, matchId: (record as any).matchId, stream, actionCount: 0, totalRecords: 0, headerWritten: false, manifestWritten: false };
+        const state: StreamState = { streamKey, matchId: getRecordMatchId(record), stream, actionCount: 0, totalRecords: 0, headerWritten: false, manifestWritten: false };
         this.streams.set(streamKey, state); return state;
     }
 }

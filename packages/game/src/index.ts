@@ -335,6 +335,7 @@ export { exp03CountdownAtoms } from './engine/atoms/countdown';
 
 export type {
     ReplayActionRecord,
+    ReplayManifestRecord,
     ReplayRecord,
     ReplaySink,
     ReplayHookOptions,
