@@ -22,6 +22,63 @@ describe('withReplaySink v2', () => {
         expect(records.filter((r) => r.recordType === 'checkpoint.turnEnd')).toHaveLength(2);
     });
 
+    it('emits deterministic placeInfluence deltas when action applies', () => {
+        const records: ReplayRecord[] = [];
+        const wrapped = withReplaySink({
+            placeInfluence: ({ G }: any) => {
+                G.objects.i_supply.tileId = 'tile-a';
+            },
+        }, { sink: { writeRecord: (record) => records.push(record) } });
+
+        const context = makeContext();
+        context.G.objects = {
+            i_supply: { id: 'i_supply', type: 'Influence', owner: '0' },
+        };
+
+        wrapped.placeInfluence(context as any, { targetTileId: 'tile-a' });
+
+        const action = records.find((record) => record.recordType === 'action') as any;
+        expect(action.resolved.outcome).toBe('applied');
+        expect(action.resolved.influence).toEqual({
+            pre: { personalSupply: 1, board: 0 },
+            post: { personalSupply: 0, board: 1 },
+            expectedDelta: { personalSupply: -1, board: 1 },
+            observedDelta: { personalSupply: -1, board: 1 },
+        });
+    });
+
+    it('does not emit action records for failed/illegal moves', () => {
+        const records: ReplayRecord[] = [];
+        const wrapped = withReplaySink({ placeInfluence: () => INVALID_MOVE }, { sink: { writeRecord: (record) => records.push(record) } });
+        wrapped.placeInfluence(makeContext() as any, { targetTileId: 'tile-a' });
+        expect(records).toHaveLength(0);
+    });
+
+    it('emits deterministic error record when placeInfluence projection mismatches authoritative delta', () => {
+        const records: ReplayRecord[] = [];
+        const onError = vi.fn();
+        const wrapped = withReplaySink({
+            placeInfluence: ({ G }: any) => {
+                G.objects.i_supply.tileId = 'tile-a';
+                G.objects.i_extra = { id: 'i_extra', type: 'Influence', owner: '0', tileId: 'tile-b' };
+            },
+        }, { sink: { writeRecord: (record) => records.push(record) }, onError });
+
+        const context = makeContext();
+        context.G.objects = {
+            i_supply: { id: 'i_supply', type: 'Influence', owner: '0' },
+        };
+
+        wrapped.placeInfluence(context as any, { targetTileId: 'tile-a' });
+
+        expect(onError).toHaveBeenCalledTimes(1);
+        const actionRecords = records.filter((record) => record.recordType === 'action') as any[];
+        expect(actionRecords).toHaveLength(1);
+        expect(actionRecords[0].resolved.outcome).toBe('error');
+        expect(actionRecords[0].resolved.errorCode).toBe('PLACE_INFLUENCE_INVARIANT_FAILED');
+        expect(records.some((record) => record.recordType === 'checkpoint.turnEnd')).toBe(false);
+    });
+
     it('is best-effort and emits sink failures into the error channel', () => {
         const onError = vi.fn();
         const wrapped = withReplaySink({ okMove: () => undefined }, { sink: { writeRecord: () => { throw new Error('sink failure'); } }, onError });
