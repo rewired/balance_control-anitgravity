@@ -41,6 +41,19 @@ type BoardViewportDevProps = {
 type BoardViewportProps = BoardViewportGameProps | BoardViewportDevProps;
 
 const FIT_PADDING = 48;
+const MIN_SCALE = 0.25;
+const MAX_SCALE = 2.5;
+const SCALE_EPSILON = 0.0001;
+
+const clampScale = (value: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, value));
+const transformsMatch = (
+    a: { x: number; y: number; scale: number },
+    b: { x: number; y: number; scale: number },
+) => {
+    return Math.abs(a.x - b.x) <= SCALE_EPSILON
+        && Math.abs(a.y - b.y) <= SCALE_EPSILON
+        && Math.abs(a.scale - b.scale) <= SCALE_EPSILON;
+};
 
 /**
  * @remarks
@@ -51,6 +64,7 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
     const viewportRef = useRef<HTMLDivElement | null>(null);
     const setTransformRef = useRef<((x: number, y: number, scale: number, animationTime?: number) => void) | null>(null);
     const baselineTransformRef = useRef<{ x: number; y: number; scale: number } | null>(null);
+    const currentTransformRef = useRef<{ x: number; y: number; scale: number } | null>(null);
     const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
     const devProps = props.mode === 'dev' ? (props as BoardViewportDevProps) : null;
@@ -96,7 +110,8 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
     const applyFit = useCallback(() => {
         if (!setTransformRef.current) return;
         if (!viewportSize.width || !viewportSize.height) return;
-        const transform = computeFitTransform(layout.contentBounds, viewportSize, FIT_PADDING);
+        const fitted = computeFitTransform(layout.contentBounds, viewportSize, FIT_PADDING);
+        const transform = { ...fitted, scale: clampScale(fitted.scale) };
         baselineTransformRef.current = transform;
         const node = viewportRef.current;
         if (node) {
@@ -104,12 +119,16 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
             node.dataset.baselineTx = String(transform.x);
             node.dataset.baselineTy = String(transform.y);
         }
+        const current = currentTransformRef.current;
+        if (current && transformsMatch(current, transform)) return;
         setTransformRef.current(transform.x, transform.y, transform.scale, animationTime);
     }, [layout.contentBounds, viewportSize, animationTime]);
 
     const resetView = useCallback(() => {
         const baseline = baselineTransformRef.current;
         if (!setTransformRef.current || !baseline) return;
+        const current = currentTransformRef.current;
+        if (current && transformsMatch(current, baseline)) return;
         setTransformRef.current(baseline.x, baseline.y, baseline.scale, animationTime);
     }, [animationTime]);
 
@@ -119,6 +138,26 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
         node.dataset.scale = String(state.scale);
         node.dataset.tx = String(state.positionX);
         node.dataset.ty = String(state.positionY);
+        currentTransformRef.current = { x: state.positionX, y: state.positionY, scale: state.scale };
+    }, []);
+
+    useEffect(() => {
+        const node = viewportRef.current;
+        if (!node) return;
+
+        const preventGestureDefault = (event: Event) => {
+            event.preventDefault();
+        };
+
+        node.addEventListener('gesturestart', preventGestureDefault, { passive: false });
+        node.addEventListener('gesturechange', preventGestureDefault, { passive: false });
+        node.addEventListener('gestureend', preventGestureDefault, { passive: false });
+
+        return () => {
+            node.removeEventListener('gesturestart', preventGestureDefault);
+            node.removeEventListener('gesturechange', preventGestureDefault);
+            node.removeEventListener('gestureend', preventGestureDefault);
+        };
     }, []);
 
     useEffect(() => {
@@ -128,10 +167,11 @@ export const BoardViewport: React.FC<BoardViewportProps> = (props) => {
     return (
         <div className="board-viewport" ref={viewportRef} data-testid="board-viewport">
             <TransformWrapper
-                minScale={0.25}
-                maxScale={2.5}
+                minScale={MIN_SCALE}
+                maxScale={MAX_SCALE}
                 limitToBounds={false}
                 wheel={{ step: 0.1, excluded: ['board-viewport-controls'] }}
+                pinch={{ disabled: false }}
                 panning={{ disabled: false, excluded: ['board-viewport-controls'] }}
                 doubleClick={{ disabled: true }}
                 onTransformed={handleTransformed}

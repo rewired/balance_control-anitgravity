@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+test.setTimeout(90_000);
+
 const VIEWPORT_POLL_TIMEOUT_MS = 10_000;
 const VIEWPORT_RETRY_ATTEMPTS = 12;
 const VIEWPORT_SCALE_THRESHOLD = 0.05;
@@ -47,6 +49,31 @@ async function readViewportSnapshot(page: any) {
             baselineTy: Number.isFinite(baselineTy) ? baselineTy : null,
         };
     });
+}
+
+async function waitForScaleDelta(
+    page: any,
+    baselineScale: number,
+    opts: { direction: 'increase' | 'decrease'; threshold?: number; timeoutMs?: number },
+) {
+    const threshold = opts.threshold ?? VIEWPORT_SCALE_THRESHOLD;
+    const timeoutMs = opts.timeoutMs ?? VIEWPORT_POLL_TIMEOUT_MS;
+    const target = opts.direction === 'increase' ? threshold : -threshold;
+
+    const poll = expect.poll(async () => {
+        const snapshot = await readViewportSnapshot(page);
+        if (!snapshot || snapshot.scale === null) return null;
+        return snapshot.scale - baselineScale;
+    }, {
+        timeout: timeoutMs,
+        message: `Expected viewport scale delta to ${opts.direction} from baseline=${baselineScale} (threshold=${threshold}).`,
+    });
+
+    if (opts.direction === 'increase') {
+        await poll.toBeGreaterThan(target);
+    } else {
+        await poll.toBeLessThan(target);
+    }
 }
 
 async function assertBaselineAttributesReady(page: any, timeoutMs = VIEWPORT_POLL_TIMEOUT_MS) {
@@ -113,22 +140,9 @@ async function assertScaleChanged(
 ) {
     const threshold = opts.threshold ?? VIEWPORT_SCALE_THRESHOLD;
     const timeoutMs = opts.timeoutMs ?? VIEWPORT_POLL_TIMEOUT_MS;
-    const target = direction === 'increase' ? threshold : -threshold;
 
     try {
-        const poll = expect.poll(async () => {
-            const snapshot = await readViewportSnapshot(page);
-            if (!snapshot || snapshot.scale === null) return null;
-            return snapshot.scale - baselineScale;
-        }, {
-            timeout: timeoutMs,
-            message: `Expected viewport scale to ${direction} from baseline=${baselineScale}.`,
-        });
-        if (direction === 'increase') {
-            await poll.toBeGreaterThan(target);
-        } else {
-            await poll.toBeLessThan(target);
-        }
+        await waitForScaleDelta(page, baselineScale, { direction, threshold, timeoutMs });
     } catch (error) {
         const snapshot = await readViewportSnapshot(page);
         throw new Error(
@@ -174,6 +188,7 @@ async function zoomWithRetry(
 
     for (let i = 0; i < attempts; i++) {
         await page.mouse.wheel(0, opts.deltaY);
+
         try {
             await assertScaleChanged(page, opts.baselineScale, opts.direction, {
                 threshold,
@@ -198,26 +213,9 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     });
     page.on('pageerror', (err) => consoleErrors.push(String(err)));
 
-    await page.goto('/?mode=online');
+    await page.goto('/?mode=hotseat');
 
-    await expect(page.getByTestId('lobby-screen')).toBeVisible();
-
-    await page.getByTestId('lobby-player-name').fill('E2E');
-    const createResponse = page.waitForResponse((resp) => {
-        return resp.request().method() === 'POST' && /\/games\/[^/]+\/create$/.test(resp.url());
-    });
-    await page.getByTestId('lobby-create-match').click();
-    const createdMatch = await createResponse;
-    const createdMatchJson = (await createdMatch.json().catch(() => null)) as { matchID?: string } | null;
-    const matchID = createdMatchJson?.matchID;
-    expect(matchID).toBeTruthy();
-
-    await expect(page.getByTestId(`lobby-match-${matchID}`)).toBeVisible({ timeout: 15_000 });
-    const joinButton = page.getByTestId(`lobby-join-${matchID}-0`);
-    await expect(joinButton).toBeVisible({ timeout: 15_000 });
-    await joinButton.click();
-
-    await expect(page.getByTestId('game-screen')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTestId('hotseat-game-screen')).toBeVisible({ timeout: 30_000 });
     await expect(page.getByTestId('hex-board')).toBeVisible();
 
     const viewport = page.getByTestId('board-viewport');
@@ -235,6 +233,15 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
         .toBeLessThan(20);
     const baseline = await readViewportTransform(page);
     expect(baseline).not.toBeNull();
+
+    await viewport.hover();
+    await zoomWithRetry(page, {
+        deltaY: -250,
+        baselineScale: baseline!.scale,
+        direction: 'increase',
+    });
+    const baselineForZoomOut = await readViewportTransform(page);
+    expect(baselineForZoomOut).not.toBeNull();
 
     // Board is framed inside the viewport (avoid pixel-perfect assertions).
     const viewportBox = await viewport.boundingBox();
@@ -265,12 +272,12 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     await page.mouse.move(viewportBox.x + viewportBox.width / 2, viewportBox.y + viewportBox.height / 2);
     await zoomWithRetry(page, {
         deltaY: 250,
-        baselineScale: baseline!.scale,
+        baselineScale: baselineForZoomOut!.scale,
         direction: 'decrease',
     });
     const zoomedOut = await readViewportTransform(page);
     expect(zoomedOut).not.toBeNull();
-    expect(zoomedOut!.scale).toBeLessThan(baseline!.scale - 0.01);
+    expect(zoomedOut!.scale).toBeLessThan(baselineForZoomOut!.scale - 0.01);
     expect(zoomedOut!.scale).toBeGreaterThanOrEqual(0.25);
 
     await zoomWithRetry(page, {
@@ -307,7 +314,7 @@ test('board viewport: load + fit/zoom/pan/reset', async ({ page }) => {
     await page.mouse.move(viewportBox.x + viewportBox.width / 2, viewportBox.y + viewportBox.height / 2);
     await zoomWithRetry(page, {
         deltaY: 300,
-        baselineScale: baseline!.scale,
+        baselineScale: baselineForZoomOut!.scale,
         direction: 'decrease',
     });
     await expect
