@@ -135,3 +135,4 @@ Will include `git show -1 --stat` output in same `Postflight:` block.
 
 * Follow-up: switched nested watcher shell from `bash -lc` to `bash -c` so pnpm-injected Node PATH is preserved and `node --watch` resolves in dev subprocesses.
 * Validation follow-up: `pnpm lint` passed; `pnpm -C packages/server build` fails in clean state until workspace deps are built; `pnpm -r build` then passed (including server), and `pnpm test` passed workspace-wide.
+* Follow-up 2: replaced shell loop (`while [ ! -f ... ]; sleep`) with cross-platform Node bootstrap script `packages/server/scripts/wait-for-dist-watch.cjs` (poll + spawn `node --watch` with inherited stdio), and switched `dev` script to `pnpm node scripts/wait-for-dist-watch.cjs`.
