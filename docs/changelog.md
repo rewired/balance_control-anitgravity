@@ -7,6 +7,7 @@
 
 ## Unreleased
 
+- 2026-03-10: task(0362) Replay verifier invariants: add fail-fast contextual divergence diagnostics (`recordIndex` + `seq/turn/round/tileId/player`), enforce deterministic checks for applied `placeInfluence`/`moveInfluence`, Board-zone tile-id intent bindings, and settlement-perTile vs boardTileCount, and add canonical replay fixture validation tests executed on every game test run; add DD-0362.
 - 2026-03-09: task(0360) Replay ordering hardening: move replay emission now captures a single post-mutation authoritative snapshot and derives action hash + checkpoint projection from that same committed state, adds non-production deterministic replay debug identity/version logging, and extends replay verifier checkpoint mode to recompute/assert `perPlayer` and `global` summary exact-match consistency.
 - 2026-03-09: task(0359) Replay checkpoint projection hardening: derive `boardTileCount` from canonical board zone authority, remove round-checkpoint board metric drift by recomputing globals per checkpoint, enforce settlement invariant (`perTile.length > 0` => `boardTileCount > 0`), and add replay regression tests for settlement/action-target/board-metric consistency.
 - 2026-03-09: task(0356) Server replay tests: remove `as any` fixture casts for manifest/action records in `replay-logging.test.ts`, add compile-time `satisfies` coverage for all replay record variants, and add negative boundary coverage proving header metadata is sourced from `recordType: "manifest"` only.

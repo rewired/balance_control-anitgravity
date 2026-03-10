@@ -41,3 +41,27 @@ Validation rules:
 
 - If `system.roundSettlement.perTile.length > 0`, then `checkpoint.roundEnd.global.boardTileCount > 0` MUST hold.
 - Replay records should preserve referential consistency between action targets and settlement projection data; e.g., `action.intent.targetTileId` used for board placement must reference a valid tile in the settled board tile set when evaluating round settlement snapshots.
+
+
+## Validator fail-fast contract
+
+Replay validators MUST fail on the first invariant breach and report:
+
+- `recordIndex` (body index in the replay stream)
+- key identifiers when available: `seq`, `turn`, `round`, `tileId`, `player`
+
+## Additional deterministic invariants
+
+For `moveType: "moveInfluence"` with `resolved.outcome: "applied"`:
+
+- total board influence count is unchanged between pre/post action snapshots
+- source/target tile influence bindings must shift by exactly `-1/+1`
+
+For move intents that require a tile currently on Board (`placeInfluence`, `moveInfluence`, `formalizeInfluence`, `convertResources`):
+
+- required tile IDs in `intent` (`targetTileId`, `sourceId`, `targetId`, `committeeTileId`, `grassrootsTileId`) MUST resolve to tiles currently present in Board zone before move execution
+
+For checkpoints:
+
+- `checkpoint.turnEnd` and `checkpoint.roundEnd` summaries (`perPlayer`, `global`) MUST be fully recomputable from the authoritative state snapshot that produced `stateHash`
+- replay validation MUST reject any checkpoint whose summary projection does not exactly match deterministic recomputation
