@@ -96,15 +96,65 @@ export type ReplayHookOptions = Readonly<{ sink?: ReplaySink; onError?: ReplaySi
 export type ReplaySystemRoundSettlementPayload = Readonly<{ roundNumber: number; settlementKind: 'regular' | 'final'; resortTileOrder: readonly string[] }>;
 
 type ReplayInfluenceProjection = Readonly<{ personalSupply: number; board: number }>;
+type ReplayInfluenceDelta = Readonly<{ personalSupply: number; board: number }>;
 type ReplayCheckpointSummary = Readonly<{
     perPlayer: Record<string, Record<string, unknown>>;
     global: Record<string, unknown>;
 }>;
 
 function projectPlayerInfluence(G: any, playerId: string): ReplayInfluenceProjection {
-    const influenceBoard = Object.values(G?.objects ?? {}).filter((o: any) => o?.type === 'Influence' && o.owner === playerId && typeof o.tileId === 'string').length;
-    const influenceSupply = Object.values(G?.objects ?? {}).filter((o: any) => o?.type === 'Influence' && o.owner === playerId && !o.tileId).length;
+    let influenceBoard = 0;
+    let influenceSupply = 0;
+    const zones = G?.zones ?? {};
+    for (const [zoneId, zone] of Object.entries(zones) as Array<[string, { items?: string[] }]>) {
+        const itemIds = Array.isArray(zone?.items) ? zone.items : [];
+        for (const itemId of itemIds) {
+            const obj = G?.objects?.[itemId];
+            if (obj?.type !== 'Influence' || obj?.owner !== playerId) continue;
+            if (zoneId === `${CoreZoneName.PersonalSupply}:${playerId}`) {
+                influenceSupply += 1;
+            } else {
+                influenceBoard += 1;
+            }
+        }
+    }
     return { personalSupply: influenceSupply, board: influenceBoard };
+}
+
+function computeInfluenceDelta(pre: ReplayInfluenceProjection, post: ReplayInfluenceProjection): ReplayInfluenceDelta {
+    return {
+        personalSupply: post.personalSupply - pre.personalSupply,
+        board: post.board - pre.board,
+    };
+}
+
+function assertExpectedInfluenceDelta(options: ReplayHookOptions | undefined, record: ReplayActionRecord, expectedDelta: ReplayInfluenceDelta): void {
+    const influenceProjection = record.resolved.influence as undefined | {
+        pre?: ReplayInfluenceProjection;
+        post?: ReplayInfluenceProjection;
+    };
+    if (!influenceProjection?.pre || !influenceProjection?.post) {
+        throw new Error('Replay invariant failed: resolveChoice expected influence delta but projection snapshot was missing.');
+    }
+    const observedDelta = computeInfluenceDelta(influenceProjection.pre, influenceProjection.post);
+    if (observedDelta.personalSupply !== expectedDelta.personalSupply || observedDelta.board !== expectedDelta.board) {
+        const invariantRecord: ReplayActionRecord = {
+            ...record,
+            resolved: {
+                ...record.resolved,
+                outcome: 'error',
+                errorCode: 'RESOLVE_CHOICE_INFLUENCE_INVARIANT_FAILED',
+                influence: {
+                    pre: influenceProjection.pre,
+                    post: influenceProjection.post,
+                    expectedDelta,
+                    observedDelta,
+                },
+            },
+        };
+        options?.sink?.writeRecord(invariantRecord);
+        throw new Error('Deterministic replay invariant failed for resolveChoice influence projection.');
+    }
 }
 
 function buildManifest(context: any): ReplayManifestRecord {
@@ -150,8 +200,7 @@ export function projectReplayCheckpointSummary(G: any, ctx: any): ReplayCheckpoi
     const players = Number(ctx?.numPlayers ?? 0);
     for (let i = 0; i < players; i += 1) {
         const pid = String(i);
-        const influenceBoard = Object.values(G.objects ?? {}).filter((o: any) => o?.type === 'Influence' && o.owner === pid && typeof o.tileId === 'string').length;
-        const influenceSupply = Object.values(G.objects ?? {}).filter((o: any) => o?.type === 'Influence' && o.owner === pid && !o.tileId).length;
+        const { board: influenceBoard, personalSupply: influenceSupply } = projectPlayerInfluence(G, pid);
         const resourcesByResort: Record<string, number> = {};
         for (const obj of Object.values(G.objects ?? {}) as any[]) {
             if (obj?.type === 'Resource' && obj.owner === pid && typeof obj.resort === 'string') resourcesByResort[obj.resort] = (resourcesByResort[obj.resort] ?? 0) + 1;
@@ -189,6 +238,9 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
             const placeInfluencePre = moveType === 'placeInfluence' && typeof currentPlayer === 'string'
                 ? projectPlayerInfluence(context?.G, currentPlayer)
                 : undefined;
+            const resolveChoicePre = moveType === 'resolveChoice' && typeof currentPlayer === 'string'
+                ? projectPlayerInfluence(context?.G, currentPlayer)
+                : undefined;
             const preMoveStateRef = context?.G;
             const preMoveStateVersion = Number(context?.ctx?._stateID ?? -1);
             const result = moveFn(context, ...args);
@@ -217,6 +269,7 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                 const drawnTileId = authoritativeG?.zones?.[`staging_${playerId}`]?.items?.[0];
                 const drawnTile = drawnTileId ? authoritativeG?.tiles?.[drawnTileId] : undefined;
                 const placeInfluencePost = moveType === 'placeInfluence' ? projectPlayerInfluence(authoritativeG, playerId) : undefined;
+                const resolveChoicePost = moveType === 'resolveChoice' ? projectPlayerInfluence(authoritativeG, playerId) : undefined;
                 const postCommitStateHash = options.includeStateHash ? hashState(authoritativeG) : undefined;
                 const checkpointSummary = projectReplayCheckpointSummary(authoritativeG, authoritativeCtx);
                 if (moveType === 'placeInfluence' && placeInfluencePre && placeInfluencePost) {
@@ -274,6 +327,13 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                                 },
                             },
                         } : {}),
+                        ...(moveType === 'resolveChoice' && resolveChoicePre && resolveChoicePost ? {
+                            influence: {
+                                pre: resolveChoicePre,
+                                post: resolveChoicePost,
+                                observedDelta: computeInfluenceDelta(resolveChoicePre, resolveChoicePost),
+                            },
+                        } : {}),
                         ...(moveType === 'placeTile' ? {
                             drawnTileId,
                             drawnTileRef: drawnTile ? { label: drawnTile.name ?? drawnTileId, kind: drawnTile.type } : undefined,
@@ -284,6 +344,13 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                     matchId: typeof context?.ctx?.matchID === 'string' ? context.ctx.matchID : undefined,
                 };
                 options.sink?.writeRecord(record);
+
+                if (moveType === 'resolveChoice' && resolveChoicePre && resolveChoicePost) {
+                    const selection = (args.length === 1 ? (args[0] as any) : undefined)?.selection;
+                    if (selection === 'Receive 1 Influence' || selection === 'Receive 1 Influence (Labor Market)') {
+                        assertExpectedInfluenceDelta(options, record, { personalSupply: -1, board: 1 });
+                    }
+                }
 
                 const pendingChoice = context?.G?.engine?.pendingChoice;
                 const pendingChoiceId = typeof pendingChoice?.choiceId === 'string' ? pendingChoice.choiceId : undefined;
