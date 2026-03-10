@@ -5,8 +5,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "concurrently \"tsc -w\" \"pnpm node scripts/wait-for-dist-watch.cjs\"",
-    "test": "vitest run"
+    "dev": "pnpm run dev:deps && concurrently \"pnpm run dev:watch\" \"pnpm node scripts/wait-for-dist-watch.cjs\"",
+    "test": "vitest run",
+    "dev:deps": "pnpm -C ../game build && pnpm -C ../packs build",
+    "dev:watch": "tsc -w"
   },
   "dependencies": {
     "boardgame.io": "^0.50.0",
