@@ -228,8 +228,14 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
     if (!options?.sink) return moves;
     let seq = 1;
     let manifestWritten = false;
+    let lastRecordedStateVersion: number | null = null;
     let previousPendingChoiceId: string | undefined;
     const wrapped: MoveMap = {};
+
+    const readStateVersion = (ctx: any): number | null => {
+        const candidate = Number(ctx?._stateID);
+        return Number.isFinite(candidate) && candidate >= 0 ? candidate : null;
+    };
 
     for (const [moveType, moveFn] of Object.entries(moves)) {
         wrapped[moveType] = ((context: any, ...args: unknown[]) => {
@@ -242,9 +248,9 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                 ? projectPlayerInfluence(context?.G, currentPlayer)
                 : undefined;
             const preMoveStateRef = context?.G;
-            const preMoveStateVersion = Number(context?.ctx?._stateID ?? -1);
+            const preMoveStateVersion = readStateVersion(context?.ctx);
             const result = moveFn(context, ...args);
-            if (result === INVALID_MOVE || isClientOptimistic) return result;
+            if (result === INVALID_MOVE) return result;
             const playerId = currentPlayer;
             if (typeof playerId !== 'string') return result;
 
@@ -256,7 +262,17 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
 
                 const authoritativeG = context?.G;
                 const authoritativeCtx = context?.ctx;
-                const postMoveStateVersion = Number(authoritativeCtx?._stateID ?? preMoveStateVersion);
+                const postMoveStateVersion = readStateVersion(authoritativeCtx);
+                const isOptimisticNoCommitPass = isClientOptimistic
+                    && preMoveStateVersion !== null
+                    && postMoveStateVersion !== null
+                    && preMoveStateVersion === postMoveStateVersion;
+                const isDuplicateOrStalePass = postMoveStateVersion !== null
+                    && lastRecordedStateVersion !== null
+                    && postMoveStateVersion <= lastRecordedStateVersion;
+                if (isOptimisticNoCommitPass || isDuplicateOrStalePass) {
+                    return result;
+                }
                 if (shouldLogReplayDebug()) {
                     console.debug('[ReplayDebug] withReplaySink.moveStateSnapshot', {
                         moveType,
@@ -375,6 +391,9 @@ export function withReplaySink(moves: MoveMap, options?: ReplayHookOptions): Mov
                     stateHash: hashState(authoritativeG),
                     matchId: record.matchId,
                 });
+                if (postMoveStateVersion !== null) {
+                    lastRecordedStateVersion = postMoveStateVersion;
+                }
             } catch (error) {
                 options.onError?.({ error, record: { recordType: 'action', seq, round: 0, turn: 0, stage: 'unknown', player: playerId, moveType, intent: args, resolved: {} } });
             }
