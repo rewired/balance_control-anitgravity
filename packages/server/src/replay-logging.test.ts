@@ -123,6 +123,8 @@ describe('NdjsonReplaySink v2 boundaries', () => {
             loggingMode: 'canonical',
         });
         expect(records[2].seed).toBeUndefined();
+        const actionCount = records.filter((r) => r.recordType === 'action').length;
+        expect(records[3].totalActions).toBe(actionCount);
     });
 
 });

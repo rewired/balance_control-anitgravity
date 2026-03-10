@@ -82,6 +82,51 @@ describe('withReplaySink v2', () => {
         expect(checkpoint.perPlayer['0'].influence).toEqual({ personalSupply: 0, board: 1, total: 1 });
     });
 
+
+
+    it('records legal move from _isPlayerView path when it is the only committed hotseat pass', () => {
+        const records: ReplayRecord[] = [];
+        const wrapped = withReplaySink({
+            okMove: ({ ctx }: any) => {
+                ctx._stateID = 7;
+            },
+        }, { sink: { writeRecord: (record) => records.push(record) } });
+
+        const context = makeContext() as any;
+        context.G = { ...context.G, _isPlayerView: true };
+        context.ctx._stateID = 6;
+
+        wrapped.okMove(context, { id: 'hotseat-committed' });
+
+        const actions = records.filter((record) => record.recordType === 'action') as any[];
+        expect(actions).toHaveLength(1);
+        expect(actions[0].seq).toBe(1);
+    });
+
+    it('suppresses duplicate optimistic passes while keeping seq monotone for committed actions', () => {
+        const records: ReplayRecord[] = [];
+        const wrapped = withReplaySink({
+            okMove: ({ ctx }: any, intent: any) => {
+                if (intent.commit) {
+                    ctx._stateID = Number(ctx._stateID ?? 0) + 1;
+                }
+            },
+        }, { sink: { writeRecord: (record) => records.push(record) } });
+
+        const context = makeContext() as any;
+        context.G = { ...context.G, _isPlayerView: true };
+        context.ctx._stateID = 20;
+
+        wrapped.okMove(context, { id: 'optimistic-preview', commit: false });
+        wrapped.okMove(context, { id: 'authoritative-commit', commit: true });
+        wrapped.okMove(context, { id: 'stale-duplicate', commit: false });
+
+        const actions = records.filter((record) => record.recordType === 'action') as any[];
+        expect(actions).toHaveLength(1);
+        expect(actions[0].intent).toEqual({ id: 'authoritative-commit', commit: true });
+        expect(actions[0].seq).toBe(1);
+    });
+
     it('does not emit replay records when resolveChoice selection is invalid', () => {
         const records: ReplayRecord[] = [];
         const wrapped = withReplaySink({ resolveChoice: () => INVALID_MOVE }, { sink: { writeRecord: (record) => records.push(record) } });
