@@ -26,11 +26,14 @@ describe('withReplaySink v2', () => {
         const records: ReplayRecord[] = [];
         const wrapped = withReplaySink({
             placeInfluence: ({ G }: any) => {
-                G.objects.i_supply.tileId = 'tile-a';
+                G.zones['PersonalSupply:0'].items = [];
+                G.zones['tile-a'].items = ['i_supply'];
             },
         }, { sink: { writeRecord: (record) => records.push(record) } });
 
         const context = makeContext();
+        context.G.zones['PersonalSupply:0'] = { items: ['i_supply'] } as any;
+        context.G.zones['tile-a'] = { items: [] } as any;
         context.G.objects = {
             i_supply: { id: 'i_supply', type: 'Influence', owner: '0' },
         };
@@ -47,6 +50,47 @@ describe('withReplaySink v2', () => {
         });
     });
 
+
+    it('captures resolveChoice influence gain and same-turn checkpoint projection from authoritative zones', () => {
+        const records: ReplayRecord[] = [];
+        const wrapped = withReplaySink({
+            resolveChoice: ({ G }: any) => {
+                const supplyZone = G.zones['PersonalSupply:0'];
+                const boardZone = G.zones['tile-a'];
+                const movedId = supplyZone.items.shift();
+                boardZone.items.push(movedId);
+            },
+        }, { sink: { writeRecord: (record) => records.push(record) } });
+
+        const context = makeContext();
+        context.G.zones['PersonalSupply:0'] = { items: ['i_supply'] } as any;
+        context.G.zones['tile-a'] = { items: [] } as any;
+        context.G.objects = { i_supply: { id: 'i_supply', type: 'Influence', owner: '0' } };
+
+        wrapped.resolveChoice(context as any, { choiceId: 'choice_1', selection: 'Receive 1 Influence' });
+
+        const action = records.find((record) => record.recordType === 'action') as any;
+        expect(action.moveType).toBe('resolveChoice');
+        expect(action.resolved.outcome).toBe('applied');
+        expect(action.resolved.influence).toEqual({
+            pre: { personalSupply: 1, board: 0 },
+            post: { personalSupply: 0, board: 1 },
+            observedDelta: { personalSupply: -1, board: 1 },
+        });
+
+        const checkpoint = records.find((record) => record.recordType === 'checkpoint.turnEnd') as any;
+        expect(checkpoint.perPlayer['0'].influence).toEqual({ personalSupply: 0, board: 1, total: 1 });
+    });
+
+    it('does not emit replay records when resolveChoice selection is invalid', () => {
+        const records: ReplayRecord[] = [];
+        const wrapped = withReplaySink({ resolveChoice: () => INVALID_MOVE }, { sink: { writeRecord: (record) => records.push(record) } });
+
+        wrapped.resolveChoice(makeContext() as any, { choiceId: 'choice_1', selection: 'Invalid Option' });
+
+        expect(records).toHaveLength(0);
+    });
+
     it('does not emit action records for failed/illegal moves', () => {
         const records: ReplayRecord[] = [];
         const wrapped = withReplaySink({ placeInfluence: () => INVALID_MOVE }, { sink: { writeRecord: (record) => records.push(record) } });
@@ -59,12 +103,17 @@ describe('withReplaySink v2', () => {
         const onError = vi.fn();
         const wrapped = withReplaySink({
             placeInfluence: ({ G }: any) => {
-                G.objects.i_supply.tileId = 'tile-a';
-                G.objects.i_extra = { id: 'i_extra', type: 'Influence', owner: '0', tileId: 'tile-b' };
+                G.zones['PersonalSupply:0'].items = [];
+                G.zones['tile-a'].items = ['i_supply'];
+                G.zones['tile-b'].items = ['i_extra'];
+                G.objects.i_extra = { id: 'i_extra', type: 'Influence', owner: '0' };
             },
         }, { sink: { writeRecord: (record) => records.push(record) }, onError });
 
         const context = makeContext();
+        context.G.zones['PersonalSupply:0'] = { items: ['i_supply'] } as any;
+        context.G.zones['tile-a'] = { items: [] } as any;
+        context.G.zones['tile-b'] = { items: [] } as any;
         context.G.objects = {
             i_supply: { id: 'i_supply', type: 'Influence', owner: '0' },
         };

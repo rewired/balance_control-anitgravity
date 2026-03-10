@@ -18,6 +18,8 @@ export const SystemMoves = {
         if (!G.engine.pendingChoice || G.engine.pendingChoice.choiceId !== choiceId) return INVALID_MOVE;
 
         const choice = G.engine.pendingChoice;
+        const options = Array.isArray(choice?.spec?.options) ? choice.spec.options : undefined;
+        if (options && !options.includes(selection)) return INVALID_MOVE;
 
         // Forced confirm gate for unplaceable draw loop.
         if (choice.sourceId === UNPLACEABLE_DRAW_CHOICE_SOURCE_ID && selection !== 'OK') return INVALID_MOVE;
@@ -40,4 +42,3 @@ export const SystemMoves = {
         }
     },
 };
-
