@@ -2,6 +2,7 @@ import { CoreZoneName, RULESET_MANIFEST, TileType, type GameConfig, type GameObj
 import type { EnginePackDefinition, PackManifest } from '../types';
 import { generateCoreTiles } from './tile-loader';
 import { coreRootTurn, coreEndIf, buildCorePlayerView } from './root-pack';
+import { coreEnumerateIntents } from './legal-intents';
 import {
     CoreMoves,
     coreResourceAtoms,
@@ -129,4 +130,5 @@ export const CorePack: EnginePackDefinition = {
     turn: coreRootTurn,
     endIf: coreEndIf,
     playerView: buildCorePlayerView,
+    enumerateIntents: coreEnumerateIntents,
 };

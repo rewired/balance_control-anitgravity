@@ -4,6 +4,7 @@ import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import { GameLayout } from '../src/components/GameLayout';
 import { I18nProvider } from '../src/ui/i18n';
+import '../src/game';
 
 // Mock ResizeObserver
 class ResizeObserverMock {

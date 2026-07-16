@@ -9,7 +9,22 @@ export { coreHotspotAtoms } from '../engine/atoms/hotspot';
 export { createCoreRulesAtoms } from '../engine/atoms/rules';
 export { CoreMoves } from '../moves';
 export { drawTileToStaging } from '../mechanics-draw';
-export { getRoundSettlementResortTileOrder, runFinalRoundSettlement } from '../mechanics-turn';
+export {
+    getRoundSettlementResortTileOrder,
+    runFinalRoundSettlement,
+    allStartingInfluencePlaced,
+    countPlayerInfluence,
+    getInfluenceCap,
+    hasInfluenceInSupply,
+} from '../mechanics-turn';
 export { validateSurfaceHash } from '../surface';
 export { emitReplaySystemRecord, type ReplayHookOptions } from '../engine/replay-sink';
 export { isAdjacent } from '../engine/topology';
+export { computeMajority } from '../mechanics';
+export { coordToString, getNeighbors, stringToCoord } from '../topology';
+export { evaluateTileSelector } from '../engine/selectors';
+export { EnginePackRegistry } from '../expansion-registry';
+export { getPlayerMetaMarker } from '../state-lookup';
+export { getLegalGrassrootsOutputs } from '../mechanics/conversion';
+export { selectDeterministicCostResourceIds } from '../engine/deterministic-cost';
+export type { LegalIntent } from '../engine/legal-intents';
