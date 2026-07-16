@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import * as ts from 'typescript';
 
 const ALLOWED_MISSING_CONTROLLER_POLICIES = new Set(['ERROR', 'NOISE', 'SKIP']);
-const REQUIRED_PACKAGES = ['game', 'expansion-01', 'expansion-02', 'expansion-03'];
+const REQUIRED_PACKAGES = ['game', 'core', 'expansion-01', 'expansion-02', 'expansion-03'];
 
 interface Violation {
     packageName: string;
