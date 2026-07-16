@@ -14,7 +14,7 @@ import {
     type CostValidationResult
 } from './resolver/costs';
 import { getPublicSurface } from '../surface';
-import { updateGlobalStats } from '../state-lookup';
+import { EnginePackRegistry } from '../expansion-registry';
 import { assemblePacks } from '../move-assembly';
 
 /**
@@ -232,8 +232,10 @@ export class EffectResolver {
             }
         }
 
-        // Task: Server-authoritative influence/meta-marker stats
-        updateGlobalStats(G, ctx);
+        // Server-authoritative influence/meta-marker stats, sourced from the
+        // required pack's updateStats hook (kernel carries no domain logic).
+        const requiredPack = EnginePackRegistry.getRegisteredPacks().find((pack) => pack.manifest.required);
+        requiredPack?.updateStats?.(G, ctx);
 
         return ok;
     }

@@ -5,7 +5,7 @@ import { hashState } from './hash-state';
 import { assemblePacks } from './move-assembly';
 import { ensureCorePackRegistered } from './packs/register-core';
 import { getPublicSurface } from './surface';
-import { updateGlobalStats } from './state-lookup';
+import { coreUpdateStats } from './packs/core/state';
 
 /**
  * Normalizes boardgame.io context to ensure RNG is available.
@@ -157,7 +157,7 @@ export const SetupGame = ({ ctx, setupData }: { ctx: Ctx, setupData?: unknown })
     packAssembly.applySetupPostShuffle(G, normalizedCtx);
 
     // Initial stats computation
-    updateGlobalStats(G, normalizedCtx);
+    coreUpdateStats(G, normalizedCtx);
 
     return G;
 };

@@ -71,4 +71,6 @@ export type EnginePackDefinition = Readonly<{
     playerView?: (G: GameState, playerID: string | null) => GameState;
     /** Legal-intent enumeration contribution for this pack's own moves. */
     enumerateIntents?: (G: GameState, ctx: any, playerID: string) => any[];
+    /** Post-resolve stats bookkeeping (e.g. G.meta.stats); only the required pack may populate this. */
+    updateStats?: (G: GameState, ctx: any) => void;
 }>;

@@ -3,6 +3,7 @@ import type { EnginePackDefinition, PackManifest } from '../types';
 import { generateCoreTiles } from './tile-loader';
 import { coreRootTurn, coreEndIf, buildCorePlayerView } from './root-pack';
 import { coreEnumerateIntents } from './legal-intents';
+import { coreUpdateStats } from './state';
 import {
     CoreMoves,
     coreResourceAtoms,
@@ -131,4 +132,5 @@ export const CorePack: EnginePackDefinition = {
     endIf: coreEndIf,
     playerView: buildCorePlayerView,
     enumerateIntents: coreEnumerateIntents,
+    updateStats: coreUpdateStats,
 };

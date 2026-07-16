@@ -24,7 +24,7 @@ export { computeMajority } from '../mechanics';
 export { coordToString, getNeighbors, stringToCoord } from '../topology';
 export { evaluateTileSelector } from '../engine/selectors';
 export { EnginePackRegistry } from '../expansion-registry';
-export { getPlayerMetaMarker } from '../state-lookup';
+export { getPlayerMetaMarker, findObjectZoneId } from '../state-lookup';
 export { getLegalGrassrootsOutputs } from '../mechanics/conversion';
 export { selectDeterministicCostResourceIds } from '../engine/deterministic-cost';
 export type { LegalIntent } from '../engine/legal-intents';
