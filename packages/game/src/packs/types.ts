@@ -12,6 +12,33 @@ export type PackManifest = Readonly<{
     compatibleWith?: string[];
 }>;
 
+/**
+ * Per-stage move membership for the root turn structure.
+ * @remarks infrastructure; no direct SPEC binding
+ */
+export type TurnStageDescriptor = Readonly<{
+    moves: string[];
+    next?: string;
+}>;
+
+/**
+ * Root turn-structure contract supplied by the single required pack.
+ * Only a pack with `manifest.required === true` may populate this
+ * (validated by `EnginePackRegistry.validateEnabledPacks`).
+ * @remarks infrastructure; no direct SPEC binding
+ */
+export type RootTurnDescriptor = Readonly<{
+    order: {
+        first: (args: { G: GameState }) => number;
+        next: (args: { ctx: any }) => number;
+    };
+    activePlayers: Record<string, string>;
+    stages: Record<string, TurnStageDescriptor>;
+    rootMoveIds: string[];
+    onBegin?: (args: { G: GameState; ctx: any; events: any }) => void;
+    onEnd?: (args: { G: GameState; ctx: any }) => void;
+}>;
+
 export type EnginePackDefinition = Readonly<{
     id: EnginePackId;
     name: string;
@@ -33,4 +60,12 @@ export type EnginePackDefinition = Readonly<{
     engine?: {
         atoms?: (args: { triggerHook: (...args: any[]) => unknown }) => AtomRegistration[];
     };
+    /** Root turn-structure contract; only the required pack may populate this. */
+    turn?: RootTurnDescriptor;
+    /** Win/draw condition; only the required pack may populate this. */
+    endIf?: (args: { G: GameState }) => { winner: string } | { draw: true } | undefined;
+    /** Per-player state masking; only the required pack may populate this. */
+    playerView?: (G: GameState, playerID: string | null) => GameState;
+    /** Legal-intent enumeration contribution for this pack's own moves. */
+    enumerateIntents?: (G: GameState, ctx: any, playerID: string, stage: string) => any[];
 }>;
