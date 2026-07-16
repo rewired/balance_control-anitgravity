@@ -1,0 +1,21 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "moduleResolution": "node",
+        "rootDir": "./src",
+        "declaration": true,
+        "baseUrl": ".",
+        "paths": {
+            "@balance-control/rules": [
+                "../rules/dist/index.d.ts"
+            ],
+            "@balance-control/game": [
+                "../game/dist/index.d.ts"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
