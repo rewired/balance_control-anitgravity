@@ -1,6 +1,7 @@
 import { CoreZoneName, RULESET_MANIFEST, TileType, type GameConfig, type GameObject, type GameState, type Tile } from '@balance-control/rules';
 import type { EnginePackDefinition, PackManifest } from '../types';
 import { generateCoreTiles } from './tile-loader';
+import { coreRootTurn, coreEndIf, buildCorePlayerView } from './root-pack';
 import {
     CoreMoves,
     coreResourceAtoms,
@@ -125,4 +126,7 @@ export const CorePack: EnginePackDefinition = {
             ];
         },
     },
+    turn: coreRootTurn,
+    endIf: coreEndIf,
+    playerView: buildCorePlayerView,
 };

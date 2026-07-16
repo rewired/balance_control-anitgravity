@@ -92,7 +92,8 @@ export function assemblePacks(options: { config?: GameConfig; mode?: PackAssembl
 
     const moveModules = mode === 'registered' ? getMoveModulesSuperset() : getEnabledMoveModules(config);
     const moves = mergeMoveModules(moveModules);
-    const expansionMoveModules = moveModules.filter((m) => m.moduleId !== 'core');
+    const requiredPackId = packs.find((p) => p.manifest.required)?.id;
+    const expansionMoveModules = moveModules.filter((m) => m.moduleId !== requiredPackId);
     const expansionMoves = mergeMoveModules(expansionMoveModules);
 
     const applySetupPreShuffle = (G: GameState, ctx: any) => {
@@ -116,10 +117,10 @@ export function assemblePacks(options: { config?: GameConfig; mode?: PackAssembl
                 pack.engine?.atoms?.({
                     triggerHook: (G2, ctx2, hook, payload) => triggerHook(G2 as any, ctx2, hook, payload),
                 }) ?? [];
-            if (pack.id !== 'core' && atoms.length === 0) continue;
+            if (!pack.manifest.required && atoms.length === 0) continue;
             registry.registerModule({
                 id: pack.id,
-                isEnabled: () => (pack.id === 'core' ? true : enabledPackIds.has(pack.id)),
+                isEnabled: () => (pack.manifest.required ? true : enabledPackIds.has(pack.id)),
                 atoms,
             });
         }

@@ -1,5 +1,6 @@
 import type { GameConfig, GameState, MeasureDeckDescriptor, ResourceType } from '@balance-control/rules';
 import type { AtomRegistration } from '../engine/engine-module-registry';
+import type { ReplayHookOptions } from '../engine/replay-sink';
 
 export type EnginePackId = 'core' | 'exp01' | 'exp02' | 'exp03';
 
@@ -19,6 +20,8 @@ export type PackManifest = Readonly<{
 export type TurnStageDescriptor = Readonly<{
     moves: string[];
     next?: string;
+    /** If true, expansion-contributed moves are merged into this stage's move map. */
+    mergeExpansionMoves?: boolean;
 }>;
 
 /**
@@ -35,8 +38,8 @@ export type RootTurnDescriptor = Readonly<{
     activePlayers: Record<string, string>;
     stages: Record<string, TurnStageDescriptor>;
     rootMoveIds: string[];
-    onBegin?: (args: { G: GameState; ctx: any; events: any }) => void;
-    onEnd?: (args: { G: GameState; ctx: any }) => void;
+    onBegin?: (args: { G: GameState; ctx: any; events: any; replayHook?: ReplayHookOptions }) => void;
+    onEnd?: (args: { G: GameState; ctx: any; replayHook?: ReplayHookOptions }) => void;
 }>;
 
 export type EnginePackDefinition = Readonly<{

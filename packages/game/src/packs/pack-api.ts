@@ -8,3 +8,7 @@ export { coreChoiceAtoms } from '../engine/atoms/choice';
 export { coreHotspotAtoms } from '../engine/atoms/hotspot';
 export { createCoreRulesAtoms } from '../engine/atoms/rules';
 export { CoreMoves } from '../moves';
+export { drawTileToStaging } from '../mechanics-draw';
+export { getRoundSettlementResortTileOrder, runFinalRoundSettlement } from '../mechanics-turn';
+export { validateSurfaceHash } from '../surface';
+export { emitReplaySystemRecord, type ReplayHookOptions } from '../engine/replay-sink';
