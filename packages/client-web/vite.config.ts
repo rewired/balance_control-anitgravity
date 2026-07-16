@@ -9,6 +9,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@balance-control/game': path.resolve(__dirname, '../game/src/index.ts'),
+            '@balance-control/core': path.resolve(__dirname, '../core/src/index.ts'),
             '@balance-control/rules': path.resolve(__dirname, '../rules/src/index.ts'),
             '@balance-control/shared': path.resolve(__dirname, '../shared/src/index.ts'),
             '@balance-control/expansion-01/engine': path.resolve(__dirname, '../expansion-01/src/engine/index.ts'),

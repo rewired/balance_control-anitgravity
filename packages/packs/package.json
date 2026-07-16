@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@balance-control/game": "workspace:*",
+    "@balance-control/core": "workspace:*",
     "@balance-control/rules": "workspace:*",
     "@balance-control/expansion-01": "workspace:*",
     "@balance-control/expansion-02": "workspace:*",

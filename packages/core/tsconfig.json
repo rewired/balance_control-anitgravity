@@ -5,6 +5,7 @@
         "moduleResolution": "node",
         "rootDir": "./src",
         "declaration": true,
+        "resolveJsonModule": true,
         "baseUrl": ".",
         "paths": {
             "@balance-control/rules": [
@@ -16,6 +17,7 @@
         }
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "src/**/*.json"
     ]
 }

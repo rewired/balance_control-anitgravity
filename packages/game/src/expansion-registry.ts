@@ -124,10 +124,10 @@ class EnginePackRegistryImpl {
 
         const rootHookOwners = enabledPackIds
             .map((id) => registered.get(id))
-            .filter((pack): pack is EnginePackDefinition => Boolean(pack && pack.manifest.required && (pack.turn || pack.endIf || pack.playerView)));
+            .filter((pack): pack is EnginePackDefinition => Boolean(pack && pack.manifest.required && (pack.turn || pack.endIf || pack.playerView || pack.setupGame || pack.wrapMovesForReplay)));
         if (rootHookOwners.length > 1) {
             const ids = rootHookOwners.map((p) => p.id).sort().join(', ');
-            throw new Error(`EnginePackRegistry: more than one required pack defines turn/endIf/playerView (${ids}).`);
+            throw new Error(`EnginePackRegistry: more than one required pack defines setupGame/turn/endIf/playerView/wrapMovesForReplay (${ids}).`);
         }
 
         if (pinnedVersions) {

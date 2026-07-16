@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ReplayRecord } from '@balance-control/game';
 import { createClientGameWithReplayHooks } from '../src/game';
 import { HotseatForwardingReplaySink } from '../src/replay/hotseat-forwarding-sink';
-import { withReplaySink } from '../../game/src/engine/replay-sink';
+import { withReplaySink } from '@balance-control/core';
 
 function makeHotseatContext() {
     return {

@@ -1,9 +1,9 @@
 import {
-    CorePack,
     EnginePackRegistry,
     CANONICAL_ENGINE_MODULE_ORDER,
     type EnginePackDefinition
 } from '@balance-control/game';
+import { CorePack } from '@balance-control/core';
 
 import { Exp01Pack } from './exp01';
 import { Exp02Pack } from './exp02';

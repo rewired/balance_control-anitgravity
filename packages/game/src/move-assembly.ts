@@ -6,7 +6,7 @@ import { EngineModuleRegistry } from './engine/engine-module-registry';
 import type { EngineState, HookPoint } from './engine/types';
 import { MoveModuleRegistry, type MoveFn, type MoveMap, type MoveModule } from './move-module-registry';
 import type { EnginePackDefinition } from './packs/types';
-import { ensureCorePackRegistered } from './packs/register-core';
+import { ensureRequiredPackRegistered } from './ensure-required-pack-registered';
 
 export type { MoveFn, MoveMap, MoveModule };
 
@@ -35,7 +35,7 @@ export type PackAssembly = Readonly<{
  * @pure
  */
 export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
-    ensureCorePackRegistered();
+    ensureRequiredPackRegistered();
     const modules = EnginePackRegistry.getEnabledMoveModules(config);
     const out: MoveModule[] = [];
 
@@ -55,7 +55,7 @@ export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
  * @pure
  */
 export function getMoveModulesSuperset(): MoveModule[] {
-    ensureCorePackRegistered();
+    ensureRequiredPackRegistered();
     const modules = EnginePackRegistry.getRegisteredMoveModules();
     const out: MoveModule[] = [];
 
@@ -83,7 +83,7 @@ function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
  * @pure
  */
 export function assemblePacks(options: { config?: GameConfig; mode?: PackAssemblyMode }): PackAssembly {
-    ensureCorePackRegistered();
+    ensureRequiredPackRegistered();
     const mode = options.mode ?? 'enabled';
     const config: GameConfig = options.config ?? DEFAULT_GAME_CONFIG;
 

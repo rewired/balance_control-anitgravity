@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "pnpm -C ../rules build && pnpm -C ../game build && pnpm -C ../expansion-01 build && pnpm -C ../expansion-02 build && pnpm -C ../expansion-03 build && pnpm -C ../packs build",
+    "prebuild": "pnpm -C ../rules build && pnpm -C ../game build && pnpm -C ../core build && pnpm -C ../expansion-01 build && pnpm -C ../expansion-02 build && pnpm -C ../expansion-03 build && pnpm -C ../packs build",
     "build": "tsc && vite build",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -15,6 +15,7 @@
     "@balance-control/expansion-02": "workspace:*",
     "@balance-control/expansion-03": "workspace:*",
     "@balance-control/game": "workspace:*",
+    "@balance-control/core": "workspace:*",
     "@balance-control/packs": "workspace:*",
     "@balance-control/rules": "workspace:*",
     "boardgame.io": "^0.50.0",

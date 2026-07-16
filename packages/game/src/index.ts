@@ -1,10 +1,9 @@
 import { Game } from 'boardgame.io';
 import { GameState } from '@balance-control/rules';
-import { SetupGame } from './setup';
 import { assemblePacks, buildStageMoveMap, type MoveMap } from './move-assembly';
-import { ensureCorePackRegistered } from './packs/register-core';
+import { ensureRequiredPackRegistered } from './ensure-required-pack-registered';
 import { EnginePackRegistry } from './expansion-registry';
-import { withReplaySink, type ReplayHookOptions } from './engine/replay-sink';
+import type { ReplayHookOptions } from './engine/replay-sink';
 
 function selectMoves(mergedMoves: MoveMap, moveIds: readonly string[], stageName: string): MoveMap {
     const out: MoveMap = {};
@@ -42,18 +41,18 @@ export function createBalanceControlGame(): Game<GameState> {
  * @sideEffects
  */
 export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions): Game<GameState> {
-    ensureCorePackRegistered();
+    ensureRequiredPackRegistered();
     const packAssembly = assemblePacks({ mode: 'registered' });
     const moveModules = packAssembly.moveModules;
-    const mergedMoves = withReplaySink(packAssembly.moves, replayHook);
 
     const requiredPack = EnginePackRegistry.getRegisteredPacks().find((pack) => pack.manifest.required);
-    if (!requiredPack || !requiredPack.turn || !requiredPack.endIf || !requiredPack.playerView) {
+    if (!requiredPack || !requiredPack.turn || !requiredPack.endIf || !requiredPack.playerView || !requiredPack.setupGame) {
         throw new Error(
-            'createBalanceControlGameWithHooks: the required pack must supply turn/endIf/playerView. Register a required pack (e.g. CorePack) that populates these fields before calling this factory.'
+            'createBalanceControlGameWithHooks: the required pack must supply setupGame/turn/endIf/playerView. Register a required pack (e.g. CorePack) that populates these fields before calling this factory.'
         );
     }
     const rootTurn = requiredPack.turn;
+    const mergedMoves = requiredPack.wrapMovesForReplay ? requiredPack.wrapMovesForReplay(packAssembly.moves, replayHook) : packAssembly.moves;
 
     const expansionModules = moveModules.filter((module) => module.moduleId !== requiredPack.id).map((module) => {
         const wrappedModuleMoves: MoveMap = {};
@@ -82,7 +81,7 @@ export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions
 
     return {
         name: 'balance-control',
-        setup: (ctx: any, setupData: unknown) => SetupGame({ ctx, setupData }),
+        setup: (ctx: any, setupData: unknown) => requiredPack.setupGame!(ctx, setupData),
         moves: rootMoves as any,
         playerView: ({ G, playerID }: { G: GameState; playerID: string | null }) => {
             return requiredPack.playerView!(G, playerID);
@@ -101,22 +100,62 @@ export function createBalanceControlGameWithHooks(replayHook?: ReplayHookOptions
 /** @rule CORE-01-09-02 */
 
 export { EnginePackRegistry } from './expansion-registry';
-export type { EnginePackDefinition, EnginePackId, PackManifest } from './packs/types';
-export { CorePack } from './packs/core';
+export type { EnginePackDefinition, EnginePackId, PackManifest, RootTurnDescriptor, TurnStageDescriptor } from './packs/types';
 export * from './move-contracts';
 export * from './config';
 export * from './hash-state';
 export * from './surface';
 export * from './engine/legal-intents';
-export { selectTileController } from './public-selectors';
-export { assemblePacks } from './move-assembly';
+export {
+    assemblePacks,
+    buildStageMoveMap,
+    getEnabledMoveModules,
+    getMoveModulesSuperset,
+    buildMovesForConfig,
+    buildExpansionMovesForConfig,
+    buildMovesSuperset,
+    buildExpansionMovesSuperset,
+} from './move-assembly';
+export type { MoveMap, MoveFn, MoveModule } from './move-module-registry';
 export { CANONICAL_ENGINE_MODULE_ORDER } from './expansion-registry';
+export { ensureRequiredPackRegistered } from './ensure-required-pack-registered';
+export * from './topology';
+export { getPlayerMetaMarker, findObjectZoneId } from './state-lookup';
+export { EngineModuleRegistry } from './engine/engine-module-registry';
 
-// Internal APIs exposed for pack implementations in @balance-control/packs
+// Internal APIs exposed for pack implementations (@balance-control/packs, @balance-control/core)
 export { EffectResolver } from './engine/resolver';
 export { lookupMeasureDeckForObjectId } from './engine/measure-deck-provider';
 export { exp02RegulationAtoms } from './engine/atoms/regulation';
 export { exp03CountdownAtoms } from './engine/atoms/countdown';
+export { evaluateTileSelector, evaluatePlayerSelector } from './engine/selectors';
+export { isAdjacent } from './engine/topology';
+export type {
+    TileSelector,
+    PlayerSelector,
+    EffectAtom,
+    HookPoint,
+    ExpiryTrigger,
+    ActiveModifier,
+    EngineState,
+    ChoiceKind,
+    ChoiceRequest,
+    PendingChoice,
+    MissingControllerPolicy,
+} from './engine/types';
+export type { AtomRegistration, AtomHandler } from './engine/engine-module-registry';
+export { allocId, capitalize } from './engine/resolver/ids';
+export { applyModifiers, removeModifier, getHookForAtom } from './engine/resolver/modifiers';
+export { isProhibited } from './engine/resolver/prohibitions';
+export {
+    validateCost,
+    commitCost,
+    getExtraCostSlots,
+    checkAndPayCosts,
+    type CostSlot,
+    type CostSpec,
+    type CostValidationResult,
+} from './engine/resolver/costs';
 
 export type {
     ReplayActionRecord,
@@ -129,7 +168,8 @@ export type {
     ReplaySystemChoiceOpenedRecord,
     ReplaySystemHotspotResolvedRecord,
     ReplaySystemRoundSettlementRecord,
+    ReplaySystemRoundSettlementPayload,
+    ReplayTileRef,
 } from './engine/replay-sink';
+export { projectReplayStateSnapshot } from './engine/replay-sink';
 export type { ReplayDomainFieldType, ReplayTypedFields } from './engine/replay-typed-fields';
-
-export { verifyReplayRecords, type ReplayNdjsonRecord, type ReplayVerifyOptions } from './replay-verify';

@@ -1,6 +1,7 @@
 import type { GameConfig, GameState, MeasureDeckDescriptor, ResourceType } from '@balance-control/rules';
 import type { AtomRegistration } from '../engine/engine-module-registry';
 import type { ReplayHookOptions } from '../engine/replay-sink';
+import type { MoveMap } from '../move-module-registry';
 
 export type EnginePackId = 'core' | 'exp01' | 'exp02' | 'exp03';
 
@@ -63,6 +64,8 @@ export type EnginePackDefinition = Readonly<{
     engine?: {
         atoms?: (args: { triggerHook: (...args: any[]) => unknown }) => AtomRegistration[];
     };
+    /** Full G construction (setup); only the required pack may populate this. */
+    setupGame?: (ctx: any, setupData: unknown) => GameState;
     /** Root turn-structure contract; only the required pack may populate this. */
     turn?: RootTurnDescriptor;
     /** Win/draw condition; only the required pack may populate this. */
@@ -73,4 +76,6 @@ export type EnginePackDefinition = Readonly<{
     enumerateIntents?: (G: GameState, ctx: any, playerID: string) => any[];
     /** Post-resolve stats bookkeeping (e.g. G.meta.stats); only the required pack may populate this. */
     updateStats?: (G: GameState, ctx: any) => void;
+    /** Wraps assembled moves with replay-log emission; only the required pack may populate this. */
+    wrapMovesForReplay?: (moves: MoveMap, replayHook?: ReplayHookOptions) => MoveMap;
 }>;

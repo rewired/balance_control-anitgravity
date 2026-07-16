@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "@balance-control/rules": "workspace:*",
-    "@balance-control/game": "workspace:*"
+    "@balance-control/game": "workspace:*",
+    "boardgame.io": "^0.50.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0",

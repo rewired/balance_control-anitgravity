@@ -75,6 +75,9 @@ importers:
 
   packages/client-web:
     dependencies:
+      '@balance-control/core':
+        specifier: workspace:*
+        version: link:../core
       '@balance-control/expansion-01':
         specifier: workspace:*
         version: link:../expansion-01
@@ -145,6 +148,9 @@ importers:
       '@balance-control/rules':
         specifier: workspace:*
         version: link:../rules
+      boardgame.io:
+        specifier: ^0.50.0
+        version: 0.50.2
     devDependencies:
       typescript:
         specifier: ^5.0.0
@@ -241,6 +247,9 @@ importers:
 
   packages/packs:
     dependencies:
+      '@balance-control/core':
+        specifier: workspace:*
+        version: link:../core
       '@balance-control/expansion-01':
         specifier: workspace:*
         version: link:../expansion-01

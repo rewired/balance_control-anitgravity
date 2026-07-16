@@ -9,7 +9,11 @@ import { useIntentViewModel } from '../src/ui/useIntentViewModel';
 // Mock dependencies
 vi.mock('@balance-control/game', async () => {
     return {
-        enumerateLegalIntents: () => [],
+        enumerateLegalIntents: () => []
+    };
+});
+vi.mock('@balance-control/core', async () => {
+    return {
         selectTileController: () => null
     };
 });
