@@ -12,3 +12,4 @@ export { drawTileToStaging } from '../mechanics-draw';
 export { getRoundSettlementResortTileOrder, runFinalRoundSettlement } from '../mechanics-turn';
 export { validateSurfaceHash } from '../surface';
 export { emitReplaySystemRecord, type ReplayHookOptions } from '../engine/replay-sink';
+export { isAdjacent } from '../engine/topology';

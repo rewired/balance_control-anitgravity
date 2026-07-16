@@ -1,6 +1,6 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
 import { CoreZoneName, TileType } from '@balance-control/rules';
-import { isMoveAdjacent } from '../../../engine/topology';
+import { isMoveAdjacent } from '../../../packs/core/adjacency';
 import { EffectResolver } from '../../../engine/resolver';
 import {
     resolveProvidedOrDeterministicResourceIds,

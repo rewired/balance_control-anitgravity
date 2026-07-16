@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isMoveAdjacent } from '../src/engine/topology';
+import { isMoveAdjacent } from '../src/packs/core/adjacency';
 import { GameState, TileType, CoreZoneName } from '@balance-control/rules';
 import { getNeighbors, positionKey, coordToString, stringToCoord } from '../src/topology';
 import { SetupGame } from '../src/setup';

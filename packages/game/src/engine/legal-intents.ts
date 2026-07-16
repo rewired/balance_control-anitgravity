@@ -2,7 +2,7 @@ import { CoreZoneName, GameState, TileType } from '@balance-control/rules';
 import { allStartingInfluencePlaced, countPlayerInfluence, getInfluenceCap, hasInfluenceInSupply } from '../mechanics-turn';
 import { computeMajority } from '../mechanics';
 import { coordToString, getNeighbors, stringToCoord } from '../topology';
-import { isMoveAdjacent } from './topology';
+import { isMoveAdjacent } from '../packs/core/adjacency';
 import { EffectResolver } from './resolver';
 import { evaluateTileSelector } from './selectors';
 import { EnginePackRegistry } from '../expansion-registry';
