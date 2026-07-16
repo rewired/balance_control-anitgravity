@@ -1,0 +1,35 @@
+{
+  "name": "@balance-control/core",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./engine": {
+      "types": "./dist/engine/index.d.ts",
+      "default": "./dist/engine/index.js"
+    },
+    "./ui": {
+      "types": "./dist/ui/index.d.ts",
+      "default": "./dist/ui/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run --no-threads --sequence.concurrent false",
+    "dev": "tsc -w",
+    "pretest": "pnpm -C ../rules build && pnpm -C ../shared build && pnpm -C ../game build"
+  },
+  "dependencies": {
+    "@balance-control/rules": "workspace:*",
+    "@balance-control/game": "workspace:*",
+    "boardgame.io": "^0.50.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.6"
+  }
+}

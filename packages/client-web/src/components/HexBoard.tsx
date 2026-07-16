@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import type { GameState, Tile } from '@balance-control/rules';
 import type { LegalIntent } from '@balance-control/game';
-import { selectTileController } from '@balance-control/game';
+import { selectTileController } from '@balance-control/core';
 import { axialToPixel, computeBoardLayout, parseCoordString, stableSortCoords } from '../ui/hexLayout';
 import { HexTileVisual } from '../ui/tiles/HexTileVisual';
 import { ResortIcon, isResortKey } from '../ui/tiles/ResortIcon';

@@ -6,7 +6,7 @@ import { EngineModuleRegistry } from './engine/engine-module-registry';
 import type { EngineState, HookPoint } from './engine/types';
 import { MoveModuleRegistry, type MoveFn, type MoveMap, type MoveModule } from './move-module-registry';
 import type { EnginePackDefinition } from './packs/types';
-import { ensureCorePackRegistered } from './packs/register-core';
+import { ensureRequiredPackRegistered } from './ensure-required-pack-registered';
 
 export type { MoveFn, MoveMap, MoveModule };
 
@@ -35,7 +35,7 @@ export type PackAssembly = Readonly<{
  * @pure
  */
 export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
-    ensureCorePackRegistered();
+    ensureRequiredPackRegistered();
     const modules = EnginePackRegistry.getEnabledMoveModules(config);
     const out: MoveModule[] = [];
 
@@ -55,7 +55,7 @@ export function getEnabledMoveModules(config: GameConfig): MoveModule[] {
  * @pure
  */
 export function getMoveModulesSuperset(): MoveModule[] {
-    ensureCorePackRegistered();
+    ensureRequiredPackRegistered();
     const modules = EnginePackRegistry.getRegisteredMoveModules();
     const out: MoveModule[] = [];
 
@@ -83,7 +83,7 @@ function mergeMoveModules(modules: readonly MoveModule[]): MoveMap {
  * @pure
  */
 export function assemblePacks(options: { config?: GameConfig; mode?: PackAssemblyMode }): PackAssembly {
-    ensureCorePackRegistered();
+    ensureRequiredPackRegistered();
     const mode = options.mode ?? 'enabled';
     const config: GameConfig = options.config ?? DEFAULT_GAME_CONFIG;
 
@@ -92,7 +92,8 @@ export function assemblePacks(options: { config?: GameConfig; mode?: PackAssembl
 
     const moveModules = mode === 'registered' ? getMoveModulesSuperset() : getEnabledMoveModules(config);
     const moves = mergeMoveModules(moveModules);
-    const expansionMoveModules = moveModules.filter((m) => m.moduleId !== 'core');
+    const requiredPackId = packs.find((p) => p.manifest.required)?.id;
+    const expansionMoveModules = moveModules.filter((m) => m.moduleId !== requiredPackId);
     const expansionMoves = mergeMoveModules(expansionMoveModules);
 
     const applySetupPreShuffle = (G: GameState, ctx: any) => {
@@ -116,10 +117,10 @@ export function assemblePacks(options: { config?: GameConfig; mode?: PackAssembl
                 pack.engine?.atoms?.({
                     triggerHook: (G2, ctx2, hook, payload) => triggerHook(G2 as any, ctx2, hook, payload),
                 }) ?? [];
-            if (pack.id !== 'core' && atoms.length === 0) continue;
+            if (!pack.manifest.required && atoms.length === 0) continue;
             registry.registerModule({
                 id: pack.id,
-                isEnabled: () => (pack.id === 'core' ? true : enabledPackIds.has(pack.id)),
+                isEnabled: () => (pack.manifest.required ? true : enabledPackIds.has(pack.id)),
                 atoms,
             });
         }

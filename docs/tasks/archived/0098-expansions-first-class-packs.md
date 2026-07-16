@@ -208,3 +208,10 @@ Recorded in final commit message (Postflight: block).
 ---
 
 ## 15) Amendments (append-only)
+
+### A-01 — Superseded by task chain 0366–0374 (2026-07-16)
+
+* Reason: this task was FROZEN (specced, never implemented) on 2026-02-17. The goal it describes — expansions (and, by the same principle, CORE) as first-class, structurally-symmetric engine packs — was independently re-derived and fully implemented by task chain 0366–0374 (`docs/design-decisions/DD-0366-core-extraction-root-pack-contract.md`), which extracted CORE-01 into its own workspace package (`@balance-control/core`), structurally identical to `expansion-01/02/03`, and introduced the "root pack" contract so the kernel's `Game` factory no longer hardcodes any ruleset specifics.
+* Change: no code from this task file was executed. Task State remains `FROZEN` as a historical record; treat 0366–0374 as the actual completion of this task's intent.
+* Spec anchors: none (this note is a pointer only).
+* Guardrails: none impacted by this note.

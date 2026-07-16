@@ -18,6 +18,7 @@
         "jsx": "react-jsx",
         "paths": {
             "@balance-control/game": ["../game/src"],
+            "@balance-control/core": ["../core/src"],
             "@balance-control/rules": ["../rules/src"],
             "@balance-control/shared": ["../shared/src"],
             "@balance-control/expansion-01": ["../expansion-01/src"],
@@ -33,6 +34,7 @@
         "src",
         "../bot-llm/src",
         "../game/src",
+        "../core/src",
         "../rules/src",
         "../shared/src",
         "../expansion-01/src",

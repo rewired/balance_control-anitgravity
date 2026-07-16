@@ -20,7 +20,7 @@ function findTsFiles(dir: string): string[] {
     });
 }
 
-const EXCLUDED_ROOT_FILES = ['pack-api.ts', 'types.ts', 'register-core.ts'];
+const EXCLUDED_ROOT_FILES = ['types.ts'];
 
 describe('Pack Boundary Imports', () => {
     it('should only use allowed imports in pack files', () => {
